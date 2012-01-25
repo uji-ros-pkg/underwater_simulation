@@ -1,0 +1,75 @@
+diff -Naur src/CMakeLists.txt src-patched//CMakeLists.txt
+--- src/CMakeLists.txt	2009-11-03 20:35:01.000000000 +0100
++++ src-patched//CMakeLists.txt	2011-12-21 11:58:02.878993665 +0100
+@@ -1,2 +1,2 @@
+ add_subdirectory (osgOcean)
+-add_subdirectory (oceanExample)
+\ No hay ningún carácter de nueva línea al final del archivo
++#add_subdirectory (oceanExample)
+diff -Naur src/osgOcean/FFTOceanSurface.cpp src-patched//osgOcean/FFTOceanSurface.cpp
+--- src/osgOcean/FFTOceanSurface.cpp	2009-11-03 20:35:01.000000000 +0100
++++ src-patched//osgOcean/FFTOceanSurface.cpp	2011-12-21 11:58:02.878993665 +0100
+@@ -64,7 +64,7 @@
+     _numLevels      ( (unsigned int) ( log( (float)_tileSize) / log(2.f) )+1),
+     _startPos       ( -float( (_tileResolution+1)*_numTiles) * 0.5f, float( (_tileResolution+1)*_numTiles) * 0.5f ),
+     _THRESHOLD      ( 3.f ),
+-    _VRES           ( 1024 ),
++    _VRES           ( 1920 ),
+     _NUMFRAMES      ( numFrames ),
+     _activeVertices ( new osg::Vec3Array ),
+     _activeNormals  ( new osg::Vec3Array ),
+diff -Naur src/osgOcean/FFTSimulation.cpp src-patched//osgOcean/FFTSimulation.cpp
+--- src/osgOcean/FFTSimulation.cpp	2009-11-03 20:35:01.000000000 +0100
++++ src-patched//osgOcean/FFTSimulation.cpp	2011-12-21 11:58:02.878993665 +0100
+@@ -263,7 +263,7 @@
+             K.x() = _PI2*x2*oneOverLen;
+ 
+             RandUtils::gaussianRand(real,imag);
+-            _baseAmplitudes[y*(_N+1)+x] = complex(real,imag) * sqrt( 0.5 * phillipsSpectrum(K) );
++            _baseAmplitudes[y*(_N+1)+x] = complex(real,imag) * (float)sqrt( 0.5 * phillipsSpectrum(K) );
+         }
+     }
+ }
+diff -Naur src/osgOcean/OceanScene.cpp src-patched//osgOcean/OceanScene.cpp
+--- src/osgOcean/OceanScene.cpp	2009-11-03 20:35:01.000000000 +0100
++++ src-patched//osgOcean/OceanScene.cpp	2011-12-21 11:58:02.878993665 +0100
+@@ -60,7 +60,7 @@
+     _enableDefaultShader        ( true ),
+     _reflectionTexSize          ( 512,512 ),
+     _refractionTexSize          ( 512,512 ),
+-    _screenDims                 ( 1024,768 ),
++    _screenDims                 ( 1920,1080 ),
+     _sunDirection               ( 0, 0, -1 ),
+     _reflectionUnit             ( 1 ),
+     _refractionUnit             ( 2 ),
+@@ -138,7 +138,7 @@
+     _enableDefaultShader        ( true ),
+     _reflectionTexSize          ( 512,512 ),
+     _refractionTexSize          ( 512,512 ),
+-    _screenDims                 ( 1024,768 ),
++    _screenDims                 ( 1920,1080 ),
+     _sunDirection               ( 0,0,-1 ),
+     _reflectionUnit             ( 1 ),
+     _refractionUnit             ( 2 ),
+@@ -534,7 +534,8 @@
+         if (cv) 
+         {
+             if (cv->getCurrentCamera()->getName() == "ShadowCamera" ||
+-                cv->getCurrentCamera()->getName() == "AnalysisCamera" )
++                cv->getCurrentCamera()->getName() == "AnalysisCamera"  ||
++		cv->getCurrentCamera()->getName() == "CamViewCamera" )
+                 // Do not do reflections and everything if we're in a shadow pass.
+                 osg::Group::traverse(nv);
+             else
+diff -Naur src/osgOcean/SiltEffect.cpp src-patched//osgOcean/SiltEffect.cpp
+--- src/osgOcean/SiltEffect.cpp	2009-11-03 20:35:01.000000000 +0100
++++ src-patched//osgOcean/SiltEffect.cpp	2011-12-21 11:58:02.878993665 +0100
+@@ -108,7 +108,7 @@
+ {
+     setNumChildrenRequiringUpdateTraversal(1);
+ 
+-    setUpGeometries(1024);
++    setUpGeometries(1920);
+ 
+     setIntensity(0.5);
+ }

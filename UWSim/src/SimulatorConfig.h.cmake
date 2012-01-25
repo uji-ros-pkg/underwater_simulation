@@ -1,0 +1,43 @@
+#ifndef SIMULATORCONFIG_H
+#define SIMULATORCONFIG_H
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#ifndef M_PI_2
+#define M_PI_2 M_PI/2
+#endif
+#ifndef M_PI_4
+#define M_PI_4 M_PI/4
+#endif
+
+#include <osg/Notify>
+
+
+#ifndef OSG_INFO
+#define OSG_INFO osg::notify(osg::INFO)
+#endif
+
+#ifndef OSG_DEBUG
+#define OSG_DEBUG osg::notify(osg::DEBUG_INFO)
+#endif
+
+//Build ROS interfaces
+#cmakedefine BUILD_ROS_INTERFACES ${BUILD_ROS_INTERFACES}
+
+//Build Bullet physics
+#cmakedefine BUILD_BULLET_PHYSICS ${BUILD_BULLET_PHYSICS}
+
+//Path to the simulator root folder
+#cmakedefine SIMULATOR_ROOT_PATH "${SIMULATOR_ROOT_PATH}"
+
+//Path to the data folder
+#cmakedefine SIMULATOR_DATA_PATH "${SIMULATOR_DATA_PATH}"
+
+//Operating system
+#cmakedefine WIN32 ${WIN32}
+#cmakedefine UNIX ${UNIX}
+#cmakedefine APPLE ${APPLE}
+
+#endif
+

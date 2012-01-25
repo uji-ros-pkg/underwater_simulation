@@ -1,0 +1,25 @@
+<package>
+  <description brief="UWSim">
+
+     UWSim
+
+  </description>
+  <author>Mario Prats</author>
+  <license>LGPL</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="image_transport"/>
+  <depend package="osgOcean"/>
+  <depend package="visp"/>
+  <depend package="urdf"/>
+  <depend package="urdf_parser"/>
+  <rosdep name="libxml++-2.6" />
+
+  <url>http://www.irs.uji.es/uwsim/</url>
+
+</package>
+
+
