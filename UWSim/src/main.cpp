@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
      viewer.getWindows(windows);
      windows[0]->setWindowName("UWSim");
 
-    while( !viewer.done() )
+    while( !viewer.done() && ros::ok())
     {
 
         const double currSimTime = viewer.getFrameStamp()->getSimulationTime();

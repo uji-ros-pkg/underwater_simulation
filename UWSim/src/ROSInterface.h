@@ -33,6 +33,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/distortion_models.h>
 #include <image_transport/image_transport.h>
 //#include <cola2_common/NavigationData.h>
 
@@ -396,7 +397,7 @@ public:
 	
 class VirtualCameraToROSImage : public ROSPublisherInterface {
 	VirtualCamera *cam;
-	image_transport::ImageTransport *it;
+    boost::shared_ptr<image_transport::ImageTransport> it;
 	image_transport::Publisher img_pub_;
 	std::string image_topic;
 public:
@@ -406,7 +407,7 @@ public:
 	}
 
 	void createPublisher(ros::NodeHandle &nh) {
-		it=new image_transport::ImageTransport(nh);
+		it.reset(new image_transport::ImageTransport(nh));
 		img_pub_ = it->advertise(image_topic, 1);
 		pub_=nh.advertise<sensor_msgs::CameraInfo>(topic, 1);
 	}
@@ -438,11 +439,16 @@ public:
 				img_info.K[5]=cam->cy;
 				img_info.K[8]=1;
 
+				img_info.R[0]=img_info.R[4]=img_info.R[8]=1;
+
 				img_info.P[0]=cam->fx;
 				img_info.P[2]=cam->cx;
 				img_info.P[5]=cam->fy;
 				img_info.P[6]=cam->cy;
-				img_info.P[11]=1;
+				img_info.P[10]=1;
+
+				img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+
 			
 				char *virtualdata=(char*)cam->renderTexture->data();
 				//memcpy(&(img.data.front()),virtualdata,d*sizeof(char));
