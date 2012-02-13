@@ -89,8 +89,8 @@ SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, Vehicle vehicleChars)
     //Add virtual cameras in config file
     int cam=0;
     while(vehicleChars.Vcams.size() > 0){
-      OSG_INFO << "Adding a virtual camera..." << std::endl;	
       vcam=vehicleChars.Vcams.front();
+      OSG_INFO << "Adding a virtual camera " << vcam.name << "..." << std::endl;	
       vehicleChars.Vcams.pop_front();
       //Camera frame given wrt vehicle origin frame. 
       //Remember that in opengl/osg, the camera frame is a right-handed system with Z going backwards (opposite to the viewing direction) and Y up.
