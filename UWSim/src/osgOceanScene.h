@@ -435,6 +435,7 @@ public:
 
         if(!object.valid()){
             osg::notify(osg::WARN) << "Could not find: " << filename << std::endl;
+            return NULL;
         } else {
 			static const char model_vertex[]   = "default_scene.vert";
 			static const char model_fragment[] = "default_scene.frag";

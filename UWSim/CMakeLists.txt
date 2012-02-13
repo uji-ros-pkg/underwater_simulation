@@ -62,6 +62,8 @@ pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 INCLUDE_DIRECTORIES(${OPENSCENEGRAPH_INCLUDE_DIRS} ${BULLET_INCLUDE_DIR} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${LIBXML++_INCLUDE_DIRS})
 LINK_DIRECTORIES(${BULLET_LIBRARY_DIR} ${OSGWORKS_LIBRARY_DIR} ${OSGBULLET_LIBRARY_DIR} ${LIBXML++_LIBRARY_DIRS})
 
+# this disables the warnings that come mostly from osg
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
 
 rosbuild_add_executable(UWSim  src/main.cpp 
 src/osgOceanScene.cpp

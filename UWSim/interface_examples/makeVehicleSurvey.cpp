@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
 	double x=atof(argv[2]);
 	double y=atof(argv[3]);
 	double z=atof(argv[4]);
-	double yaw=atof(argv[5]);
+	// TODO FIXME yaw is not used below!
+	//double yaw=atof(argv[5]);
 	double amp=atof(argv[6]);
 	double step=atof(argv[7]);
 

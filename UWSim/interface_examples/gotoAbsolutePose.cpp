@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
 	ros::Publisher position_pub=nh.advertise<nav_msgs::Odometry>(controlTopic,1);
 	ros::Subscriber position_sub = nh.subscribe(poseTopic, 1, vehiclePoseCallback);
 
-	double angle=0;
 	ros::Rate r(30);
 	while (ros::ok()) {
 	   if (firstpass) {

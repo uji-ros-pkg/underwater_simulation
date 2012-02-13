@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 	ros::Publisher position_pub;
 	position_pub=nh.advertise<nav_msgs::Odometry>(topic,1);
 
-	double angle=0;
 	ros::Rate r(25);
 	while (ros::ok()) {
 		nav_msgs::Odometry odom;

@@ -39,7 +39,6 @@ int main(int argc, char **argv) {
 	osg::Vec3d trans=transform.getTrans();
 	osg::Quat rot=transform.getRotate();
 
-	double angle=0;
 	ros::Rate r(10);
 	while (ros::ok()) {
 		nav_msgs::Odometry odom;

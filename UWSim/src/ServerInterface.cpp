@@ -63,7 +63,7 @@ void ServerInterface::run () {
 #endif
 		std::cerr << "Client accepted. Read and Callback to process data..." << std::endl;
 
-		while(int readres=processData(client_sock));
+		while(/*int readres=*/processData(client_sock));
 
 		std::cerr << "Closing Client.." << std::endl;
 #ifdef WIN32

@@ -68,8 +68,8 @@ public:
 
 	/* Thread code */
 	void run() {
-		int argc=0;
-		char **argv=NULL;
+		//int argc=0;
+		//char **argv=NULL;
 
 		std::string nodeName=topic;
 		std::replace( nodeName.begin(), nodeName.end(), '/', '_' );
@@ -204,7 +204,7 @@ public:
 		if (js->position.size()!=0) {
 			//position command
 			double *q = new double [js->position.size()];
-			for (int i=0; i<js->position.size(); i++) {
+			for (unsigned int i=0; i<js->position.size(); i++) {
 				q[i]=js->position[i];
 			}
 			arm->urdf->setJointPosition(q);
@@ -212,7 +212,7 @@ public:
 		} else if (js->velocity.size()!=0) {
 			//velocity command
 			double *qdot = new double [js->velocity.size()];
-			for (int i=0; i<js->velocity.size(); i++) {
+			for (unsigned int i=0; i<js->velocity.size(); i++) {
 				qdot[i]=js->velocity[i];
 			}
 			arm->urdf->setJointVelocity(qdot);
@@ -252,8 +252,8 @@ public:
 		//Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
 		//the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
 		//looking towards bottom-right. Therefore it must be manually arranged, although this could be much improved:
-		for (int i=0; i<msg->height; i++) {
-			for (int j=0; j<msg->step; j++) {
+		for (unsigned int i=0; i<msg->height; i++) {
+			for (unsigned int j=0; j<msg->step; j++) {
 				osgimage_data[i*msg->step+j]=msg->data[(msg->height-i-1)*msg->step+j];
 			}
 		}
@@ -282,8 +282,8 @@ public:
 
 	/* Thread code */
 	void run() {
-		int argc=0;
-		char **argv=NULL;
+		//int argc=0;
+		//char **argv=NULL;
 
 		std::string nodeName=topic;
 		std::replace( nodeName.begin(), nodeName.end(), '/', '_' );
@@ -379,7 +379,7 @@ public:
 	    if (arm!=NULL) {
 		sensor_msgs::JointState js;
 		std::vector<double> q=arm->getJointPosition();
-		for (int i=0; i<q.size(); i++) {
+		for (size_t i=0; i<q.size(); i++) {
 			char name[4];
 			sprintf(name,"q%d",i+1);
 			js.name.push_back(std::string(name));
@@ -456,7 +456,7 @@ public:
 				//the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
 				//looking towards bottom-right. Therefore it must be manually arranged, although this could be much improved:
 				for (int i=0; i<h; i++) {
-					for (int j=0; j<img.step; j++) {
+					for (unsigned int j=0; j<img.step; j++) {
 						img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
 					}
 				}

@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 	wMb_m.setTrans(auxObject.position[0],auxObject.position[1],auxObject.position[2]);
 
 	osg::MatrixTransform *wMb=new osg::MatrixTransform(wMb_m);
-	osg::Node *object=scene->addObject(wMb,auxObject.file, &auxObject);
+	/*osg::Node *object=*/scene->addObject(wMb,auxObject.file, &auxObject);
 	wMb->setName(auxObject.name);
 
 	config.objects.pop_front();
@@ -295,24 +295,25 @@ int main(int argc, char *argv[])
     OSG_INFO << "Setting interfaces with external software..." << std::endl;
     ROSInterfaceInfo rosInterface;
     std::vector<HUDCamera*> realcams;
+    // TODO FIXME Memory management!
     while(config.ROSInterfaces.size()>0){
       rosInterface = config.ROSInterfaces.front();
       
       if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT){
-	ROSOdomToPAT *odomSub=new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName);
+	/*ROSOdomToPAT *odomSub=*/new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName);
       }
 
       if(rosInterface.type==ROSInterfaceInfo::PATToROSOdom)
-	PATToROSOdom *odomPub=new PATToROSOdom(root,rosInterface.targetName,rosInterface.topic,rosInterface.rate);
+	/*PATToROSOdom *odomPub=*/new PATToROSOdom(root,rosInterface.targetName,rosInterface.topic,rosInterface.rate);
 
       if(rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm || rosInterface.type==ROSInterfaceInfo::ArmToROSJointState) {
 	//Find corresponding SimulatedIAUV Object
 	for (int j=0; j<nvehicle ;j++){
 		if (iauvFile[j]->name==rosInterface.targetName) {
 		   if (rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm)
-			ROSJointStateToArm *jsSub=new ROSJointStateToArm(rosInterface.topic,iauvFile[j]);
+			/*ROSJointStateToArm *jsSub=*/new ROSJointStateToArm(rosInterface.topic,iauvFile[j]);
 		   else
-			ArmToROSJointState *jsPub=new ArmToROSJointState(iauvFile[j],rosInterface.topic,rosInterface.rate);
+			/*ArmToROSJointState *jsPub=*/new ArmToROSJointState(iauvFile[j],rosInterface.topic,rosInterface.rate);
 		}
         }
       }
@@ -322,7 +323,7 @@ int main(int argc, char *argv[])
 	for (int j=0; j<nvehicle ;j++){
 	  for (int c=0; c<iauvFile[j]->ncams; c++) {
 		if (iauvFile[j]->camview[c].name==rosInterface.targetName) {
-		   VirtualCameraToROSImage *vcamPub=new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate);
+		   /*VirtualCameraToROSImage *vcamPub=*/new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate);
 		}
 	  }
         }
@@ -330,7 +331,7 @@ int main(int argc, char *argv[])
 
       if(rosInterface.type==ROSInterfaceInfo::ROSImageToHUD) {
 	HUDCamera *realcam=new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale);
-	ROSImageToHUDCamera *hudSub=new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam);
+	/*ROSImageToHUDCamera *hudSub=*/new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam);
         realcams.push_back(realcam);
       }
 
@@ -352,7 +353,7 @@ int main(int argc, char *argv[])
     int dispx=0;
     int ncamwidgets=0;
     for (int j=0; j<nvehicle ;j++){
-      for (char i=0; i<iauvFile[j]->ncams; i++) {
+      for (int i=0; i<iauvFile[j]->ncams; i++) {
 	    camWidgets.push_back(iauvFile[j]->camview[i].getWidgetWindow());
 	    camWidgets[ncamwidgets]->setX(dispx);
 	    camWidgets[ncamwidgets]->setY(0);
@@ -404,7 +405,9 @@ int main(int argc, char *argv[])
 
     viewer.realize();
         viewer.frame();
+#ifdef BUILD_BULLET_PHYSICS
     double prevSimTime = 0.;
+#endif
 
      typedef osgViewer::Viewer::Windows Windows;
      Windows windows;
@@ -414,15 +417,15 @@ int main(int argc, char *argv[])
     while( !viewer.done() && ros::ok())
     {
 
+#ifdef BUILD_BULLET_PHYSICS
         const double currSimTime = viewer.getFrameStamp()->getSimulationTime();
         double elapsed( currSimTime - prevSimTime );
         if( viewer.getFrameStamp()->getFrameNumber() < 3 )
             elapsed = 1./60.;
 
-#ifdef BUILD_BULLET_PHYSICS
   	physics.stepSimulation(elapsed, 8, btScalar(1.)/btScalar(200.) );
-#endif
         prevSimTime = currSimTime;
+#endif
         viewer.frame();
 
     }
