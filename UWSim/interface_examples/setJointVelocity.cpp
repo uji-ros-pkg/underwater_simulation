@@ -1,6 +1,5 @@
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
-#include <visp/vpColVector.h>
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
@@ -17,7 +16,7 @@ int main(int argc, char **argv) {
 	velocity_pub=nh.advertise<sensor_msgs::JointState>(topic,1);
 	ros::Rate rate(30);
 
-	vpColVector qdot(5);
+	double qdot[5];
 	for (int i=0; i<5; i++) qdot[i]=atof(argv[i+2]);
 
 	while (ros::ok()) {

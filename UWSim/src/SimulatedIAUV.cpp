@@ -73,10 +73,10 @@ SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype) {
 }
 */
 
-SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, Vehicle vehicleChars) {
+SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) {
   name=vehicleChars.name;
   baseTransform=new osg::MatrixTransform;
-  urdf=new URDFRobot(oscene,vehicleChars); 
+  urdf=new URDFRobot(oscene->getOceanScene(),vehicleChars); 
 
   if(urdf->baseTransform!=NULL /* && arm->baseTransform!=NULL*/ ){
     baseTransform->addChild(urdf->baseTransform);
@@ -102,6 +102,22 @@ SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, Vehicle vehicleChars)
       OSG_INFO << "Done adding a virtual camera..." << std::endl;
     }
 
+    //Adding range sensors
+    rangeSensor rs;
+    range_sensors = new VirtualRangeSensor[vehicleChars.range_sensors.size()];
+    n_range_sensors=vehicleChars.range_sensors.size();
+    int r=0;
+    while(vehicleChars.range_sensors.size() > 0){
+      OSG_INFO << "Adding a virtual range sensor..." << std::endl;	
+      rs=vehicleChars.range_sensors.front();
+      vehicleChars.range_sensors.pop_front();
+      osg::Transform *vMr=new osg::PositionAttitudeTransform;	
+      ((osg::PositionAttitudeTransform*)vMr)->setPosition(osg::Vec3d(rs.position[0],rs.position[1],rs.position[2]));
+      ((osg::PositionAttitudeTransform*)vMr)->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
+      urdf->link[rs.link]->asGroup()->addChild(vMr);
+      range_sensors[r++].init(rs.name, oscene->localizedWorld, vMr, rs.range, (rs.visible)? true:false);
+      OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
+    }
   
   //Set-up a lamp attached to the vehicle: TODO
 /*

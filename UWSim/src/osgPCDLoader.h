@@ -29,10 +29,10 @@ class osgPCDLoader {
 
 			geode=osg::ref_ptr<osg::Geode>(new osg::Geode());
 			osg::ref_ptr<osg::Geometry> geometry (new osg::Geometry());
-
 			osg::ref_ptr<osg::Vec3Array> vertices (new osg::Vec3Array());
 			osg::ref_ptr<osg::Vec4Array> colors (new osg::Vec4Array());
 
+			//Read vertex and color info from PCD
 			for (int i=0; i<cloud.points.size(); i++) {
 				vertices->push_back (osg::Vec3 (cloud.points[i].x, cloud.points[i].y, cloud.points[i].z));
 
@@ -45,14 +45,13 @@ class osgPCDLoader {
 				green=rgb_val_ & 0x000000ff;
 				rgb_val_ = rgb_val_ >> 8;
 				red=rgb_val_ & 0x000000ff;
-				//std::cerr << "Color is " << red << " " << green << " " << blue << std::endl;
 
-				//colors->push_back (osg::Vec4f (1.0f, 0.0f, 0.0f ,1.0f));
 				colors->push_back (osg::Vec4f ((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f));
 			}
 	
-			geometry->setVertexArray (vertices.get());
-			geometry->setColorArray (colors.get());
+			//Set OSG Geometry vertex and colors
+			geometry->setVertexArray(vertices.get());
+			geometry->setColorArray(colors.get());
 			geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
 			geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,vertices->size()));

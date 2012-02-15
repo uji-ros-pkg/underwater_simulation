@@ -8,16 +8,22 @@
 #ifndef SIMULATEDIAUV_H_
 #define SIMULATEDIAUV_H_
 
+#include "osgOceanScene.h"
 #include "URDFRobot.h"
 #include "VirtualCamera.h"
 #include "ConfigXMLParser.h"
+#include "VirtualRangeSensor.h"
+
 
 /* An I-AUV */
 class SimulatedIAUV
 {
 public:
 	VirtualCamera *camview;
+	VirtualRangeSensor *range_sensors;
+
 	char ncams;
+	char n_range_sensors;
 	typedef enum {ARM5,PA10} arm_t;
 
 	std::string name;		///< Vehicle name
@@ -26,7 +32,7 @@ public:
 	osg::MatrixTransform *baseTransform;
 
 	//SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype);
-        SimulatedIAUV(osgOcean::OceanScene *oscene, Vehicle vehicle);
+        SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicle);
 
 	//void setVirtualCamera(std::string name, osg::Transform* transform, osg::Vec3d eye, osg::Vec3d orientation, osg::Vec3d upVector, int width, int height);
 

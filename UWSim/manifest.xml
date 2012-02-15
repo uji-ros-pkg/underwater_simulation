@@ -13,7 +13,6 @@
   <depend package="nav_msgs"/>
   <depend package="image_transport"/>
   <depend package="osgOcean"/>
-  <depend package="visp"/>
   <depend package="urdf"/>
   <depend package="urdf_parser"/>
   <rosdep name="libxml++-2.6" />

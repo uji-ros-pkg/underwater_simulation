@@ -29,8 +29,7 @@
 #include <osgOcean/ShaderManager>
 
 #include "SkyDome.h"
-#include "SimulatedIAUV.h"
-#include "URDFRobot.h"
+#include "ConfigXMLParser.h"
 
 
 // ----------------------------------------------------
@@ -95,6 +94,7 @@ class osgOceanScene : public osg::Referenced
 {
 public:
     enum SCENE_TYPE{ CLEAR, DUSK, CLOUDY };
+    osg::MatrixTransform *localizedWorld;
 
 private:
     SCENE_TYPE _sceneType;
@@ -103,7 +103,6 @@ private:
     osg::ref_ptr<osg::Group> _scene;
 
     osg::ref_ptr<osgOcean::OceanScene> _oceanScene;
-    osg::MatrixTransform *localizedWorld;
     osg::ref_ptr<osgOcean::FFTOceanSurface> _oceanSurface;
     osg::ref_ptr<osg::TextureCubeMap> _cubemap;
     osg::ref_ptr<SkyDome> _skyDome;

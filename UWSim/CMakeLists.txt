@@ -74,26 +74,30 @@ src/URDFRobot.cpp
 src/SimulatedIAUV.cpp
 src/ServerInterface.cpp
 src/VirtualCamera.cpp
+src/VirtualRangeSensor.cpp
 src/HUDCamera.cpp
 src/ConfigXMLParser.cpp
-src/UWSimUtils.cpp)
+src/UWSimUtils.cpp
+src/ROSInterface.cpp)
 
 rosbuild_add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 rosbuild_add_executable(setJointPosition interface_examples/setJointPosition.cpp)
 rosbuild_add_executable(setJointVelocity interface_examples/setJointVelocity.cpp)
 rosbuild_add_executable(setVehiclePosition interface_examples/setVehiclePosition.cpp)
 rosbuild_add_executable(setVehicleVelocity interface_examples/setVehicleVelocity.cpp)
+rosbuild_add_executable(setVehicleTwist interface_examples/setVehicleTwist.cpp)
 rosbuild_add_executable(setVehicleDisturbances interface_examples/setVehicleDisturbances.cpp)
 rosbuild_add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp)
 rosbuild_add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
 
-TARGET_LINK_LIBRARIES(UWSim ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setJointPosition ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setJointVelocity ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehiclePosition ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleVelocity ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleDisturbances ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(gotoAbsolutePose ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(gotoRelativePose ${OPENSCENEGRAPH_LIBRARIES} ${BULLET_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(UWSim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setJointPosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setJointVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setVehiclePosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setVehicleVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setVehicleTwist ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setVehicleDisturbances ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(gotoAbsolutePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(gotoRelativePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 

@@ -14,9 +14,9 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, ROSImageToHUD} type_t;
+  typedef enum {ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT} type_t;
   string topic, infoTopic, targetName;
-  type_t type; //Type of ROSInterface, 0: ROSOdomToPAT ,1:PATToROSOdom, 2: ROSJointStateToArm, 3: ArmToROSJointState, 4:VirtualCameraToROSImage
+  type_t type; //Type of ROSInterface
   int rate; //if it's necessary
   unsigned int w, h; //width and height if necessary
   unsigned int posx, posy; ///< default (x,y) position of the widget if necessary
@@ -34,6 +34,16 @@ struct Vcam{
   double position[3],orientation[3];
   Parameters * parameters;
   void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;parameters=NULL;}
+};
+
+struct rangeSensor {
+  string name;
+  string linkName;
+  double position[3],orientation[3];
+  double range;
+  int visible;
+  int link;
+  void init(){name="";linkName="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;range=0;visible=0;}
 };
 
 struct Mimic{
@@ -83,6 +93,7 @@ struct Vehicle{
   double * jointValues;
   Material * materials;
   list <Vcam> Vcams;
+  list <rangeSensor> range_sensors;
 };
 
 struct Object{
@@ -105,27 +116,28 @@ private:
   void extractPositionOrColor(const xmlpp::Node* node,double * param);
   void extractOrientation(const xmlpp::Node* node,double * param);
 
-  void proccessFog(const xmlpp::Node* node);
-  void proccessOceanState(const xmlpp::Node* node);
-  void proccessSimParams(const xmlpp::Node* node);
-  void proccessParameters(const xmlpp::Node*, Parameters * params);
-  void proccessVcam(const xmlpp::Node* node, Vcam * vcam);
-  void proccessCamera(const xmlpp::Node* node);
-  void proccessJointValues(const xmlpp::Node* node,double ** jointValues,int * ninitJoints);
-  void proccessVehicle(const xmlpp::Node* node,Vehicle *vehicle);
-  void proccessObject(const xmlpp::Node* node,Object *object);
-  void proccessROSInterface(const xmlpp::Node* node,ROSInterfaceInfo * rosInterface);
-  void proccessROSInterfaces(const xmlpp::Node* node);
-  void proccessXML(const xmlpp::Node* node);
+  void processFog(const xmlpp::Node* node);
+  void processOceanState(const xmlpp::Node* node);
+  void processSimParams(const xmlpp::Node* node);
+  void processParameters(const xmlpp::Node*, Parameters * params);
+  void processVcam(const xmlpp::Node* node, Vcam * vcam);
+  void processRangeSensor(const xmlpp::Node* node, rangeSensor *rs);
+  void processCamera(const xmlpp::Node* node);
+  void processJointValues(const xmlpp::Node* node,double ** jointValues,int * ninitJoints);
+  void processVehicle(const xmlpp::Node* node,Vehicle *vehicle);
+  void processObject(const xmlpp::Node* node,Object *object);
+  void processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo * rosInterface);
+  void processROSInterfaces(const xmlpp::Node* node);
+  void processXML(const xmlpp::Node* node);
 
 
-  void proccessPose(urdf::Pose pose,double * position, double * rpy,double * quat);
-  int proccessVisual(boost::shared_ptr<const urdf::Visual> visual,Link * link,int nmat,Material * materials); //returns current material
-  void proccessJoint(boost::shared_ptr<const urdf::Joint> joint,Joint * jointVehicle,int parentLink,int childLink);
-  int proccessLink(boost::shared_ptr<const urdf::Link> link,Vehicle * vehicle,int nlink,int njoint,int nmat,Material * materials); //returns current link number
-  int proccessURDFFile(string file, Vehicle * vehicle);
+  void processPose(urdf::Pose pose,double * position, double * rpy,double * quat);
+  int processVisual(boost::shared_ptr<const urdf::Visual> visual,Link * link,int nmat,Material * materials); //returns current material
+  void processJoint(boost::shared_ptr<const urdf::Joint> joint,Joint * jointVehicle,int parentLink,int childLink);
+  int processLink(boost::shared_ptr<const urdf::Link> link,Vehicle * vehicle,int nlink,int njoint,int nmat,Material * materials); //returns current link number
+  int processURDFFile(string file, Vehicle * vehicle);
 
-  void postProccessVehicle(Vehicle * vehicle);
+  void postprocessVehicle(Vehicle * vehicle);
 
 public:
   double windx, windy,windSpeed,depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight, oceanSurfaceHeight,fogDensity;

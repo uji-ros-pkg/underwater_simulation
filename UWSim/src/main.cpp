@@ -42,6 +42,7 @@
 #include "EventHandler.h"
 #include "HUDCamera.h"
 #include "ConfigXMLParser.h"
+#include "VirtualRangeSensor.h"
 
 #include "ROSInterface.h"
 #include "UWSimUtils.h"
@@ -199,7 +200,7 @@ int main(int argc, char *argv[])
 
     while(config.vehicles.size() > 0) {
       vehicle=config.vehicles.front();
-      iauvFile[nvehicle]=new SimulatedIAUV(scene->getOceanScene(),vehicle);
+      iauvFile[nvehicle]=new SimulatedIAUV(scene.get(),vehicle);
       config.vehicles.pop_front();
 
       scene->addObject(iauvFile[nvehicle]->baseTransform);
@@ -288,8 +289,6 @@ int main(int argc, char *argv[])
       }
     }
 
-
-
     ros::init(argc,argv,"UWSim");
 
     OSG_INFO << "Setting interfaces with external software..." << std::endl;
@@ -301,6 +300,10 @@ int main(int argc, char *argv[])
       
       if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT){
 	/*ROSOdomToPAT *odomSub=*/new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName);
+      }
+
+      if(rosInterface.type==ROSInterfaceInfo::ROSTwistToPAT){
+	ROSTwistToPAT *odomSub=new ROSTwistToPAT(root,rosInterface.topic,rosInterface.targetName);
       }
 
       if(rosInterface.type==ROSInterfaceInfo::PATToROSOdom)
@@ -333,6 +336,17 @@ int main(int argc, char *argv[])
 	HUDCamera *realcam=new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale);
 	/*ROSImageToHUDCamera *hudSub=*/new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam);
         realcams.push_back(realcam);
+      }
+
+      if(rosInterface.type==ROSInterfaceInfo::RangeSensorToROSRange) {
+	//Find corresponding VirtualRangeSensor Object on all the vehicles
+	for (int j=0; j<nvehicle ;j++){
+	  for (int c=0; c<iauvFile[j]->n_range_sensors; c++) {
+		if (iauvFile[j]->range_sensors[c].name==rosInterface.targetName) {
+		   new RangeSensorToROSRange(&(iauvFile[j]->range_sensors[c]),rosInterface.topic, rosInterface.rate);
+		}
+	  }
+        }
       }
 
       config.ROSInterfaces.pop_front();
@@ -422,7 +436,6 @@ int main(int argc, char *argv[])
         double elapsed( currSimTime - prevSimTime );
         if( viewer.getFrameStamp()->getFrameNumber() < 3 )
             elapsed = 1./60.;
-
   	physics.stepSimulation(elapsed, 8, btScalar(1.)/btScalar(200.) );
         prevSimTime = currSimTime;
 #endif

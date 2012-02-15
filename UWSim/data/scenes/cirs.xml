@@ -72,8 +72,8 @@
     <file>data/scenes/g500ARM5.urdf</file>
     <jointValues>
       <joint> 0 </joint>
-      <joint> M_PI_4</joint>
-      <joint> M_PI_4 </joint>
+      <joint> 0</joint>
+      <joint> 2.2 </joint>
       <joint> 0 </joint>
       <joint>-0.3 </joint>
     </jointValues>
@@ -119,6 +119,22 @@
         <y>1.57 </y>
       </orientation>
     </virtualCamera>
+    <rangeSensor>
+      <name>sonar</name>
+      <relativeTo>part0</relativeTo>
+      <range>10</range>
+      <visible>1</visible>
+      <position>
+        <x>-0.3</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>1.57</p>
+        <y>0</y>
+      </orientation>
+    </rangeSensor>
   </vehicle>
 
   <object>
@@ -184,6 +200,11 @@
       <imageTopic> /uwsim/camera1 </imageTopic>
       <infoTopic> /uwsim/camera1_info </infoTopic>
     </VirtualCameraToROSImage>
+    <RangeSensorToROSRange>
+      <name>sonar</name>
+      <topic> /uwsim/g500/range </topic>
+      <rate>10</rate>
+    </RangeSensorToROSRange>
   </rosInterfaces>
 </UWSimScene>
 

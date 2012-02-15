@@ -94,7 +94,7 @@
     }
   }
 
- void ConfigFile::proccessFog(const xmlpp::Node* node){
+ void ConfigFile::processFog(const xmlpp::Node* node){
 
     xmlpp::Node::NodeList list = node->get_children();
       for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
@@ -106,7 +106,7 @@
       }
   }
 
-  void ConfigFile::proccessOceanState(const xmlpp::Node* node){
+  void ConfigFile::processOceanState(const xmlpp::Node* node){
 
     xmlpp::Node::NodeList list = node->get_children();
       for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
@@ -138,7 +138,7 @@
 	else if(child->get_name()=="oceanSurfaceHeight")
 	  extractFloatChar(child,&oceanSurfaceHeight);
 	else if(child->get_name()=="fog")
-	  proccessFog(child);
+	  processFog(child);
 	else if(child->get_name()=="color")
 	  extractPositionOrColor(child,color);
 	else if(child->get_name()=="attenuation")
@@ -147,7 +147,7 @@
 
   }
 
-  void ConfigFile::proccessSimParams(const xmlpp::Node* node){
+  void ConfigFile::processSimParams(const xmlpp::Node* node){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -179,7 +179,7 @@
     }
   }
 
-  void ConfigFile::proccessParameters(const xmlpp::Node* node,Parameters * params){
+  void ConfigFile::processParameters(const xmlpp::Node* node,Parameters * params){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -202,7 +202,7 @@
     }
   }
 
-  void ConfigFile::proccessVcam(const xmlpp::Node* node,Vcam * vcam){
+  void ConfigFile::processVcam(const xmlpp::Node* node,Vcam * vcam){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -221,14 +221,34 @@
 	extractStringChar(child,&vcam->name);
       else if(child->get_name()=="parameters"){
 	vcam->parameters=new Parameters();
-	proccessParameters(child,vcam->parameters);
+	processParameters(child,vcam->parameters);
 
       }
     }
 
   }
 
-  void ConfigFile::proccessCamera(const xmlpp::Node* node){
+  void ConfigFile::processRangeSensor(const xmlpp::Node* node, rangeSensor *rs){
+    xmlpp::Node::NodeList list = node->get_children();
+    for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+      xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+
+      if(child->get_name()=="position")
+	extractPositionOrColor(child,rs->position);
+      else if(child->get_name()=="relativeTo")
+	extractStringChar(child,&rs->linkName);
+      else if(child->get_name()=="orientation")
+	extractOrientation(child,rs->orientation);
+      else if(child->get_name()=="name")
+	extractStringChar(child,&rs->name);
+      else if(child->get_name()=="range")
+	extractFloatChar(child,&rs->range);
+      else if(child->get_name()=="visible")
+	extractIntChar(child,&rs->visible);
+    }
+  }
+
+  void ConfigFile::processCamera(const xmlpp::Node* node){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -257,7 +277,7 @@
     }
   }
 
-  void ConfigFile::proccessPose(urdf::Pose pose,double * position, double * rpy,double * quat){
+  void ConfigFile::processPose(urdf::Pose pose,double * position, double * rpy,double * quat){
     position[0]=pose.position.x;
     position[1]=pose.position.y;
     position[2]=pose.position.z;
@@ -265,7 +285,7 @@
     pose.rotation.getQuaternion(quat[0],quat[1],quat[2],quat[3]);
   }
 
-  int ConfigFile::proccessVisual(boost::shared_ptr<const urdf::Visual> visual,Link * link,int nmat,Material * materials){
+  int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link * link,int nmat,Material * materials){
      urdf::Geometry * geometry =visual->geometry.get();
 
 
@@ -292,7 +312,7 @@
 	link->type=3;
 	link->radius=sphere->radius;
      }
-     proccessPose(visual->origin,link->position,link->rpy,link->quat);
+     processPose(visual->origin,link->position,link->rpy,link->quat);
 
 
      //Material
@@ -321,13 +341,13 @@
      return nmat;
   }
 
-  void ConfigFile::proccessJoint(boost::shared_ptr<const urdf::Joint> joint,Joint * jointVehicle,int parentLink,int childLink){
+  void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint,Joint * jointVehicle,int parentLink,int childLink){
 
     jointVehicle->name=joint->name;
     jointVehicle->axis[0]=joint->axis.x;
     jointVehicle->axis[1]=joint->axis.y;
     jointVehicle->axis[2]=joint->axis.z;
-    proccessPose(joint->parent_to_joint_origin_transform,jointVehicle->position,jointVehicle->rpy,jointVehicle->quat);
+    processPose(joint->parent_to_joint_origin_transform,jointVehicle->position,jointVehicle->rpy,jointVehicle->quat);
     jointVehicle->child=childLink;
     jointVehicle->parent=parentLink;
 
@@ -363,21 +383,21 @@
     }
   }
 
-  int ConfigFile::proccessLink(boost::shared_ptr<const urdf::Link> link,Vehicle * vehicle,int nlink,int njoint,int nmat,Material * materials){
+  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle * vehicle,int nlink,int njoint,int nmat,Material * materials){
 
     vehicle->links[nlink].name=link->name;
 
-    nmat= proccessVisual(link->visual,&vehicle->links[nlink],nmat, materials);
+    nmat= processVisual(link->visual,&vehicle->links[nlink],nmat, materials);
 
     int linkNumber=nlink;
     for(uint i=0;i<link->child_joints.size();i++){
-       proccessJoint(link->child_joints[i],&vehicle->joints[linkNumber],nlink,linkNumber+1);
-       linkNumber=proccessLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1,nmat,materials);
+       processJoint(link->child_joints[i],&vehicle->joints[linkNumber],nlink,linkNumber+1);
+       linkNumber=processLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1,nmat,materials);
     }
     return linkNumber;
   }
 
-  int ConfigFile::proccessURDFFile(string file, Vehicle * vehicle){
+  int ConfigFile::processURDFFile(string file, Vehicle * vehicle){
     urdf::Model model;
 
     if (!model.initFile(std::string(SIMULATOR_ROOT_PATH)+file)){	
@@ -394,11 +414,11 @@
     vehicle->nmaterials = model.materials_.size();
     vehicle->materials = new Material[vehicle->nmaterials];
     boost::shared_ptr<const urdf::Link> root = model.getRoot();
-    proccessLink(root,vehicle,0,0,0,vehicle->materials);
+    processLink(root,vehicle,0,0,0,vehicle->materials);
     return 0;
   }
 
-  void ConfigFile::proccessJointValues(const xmlpp::Node* node,double ** jointValues,int * ninitJoints){
+  void ConfigFile::processJointValues(const xmlpp::Node* node,double ** jointValues,int * ninitJoints){
     xmlpp::Node::NodeList list = node->get_children();
     *ninitJoints=(list.size()-1)/2;
     *jointValues = new double[(list.size()-1)/2];
@@ -412,7 +432,7 @@
     }
   }
 
-  void ConfigFile::postProccessVehicle(Vehicle * vehicle){
+  void ConfigFile::postprocessVehicle(Vehicle * vehicle){
 
     //Get mimic parents
 
@@ -446,16 +466,33 @@
 	  aux.link=j;
 	  found=1;
 	}
-
       }
       if(found==0)
 	cout<<"Camera attached to unknown link: "<<aux.linkName<<" camera will be ignored"<<endl;
       else 
       	vehicle->Vcams.push_back(aux);
     }
+
+    //get Range sensor joint
+    rangeSensor rs;
+    for(unsigned int i=0;i<vehicle->range_sensors.size();i++){
+      found=0;
+      rs=vehicle->range_sensors.front();
+      vehicle->range_sensors.pop_front();
+      for(int j=0;j<vehicle->nlinks && !found;j++){
+	if(vehicle->links[j].name==rs.linkName){
+	  rs.link=j;
+	  found=1;
+	}
+      }
+      if(found==0)
+	cout<<"RangeSensor attached to unknown link: "<<rs.linkName<<". Will be ignored"<<endl;
+      else 
+      	vehicle->range_sensors.push_back(rs);
+    }
   }
 
-  void ConfigFile::proccessVehicle(const xmlpp::Node* node,Vehicle *vehicle){
+  void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle *vehicle){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -465,26 +502,31 @@
       else if(child->get_name()=="file"){
 	string aux;
 	extractStringChar(child,&aux);
-	proccessURDFFile(aux,vehicle);
+	processURDFFile(aux,vehicle);
       }
       else if(child->get_name()=="position")
 	extractPositionOrColor(child,vehicle->position);
       else if(child->get_name()=="orientation")
 	extractOrientation(child,vehicle->orientation);
       else if (child->get_name()=="jointValues")
-	proccessJointValues(child,&vehicle->jointValues,&vehicle->ninitJoints);
+	processJointValues(child,&vehicle->jointValues,&vehicle->ninitJoints);
       else if (child->get_name()=="virtualCamera"){
 	Vcam aux;
 	aux.init();
-	proccessVcam(child,&aux);
+	processVcam(child,&aux);
 	vehicle->Vcams.push_back(aux);	
+      } else if (child->get_name()=="rangeSensor"){
+	rangeSensor aux;
+	aux.init();
+	processRangeSensor(child,&aux);
+	vehicle->range_sensors.push_back(aux);	
       }
     }
   }
 
   
 
-  void ConfigFile::proccessObject(const xmlpp::Node* node,Object *object){
+  void ConfigFile::processObject(const xmlpp::Node* node,Object *object){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -505,14 +547,14 @@
     }
   }
 
-  void ConfigFile::proccessROSInterface(const xmlpp::Node* node,ROSInterfaceInfo * rosInterface){
+  void ConfigFile::processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo * rosInterface){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
 
       if(child->get_name()=="topic" || child->get_name()=="imageTopic" )
 	extractStringChar(child,&rosInterface->topic);
-      else if(child->get_name()=="vehicleName" || child->get_name()=="cameraName")
+      else if(child->get_name()=="vehicleName" || child->get_name()=="cameraName" || child->get_name()=="name")
 	extractStringChar(child,&rosInterface->targetName);
       else if(child->get_name()=="rate")
 	extractIntChar(child,&rosInterface->rate);
@@ -531,7 +573,7 @@
     }
   }
 
-  void ConfigFile::proccessROSInterfaces(const xmlpp::Node* node){
+  void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
     xmlpp::Node::NodeList list = node->get_children();
     for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
       xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
@@ -542,39 +584,51 @@
       if(child->get_name()=="ROSOdomToPAT"){
 	rosInterface.type=ROSInterfaceInfo::ROSOdomToPAT;
 	rosInterface.rate=10;	//TODO: Set rate on XML
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);
       }
       else if(child->get_name()=="PATToROSOdom"){
 	rosInterface.type=ROSInterfaceInfo::PATToROSOdom;
 	rosInterface.rate=10;
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);
       }
       else if(child->get_name()=="ArmToROSJointState") {
 	rosInterface.type=ROSInterfaceInfo::ArmToROSJointState;
 	rosInterface.rate=10;
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);
       } else if(child->get_name()=="ROSJointStateToArm") {
 	rosInterface.type=ROSInterfaceInfo::ROSJointStateToArm;
 	rosInterface.rate=10;
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);
       } else if(child->get_name()=="VirtualCameraToROSImage") {
 	rosInterface.type=ROSInterfaceInfo::VirtualCameraToROSImage;
 	rosInterface.rate=25;
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
+	ROSInterfaces.push_back(rosInterface);	
+      } else if(child->get_name()=="RangeSensorToROSRange") {
+	rosInterface.type=ROSInterfaceInfo::RangeSensorToROSRange;
+	rosInterface.rate=10;
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);	
       } else if(child->get_name()=="ROSImageToHUD") {
 	rosInterface.type=ROSInterfaceInfo::ROSImageToHUD;
-	proccessROSInterface(child,&rosInterface);
+	processROSInterface(child,&rosInterface);
 	ROSInterfaces.push_back(rosInterface);	
       } 
+	else if(child->get_name()=="ROSTwistToPAT"){
+	rosInterface.type=ROSInterfaceInfo::ROSTwistToPAT;
+	rosInterface.rate=10;
+	processROSInterface(child,&rosInterface);
+	ROSInterfaces.push_back(rosInterface);
+      }
+
     }
   }
 
-  void ConfigFile::proccessXML(const xmlpp::Node* node){
+  void ConfigFile::processXML(const xmlpp::Node* node){
 
     if(node->get_name()!="UWSimScene")
       cout<<"CFG: XML file is not UWSimScene file."<<endl;
@@ -586,27 +640,27 @@
         xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
         //cout<<child->get_name()<<endl;
         if(child->get_name()=="oceanState")
-  	  proccessOceanState(child);
+  	  processOceanState(child);
         else if(child->get_name()=="simParams")
-	  proccessSimParams(child);
+	  processSimParams(child);
 	else if(child->get_name()=="camera")
-	  proccessCamera(child);
+	  processCamera(child);
 	else if(child->get_name()=="vehicle"){
 	  Vehicle  vehicle;
 	  vehicle.jointValues=NULL;
-	  proccessVehicle(child,&vehicle);
-          postProccessVehicle(&vehicle);
+	  processVehicle(child,&vehicle);
+          postprocessVehicle(&vehicle);
 	  vehicles.push_back(vehicle);		
 	}
 	else if(child->get_name()=="object"){
 	  Object  object;
 	  memset(object.offsetp,0,3*sizeof(double));
  	  memset(object.offsetr,0,3*sizeof(double));
-	  proccessObject(child,&object);
+	  processObject(child,&object);
 	  objects.push_back(object);		
 	}
         else if(child->get_name()=="rosInterfaces")
-	  proccessROSInterfaces(child);
+	  processROSInterfaces(child);
       }
     }
 
@@ -628,7 +682,7 @@
       {
         //Walk the tree:
         const xmlpp::Node* pNode = parser.get_document()->get_root_node(); //deleted by DomParser.
-        proccessXML(pNode);
+        processXML(pNode);
       }
     }
     catch(const std::exception& ex)
