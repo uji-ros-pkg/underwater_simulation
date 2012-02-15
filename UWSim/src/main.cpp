@@ -430,6 +430,7 @@ int main(int argc, char *argv[])
 
     while( !viewer.done() && ros::ok())
     {
+	ros::spinOnce();
 
 #ifdef BUILD_BULLET_PHYSICS
         const double currSimTime = viewer.getFrameStamp()->getSimulationTime();

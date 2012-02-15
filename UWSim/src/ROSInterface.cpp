@@ -8,20 +8,8 @@ ROSSubscriberInterface::ROSSubscriberInterface(std::string topic):ROSInterface(t
 
 /* Thread code */
 void ROSSubscriberInterface::run() {
-  //int argc=0;
-  //char **argv=NULL;
-
-  std::string nodeName=topic;
-  std::replace( nodeName.begin(), nodeName.end(), '/', '_' );
-  //ros::init(argc,argv,"UWSim_Sub_"+nodeName);
-  ros::NodeHandle nh_;
-
-  //FIXME: Corregir condiciones de carrera
-  //small sleep to let processData to be settled by the child classes
-  ros::Duration(4.).sleep();
-
+  ros::Duration(2).sleep();
   createSubscriber(nh_);		
-  ros::spin();
 }
 
 ROSSubscriberInterface::~ROSSubscriberInterface(){}
@@ -263,25 +251,13 @@ ROSPublisherInterface::ROSPublisherInterface(std::string topic, int publish_rate
 
 /* Thread code */
 void ROSPublisherInterface::run() {
-  //int argc=0;
-  //char **argv=NULL;
-
-  std::string nodeName=topic;
-  std::replace( nodeName.begin(), nodeName.end(), '/', '_' );
-  //ros::init(argc,argv,"UWSim_Pub_"+nodeName);
-  ros::NodeHandle nh_;
-
-  //FIXME: Corregir condiciones de carrera
-  //small sleep to let processData to be settled by the child classes
-  ros::Duration(4.).sleep();
-
+  ros::Duration(2).sleep();
   createPublisher(nh_);
 
   ros::Rate rate(publish_rate);
   while (ros::ok()) {
    publish();
 
-   ros::spinOnce();
    rate.sleep();
   }
 }

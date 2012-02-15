@@ -43,11 +43,10 @@
 //Max time (in seconds) between two consecutive control references
 #define MAX_ELAPSED	1
 
-class ROSSubscriberInterface;
-
 class ROSInterface {
 protected:
 	std::string topic;
+	ros::NodeHandle nh_;
 public:
 	ROSInterface(std::string topic) {this->topic=topic;}
 
