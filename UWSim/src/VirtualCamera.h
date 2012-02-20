@@ -56,8 +56,9 @@ public:
 	//osg::ref_ptr<osg::Geode> quadGeode;
 
     VirtualCamera(std::string name, osg::Node *trackNode, int width, int height);
+    VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
     VirtualCamera();
-    void init(std::string name, osg::Node *trackNode, int width, int height,Parameters * params);
+    void init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
 
     void createCamera();
 

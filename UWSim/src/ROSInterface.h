@@ -28,6 +28,8 @@
 //STL
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 //ROS
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
@@ -148,9 +150,9 @@ public:
 
 
 class ROSJointStateToArm: public ROSSubscriberInterface {
-	SimulatedIAUV *arm;
+	boost::shared_ptr<SimulatedIAUV> arm;
 public:
-	ROSJointStateToArm(std::string topic, SimulatedIAUV *arm);
+	ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm);
 	virtual void createSubscriber(ros::NodeHandle &nh);
 
 	virtual void processData(const sensor_msgs::JointState::ConstPtr& js);
@@ -203,7 +205,7 @@ public:
 
 
 class ArmToROSJointState : public ROSPublisherInterface {
-	URDFRobot *arm;
+	boost::shared_ptr<URDFRobot> arm;
 public:
 	ArmToROSJointState(SimulatedIAUV *arm, std::string topic, int rate);
 

@@ -12,7 +12,7 @@ void ROSSubscriberInterface::run() {
   createSubscriber(nh_);		
 }
 
-ROSSubscriberInterface::~ROSSubscriberInterface(){}
+ROSSubscriberInterface::~ROSSubscriberInterface(){join();}
 
 
 ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName): ROSSubscriberInterface(topic) {
@@ -175,7 +175,7 @@ public:
 */
 
 
-ROSJointStateToArm::ROSJointStateToArm(std::string topic, SimulatedIAUV *arm): ROSSubscriberInterface(topic) {
+ROSJointStateToArm::ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm): ROSSubscriberInterface(topic) {
   this->arm=arm;
 }
 
@@ -204,7 +204,8 @@ void ROSJointStateToArm::processData(const sensor_msgs::JointState::ConstPtr& js
   }
 }
 
-ROSJointStateToArm::~ROSJointStateToArm(){}
+ROSJointStateToArm::~ROSJointStateToArm(){
+}
 
 
 ROSImageToHUDCamera::ROSImageToHUDCamera(std::string image_topic, std::string info_topic, HUDCamera *cam): ROSSubscriberInterface(info_topic) {
@@ -262,7 +263,7 @@ void ROSPublisherInterface::run() {
   }
 }
 
-ROSPublisherInterface::~ROSPublisherInterface(){}
+ROSPublisherInterface::~ROSPublisherInterface(){join();}
 
 
 PATToROSOdom::PATToROSOdom(osg::Group *rootNode,std::string vehicleName, std::string topic, int rate): ROSPublisherInterface(topic,rate) {
@@ -394,11 +395,15 @@ void VirtualCameraToROSImage::publish() {
       //Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
       //the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
       //looking towards bottom-right. Therefore it must be manually arranged, although this could be much improved:
-      for (int i=0; i<h; i++) {
-        for (unsigned int j=0; j<img.step; j++) {
-          img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
-	}
-      }
+      if (virtualdata!=NULL) 
+      	for (int i=0; i<h; i++) {
+        	for (unsigned int j=0; j<img.step; j++) {
+          		img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
+		}
+        }
+      else
+	memset(&(img.data.front()), 0, d);
+
       img_pub_.publish(img);
       pub_.publish(img_info);
     }
@@ -425,7 +430,7 @@ void RangeSensorToROSRange::publish() {
     r.field_of_view=0;	//X axis of the sensor
     r.min_range=0;
     r.max_range=rs->range;
-    r.range=rs->node_tracker->distance_to_obstacle;
+    r.range= (rs->node_tracker!=NULL) ? rs->node_tracker->distance_to_obstacle : r.max_range;
 	
     pub_.publish(r);
   }

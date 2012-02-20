@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 #include <osgOcean/Version>
 #include <osgOcean/OceanScene>
@@ -140,14 +141,6 @@ int main(int argc, char *argv[])
     	freeMotion = true;
     }
 
-   //used in vehicle now.
-   /* std::string ros_cam(config.roscam);
-    std::string ros_cam_info(config.roscaminfo);
-    while (arguments.read("--roscam", ros_cam));
-    while (arguments.read("--roscaminfo", ros_cam_info));
-    if (ros_cam!=std::string("")) OSG_INFO << "roscam: " << ros_cam << std::endl;*/
-
-
     // any option left unread are converted into errors to write out later.
     arguments.reportRemainingOptionsAsUnrecognized();
 
@@ -194,37 +187,33 @@ int main(int argc, char *argv[])
     scene->getOceanScene()->setUnderwaterAttenuation( osg::Vec3f(config.attenuation[0], config.attenuation[1], config.attenuation[2]) );
    
     //Add config file iauv
-    SimulatedIAUV **iauvFile=new SimulatedIAUV*[config.vehicles.size()];
-    Vehicle vehicle;
-    int nvehicle=0;
-
-    while(config.vehicles.size() > 0) {
-      vehicle=config.vehicles.front();
-      iauvFile[nvehicle]=new SimulatedIAUV(scene.get(),vehicle);
+    std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile;
+    int nvehicle=config.vehicles.size();
+    for (int i=0; i<nvehicle; i++) {
+      Vehicle vehicle=config.vehicles.front();
+      boost::shared_ptr<SimulatedIAUV> siauv(new SimulatedIAUV(scene.get(),vehicle));
+      iauvFile.push_back(siauv);
       config.vehicles.pop_front();
 
-      scene->addObject(iauvFile[nvehicle]->baseTransform);
+      scene->addObject(iauvFile[i]->baseTransform);
 
-      iauvFile[nvehicle]->setVehiclePosition(vehicle.position[0],vehicle.position[1],vehicle.position[2],vehicle.orientation[0],vehicle.orientation[1],vehicle.orientation[2]);
+      siauv->setVehiclePosition(vehicle.position[0],vehicle.position[1],vehicle.position[2],vehicle.orientation[0],vehicle.orientation[1],vehicle.orientation[2]);
        
-      if(vehicle.jointValues!=NULL){
-       	iauvFile[nvehicle]->urdf->setJointPosition(vehicle.jointValues);
+      if(vehicle.jointValues!=NULL && siauv->urdf!=NULL){
+        siauv->urdf->setJointPosition(vehicle.jointValues);
       }  
-      nvehicle++; 
     }
 
- 
     //Add objects added in config file.
-    Object auxObject;
     while(config.objects.size()>0){
-    	osg::Matrixd wMb_m;
-	auxObject= config.objects.front();
+	Object auxObject= config.objects.front();
 
+    	osg::Matrixd wMb_m;
 	wMb_m.makeRotate(osg::Quat(auxObject.orientation[0],osg::Vec3d(1,0,0),auxObject.orientation[1],osg::Vec3d(0,1,0), auxObject.orientation[2],osg::Vec3d(0,0,1) ));
 	wMb_m.setTrans(auxObject.position[0],auxObject.position[1],auxObject.position[2]);
 
-	osg::MatrixTransform *wMb=new osg::MatrixTransform(wMb_m);
-	/*osg::Node *object=*/scene->addObject(wMb,auxObject.file, &auxObject);
+	osg::ref_ptr<osg::MatrixTransform> wMb=new osg::MatrixTransform(wMb_m);
+	scene->addObject(wMb, auxObject.file, &auxObject);
 	wMb->setName(auxObject.name);
 
 	config.objects.pop_front();
@@ -233,18 +222,18 @@ int main(int argc, char *argv[])
 
     //Set main camera position, lookAt, and other params  
     if (freeMotion) {	
-	osgGA::TrackballManipulator* tb = new osgGA::TrackballManipulator;
+	osg::ref_ptr<osgGA::TrackballManipulator> tb = new osgGA::TrackballManipulator;
 	tb->setHomePosition( osg::Vec3f(config.camPosition[0],config.camPosition[1],config.camPosition[2]), osg::Vec3f(config.camLookAt[0],config.camLookAt[1],config.camLookAt[2]), osg::Vec3f(0,0,1) );
 	viewer.setCameraManipulator( tb );
     } else {	//Main camera tracks an object
         findRoutedNode findRN(config.vehicleToTrack);
         findRN.find(scene->getScene());
-	osg::Node *first=findRN.getFirst();
-	if (first!=NULL) {
+
+	osg::ref_ptr<osg::Node> first=findRN.getFirst();
+	if (first.valid()) {
 		//target to track found
-                cout<<"FOUND!!!! "<<first->getName()<<" "<<first<<endl;
 		osg::ref_ptr<osg::Node> emptyNode= new osg::Node;
-		osgGA::NodeTrackerManipulator *ntm = new osgGA::NodeTrackerManipulator;
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> ntm = new osgGA::NodeTrackerManipulator;
 	 	first->asGroup()->addChild(emptyNode);
 		ntm->setTrackNode(emptyNode);
 		ntm->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER);
@@ -252,7 +241,7 @@ int main(int argc, char *argv[])
 		viewer.setCameraManipulator( ntm );
 	} else {
 		//Target object not found, free camera
-		osgGA::TrackballManipulator* tb = new osgGA::TrackballManipulator;
+		osg::ref_ptr<osgGA::TrackballManipulator> tb = new osgGA::TrackballManipulator;
 		tb->setHomePosition( osg::Vec3f(config.camPosition[0],config.camPosition[1],config.camPosition[2]), osg::Vec3f(config.camLookAt[0],config.camLookAt[1],config.camLookAt[2]), osg::Vec3f(0,0,1) );
 		viewer.setCameraManipulator( tb );
 	}
@@ -269,10 +258,8 @@ int main(int argc, char *argv[])
     	viewer.getCamera()->setProjectionMatrixAsPerspective(config.camFov, config.camAspectRatio, 1, 10);
     }
 
-
-
     //Set-up the scene graph and main loop
-    osg::Group* root = new osg::Group;
+    osg::ref_ptr<osg::Group> root = new osg::Group;
     root->addChild(scene->getScene());
 
  //   iauv->lightSource->addChild(scene->getScene());	//Add vehicles light sources to the scene. Check if can be added to the .osg file.
@@ -283,7 +270,7 @@ int main(int argc, char *argv[])
 
     OSG_INFO << "Setting vehicle virtual cameras" << std::endl;
     for (int j=0; j<nvehicle ;j++){
-      for (int i=0; i<iauvFile[j]->ncams; i++) {
+      for (unsigned int i=0; i<iauvFile[j]->getNumCams(); i++) {
 	    iauvFile[j]->camview[i].textureCamera->addChild( scene->getScene() );
 	    root->addChild( iauvFile[j]->camview[i].textureCamera );
       }
@@ -292,69 +279,60 @@ int main(int argc, char *argv[])
     ros::init(argc,argv,"UWSim");
 
     OSG_INFO << "Setting interfaces with external software..." << std::endl;
-    ROSInterfaceInfo rosInterface;
-    std::vector<HUDCamera*> realcams;
-    // TODO FIXME Memory management!
+    std::vector<boost::shared_ptr<HUDCamera> > realcams;
+    std::vector<boost::shared_ptr<ROSInterface> > ROSInterfaces;
     while(config.ROSInterfaces.size()>0){
-      rosInterface = config.ROSInterfaces.front();
+      ROSInterfaceInfo rosInterface = config.ROSInterfaces.front();
+     
+      boost::shared_ptr<ROSInterface> iface; 
+      if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT)
+	iface=boost::shared_ptr<ROSOdomToPAT>(new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName));
+
+      if(rosInterface.type==ROSInterfaceInfo::ROSTwistToPAT)
+	iface=boost::shared_ptr<ROSTwistToPAT>(new ROSTwistToPAT(root,rosInterface.topic,rosInterface.targetName));
       
-      if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT){
-	/*ROSOdomToPAT *odomSub=*/new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName);
-      }
-
-      if(rosInterface.type==ROSInterfaceInfo::ROSTwistToPAT){
-	ROSTwistToPAT *odomSub=new ROSTwistToPAT(root,rosInterface.topic,rosInterface.targetName);
-      }
-
       if(rosInterface.type==ROSInterfaceInfo::PATToROSOdom)
-	/*PATToROSOdom *odomPub=*/new PATToROSOdom(root,rosInterface.targetName,rosInterface.topic,rosInterface.rate);
+	iface=boost::shared_ptr<PATToROSOdom>(new PATToROSOdom(root,rosInterface.targetName,rosInterface.topic,rosInterface.rate));
 
       if(rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm || rosInterface.type==ROSInterfaceInfo::ArmToROSJointState) {
 	//Find corresponding SimulatedIAUV Object
 	for (int j=0; j<nvehicle ;j++){
 		if (iauvFile[j]->name==rosInterface.targetName) {
 		   if (rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm)
-			/*ROSJointStateToArm *jsSub=*/new ROSJointStateToArm(rosInterface.topic,iauvFile[j]);
+			iface=boost::shared_ptr<ROSJointStateToArm>(new ROSJointStateToArm(rosInterface.topic,iauvFile[j]));
 		   else
-			/*ArmToROSJointState *jsPub=*/new ArmToROSJointState(iauvFile[j],rosInterface.topic,rosInterface.rate);
+			iface=boost::shared_ptr<ArmToROSJointState>(new ArmToROSJointState(iauvFile[j].get(),rosInterface.topic,rosInterface.rate));
 		}
         }
       }
 
-      if(rosInterface.type==ROSInterfaceInfo::VirtualCameraToROSImage) {
+      if(rosInterface.type==ROSInterfaceInfo::VirtualCameraToROSImage) 
 	//Find corresponding VirtualCamera Object on all the vehicles
-	for (int j=0; j<nvehicle ;j++){
-	  for (int c=0; c<iauvFile[j]->ncams; c++) {
-		if (iauvFile[j]->camview[c].name==rosInterface.targetName) {
-		   /*VirtualCameraToROSImage *vcamPub=*/new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate);
-		}
-	  }
-        }
-      }
+	for (int j=0; j<nvehicle ;j++)
+	  for (unsigned int c=0; c<iauvFile[j]->getNumCams(); c++) 
+		if (iauvFile[j]->camview[c].name==rosInterface.targetName) 
+		   iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate));
 
       if(rosInterface.type==ROSInterfaceInfo::ROSImageToHUD) {
-	HUDCamera *realcam=new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale);
-	/*ROSImageToHUDCamera *hudSub=*/new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam);
+	boost::shared_ptr<HUDCamera> realcam(new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale));
+	iface=boost::shared_ptr<ROSImageToHUDCamera>(new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam.get()));
         realcams.push_back(realcam);
       }
 
-      if(rosInterface.type==ROSInterfaceInfo::RangeSensorToROSRange) {
+      if(rosInterface.type==ROSInterfaceInfo::RangeSensorToROSRange)
 	//Find corresponding VirtualRangeSensor Object on all the vehicles
-	for (int j=0; j<nvehicle ;j++){
-	  for (int c=0; c<iauvFile[j]->n_range_sensors; c++) {
-		if (iauvFile[j]->range_sensors[c].name==rosInterface.targetName) {
-		   new RangeSensorToROSRange(&(iauvFile[j]->range_sensors[c]),rosInterface.topic, rosInterface.rate);
-		}
-	  }
-        }
-      }
+	for (int j=0; j<nvehicle ;j++)
+	  for (unsigned int c=0; c<iauvFile[j]->getNumRangeSensors(); c++)
+		if (iauvFile[j]->range_sensors[c].name==rosInterface.targetName)
+		   iface=boost::shared_ptr<RangeSensorToROSRange>(new RangeSensorToROSRange(&(iauvFile[j]->range_sensors[c]),rosInterface.topic, rosInterface.rate));
 
+      ROSInterfaces.push_back(iface);
       config.ROSInterfaces.pop_front();
     }
 
 
     OSG_INFO << "Starting window manager..." << std::endl;
-    osgWidget::WindowManager* wm = new osgWidget::WindowManager(
+    osg::ref_ptr<osgWidget::WindowManager> wm = new osgWidget::WindowManager(
 		&viewer,
 		reswidth,
 		resheight,
@@ -363,11 +341,11 @@ int main(int argc, char *argv[])
     );
 
     wm->setPointerFocusMode(osgWidget::WindowManager::PFM_SLOPPY);
-    std::vector<osgWidget::Window*> camWidgets;
+    std::vector<osg::ref_ptr<osgWidget::Window> > camWidgets;
     int dispx=0;
     int ncamwidgets=0;
     for (int j=0; j<nvehicle ;j++){
-      for (int i=0; i<iauvFile[j]->ncams; i++) {
+      for (unsigned int i=0; i<iauvFile[j]->getNumCams(); i++) {
 	    camWidgets.push_back(iauvFile[j]->camview[i].getWidgetWindow());
 	    camWidgets[ncamwidgets]->setX(dispx);
 	    camWidgets[ncamwidgets]->setY(0);
@@ -394,11 +372,10 @@ int main(int argc, char *argv[])
         static_cast<int>(wm->getHeight())
     );
 
-    osg::Group*  appgroup  = new osg::Group();
-    osg::Camera* appcamera = wm->createParentOrthoCamera();
+    osg::ref_ptr<osg::Group>  appgroup  = new osg::Group();
+    osg::ref_ptr<osg::Camera> appcamera = wm->createParentOrthoCamera();
 
     appgroup->addChild(appcamera);
-
 
     if(root) appgroup->addChild(root);
 
@@ -443,7 +420,19 @@ int main(int argc, char *argv[])
         viewer.frame();
 
     }
+    if (ros::ok()) ros::shutdown();
 
+/*
+    std::cerr << "Stopping ROSInterfaces" << std::endl;
+    for (int i=0; i<ROSInterfaces.size(); i++)
+	ROSInterfaces[i].reset();
+    std::cerr << "Release scene graph" << std::endl;
+    root.release();
+    std::cerr << "Stopping Vehicles" << std::endl;
+    for (int i=0; i<iauvFile.size(); i++)
+	iauvFile[i].reset();
+*/
+    OSG_INFO << "Finished" << std::endl;
 
     return 0;
 }

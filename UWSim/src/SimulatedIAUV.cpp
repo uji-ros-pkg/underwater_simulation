@@ -12,6 +12,7 @@
 #include <osg/PositionAttitudeTransform>
 
 /** Callback for updating the vehicle lamp according to the vehicle position */
+/*
 class LightUpdateCallback:public osg::NodeCallback {
 	osg::Transform *trackNode;	///< Node that the light must track
 
@@ -31,6 +32,7 @@ public:
 		osg::NodeCallback::operator()(node,nv);
 	}
 };
+*/
 
 /*
 SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype) {
@@ -73,49 +75,41 @@ SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype) {
 }
 */
 
-SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) {
+SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf(new URDFRobot(oscene->getOceanScene(),vehicleChars)) {
   name=vehicleChars.name;
   baseTransform=new osg::MatrixTransform;
-  urdf=new URDFRobot(oscene->getOceanScene(),vehicleChars); 
 
   if(urdf->baseTransform!=NULL /* && arm->baseTransform!=NULL*/ ){
     baseTransform->addChild(urdf->baseTransform);
     baseTransform->setName(vehicleChars.name);
   }
 
-    Vcam vcam;
-    camview = new VirtualCamera[vehicleChars.Vcams.size()];
-    ncams=vehicleChars.Vcams.size();
     //Add virtual cameras in config file
-    int cam=0;
     while(vehicleChars.Vcams.size() > 0){
-      vcam=vehicleChars.Vcams.front();
+      Vcam vcam=vehicleChars.Vcams.front();
       OSG_INFO << "Adding a virtual camera " << vcam.name << "..." << std::endl;	
       vehicleChars.Vcams.pop_front();
       //Camera frame given wrt vehicle origin frame. 
       //Remember that in opengl/osg, the camera frame is a right-handed system with Z going backwards (opposite to the viewing direction) and Y up.
-      osg::Transform *vMc=new osg::PositionAttitudeTransform;	
-      ((osg::PositionAttitudeTransform*)vMc)->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
-      ((osg::PositionAttitudeTransform*)vMc)->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
+      osg::ref_ptr<osg::Transform> vMc=(osg::Transform*) new osg::PositionAttitudeTransform;	
+      vMc->asPositionAttitudeTransform()->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
+      vMc->asPositionAttitudeTransform()->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
       urdf->link[vcam.link]->asGroup()->addChild(vMc);
-      camview[cam++].init(vcam.name, vMc, vcam.resw, vcam.resh, vcam.parameters);
+      camview.push_back(VirtualCamera(vcam.name, vMc, vcam.resw, vcam.resh, vcam.parameters));
       OSG_INFO << "Done adding a virtual camera..." << std::endl;
     }
 
     //Adding range sensors
-    rangeSensor rs;
-    range_sensors = new VirtualRangeSensor[vehicleChars.range_sensors.size()];
-    n_range_sensors=vehicleChars.range_sensors.size();
-    int r=0;
     while(vehicleChars.range_sensors.size() > 0){
-      OSG_INFO << "Adding a virtual range sensor..." << std::endl;	
+      OSG_INFO << "Adding a virtual range sensor..." << std::endl;
+      rangeSensor rs;
       rs=vehicleChars.range_sensors.front();
       vehicleChars.range_sensors.pop_front();
-      osg::Transform *vMr=new osg::PositionAttitudeTransform;	
-      ((osg::PositionAttitudeTransform*)vMr)->setPosition(osg::Vec3d(rs.position[0],rs.position[1],rs.position[2]));
-      ((osg::PositionAttitudeTransform*)vMr)->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
+      osg::ref_ptr<osg::Transform> vMr=(osg::Transform*) new osg::PositionAttitudeTransform;	
+      vMr->asPositionAttitudeTransform()->setPosition(osg::Vec3d(rs.position[0],rs.position[1],rs.position[2]));
+      vMr->asPositionAttitudeTransform()->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
       urdf->link[rs.link]->asGroup()->addChild(vMr);
-      range_sensors[r++].init(rs.name, oscene->localizedWorld, vMr, rs.range, (rs.visible)? true:false);
+      range_sensors.push_back(VirtualRangeSensor(rs.name, oscene->localizedWorld, vMr, rs.range, (rs.visible)? true:false));
       OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
     }
   

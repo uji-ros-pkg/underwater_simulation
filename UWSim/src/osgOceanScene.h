@@ -454,23 +454,17 @@ public:
 			linkBase.preMultRotate(osg::Quat(o->offsetr[2],osg::Vec3d(0,0,1)));
 			linkBase.preMultTranslate(osg::Vec3d(-o->offsetp[0],-o->offsetp[1],-o->offsetp[2]));
    
-			osg::MatrixTransform *linkBaseTransform= new osg::MatrixTransform(linkBase);
-			linkBaseTransform->addChild(object.get());
+			osg::ref_ptr<osg::MatrixTransform> linkBaseTransform= new osg::MatrixTransform(linkBase);
+			linkBaseTransform->addChild(object);
 
 			osg::Matrix linkPost;
 			linkBase.invert(linkPost);
-			//linkPost.makeRotate(-o->offsetr[2],0,0,1);
-			//linkPost.preMultRotate(osg::Quat(-o->offsetr[1],osg::Vec3d(0,1,0)));
-			//linkPost.preMultRotate(osg::Quat(-o->offsetr[0],osg::Vec3d(1,0,0)));
-			//linkPost.setTrans(-o->offsetp[0],-o->offsetp[1],-o->offsetp[2]);
-			   //linkPost.makeRotate(osg::Quat (o->offsetr[0], osg::Vec3d(1,0,0), o->offsetr[1], osg::Vec3d(0,1,0), o->offsetr[2], osg::Vec3d(0,0,1)).inverse());
-			   //linkPost.preMultTranslate(-osg::Vec3d (o->offsetp[0],o->offsetp[1],o->offsetp[2]));	   
 
-			   osg::MatrixTransform *linkPostTransform= new osg::MatrixTransform(linkPost);
-			   object.get()->asGroup()->addChild(linkPostTransform);
+			osg::ref_ptr<osg::MatrixTransform> linkPostTransform= new osg::MatrixTransform(linkPost);
+			object->asGroup()->addChild(linkPostTransform);
 
 			transform->addChild(linkBaseTransform);
-			localizedWorld->addChild ( transform );
+			localizedWorld->addChild(transform);
 			return object.get();
         }
     }

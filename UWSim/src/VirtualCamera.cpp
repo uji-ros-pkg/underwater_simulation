@@ -38,6 +38,10 @@ VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, 
 	init(name, trackNode,width,height,NULL);
 }
 
+VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
+	init(name, trackNode,width,height,params);
+}
+
 void VirtualCamera::createCamera()
 {
 	textureCamera = new osg::Camera;
