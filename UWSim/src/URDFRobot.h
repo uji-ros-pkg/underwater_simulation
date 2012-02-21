@@ -14,18 +14,16 @@ class URDFRobot: public KinematicChain {
 
 public:
 
-	osg::Vec3d * jointAxis;
+	std::vector<osg::Vec3d> joint_axis;
 
 	URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle);
-
-	//virtual osg::Node* setTool(osg::Matrix m, std::string tool_model_file);
-	void updateJoints(double *q, int startJoint, int numJoints);
 
 	~URDFRobot();
 
 protected:
 	
-	void updateJoints(double *q);
+	void updateJoints(std::vector<double> &q);
+	void updateJoints(std::vector<double> &q, int startJoint, int numJoints);
 
 };
 

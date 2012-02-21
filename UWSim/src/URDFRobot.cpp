@@ -6,55 +6,55 @@
 
 osg::Node * createOSGBox( osg::Vec3 size )
 {
-    osg::Box * box = new osg::Box();
+    osg::ref_ptr<osg::Box> box = new osg::Box();
 
     box->setHalfLengths( size/2 );
 
-    osg::ShapeDrawable * shape = new osg::ShapeDrawable( box );
-    osg::Geode * geode = new osg::Geode();
+    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( box );
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
     geode->addDrawable( shape );
 
-    osg::Node * node = new osg::Group();
+    osg::ref_ptr<osg::Node> node = new osg::Group();
     node->asGroup()->addChild( geode );
 
-    return( node );
+    return node.get();
 }
 
 osg::Node * createOSGCylinder( double radius, double height )
 {
-    osg::Cylinder * cylinder = new osg::Cylinder();
+    osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder();
 
     cylinder->setRadius( radius );
     cylinder->setHeight( height );
 
-    osg::ShapeDrawable * shape = new osg::ShapeDrawable( cylinder );
-    osg::Geode * geode = new osg::Geode();
+    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( cylinder );
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
     geode->addDrawable( shape );
 
-    osg::Node * node = new osg::Group();
+    osg::ref_ptr<osg::Node> node = new osg::Group();
     node->asGroup()->addChild( geode );
 
-    return( node );
+    return node.get();
 }
 
 osg::Node * createOSGSphere( double radius )
 {
-    osg::Sphere * sphere = new osg::Sphere();
+    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere();
 
     sphere->setRadius( radius );
 
-    osg::ShapeDrawable * shape = new osg::ShapeDrawable( sphere );
-    osg::Geode * geode = new osg::Geode();
+    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( sphere );
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
     geode->addDrawable( shape );
 
-    osg::Node * node = new osg::Group();
+    osg::ref_ptr<osg::Node> node = new osg::Group();
     node->asGroup()->addChild( geode );
 
-    return( node );
+    return node.get();
 }
 
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
-   osg::notify(osg::WARN) << "Loading URDF robot" << std::endl;
+   osg::notify(osg::INFO) << "Loading URDF robot" << std::endl;
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/robot"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/textures"));
@@ -70,7 +70,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	}
    }
 
-   link=new osg::ref_ptr<osg::Node>[vehicle.nlinks];
+   link.resize(vehicle.nlinks);
 
    for(int i=0; i<vehicle.nlinks;i++) {
 	if(vehicle.links[i].type==0){
@@ -89,8 +89,8 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	  link[i] = createOSGSphere(vehicle.links[i].radius);
 	link[i]->setName(vehicle.links[i].name);
 	if(vehicle.links[i].material!=-1){ //Add material if exists
-	  osg::StateSet * stateset = new osg::StateSet();
-	  osg::Material * material = new osg::Material();
+	  osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet();
+	  osg::ref_ptr<osg::Material> material = new osg::Material();
           material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(vehicle.materials[vehicle.links[i].material].r, vehicle.materials[vehicle.links[i].material].g, vehicle.materials[vehicle.links[i].material].b, vehicle.materials[vehicle.links[i].material].a));
 	  stateset->setAttribute(material);
 	  link[i]->setStateSet(stateset);
@@ -110,13 +110,13 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    if(success) {
 	static const char model_vertex[]   = "default_scene.vert";
 	static const char model_fragment[] = "default_scene.frag";
-	osg::ref_ptr<osg::MatrixTransform>* linkBaseTransforms= new osg::ref_ptr<osg::MatrixTransform>[vehicle.nlinks];
-	osg::ref_ptr<osg::MatrixTransform>* linkPostTransforms= new osg::ref_ptr<osg::MatrixTransform>[vehicle.nlinks];
+	std::vector<osg::ref_ptr<osg::MatrixTransform> > linkBaseTransforms(vehicle.nlinks);
+	std::vector<osg::ref_ptr<osg::MatrixTransform> > linkPostTransforms(vehicle.nlinks);
 
 	osg::Matrix linkBase;
 	osg::Matrix linkPost;
 	for (int i=0; i<vehicle.nlinks;i++) {
-	   osg::Program* program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+	   osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
 	   program->addBindAttribLocation("aTangent", 6);
 
 	   link[i]->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);
@@ -145,8 +145,8 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   link[i]->asGroup()->addChild(linkPostTransforms[i]);
 	}
 
-	joints=new osg::MatrixTransform*[vehicle.njoints];
-	zerojoints=new osg::MatrixTransform*[vehicle.njoints];
+	joints.resize(vehicle.njoints);
+	zerojoints.resize(vehicle.njoints);
 
 	for (int i=0; i<vehicle.njoints; i++) {
 	   joints[i]= new osg::MatrixTransform;
@@ -162,7 +162,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 
 	   joints[i]->setMatrix(m);
 	   zerojoints[i]->setMatrix(m);
-
 	}
 
 	baseTransform=linkBaseTransforms[0];
@@ -172,12 +171,11 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	}
 
 	//Save rotations for joints update, limits, and type of joints
-	jointAxis= new osg::Vec3d[vehicle.njoints];
+	joint_axis.resize(vehicle.njoints);
 	for(int i=0; i<vehicle.njoints;i++){
-	   jointAxis[i]=osg::Vec3d(vehicle.joints[i].axis[0],vehicle.joints[i].axis[1],vehicle.joints[i].axis[2]);
+	   joint_axis[i]=osg::Vec3d(vehicle.joints[i].axis[0],vehicle.joints[i].axis[1],vehicle.joints[i].axis[2]);
 	   jointType[i]=vehicle.joints[i].type;
-	   limits[i][0]=vehicle.joints[i].lowLimit;
-	   limits[i][1]=vehicle.joints[i].upLimit;	
+	   limits[i]=std::pair<double,double>(vehicle.joints[i].lowLimit,vehicle.joints[i].upLimit);
 	}
 	
 	//Save mimic info
@@ -203,18 +201,18 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 }
 
 
-void URDFRobot::updateJoints(double *q) {
+void URDFRobot::updateJoints(std::vector<double> &q) {
 	osg::Matrix m;
 
-	for (int i=0; i<njoints; i++) {
+	for (int i=0; i<getNumberOfJoints(); i++) {
 	  if(jointType[i]==1){
 	    if(mimic[i].sliderCrank==0)
-	      m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,jointAxis[i]);   
+	      m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,joint_axis[i]);   
 	    else
-	      m.makeRotate((q[mimic[i].joint]+asin(mimic[i].offset*sin(q[mimic[i].joint])))*-1,jointAxis[i]);
+	      m.makeRotate((q[mimic[i].joint]+asin(mimic[i].offset*sin(q[mimic[i].joint])))*-1,joint_axis[i]);
 	  }
 	  else if(jointType[i]==2)
-	    m.makeTranslate( jointAxis[i] *= (q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset) );
+	    m.makeTranslate( joint_axis[i] *= (q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset) );
 	  else
 	    m.makeIdentity();
 	  osg::Matrix nm=zerojoints[i]->getMatrix();
@@ -224,22 +222,17 @@ void URDFRobot::updateJoints(double *q) {
 }
 
 
-void URDFRobot::updateJoints(double *q, int startJoint, int numJoints) {
+void URDFRobot::updateJoints(std::vector<double> &q, int startJoint, int numJoints) {
 	osg::Matrix m;
 
 	for (int i=startJoint; i<startJoint+numJoints; i++) {
-		m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,jointAxis[i]);   
+		m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,joint_axis[i]);   
 		osg::Matrix nm=zerojoints[i]->getMatrix();
 		nm.preMult(m);
 		joints[i]->setMatrix(nm);
 	}
 }
 
-/*
-osg::Node *URDFRobot::setTool(osg::Matrix m, std::string tool_model_file) {
-  return tool;
-}
-*/
 
 URDFRobot::~URDFRobot() {
 }

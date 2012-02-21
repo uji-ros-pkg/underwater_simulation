@@ -25,17 +25,15 @@ struct MimicArm{
  */
 class KinematicChain {
 public:
-	osg::ref_ptr<osg::Node> *link;	///< pointers to link models
-	int nlinks;			///< number of links
-	int njoints;			///< number of joints
-	double *q;			///< Joint values
-	double **limits;		//Limits for joints by default -PI , PI
+	std::vector<osg::ref_ptr<osg::Node> > link;	///< pointers to link models
+	std::vector<double> q;			///< Joint values
+	std::vector<std::pair<double,double> > limits;		///<Limits for joints by default -PI , PI
 
-	MimicArm * mimic;		//Mimic joints info
-	int *jointType;			//type of joints 0 fixed, 1 rotation, 2 prismatic
-	osg::MatrixTransform **joints;	///< pointers to transforms between links
-	osg::MatrixTransform **zerojoints; ///<pointers to original (zero) transforms between links
-	osg::MatrixTransform* baseTransform; ///<pointer to the first node in the PA10 graph (base tranform)
+	std::vector<MimicArm> mimic;			//Mimic joints info
+	std::vector<int> jointType;			//type of joints 0 fixed, 1 rotation, 2 prismatic
+	std::vector<osg::ref_ptr<osg::MatrixTransform> > joints;	///< pointers to transforms between links
+	std::vector<osg::ref_ptr<osg::MatrixTransform> > zerojoints; ///<pointers to original (zero) transforms between links
+	osg::ref_ptr<osg::MatrixTransform> baseTransform; ///<pointer to the first node in the PA10 graph (base tranform)
 
 	//osg::MatrixTransform *tool_transform;	///< Transform between the end-effector and the tool base frame
 	//osg::ref_ptr<osg::Node> tool;		///< Pointer to the tool osg node
@@ -43,17 +41,23 @@ public:
 
 	KinematicChain(int nlinks, int njoints);
 
-	//setJointPosition, setJointVelocity, etc.
 	void setJointPosition(double *q);
 	void setJointVelocity(double *qdot);
+	void setJointPosition(std::vector<double> &q);
+	void setJointVelocity(std::vector<double> &qdot);
 	std::vector<double> getJointPosition();
 
-	//virtual osg::Node* setTool(osg::Matrix m, std::string tool_model_file);
+
+	/** Get the number of links */	
+	int getNumberOfLinks() {return link.size();}
+	/** Get the number of joints*/	
+	int getNumberOfJoints() {return q.size();}
+
 
 	~KinematicChain();
 
 protected:
-	virtual void updateJoints(double *q)=0;	///< Implemented by childs for joint position update
+	virtual void updateJoints(std::vector<double> &q)=0;	///< Implemented by childs for joint position update
 };
 
 #endif /* KINEMATICCHAIN_H_ */

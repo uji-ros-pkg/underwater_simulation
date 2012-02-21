@@ -18,15 +18,14 @@
 /** A ROS Camera subscriber that can be displayed as a widget */
 class HUDCamera : public CustomWidget
 {
-	osgWidget::Widget* widget;
+	osg::ref_ptr<osgWidget::Widget> widget;
 
 	class widgetUpdateCallback : public osg::Drawable::UpdateCallback {
-		osg::Image* image;
+		osg::ref_ptr<osg::Image> image;
 		public:
 			widgetUpdateCallback(osg::Image *i): osg::Drawable::UpdateCallback() {this->image=i;} 
 			virtual void update(osg::NodeVisitor *nv, osg::Drawable *d) {
-				osgWidget::Widget * w=static_cast<osgWidget::Widget*>(d);
-				w->setImage(image,true,false);			
+				(static_cast<osgWidget::Widget*>(d))->setImage(image,true,false);			
 			}	
 	};
 

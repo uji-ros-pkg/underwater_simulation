@@ -7,16 +7,16 @@ class SceneEventHandler : public osgGA::GUIEventHandler
 private:
     osg::ref_ptr<osgOceanScene> _scene;
     osg::ref_ptr<TextHUD> _textHUD;
-    osgWidget::Window* w;
+    osg::ref_ptr<osgWidget::Window> _window;
     
 
 public:
     //vehicle track indicates whether the camera must automatically track the vehicle node
     SceneEventHandler( osgWidget::Window* w, TextHUD* textHUD, osg::ref_ptr<osgOceanScene> scene ):
         _scene(scene),
-        _textHUD(textHUD)
+        _textHUD(textHUD),
+	_window(w)
     {
-		this->w=w;	
         	_textHUD->setSceneText("Clear Blue Sky");
     }
 
@@ -46,7 +46,7 @@ public:
                     return false;
                 } else if(ea.getKey() == 'c' )
 		{
-		    if (w->isVisible()) w->hide(); else w->show();
+		    if (_window->isVisible()) _window->hide(); else _window->show();
                     return false;
                 }
 		
@@ -58,10 +58,6 @@ public:
 
     void getUsage(osg::ApplicationUsage& usage) const
     {
-        //usage.addKeyboardMouseBinding("c","Camera type (cycle through Fixed, Flight, Trackball)");
-        //usage.addKeyboardMouseBinding("1","Select scene \"Clear Blue Sky\"");
-        //usage.addKeyboardMouseBinding("2","Select scene \"Dusk\"");
-        //usage.addKeyboardMouseBinding("3","Select scene \"Pacific Cloudy\"");
     }
 
 };
