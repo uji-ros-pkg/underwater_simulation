@@ -11,7 +11,7 @@ class CustomWidget {
   public:
     CustomWidget() {}
 
-    virtual osgWidget::Window* getWidgetWindow()=0;
+    virtual osg::ref_ptr<osgWidget::Window> getWidgetWindow()=0;
 
     ~CustomWidget() {}
 };

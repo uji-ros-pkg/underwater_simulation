@@ -57,7 +57,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    osg::notify(osg::NOTICE) << "UWSim; using osgOcean " << osgOceanGetVersion() << std::endl << std::endl;
+    osg::notify(osg::ALWAYS) << "UWSim; using osgOcean " << osgOceanGetVersion() << std::endl;
 
     osg::ArgumentParser arguments(&argc,argv);
     arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
     arguments.getApplicationUsage()->addCommandLineOption("--roscam","Indicate the name of an image ROS topic");
     arguments.getApplicationUsage()->addCommandLineOption("--roscaminfo","Indicate the name of a camera info ROS topic");
     arguments.getApplicationUsage()->addCommandLineOption("--configfile","Indicate config file location");
+    arguments.getApplicationUsage()->addCommandLineOption("--v","Be verbose. (OSG notify level NOTICE");
+    arguments.getApplicationUsage()->addCommandLineOption("--vv","Be much verbose. (OSG notify level DEBUG");
 
     unsigned int helpType = 0;
     if ((helpType = arguments.readHelpType()))
@@ -141,6 +143,12 @@ int main(int argc, char *argv[])
     	freeMotion = true;
     }
 
+    //Default notify level
+    osg::setNotifyLevel(osg::FATAL);
+    if (arguments.read("--v")) osg::setNotifyLevel(osg::NOTICE);
+    if (arguments.read("--vv")) osg::setNotifyLevel(osg::DEBUG_FP);
+
+
     // any option left unread are converted into errors to write out later.
     arguments.reportRemainingOptionsAsUnrecognized();
 
@@ -199,7 +207,7 @@ int main(int argc, char *argv[])
 
       siauv->setVehiclePosition(vehicle.position[0],vehicle.position[1],vehicle.position[2],vehicle.orientation[0],vehicle.orientation[1],vehicle.orientation[2]);
        
-      if(vehicle.jointValues!=NULL && siauv->urdf!=NULL){
+      if(vehicle.jointValues.size() && siauv->urdf!=NULL){
         siauv->urdf->setJointPosition(vehicle.jointValues);
       }  
     }
@@ -250,11 +258,11 @@ int main(int argc, char *argv[])
     viewer.getCamera()->setName("MainCamera");
     //Main camera projection parameters: view angle (fov), aspect ratio, fustrum near and far
     if (config.camNear!=-1 && config.camFar!=-1) {
-	std::cerr << "Setting custom near/far planes to " << config.camNear << " " << config.camFar << std::endl;
+	OSG_INFO << "Setting custom near/far planes to " << config.camNear << " " << config.camFar << std::endl;
     	viewer.getCamera()->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
 	viewer.getCamera()->setProjectionMatrixAsPerspective(config.camFov, config.camAspectRatio, config.camNear, config.camFar);
     } else {
-	std::cerr << "Setting custom near/far planes to auto" << std::endl;
+	OSG_INFO << "Setting custom near/far planes to auto" << std::endl;
     	viewer.getCamera()->setProjectionMatrixAsPerspective(config.camFov, config.camAspectRatio, 1, 10);
     }
 
@@ -340,18 +348,25 @@ int main(int argc, char *argv[])
 		0
     );
 
+    OSG_INFO << "Setting widgets..." << std::endl;
     wm->setPointerFocusMode(osgWidget::WindowManager::PFM_SLOPPY);
     std::vector<osg::ref_ptr<osgWidget::Window> > camWidgets;
     int dispx=0;
     int ncamwidgets=0;
     for (int j=0; j<nvehicle ;j++){
       for (unsigned int i=0; i<iauvFile[j]->getNumCams(); i++) {
+    	    OSG_INFO << "	widget " << i << std::endl;
+    	    OSG_INFO << "		pushback"  << std::endl;
 	    camWidgets.push_back(iauvFile[j]->camview[i].getWidgetWindow());
+	    OSG_INFO << "Window ref count " << camWidgets[ncamwidgets]->referenceCount() << std::endl;
 	    camWidgets[ncamwidgets]->setX(dispx);
 	    camWidgets[ncamwidgets]->setY(0);
 	    dispx+=iauvFile[j]->camview[i].width+20;
+    	    OSG_INFO << "		addchild"  << std::endl;
 	    wm->addChild(camWidgets[ncamwidgets]);
+    	    OSG_INFO << "		hide"  << std::endl;
 	    camWidgets[ncamwidgets]->hide();
+    	    OSG_INFO << "		eventhandler"  << std::endl;
 	    viewer.addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene ) );
 	    ncamwidgets++;
       }

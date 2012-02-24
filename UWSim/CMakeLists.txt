@@ -72,7 +72,6 @@ src/SphereSegment.cpp
 src/KinematicChain.cpp
 src/URDFRobot.cpp
 src/SimulatedIAUV.cpp
-src/ServerInterface.cpp
 src/VirtualCamera.cpp
 src/VirtualRangeSensor.cpp
 src/HUDCamera.cpp

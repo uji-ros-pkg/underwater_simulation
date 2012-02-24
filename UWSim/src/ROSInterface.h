@@ -70,7 +70,7 @@ public:
 };
 
 class ROSOdomToPAT: public ROSSubscriberInterface {
-	osg::MatrixTransform *transform;
+	osg::ref_ptr<osg::MatrixTransform> transform;
         ros::WallTime last;
         int started;
 
@@ -84,7 +84,7 @@ public:
 };
 
 class ROSTwistToPAT: public ROSSubscriberInterface {
-	osg::MatrixTransform *transform;
+	osg::ref_ptr<osg::MatrixTransform> transform;
 	ros::WallTime last;
 	int started;
 public:
@@ -160,12 +160,12 @@ public:
 };
 
 class ROSImageToHUDCamera: public ROSSubscriberInterface {
-	HUDCamera *cam;
-	image_transport::ImageTransport *it;
+	boost::shared_ptr<HUDCamera> cam;
+	boost::shared_ptr<image_transport::ImageTransport> it;
 	image_transport::Subscriber image_sub;
 	std::string image_topic;
 public:
-	ROSImageToHUDCamera(std::string image_topic, std::string info_topic, HUDCamera *cam);
+	ROSImageToHUDCamera(std::string topic, std::string info_topic, HUDCamera *camera);
 
 	virtual void createSubscriber(ros::NodeHandle &nh);
 
@@ -192,7 +192,7 @@ public:
 
 
 class PATToROSOdom : public ROSPublisherInterface {
-	osg::MatrixTransform *transform;
+	osg::ref_ptr<osg::MatrixTransform> transform;
 public:
 	PATToROSOdom(osg::Group *rootNode,std::string vehicleName, std::string topic, int rate);
 
@@ -223,7 +223,7 @@ class VirtualCameraToROSImage : public ROSPublisherInterface {
 	image_transport::Publisher img_pub_;
 	std::string image_topic;
 public:
-	VirtualCameraToROSImage(VirtualCamera *cam, std::string topic, std::string info_topic, int rate);
+	VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate);
 
 	void createPublisher(ros::NodeHandle &nh);
 
@@ -235,7 +235,7 @@ public:
 class RangeSensorToROSRange : public ROSPublisherInterface {
 	VirtualRangeSensor *rs;
 public:
-	RangeSensorToROSRange(VirtualRangeSensor *rs, std::string topic, int rate);
+	RangeSensorToROSRange(VirtualRangeSensor *rangesensor, std::string topic, int rate);
 
 	void createPublisher(ros::NodeHandle &nh);
 

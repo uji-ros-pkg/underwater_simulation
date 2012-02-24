@@ -10,7 +10,7 @@
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, Parameters * params) {
+void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
 	this->name=name;
 	this->trackNode=trackNode;
 	this->width=width;
@@ -56,7 +56,7 @@ void VirtualCamera::createCamera()
 	textureCamera->setRenderOrder(osg::Camera::PRE_RENDER);
 
 	// The camera will render into the texture that we created earlier
-	textureCamera->attach(osg::Camera::COLOR_BUFFER, renderTexture);
+	textureCamera->attach(osg::Camera::COLOR_BUFFER, renderTexture.get());
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
@@ -85,18 +85,19 @@ void VirtualCamera::createCamera()
 
 	//make this camera track the node
 	osg::ref_ptr<MyNodeTrackerCallback> node_tracker = new MyNodeTrackerCallback;
-	node_tracker->setCamera(textureCamera);
+	node_tracker->setCamera(textureCamera.get());
 	trackNode->setUpdateCallback(node_tracker);
 }
 
-osgWidget::Window* VirtualCamera::getWidgetWindow() {
-	osgWidget::Box *box=new osgWidget::Box("VirtualCameraBox", osgWidget::Box::HORIZONTAL, true);
-	osgWidget::Widget* widget = new osgWidget::Widget("VirtualCameraWidget", width, height);
-	widget->setImage(renderTexture,true,false);
-	box->addWidget(widget);
-	osgWidget::Window* boxwin=box;
-	boxwin->getBackground()->setColor(1.0f, 0.0f, 0.0f, 0.8f);
-	boxwin->attachMoveCallback();
-	boxwin->attachScaleCallback();
-	return boxwin;
+osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow() {
+	osg::ref_ptr<osgWidget::Box> box=new osgWidget::Box("VirtualCameraBox", osgWidget::Box::HORIZONTAL, true);
+	osg::ref_ptr<osgWidget::Widget> widget = new osgWidget::Widget("VirtualCameraWidget", width, height);
+	widget->setImage(renderTexture.get(),true,false);
+	box->addWidget(widget.get());
+	box->getBackground()->setColor(1.0f, 0.0f, 0.0f, 0.8f);
+	box->attachMoveCallback();
+	box->attachScaleCallback();
+	OSG_DEBUG << "box count: " << box->referenceCount() << std::endl;
+	OSG_DEBUG << "widget count: " << widget->referenceCount() << std::endl;
+	return box;
 }

@@ -22,7 +22,7 @@ class osgPCDLoader {
 		{
 			std::cerr << "Couldn't read file " << pcd_file << std::endl;
 		} else {
-			std::cout << "Loaded "
+			OSG_INFO << "Loaded "
 			    	<< cloud.width * cloud.height
 			   	<< " data points from " << pcd_file
 			    	<< std::endl;	
@@ -61,6 +61,8 @@ class osgPCDLoader {
 			state->setMode( GL_LIGHTING,osg::StateAttribute::OFF);
 		}
 	}
+
+	osg::Geode *getGeode() {geode.get();}
 	
 	~osgPCDLoader(){}
 

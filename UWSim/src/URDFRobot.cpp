@@ -1,4 +1,5 @@
 #include "URDFRobot.h"
+#include "UWSimUtils.h"
 #include <osgOcean/ShaderManager>
 #include <osg/ShapeDrawable>
 #include <osg/Material>
@@ -54,7 +55,7 @@ osg::Node * createOSGSphere( double radius )
 }
 
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
-   osg::notify(osg::INFO) << "Loading URDF robot" << std::endl;
+   ScopedTimer buildSceneTimer("Loading URDF robot... \n", osg::notify(osg::ALWAYS));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/robot"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/textures"));
@@ -73,10 +74,11 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    link.resize(vehicle.nlinks);
 
    for(int i=0; i<vehicle.nlinks;i++) {
+	ScopedTimer buildSceneTimer("  · "+vehicle.links[i].file+": ", osg::notify(osg::ALWAYS));
 	if(vehicle.links[i].type==0){
 	  link[i] = osgDB::readNodeFile(vehicle.links[i].file);
 	  if(link[i] == NULL){
-	     std::cerr<<"Error reading file, check URDF file: "<<vehicle.links[i].file<<std::endl;
+	     std::cerr<<"Error reading file " << vehicle.links[i].file <<". Check URDF file." <<std::endl;
 	     exit(0);
 	  }
         }
@@ -94,7 +96,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
           material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(vehicle.materials[vehicle.links[i].material].r, vehicle.materials[vehicle.links[i].material].g, vehicle.materials[vehicle.links[i].material].b, vehicle.materials[vehicle.links[i].material].a));
 	  stateset->setAttribute(material);
 	  link[i]->setStateSet(stateset);
-
 	}
    }
 
@@ -108,6 +109,8 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    }
 
    if(success) {
+	ScopedTimer buildSceneTimer("  · Linking links...", osg::notify(osg::ALWAYS));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
 	static const char model_vertex[]   = "default_scene.vert";
 	static const char model_fragment[] = "default_scene.frag";
 	std::vector<osg::ref_ptr<osg::MatrixTransform> > linkBaseTransforms(vehicle.nlinks);
@@ -154,7 +157,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	}
 
 	osg::Matrix m;
-	
 	for(int i=0; i<vehicle.njoints; i++){
 	   m.makeTranslate(0,0,0);
 	   m.preMultTranslate(osg::Vec3d (vehicle.joints[i].position[0],vehicle.joints[i].position[1],vehicle.joints[i].position[2]));
@@ -196,7 +198,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	}
 
 
-	osg::notify(osg::WARN) << "Robot successfully loaded" << std::endl;
+	osg::notify(osg::ALWAYS) << "Robot successfully loaded. Total time: ";
    }	
 }
 

@@ -35,7 +35,7 @@ public:
         osg::Geode* textGeode = new osg::Geode;
 
         osgText::Text* title = new osgText::Text;
-        title->setFont("fonts/arial.ttf");
+        //title->setFont("fonts/arial.ttf");
         title->setCharacterSize(24);
         title->setLineSpacing(0.4f);
 
@@ -46,14 +46,14 @@ public:
         textGeode->addDrawable( title );
 
         _modeText = new osgText::Text;
-        _modeText->setFont("fonts/arial.ttf");
+        //_modeText->setFont("fonts/arial.ttf");
         _modeText->setCharacterSize(24);
         _modeText->setPosition( osg::Vec3f(0.f, -40.f, 0.f ) );
         _modeText->setDataVariance(osg::Object::DYNAMIC);
         textGeode->addDrawable( _modeText.get() );
 
         _cameraModeText = new osgText::Text;
-        _cameraModeText->setFont("fonts/arial.ttf");
+        //_cameraModeText->setFont("fonts/arial.ttf");
         _cameraModeText->setCharacterSize(24);
         _cameraModeText->setPosition( osg::Vec3f(0.f, -60.f, 0.f ) );
         _cameraModeText->setDataVariance(osg::Object::DYNAMIC);

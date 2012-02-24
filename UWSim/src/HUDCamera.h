@@ -34,7 +34,7 @@ public:
 	unsigned int posx, posy; ///< Default position of the widget, given in pixels wrt bottom-left corner (X to the right, Y upwards)
 	double scale;		///< Percentage of default widget scaling (0..1)
 	
-	osg::Image* osg_image;	//The osg::Image object where to store the ROS image
+	osg::ref_ptr<osg::Image> osg_image;	//The osg::Image object where to store the ROS image
 	bool ready_;	//true if images have been acquired
 
 
@@ -44,7 +44,7 @@ public:
 	bool ready() {return ready_;}
 
 	//Interface to be implemented by widgets. Build a widget window with the data to be displayed
-	osgWidget::Window* getWidgetWindow();
+	osg::ref_ptr<osgWidget::Window> getWidgetWindow();
 
 	~HUDCamera();
 };

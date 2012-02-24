@@ -13,6 +13,13 @@
 
 #include <osg/Notify>
 
+#ifndef OSG_ERROR
+#define OSG_ERROR osg::notify(osg::ERROR)
+#endif
+
+#ifndef OSG_WARN
+#define OSG_WARN osg::notify(osg::WARN)
+#endif
 
 #ifndef OSG_INFO
 #define OSG_INFO osg::notify(osg::INFO)

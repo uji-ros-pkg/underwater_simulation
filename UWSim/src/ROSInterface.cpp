@@ -208,13 +208,15 @@ ROSJointStateToArm::~ROSJointStateToArm(){
 }
 
 
-ROSImageToHUDCamera::ROSImageToHUDCamera(std::string image_topic, std::string info_topic, HUDCamera *cam): ROSSubscriberInterface(info_topic) {
-  this->cam=cam;
-  this->image_topic=image_topic;
-}
+ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_topic, HUDCamera *camera): 
+	ROSSubscriberInterface(info_topic),
+	cam(camera),
+	image_topic(topic)
+ {}
 
-void ROSImageToHUDCamera::createSubscriber(ros::NodeHandle &nh) {
-  it=new image_transport::ImageTransport(nh);
+void ROSImageToHUDCamera::createSubscriber(ros::NodeHandle &nh)
+ {
+  it.reset(new image_transport::ImageTransport(nh));
   OSG_DEBUG << "ROSImageToHUDCamera::createSubscriber Subscribing to image topic " << image_topic << std::endl;
   image_sub=it->subscribe(image_topic, 1, &ROSImageToHUDCamera::processData, this);	
   //OSG_INFO << "ROSCamera::ROSCamera Subscribing to camera info topic " << info_topic << std::endl;
@@ -344,10 +346,7 @@ void ArmToROSJointState::publish() {
 ArmToROSJointState::~ArmToROSJointState() {}
 	
 
-VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *cam, std::string topic, std::string info_topic, int rate): ROSPublisherInterface	(info_topic,rate) {
-  this->cam=cam;
-  image_topic=topic;
-}
+VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate): ROSPublisherInterface	(info_topic,rate), cam(camera), image_topic(topic) {}
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
   it.reset(new image_transport::ImageTransport(nh));
@@ -415,8 +414,7 @@ VirtualCameraToROSImage::~VirtualCameraToROSImage() {}
 
 
 
-RangeSensorToROSRange::RangeSensorToROSRange(VirtualRangeSensor *rs, std::string topic, int rate): ROSPublisherInterface(topic,rate) {
-  this->rs=rs;
+RangeSensorToROSRange::RangeSensorToROSRange(VirtualRangeSensor *rangesensor, std::string topic, int rate): ROSPublisherInterface(topic,rate), rs(rangesensor) {
 }
 
 void RangeSensorToROSRange::createPublisher(ros::NodeHandle &nh) {

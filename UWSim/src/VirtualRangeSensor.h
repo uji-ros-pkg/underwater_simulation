@@ -65,7 +65,7 @@ class VirtualRangeSensor
           }
 	  public:
 		double range, distance_to_obstacle;
-		osg::Node *root;
+		osg::ref_ptr<osg::Node> root;
 		osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
 		osgUtil::IntersectionVisitor intersectVisitor;
 
@@ -100,8 +100,8 @@ class VirtualRangeSensor
 
 public:
     std::string name;
-    osg::Node *trackNode;
-    osg::Node *root;
+    osg::ref_ptr<osg::Node> trackNode;
+    osg::ref_ptr<osg::Node> root;
     double range;	///< Max distance of the beam
     bool visible;	///< Whether to make the beam visible or not
     osg::ref_ptr<IntersectorUpdateCallback> node_tracker;

@@ -28,7 +28,7 @@ class VirtualCamera : public CustomWidget
 
 	//Custom node tracking
         class MyNodeTrackerCallback : public osg::NodeTrackerCallback {
-	  osg::Camera *cam;
+	  osg::ref_ptr<osg::Camera> cam;
 
           void operator() (osg::Node *node, osg::NodeVisitor *nv)  {
 		  //std::cerr << "Node Tracker callback" << std::endl;
@@ -51,19 +51,18 @@ public:
 	double far,near,k;
 	int paramsOn;
 
-	osg::Image* renderTexture;
-	//osg::ref_ptr<osg::Geometry> screenQuad;
-	//osg::ref_ptr<osg::Geode> quadGeode;
+	osg::ref_ptr<osg::Image> renderTexture;
 
-    VirtualCamera(std::string name, osg::Node *trackNode, int width, int height);
-    VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
-    VirtualCamera();
-    void init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
+    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height);
+    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
+    	VirtualCamera();
+    	
+	void init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
 
-    void createCamera();
+    	void createCamera();
 
-    //Interface to be implemented by widgets. Build a widget window with the data to be displayed
-    osgWidget::Window* getWidgetWindow();
+    	//Interface to be implemented by widgets. Build a widget window with the data to be displayed
+    	osg::ref_ptr<osgWidget::Window> getWidgetWindow();
 };
 
 #endif /* VIRTUALCAMERA_H_ */

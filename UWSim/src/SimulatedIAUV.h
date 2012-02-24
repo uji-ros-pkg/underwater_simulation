@@ -44,6 +44,7 @@ public:
 	unsigned int getNumRangeSensors() {return range_sensors.size();}
 
 	~SimulatedIAUV() {
+		OSG_DEBUG << "Simulated IAUV destructor" << std::endl;
 	}
 };
 

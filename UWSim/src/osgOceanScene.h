@@ -2,6 +2,7 @@
 #define OSGOCEANSCENE_H_
 
 #include "SimulatorConfig.h"
+#include "UWSimUtils.h"
 
 #include <osg/TextureCubeMap>
 #include <osgDB/ReadFile>
@@ -55,40 +56,6 @@ public:
         traverse(node, nv);
     }
 };
-
-
-// ----------------------------------------------------
-//                  Scoped timer
-// ----------------------------------------------------
-
-class ScopedTimer
-{
-public:
-    ScopedTimer(const std::string& description,
-                std::ostream& output_stream = std::cout,
-                bool endline_after_time = true)
-        : _output_stream(output_stream)
-        , _start()
-        , _endline_after_time(endline_after_time)
-    {
-        _output_stream << description << std::flush;
-        _start = osg::Timer::instance()->tick();
-    }
-
-    ~ScopedTimer()
-    {
-        osg::Timer_t end = osg::Timer::instance()->tick();
-        _output_stream << osg::Timer::instance()->delta_s(_start, end) << "s";
-        if (_endline_after_time) _output_stream << std::endl;
-        else                     _output_stream << std::flush;
-    }
-
-private:
-    std::ostream& _output_stream;
-    osg::Timer_t _start;
-    bool _endline_after_time;
-};
-
 
 class osgOceanScene : public osg::Referenced
 {
@@ -182,18 +149,18 @@ public:
                 float crestFoamHeight)
     {
         {
-            ScopedTimer buildSceneTimer("Building scene... \n", osg::notify(osg::NOTICE));
+            ScopedTimer buildSceneTimer("Building scene... \n", osg::notify(osg::ALWAYS));
 
             _scene = new osg::Group;
 
             {
-                ScopedTimer cubemapTimer("  . Loading cubemaps: ", osg::notify(osg::NOTICE));
+                ScopedTimer cubemapTimer("  . Loading cubemaps: ", osg::notify(osg::ALWAYS));
                 _cubemap = loadCubeMapTextures( _cubemapDirs[_sceneType] );
             }
 
             // Set up surface
             {
-                ScopedTimer oceanSurfaceTimer("  . Generating ocean surface: ", osg::notify(osg::NOTICE));
+                ScopedTimer oceanSurfaceTimer("  . Generating ocean surface: ", osg::notify(osg::ALWAYS));
                 _oceanSurface = new osgOcean::FFTOceanSurface( 64, 256, 17,
                     windDirection, windSpeed, depth, reflectionDamping, waveScale, isChoppy, choppyFactor, 10.f, 256 );
 
@@ -209,7 +176,7 @@ public:
 
             // Set up ocean scene, add surface
             {
-                ScopedTimer oceanSceneTimer("  . Creating ocean scene: ", osg::notify(osg::NOTICE));
+                ScopedTimer oceanSceneTimer("  . Creating ocean scene: ", osg::notify(osg::ALWAYS));
                 osg::Vec3f sunDir = -_sunPositions[_sceneType];
                 sunDir.normalize();
 
@@ -278,7 +245,7 @@ public:
             }
 
             {
-                ScopedTimer lightingTimer("  . Setting up lighting: ", osg::notify(osg::NOTICE));
+                ScopedTimer lightingTimer("  . Setting up lighting: ", osg::notify(osg::ALWAYS));
                 osg::LightSource* lightSource = new osg::LightSource;
                 lightSource->setLocalStateSetModes();
 
@@ -294,6 +261,7 @@ public:
             } 
 	    {
 		//Add a coordinate transform relating the simulated world frame with respect to an arbitrary localized world
+                ScopedTimer lightingTimer("  . Setting localized world: ", osg::notify(osg::ALWAYS));
 		osg::Matrixd wMl;
 		wMl.makeRotate(offsetr[0],1,0,0);
 		wMl.preMultRotate(osg::Quat(offsetr[1],osg::Vec3d(0,1,0)));
@@ -303,7 +271,7 @@ public:
 		_oceanScene->addChild(localizedWorld);
 	    }
 
-            osg::notify(osg::NOTICE) << "complete.\nTime Taken: ";
+            osg::notify(osg::ALWAYS) << "Complete. Time Taken: ";
         }
     }
 
@@ -323,38 +291,37 @@ public:
 
     void changeScene( SCENE_TYPE type )
     {
-	std::cerr << "scene type" << std::endl;
+	OSG_DEBUG << "scene type" << std::endl;
         SCENE_TYPE _sceneType = type;
 
-	std::cerr << "Cubemaps" << std::endl;
-	//std::cerr << "cubemapsdir: " << _cubemapDirs[_sceneType] << std::endl;
-	std::cerr << "scenetype: " << _sceneType << std::endl;
+	OSG_DEBUG << "scenetype: " << _sceneType << std::endl;
 
         //_cubemap = loadCubeMapTextures( _cubemapDirs[_sceneType] );
+	OSG_DEBUG << "loag Cubemaps" << std::endl;
         _cubemap = loadCubeMapTextures("sky_dusk" );
-	std::cerr << "set Cubemaps" << std::endl;
+	OSG_DEBUG << "set Cubemaps" << std::endl;
         _skyDome->setCubeMap( _cubemap.get() );
-	std::cerr << " set Env Map" << std::endl;
+	OSG_DEBUG << " set Env Map" << std::endl;
         _oceanSurface->setEnvironmentMap( _cubemap.get() );
-		std::cerr << "set light color" << std::endl;
+	OSG_DEBUG << "set light color" << std::endl;
         _oceanSurface->setLightColor( _lightColors[type] );
 
-	std::cerr << "fog" << std::endl;
+	OSG_DEBUG << "fog" << std::endl;
         _oceanScene->setAboveWaterFog(0.0012f, _fogColors[_sceneType] );
         _oceanScene->setUnderwaterFog(0.06f,  _waterFogColors[_sceneType] );
         _oceanScene->setUnderwaterDiffuse( _underwaterDiffuse[_sceneType] );
         _oceanScene->setUnderwaterAttenuation( _underwaterAttenuations[_sceneType] );
 
-	std::cerr << "sundir" << std::endl;
+	OSG_DEBUG << "sundir" << std::endl;
         osg::Vec3f sunDir = -_sunPositions[_sceneType];
         sunDir.normalize();
 
         _oceanScene->setSunDirection( sunDir );
 
-	std::cerr << "sunpos" << std::endl;
+	OSG_DEBUG << "sunpos" << std::endl;
         _light->setPosition( osg::Vec4f(_sunPositions[_sceneType],1.f) );
         _light->setDiffuse( _sunDiffuse[_sceneType] ) ;
-	std::cerr << "done" << std::endl;
+	OSG_DEBUG << "done" << std::endl;
         //if(_islandSwitch.valid() )
         //{
         //    if(_sceneType == CLEAR || _sceneType == CLOUDY)
@@ -366,13 +333,13 @@ public:
 
     osg::ref_ptr<osg::TextureCubeMap> loadCubeMapTextures( const std::string& dir )
     {
-	std::cerr << "start cubemaps" << std::endl;
+	OSG_DEBUG << "start cubemaps" << std::endl;
         enum {POS_X, NEG_X, POS_Y, NEG_Y, POS_Z, NEG_Z};
 
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/textures/")+dir);
 
         std::string filenames[6];
-	std::cerr << "set filenames" << std::endl;
+	OSG_DEBUG << "set filenames" << std::endl;
         filenames[POS_X] = std::string("east.png");
         filenames[NEG_X] = std::string("west.png");
         filenames[POS_Z] = std::string("north.png");
@@ -380,17 +347,17 @@ public:
         filenames[POS_Y] = std::string("down.png");
         filenames[NEG_Y] = std::string("up.png");
 
-	std::cerr << "set textureCubeMap" << std::endl;
+	OSG_DEBUG << "set textureCubeMap" << std::endl;
         osg::ref_ptr<osg::TextureCubeMap> cubeMap = new osg::TextureCubeMap;
         cubeMap->setInternalFormat(GL_RGBA);
 
-	std::cerr << "set filters" << std::endl;
+	OSG_DEBUG << "set filters" << std::endl;
         cubeMap->setFilter( osg::Texture::MIN_FILTER,    osg::Texture::LINEAR_MIPMAP_LINEAR);
         cubeMap->setFilter( osg::Texture::MAG_FILTER,    osg::Texture::LINEAR);
         cubeMap->setWrap  ( osg::Texture::WRAP_S,        osg::Texture::CLAMP_TO_EDGE);
         cubeMap->setWrap  ( osg::Texture::WRAP_T,        osg::Texture::CLAMP_TO_EDGE);
 
-	std::cerr << "set image" << std::endl;
+	OSG_DEBUG << "set image" << std::endl;
         cubeMap->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile( filenames[NEG_X] ) );
         cubeMap->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile( filenames[POS_X] ) );
         cubeMap->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile( filenames[NEG_Y] ) );
@@ -398,7 +365,7 @@ public:
         cubeMap->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile( filenames[NEG_Z] ) );
         cubeMap->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile( filenames[POS_Z] ) );
 
-	std::cerr << "done" << std::endl;
+	OSG_DEBUG << "done" << std::endl;
         return cubeMap;
     }
 

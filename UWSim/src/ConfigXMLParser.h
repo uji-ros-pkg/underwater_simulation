@@ -14,7 +14,7 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT} type_t;
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -32,8 +32,8 @@ struct Vcam{
   string linkName, roscam, roscaminfo;
   int resw,resh,link;
   double position[3],orientation[3];
-  Parameters * parameters;
-  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;parameters=NULL;}
+  boost::shared_ptr<Parameters> parameters;
+  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; parameters.reset();}
 };
 
 struct rangeSensor {
@@ -68,7 +68,7 @@ struct Joint{
   int parent, child; //references to Link
   int mimicp,type; //0 fixed, 1 rotation, 2 prismatic.
   float lowLimit,upLimit;
-  Mimic *mimic;
+  boost::shared_ptr<Mimic> mimic;
   double position[3];
   double rpy[3];
   double axis[3];
@@ -82,18 +82,18 @@ struct Material{
 
 struct Vehicle{
   string name;
-  Link * links;
-  Joint * joints;
+  std::vector<Link> links;
+  std::vector<Joint> joints;
   int nlinks;
   int njoints;
   int ninitJoints;
   int nmaterials;
   double position[3];
   double orientation[3];
-  double * jointValues;
-  Material * materials;
-  list <Vcam> Vcams;
-  list <rangeSensor> range_sensors;
+  std::vector<double> jointValues;
+  std::vector<Material> materials;
+  std::list<Vcam> Vcams;
+  std::list<rangeSensor> range_sensors;
 };
 
 struct Object{
@@ -107,37 +107,37 @@ struct Object{
 class ConfigFile{
 private:
 
-  void esPi(string in,double * param);
+  void esPi(string in,double &param);
 
-  void extractFloatChar(const xmlpp::Node* node,double * param);
-  void extractIntChar(const xmlpp::Node* node,int * param);
-  void extractUIntChar(const xmlpp::Node* node, unsigned int * param);
-  void extractStringChar(const xmlpp::Node* node,string * param);
-  void extractPositionOrColor(const xmlpp::Node* node,double * param);
-  void extractOrientation(const xmlpp::Node* node,double * param);
+  void extractFloatChar(const xmlpp::Node* node,double &param);
+  void extractIntChar(const xmlpp::Node* node,int &param);
+  void extractUIntChar(const xmlpp::Node* node, unsigned int &param);
+  void extractStringChar(const xmlpp::Node* node,string &param);
+  void extractPositionOrColor(const xmlpp::Node* node,double param[3]);
+  void extractOrientation(const xmlpp::Node* node,double param[3]);
 
   void processFog(const xmlpp::Node* node);
   void processOceanState(const xmlpp::Node* node);
   void processSimParams(const xmlpp::Node* node);
-  void processParameters(const xmlpp::Node*, Parameters * params);
-  void processVcam(const xmlpp::Node* node, Vcam * vcam);
-  void processRangeSensor(const xmlpp::Node* node, rangeSensor *rs);
+  void processParameters(const xmlpp::Node*, Parameters *params);
+  void processVcam(const xmlpp::Node* node, Vcam &vcam);
+  void processRangeSensor(const xmlpp::Node* node, rangeSensor &rs);
   void processCamera(const xmlpp::Node* node);
-  void processJointValues(const xmlpp::Node* node,double ** jointValues,int * ninitJoints);
-  void processVehicle(const xmlpp::Node* node,Vehicle *vehicle);
-  void processObject(const xmlpp::Node* node,Object *object);
-  void processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo * rosInterface);
+  void processJointValues(const xmlpp::Node* node, std::vector<double> &jointValues, int &ninitJoints);
+  void processVehicle(const xmlpp::Node* node, Vehicle &vehicle);
+  void processObject(const xmlpp::Node* node, Object &object);
+  void processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &rosInterface);
   void processROSInterfaces(const xmlpp::Node* node);
   void processXML(const xmlpp::Node* node);
 
 
-  void processPose(urdf::Pose pose,double * position, double * rpy,double * quat);
-  int processVisual(boost::shared_ptr<const urdf::Visual> visual,Link * link,int nmat,Material * materials); //returns current material
-  void processJoint(boost::shared_ptr<const urdf::Joint> joint,Joint * jointVehicle,int parentLink,int childLink);
-  int processLink(boost::shared_ptr<const urdf::Link> link,Vehicle * vehicle,int nlink,int njoint,int nmat,Material * materials); //returns current link number
-  int processURDFFile(string file, Vehicle * vehicle);
+  void processPose(urdf::Pose pose,double position[3], double rpy[3],double quat[4]);
+  int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int nmat, std::vector<Material> &materials); //returns current material
+  void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink);
+  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, int nmat, std::vector<Material> &materials); //returns current link number
+  int processURDFFile(string file, Vehicle &vehicle);
 
-  void postprocessVehicle(Vehicle * vehicle);
+  void postprocessVehicle(Vehicle &vehicle);
 
 public:
   double windx, windy,windSpeed,depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight, oceanSurfaceHeight,fogDensity;

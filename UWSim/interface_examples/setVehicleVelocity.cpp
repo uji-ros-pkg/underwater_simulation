@@ -23,9 +23,9 @@ int main(int argc, char **argv) {
 	double pitch=atof(argv[6]);
 	double yaw=atof(argv[7]);
 
-        std::string nodeName=topic;
-        nodeName.replace(0,1,"a");
-	ros::init(argc, argv, nodeName);
+        //std::string nodeName=topic;
+        //nodeName.replace(0,1,"a");
+	ros::init(argc, argv, "setVehicleVelocity");
 	ros::NodeHandle nh;
 	ros::Publisher position_pub;
 	position_pub=nh.advertise<nav_msgs::Odometry>(topic,1);
