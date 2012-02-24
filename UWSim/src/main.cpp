@@ -61,25 +61,22 @@ int main(int argc, char *argv[])
 
     osg::ArgumentParser arguments(&argc,argv);
     arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
-    arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is an example of osgOcean.");
+    arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is using osgOcean.");
     arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] ...");
-    arguments.getApplicationUsage()->addCommandLineOption("--windx <x>","Wind X direction. Default 0.04");
-    arguments.getApplicationUsage()->addCommandLineOption("--windy <y>","Wind Y direction. Default 0.04");
-    arguments.getApplicationUsage()->addCommandLineOption("--windSpeed <speed>","Wind speed. Default: 12");
-    arguments.getApplicationUsage()->addCommandLineOption("--depth <depth>","Depth. Default: 10000");
-    arguments.getApplicationUsage()->addCommandLineOption("--isNotChoppy","Set the waves not choppy (by default they are).");
-    arguments.getApplicationUsage()->addCommandLineOption("--choppyFactor <factor>","How choppy the waves are. Default: 2.5");
-    arguments.getApplicationUsage()->addCommandLineOption("--crestFoamHeight <height>","How high the waves need to be before foam forms on the crest. Default: 2.2 ");
-    arguments.getApplicationUsage()->addCommandLineOption("--oceanSurfaceHeight <z>","Z position of the ocean surface in world coordinates. Default: 0.0");
+    arguments.getApplicationUsage()->addCommandLineOption("--windx <x>","Wind X direction.");
+    arguments.getApplicationUsage()->addCommandLineOption("--windy <y>","Wind Y direction.");
+    arguments.getApplicationUsage()->addCommandLineOption("--windSpeed <speed>","Wind speed.");
+    arguments.getApplicationUsage()->addCommandLineOption("--isNotChoppy","Set the waves not choppy.");
+    arguments.getApplicationUsage()->addCommandLineOption("--choppyFactor <factor>","How choppy the waves are.");
+    arguments.getApplicationUsage()->addCommandLineOption("--crestFoamHeight <height>","How high the waves need to be before foam forms on the crest.");
+    arguments.getApplicationUsage()->addCommandLineOption("--oceanSurfaceHeight <z>","Z position of the ocean surface in world coordinates.");
     arguments.getApplicationUsage()->addCommandLineOption("--disableShaders","Disable use of shaders for the whole application. Also disables most visual effects as they depend on shaders.");
-    arguments.getApplicationUsage()->addCommandLineOption("--resw <width>","Set the viewer width resolution (default 640)");
-    arguments.getApplicationUsage()->addCommandLineOption("--resh <height>","Set the viewer height resolution (default 480)");
-    arguments.getApplicationUsage()->addCommandLineOption("--trackball","Sets the main camera to move freely (the default is to track the vehicle)");
-    arguments.getApplicationUsage()->addCommandLineOption("--roscam","Indicate the name of an image ROS topic");
-    arguments.getApplicationUsage()->addCommandLineOption("--roscaminfo","Indicate the name of a camera info ROS topic");
-    arguments.getApplicationUsage()->addCommandLineOption("--configfile","Indicate config file location");
-    arguments.getApplicationUsage()->addCommandLineOption("--v","Be verbose. (OSG notify level NOTICE");
-    arguments.getApplicationUsage()->addCommandLineOption("--vv","Be much verbose. (OSG notify level DEBUG");
+    arguments.getApplicationUsage()->addCommandLineOption("--resw <width>","Set the viewer width resolution");
+    arguments.getApplicationUsage()->addCommandLineOption("--resh <height>","Set the viewer height resolution");
+    arguments.getApplicationUsage()->addCommandLineOption("--freeMotion","Sets the main camera to move freely");
+    arguments.getApplicationUsage()->addCommandLineOption("--configfile","Indicate config file location (default: data/scenes/cirs.xml). The rest of the options override the values defined in this file.");
+    arguments.getApplicationUsage()->addCommandLineOption("--v","Be verbose. (OSG notify level NOTICE)");
+    arguments.getApplicationUsage()->addCommandLineOption("--vv","Be much verbose. (OSG notify level DEBUG)");
 
     unsigned int helpType = 0;
     if ((helpType = arguments.readHelpType()))
@@ -114,7 +111,7 @@ int main(int argc, char *argv[])
     while (arguments.read("--windSpeed", windSpeed));
 
     float depth = config.depth;
-    while (arguments.read("--depth", depth));
+    //while (arguments.read("--depth", depth));
 
     float reflectionDamping = config.reflectionDamping;
     while (arguments.read("--reflectionDamping", reflectionDamping));
