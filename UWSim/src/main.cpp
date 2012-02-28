@@ -352,19 +352,13 @@ int main(int argc, char *argv[])
     int ncamwidgets=0;
     for (int j=0; j<nvehicle ;j++){
       for (unsigned int i=0; i<iauvFile[j]->getNumCams(); i++) {
-    	    OSG_INFO << "	widget " << i << std::endl;
-    	    OSG_INFO << "		pushback"  << std::endl;
 	    camWidgets.push_back(iauvFile[j]->camview[i].getWidgetWindow());
-	    OSG_INFO << "Window ref count " << camWidgets[ncamwidgets]->referenceCount() << std::endl;
 	    camWidgets[ncamwidgets]->setX(dispx);
 	    camWidgets[ncamwidgets]->setY(0);
 	    dispx+=iauvFile[j]->camview[i].width+20;
-    	    OSG_INFO << "		addchild"  << std::endl;
 	    wm->addChild(camWidgets[ncamwidgets]);
-    	    OSG_INFO << "		hide"  << std::endl;
 	    camWidgets[ncamwidgets]->hide();
-    	    OSG_INFO << "		eventhandler"  << std::endl;
-	    viewer.addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene ) );
+	    viewer.addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene) );
 	    ncamwidgets++;
       }
     }

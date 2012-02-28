@@ -6,13 +6,19 @@
  */
 
 #include "VirtualCamera.h"
+#include "UWSimUtils.h"
 #include <iostream>
 
 VirtualCamera::VirtualCamera(){}
 
 void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
 	this->name=name;
+
 	this->trackNode=trackNode;
+	//Add a switchable frame geometry on the camera frame
+        osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
+	this->trackNode->asGroup()->addChild(axis);	
+
 	this->width=width;
 	this->height=height;
 	if(params!=NULL){
@@ -97,7 +103,5 @@ osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow() {
 	box->getBackground()->setColor(1.0f, 0.0f, 0.0f, 0.8f);
 	box->attachMoveCallback();
 	box->attachScaleCallback();
-	OSG_DEBUG << "box count: " << box->referenceCount() << std::endl;
-	OSG_DEBUG << "widget count: " << widget->referenceCount() << std::endl;
 	return box;
 }

@@ -82,6 +82,15 @@ private:
     bool _endline_after_time;
 };
 
+class UWSimGeometry {
+public:
+	static osg::Node* createFrame(double radius=0.015, double length=0.2);
+	static osg::Node* createSwitchableFrame(double radius=0.015, double length=0.2);
+	static osg::Node* createOSGBox( osg::Vec3 size );
+	static osg::Node* createOSGCylinder( double radius, double height );
+	static osg::Node* createOSGSphere( double radius );
+
+};
 
 #endif
 

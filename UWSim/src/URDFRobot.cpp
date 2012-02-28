@@ -5,55 +5,6 @@
 #include <osg/Material>
 #include <math.h>
 
-osg::Node * createOSGBox( osg::Vec3 size )
-{
-    osg::ref_ptr<osg::Box> box = new osg::Box();
-
-    box->setHalfLengths( size/2 );
-
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( box );
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-    geode->addDrawable( shape );
-
-    osg::ref_ptr<osg::Node> node = new osg::Group();
-    node->asGroup()->addChild( geode );
-
-    return node.get();
-}
-
-osg::Node * createOSGCylinder( double radius, double height )
-{
-    osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder();
-
-    cylinder->setRadius( radius );
-    cylinder->setHeight( height );
-
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( cylinder );
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-    geode->addDrawable( shape );
-
-    osg::ref_ptr<osg::Node> node = new osg::Group();
-    node->asGroup()->addChild( geode );
-
-    return node.get();
-}
-
-osg::Node * createOSGSphere( double radius )
-{
-    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere();
-
-    sphere->setRadius( radius );
-
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( sphere );
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-    geode->addDrawable( shape );
-
-    osg::ref_ptr<osg::Node> node = new osg::Group();
-    node->asGroup()->addChild( geode );
-
-    return node.get();
-}
-
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
    ScopedTimer buildSceneTimer("Loading URDF robot... \n", osg::notify(osg::ALWAYS));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/robot"));
@@ -83,12 +34,12 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	  }
         }
 	else if(vehicle.links[i].type==1){
-	  link[i] = createOSGBox(osg::Vec3(vehicle.links[i].boxSize[0], vehicle.links[i].boxSize[1], vehicle.links[i].boxSize[2]));
+	  link[i] = UWSimGeometry::createOSGBox(osg::Vec3(vehicle.links[i].boxSize[0], vehicle.links[i].boxSize[1], vehicle.links[i].boxSize[2]));
 	}
 	else if(vehicle.links[i].type==2)
-	  link[i] = createOSGCylinder(vehicle.links[i].radius,vehicle.links[i].length);
+	  link[i] = UWSimGeometry::createOSGCylinder(vehicle.links[i].radius,vehicle.links[i].length);
 	else if(vehicle.links[i].type==3)
-	  link[i] = createOSGSphere(vehicle.links[i].radius);
+	  link[i] = UWSimGeometry::createOSGSphere(vehicle.links[i].radius);
 	link[i]->setName(vehicle.links[i].name);
 	if(vehicle.links[i].material!=-1){ //Add material if exists
 	  osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet();
@@ -107,6 +58,9 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 		success=false;
    	   }
    }
+
+   //Create a frame that can be switched on and off 
+   osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
 
    if(success) {
 	ScopedTimer buildSceneTimer("  · Linking links...", osg::notify(osg::ALWAYS));
@@ -166,10 +120,13 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   zerojoints[i]->setMatrix(m);
 	}
 
-	baseTransform=linkBaseTransforms[0];
+	baseTransform=new osg::MatrixTransform();
+	baseTransform->addChild(linkBaseTransforms[0]);
+	baseTransform->addChild(axis);
 	for (int i=0; i<vehicle.njoints; i++) {
 	   linkPostTransforms[vehicle.joints[i].parent]->asGroup()->addChild(joints[i]);
 	   joints[i]->addChild(linkBaseTransforms[vehicle.joints[i].child]);
+	   joints[i]->addChild(axis);
 	}
 
 	//Save rotations for joints update, limits, and type of joints
@@ -201,7 +158,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	osg::notify(osg::ALWAYS) << "Robot successfully loaded. Total time: ";
    }	
 }
-
 
 void URDFRobot::updateJoints(std::vector<double> &q) {
 	osg::Matrix m;

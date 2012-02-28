@@ -31,7 +31,7 @@
 
 #include "SkyDome.h"
 #include "ConfigXMLParser.h"
-
+#include "UWSimUtils.h"
 
 // ----------------------------------------------------
 //               Camera Track Callback
@@ -61,7 +61,7 @@ class osgOceanScene : public osg::Referenced
 {
 public:
     enum SCENE_TYPE{ CLEAR, DUSK, CLOUDY };
-    osg::MatrixTransform *localizedWorld;
+    osg::ref_ptr<osg::MatrixTransform> localizedWorld;
 
 private:
     SCENE_TYPE _sceneType;
@@ -268,6 +268,10 @@ public:
 		wMl.preMultRotate(osg::Quat(offsetr[2],osg::Vec3d(0,0,1)));
 		wMl.setTrans(offsetp[0],offsetp[1],offsetp[2]);
 		localizedWorld=new osg::MatrixTransform(wMl);
+		//add frame to localized world
+		osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
+		localizedWorld->asGroup()->addChild(axis);
+		
 		_oceanScene->addChild(localizedWorld);
 	    }
 

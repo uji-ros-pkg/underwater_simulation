@@ -6,6 +6,7 @@
 #include "ConfigXMLParser.h"
 
 #include <osgOcean/OceanScene>
+#include <osg/Switch>
 
 #include <iostream>
 #include <string.h>

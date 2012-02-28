@@ -6,6 +6,7 @@
  */
 
 #include "VirtualRangeSensor.h"
+#include "UWSimUtils.h"
 #include <iostream>
 
 VirtualRangeSensor::VirtualRangeSensor(){}
@@ -13,7 +14,12 @@ VirtualRangeSensor::VirtualRangeSensor(){}
 void VirtualRangeSensor::init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
 	this->name=name;
 	this->root=root;
+	
 	this->trackNode=trackNode;
+	//Add a switchable frame geometry on the sensor frame
+        osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
+	this->trackNode->asGroup()->addChild(axis);
+	
 	this->range=range;
 	this->visible=visible;
 
