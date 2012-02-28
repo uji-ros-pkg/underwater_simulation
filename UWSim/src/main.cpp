@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     arguments.getApplicationUsage()->addCommandLineOption("--crestFoamHeight <height>","How high the waves need to be before foam forms on the crest.");
     arguments.getApplicationUsage()->addCommandLineOption("--oceanSurfaceHeight <z>","Z position of the ocean surface in world coordinates.");
     arguments.getApplicationUsage()->addCommandLineOption("--disableShaders","Disable use of shaders for the whole application. Also disables most visual effects as they depend on shaders.");
+    arguments.getApplicationUsage()->addCommandLineOption("--disableTextures","Disable use of textures by default. Can be toggled with the 't' key.");
     arguments.getApplicationUsage()->addCommandLineOption("--resw <width>","Set the viewer width resolution");
     arguments.getApplicationUsage()->addCommandLineOption("--resh <height>","Set the viewer height resolution");
     arguments.getApplicationUsage()->addCommandLineOption("--freeMotion","Sets the main camera to move freely");
@@ -134,6 +135,9 @@ int main(int argc, char *argv[])
 
     bool disableShaders = config.disableShaders;
     if (arguments.read("--disableShaders")) disableShaders = true;
+
+    bool disableTextures = false;
+    if (arguments.read("--disableTextures")) disableTextures = true;
 
     bool freeMotion = config.freeMotion;
     if (arguments.read("--freeMotion")) {
@@ -394,6 +398,19 @@ int main(int argc, char *argv[])
     viewer.addEventHandler(new osgGA::StateSetManipulator(
         viewer.getCamera()->getOrCreateStateSet()
     ));
+
+    //If --disableTextures, force disabling textures
+    if (disableTextures) {
+	    for (unsigned int ii=0; ii<4; ii++) {
+		#if !defined(OSG_GLES1_AVAILABLE) && !defined(OSG_GLES2_AVAILABLE)
+		    viewer.getCamera()->getOrCreateStateSet()->setTextureMode( ii, GL_TEXTURE_1D, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF );
+		#endif
+		viewer.getCamera()->getOrCreateStateSet()->setTextureMode( ii, GL_TEXTURE_2D, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF );
+		viewer.getCamera()->getOrCreateStateSet()->setTextureMode( ii, GL_TEXTURE_3D, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF );
+		viewer.getCamera()->getOrCreateStateSet()->setTextureMode( ii, GL_TEXTURE_RECTANGLE, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF );
+		viewer.getCamera()->getOrCreateStateSet()->setTextureMode( ii, GL_TEXTURE_CUBE_MAP, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF);
+	    }
+    }
 
     wm->resizeAllWindows();
 
