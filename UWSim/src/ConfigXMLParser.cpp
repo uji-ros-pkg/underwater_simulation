@@ -459,9 +459,9 @@
 	  found=1;
 	}
       }
-      if(found==0)
+      if(found==0) {
 	OSG_WARN << "ConfigFile::postProcessVehicle: Camera attached to unknown link: " << aux.linkName << " camera will be ignored" << std::endl;
-      else 
+      } else 
       	vehicle.Vcams.push_back(aux);
     }
 
@@ -477,9 +477,9 @@
 	  found=1;
 	}
       }
-      if(found==0)
+      if(found==0) {
 	OSG_WARN << "ConfigFile::postProcessVehicle: RangeSensor attached to unknown link: " << rs.linkName << ". Will be ignored"<< std::endl;
-      else 
+      } else 
       	vehicle.range_sensors.push_back(rs);
     }
   }
@@ -601,9 +601,9 @@
   }
 
   void ConfigFile::processXML(const xmlpp::Node* node){
-    if(node->get_name()!="UWSimScene")
+    if(node->get_name()!="UWSimScene") {
       OSG_WARN <<"ConfigFile::processXML: XML file is not an UWSimScene file."<< std::endl;
-    else{
+    } else{
       xmlpp::Node::NodeList list = node->get_children();
       for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
       {
