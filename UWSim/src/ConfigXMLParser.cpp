@@ -387,10 +387,10 @@
     else{
       vehicle.links[nlink].type=4;
       vehicle.links[nlink].material=-1;
-      vehicle.links[nlink].position={0,0,0};
-      vehicle.links[nlink].rpy={0,0,0};
-      vehicle.links[nlink].quat={0,0,0,1};
-      
+      memset(vehicle.links[nlink].position,0,3*sizeof(double));
+      memset(vehicle.links[nlink].rpy,0,3*sizeof(double));
+      memset(vehicle.links[nlink].quat,0,4*sizeof(double));
+      vehicle.links[nlink].quat[3]=1;
     }
 
     int linkNumber=nlink;
