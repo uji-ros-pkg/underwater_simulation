@@ -382,7 +382,16 @@
   int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int nmat, std::vector<Material> &materials){
     vehicle.links[nlink].name=link->name;
 
-    nmat= processVisual(link->visual,vehicle.links[nlink],nmat, materials);
+    if(link->visual)
+      nmat= processVisual(link->visual,vehicle.links[nlink],nmat, materials);
+    else{
+      vehicle.links[nlink].type=4;
+      vehicle.links[nlink].material=-1;
+      vehicle.links[nlink].position={0,0,0};
+      vehicle.links[nlink].rpy={0,0,0};
+      vehicle.links[nlink].quat={0,0,0,1};
+      
+    }
 
     int linkNumber=nlink;
     for(uint i=0;i<link->child_joints.size();i++){

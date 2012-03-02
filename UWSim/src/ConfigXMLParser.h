@@ -54,7 +54,7 @@ struct Mimic{
 struct Link{
   string name;
   string file; // only used in mesh type
-  int type; //Related to geometry, 0: mesh from file, 1:box, 2:cylinder, 3:sphere
+  int type; //Related to geometry, 0: mesh from file, 1:box, 2:cylinder, 3:sphere, 4:NoVisual
   double position[3];
   double rpy[3];
   double quat[4];

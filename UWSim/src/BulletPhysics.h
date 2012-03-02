@@ -8,7 +8,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-//#include <osgbBullet/GLDebugDrawer.h>
+//#include <osgbCollision/GLDebugDrawer.h>
 
 #ifndef BULLETPHYSICS_H
 #define BULLETPHYSICS_H
@@ -21,7 +21,7 @@ public:
 	typedef enum {SHAPE_BOX, SHAPE_TRIMESH} collisionShapeType_t;
 
 	btDynamicsWorld * dynamicsWorld;
-	//osgbBullet::GLDebugDrawer debugDrawer;
+	//osgbCollision::GLDebugDrawer debugDrawer;
 
 	BulletPhysics();
 

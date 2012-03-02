@@ -40,7 +40,11 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	  link[i] = UWSimGeometry::createOSGCylinder(vehicle.links[i].radius,vehicle.links[i].length);
 	else if(vehicle.links[i].type==3)
 	  link[i] = UWSimGeometry::createOSGSphere(vehicle.links[i].radius);
+	else if(vehicle.links[i].type==4)
+	  link[i]=new osg::Group();
+
 	link[i]->setName(vehicle.links[i].name);
+
 	if(vehicle.links[i].material!=-1){ //Add material if exists
 	  osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet();
 	  osg::ref_ptr<osg::Material> material = new osg::Material();
@@ -58,7 +62,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 		success=false;
    	   }
    }
-
+     
    //Create a frame that can be switched on and off 
    osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
 
@@ -80,6 +84,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   link[i]->getStateSet()->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
 	   link[i]->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
 
+
 	   link[i]->setNodeMask( oscene->getNormalSceneMask() | oscene->getReflectedSceneMask() | oscene->getRefractedSceneMask() );
 	   linkBase.makeIdentity();
 	   //linkBase.preMultRotate(osg::Quat(vehicle.links[i].rpy[0],osg::Vec3d(1,0,0)));
@@ -89,7 +94,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   linkBase.makeTranslate(osg::Vec3d (vehicle.links[i].position[0],vehicle.links[i].position[1],vehicle.links[i].position[2]));
 	   linkBase.preMultRotate(osg::Quat (vehicle.links[i].quat[0],vehicle.links[i].quat[1],vehicle.links[i].quat[2],vehicle.links[i].quat[3]));
 
-	   
+	       
 	   linkBaseTransforms[i]= new osg::MatrixTransform;
 	   linkBaseTransforms[i]->setMatrix(linkBase);
 	   linkBaseTransforms[i]->addChild(link[i]);
@@ -128,7 +133,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   joints[i]->addChild(linkBaseTransforms[vehicle.joints[i].child]);
 	   joints[i]->addChild(axis);
 	}
-
 	//Save rotations for joints update, limits, and type of joints
 	joint_axis.resize(vehicle.njoints);
 	for(int i=0; i<vehicle.njoints;i++){

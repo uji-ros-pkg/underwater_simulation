@@ -340,6 +340,8 @@ int main(int argc, char *argv[])
     }
 
 
+    //root->addChild(physics.debugDrawer.getSceneGraph());
+
     OSG_INFO << "Starting window manager..." << std::endl;
     osg::ref_ptr<osgWidget::WindowManager> wm = new osgWidget::WindowManager(
 		&viewer,
@@ -437,7 +439,8 @@ int main(int argc, char *argv[])
         double elapsed( currSimTime - prevSimTime );
         if( viewer.getFrameStamp()->getFrameNumber() < 3 )
             elapsed = 1./60.;
-  	physics.stepSimulation(elapsed, 8, btScalar(1.)/btScalar(200.) );
+  	//physics.stepSimulation(elapsed, 8, btScalar(1.)/btScalar(200.) );
+	physics.stepSimulation(elapsed, 4, elapsed/4. );
         prevSimTime = currSimTime;
 #endif
         viewer.frame();
