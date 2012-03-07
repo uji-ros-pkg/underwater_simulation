@@ -16,9 +16,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	//Find file in the package
   	if(vehicle.links[i].file.rfind("/robot/"))
     	   vehicle.links[i].file.erase(0,vehicle.links[i].file.rfind("/robot/")+7);
-  	//Use osg version of file
-  	vehicle.links[i].file.erase(vehicle.links[i].file.size()-3);
-  	vehicle.links[i].file.append("osg");
 	}
    }
 
@@ -29,7 +26,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	if(vehicle.links[i].type==0){
 	  link[i] = osgDB::readNodeFile(vehicle.links[i].file);
 	  if(link[i] == NULL){
-	     std::cerr<<"Error reading file " << vehicle.links[i].file <<". Check URDF file." <<std::endl;
+	     std::cerr<<"Error reading file " << vehicle.links[i].file <<" Check URDF file." <<std::endl;
 	     exit(0);
 	  }
         }
