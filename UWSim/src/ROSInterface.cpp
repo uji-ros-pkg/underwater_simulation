@@ -1,5 +1,8 @@
 #include "ROSInterface.h"
 
+// static member
+ros::Time ROSInterface::current_time_;
+
 ROSSubscriberInterface::ROSSubscriberInterface(std::string topic):ROSInterface(topic) {
   OSG_DEBUG << "ROSSubscriberVehicleInterface Thread starting... " << topic << std::endl;
   startThread();
@@ -287,6 +290,7 @@ void PATToROSOdom::createPublisher(ros::NodeHandle &nh) {
 void PATToROSOdom::publish() {
   if (transform!=NULL) {
     nav_msgs::Odometry odom;
+    odom.header.stamp = getROSTime();
 	
     osg::Matrixd mat=transform->getMatrix();
     osg::Vec3d pos=mat.getTrans();
@@ -330,6 +334,7 @@ void ArmToROSJointState::createPublisher(ros::NodeHandle &nh) {
 void ArmToROSJointState::publish() {
   if (arm!=NULL) {
     sensor_msgs::JointState js;
+    js.header.stamp = getROSTime();
     std::vector<double> q=arm->getJointPosition();
     for (size_t i=0; i<q.size(); i++) {
       char name[4];
@@ -366,7 +371,7 @@ void VirtualCameraToROSImage::publish() {
     if (d!=0) {
       sensor_msgs::Image img;
       sensor_msgs::CameraInfo img_info;
-      img_info.header.stamp=img.header.stamp=ros::Time::now();
+      img_info.header.stamp=img.header.stamp=getROSTime();
       img.encoding=std::string("rgb8");
       img.is_bigendian=0;
       img.height=h;
@@ -424,6 +429,7 @@ void RangeSensorToROSRange::createPublisher(ros::NodeHandle &nh) {
 void RangeSensorToROSRange::publish() {
   if (rs!=NULL) {
     sensor_msgs::Range r;
+    r.header.stamp = getROSTime();
     r.radiation_type=sensor_msgs::Range::ULTRASOUND;
     r.field_of_view=0;	//X axis of the sensor
     r.min_range=0;

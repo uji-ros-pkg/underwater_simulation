@@ -432,6 +432,7 @@ int main(int argc, char *argv[])
 
     while( !viewer.done() && ros::ok())
     {
+      ROSInterface::setROSTime(ros::Time::now());
 	ros::spinOnce();
 
 #ifdef BUILD_BULLET_PHYSICS

@@ -49,10 +49,31 @@ class ROSInterface {
 protected:
 	std::string topic;
 	ros::NodeHandle nh_;
+    static ros::Time current_time_;
+
 public:
 	ROSInterface(std::string topic) {this->topic=topic;}
 
 	~ROSInterface(){}
+
+    /**
+     * Sets the static ros time in the ROSInterface,
+     * to be called once per simulation step
+     */
+	static void setROSTime(const ros::Time& time)
+    {
+      current_time_ = time;
+    }
+
+    /**
+     * Retrieve the current ROS time.
+     * Use this instead of calling ros::Time::now()
+     * when setting the timestamp of your messages.
+     */
+    static ros::Time getROSTime()
+    {
+      return current_time_;
+    }
 };
 
 class ROSSubscriberInterface: public OpenThreads::Thread, public ROSInterface {
