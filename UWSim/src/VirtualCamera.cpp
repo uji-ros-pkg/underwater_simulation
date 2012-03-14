@@ -11,7 +11,7 @@
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
+void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
 	this->name=name;
 
 	this->trackNode=trackNode;
@@ -21,6 +21,8 @@ void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int 
 
 	this->width=width;
 	this->height=height;
+	this->baseline = baseline;
+	this->frameId = frameId;
 	if(params!=NULL){
 	  this->fx=params->fx;
 	  this->fy=params->fy;
@@ -40,12 +42,20 @@ void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int 
 	createCamera();
 }
 
-VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height) {
-	init(name, trackNode,width,height,NULL);
+VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
+	init(name, trackNode,width,height,baseline, frameId, NULL);
+}
+
+VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
+	init(name, trackNode,width,height,baseline,frameId,params);
 }
 
 VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(name, trackNode,width,height,params);
+	init(name, trackNode,width,height,0.0,"",params);
+}
+
+VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height) {
+	init(name, trackNode,width,height,0.0,"", NULL);
 }
 
 void VirtualCamera::createCamera()
@@ -66,6 +76,7 @@ void VirtualCamera::createCamera()
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+	
 	if(!paramsOn){
 	  //set default fov, near and far parameters
 	  textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 10);
@@ -89,6 +100,8 @@ void VirtualCamera::createCamera()
 
 	}
 
+	Tx = (-fx * baseline);
+	Ty = 0.0;
 	//make this camera track the node
 	osg::ref_ptr<MyNodeTrackerCallback> node_tracker = new MyNodeTrackerCallback;
 	node_tracker->setCamera(textureCamera.get());

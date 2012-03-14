@@ -30,10 +30,12 @@ struct Parameters{
 struct Vcam{
   string name;
   string linkName, roscam, roscaminfo;
+  std::string frameId; ///Frame Id for stereo camera images
   int resw,resh,link;
   double position[3],orientation[3];
+  double baseLine; ///baseline for stereo cameras
   boost::shared_ptr<Parameters> parameters;
-  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; parameters.reset();}
+  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; parameters.reset();}
 };
 
 struct rangeSensor {

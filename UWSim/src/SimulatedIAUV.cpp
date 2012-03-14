@@ -95,7 +95,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
       vMc->asPositionAttitudeTransform()->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
       vMc->asPositionAttitudeTransform()->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
       urdf->link[vcam.link]->asGroup()->addChild(vMc);
-      camview.push_back(VirtualCamera(vcam.name, vMc, vcam.resw, vcam.resh, vcam.parameters.get()));
+      camview.push_back(VirtualCamera(vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get()));
       OSG_INFO << "Done adding a virtual camera..." << std::endl;
     }
 

@@ -317,11 +317,11 @@ int main(int argc, char *argv[])
 
       if(rosInterface.type==ROSInterfaceInfo::VirtualCameraToROSImage) 
 	//Find corresponding VirtualCamera Object on all the vehicles
-	for (int j=0; j<nvehicle ;j++)
+	for (int j=0; j<nvehicle ;j++) {
 	  for (unsigned int c=0; c<iauvFile[j]->getNumCams(); c++) 
 		if (iauvFile[j]->camview[c].name==rosInterface.targetName) 
 		   iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate));
-
+	}
       if(rosInterface.type==ROSInterfaceInfo::ROSImageToHUD) {
 	boost::shared_ptr<HUDCamera> realcam(new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale));
 	iface=boost::shared_ptr<ROSImageToHUDCamera>(new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam.get()));

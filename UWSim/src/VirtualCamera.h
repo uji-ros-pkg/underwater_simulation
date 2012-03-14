@@ -49,15 +49,20 @@ public:
 	int width, height;
 	double fx,fy,cx,cy;	///< intrinsic parameters
 	double far,near,k;
+	double baseline; //Only for stereo. Default=0
+	double Tx, Ty; //Only for stereo.
+	std::string frameId; //Default=""
 	int paramsOn;
-
+	
 	osg::ref_ptr<osg::Image> renderTexture;
 
-    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height);
-    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
+	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height);
+	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
+    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId);
+    	VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params);
     	VirtualCamera();
     	
-	void init(std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
+	void init(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params);
 
     	void createCamera();
 

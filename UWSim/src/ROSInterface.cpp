@@ -338,7 +338,7 @@ void ArmToROSJointState::publish() {
     std::vector<double> q=arm->getJointPosition();
     for (size_t i=0; i<q.size(); i++) {
       char name[4];
-      sprintf(name,"q%d",i+1);
+      sprintf(name,"q%d",(int)i+1);
       js.name.push_back(std::string(name));
       js.position.push_back(q[i]);
       js.effort.push_back(0);
@@ -372,7 +372,9 @@ void VirtualCameraToROSImage::publish() {
       sensor_msgs::Image img;
       sensor_msgs::CameraInfo img_info;
       img_info.header.stamp=img.header.stamp=getROSTime();
+      img_info.header.frame_id=img.header.frame_id=cam->frameId;
       img.encoding=std::string("rgb8");
+      
       img.is_bigendian=0;
       img.height=h;
       img.width=w;
@@ -380,6 +382,14 @@ void VirtualCameraToROSImage::publish() {
       img.data.resize(d);
       img_info.width=w;
       img_info.height=h;
+      
+      img_info.D.resize(4, 0.0);
+      
+      
+      img_info.R[0] = 1.0;
+      img_info.R[4] = 1.0;
+      img_info.R[8] = 1.0;
+      
       img_info.K[0]=cam->fx;
       img_info.K[2]=cam->cx;
       img_info.K[4]=cam->fy;
@@ -388,10 +398,21 @@ void VirtualCameraToROSImage::publish() {
 
       img_info.P[0]=cam->fx;
       img_info.P[2]=cam->cx;
+      img_info.P[3]=cam->Tx;
       img_info.P[5]=cam->fy;
       img_info.P[6]=cam->cy;
+      img_info.P[7]=cam->Ty;
       img_info.P[10]=1;
  
+      img_info.roi.x_offset = 0;
+      img_info.roi.y_offset = 0;
+      img_info.roi.height = img_info.height;
+      img_info.roi.width = img_info.width;
+      img_info.roi.do_rectify = false;
+      
+      img_info.binning_x = 0;
+      img_info.binning_y = 0;
+      
       img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;		
 	
       char *virtualdata=(char*)cam->renderTexture->data();

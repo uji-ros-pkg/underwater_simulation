@@ -218,6 +218,11 @@
 	extractOrientation(child,vcam.orientation);
       else if(child->get_name()=="name")
 	extractStringChar(child,vcam.name);
+      else if(child->get_name()=="baseline"){
+	extractFloatChar(child,vcam.baseLine);
+      } else if(child->get_name()=="frameId"){
+	extractStringChar(child,vcam.frameId);
+      }
       else if(child->get_name()=="parameters"){
 	vcam.parameters.reset(new Parameters());
 	processParameters(child,vcam.parameters.get());
