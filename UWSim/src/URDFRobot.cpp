@@ -150,8 +150,10 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	     mimic[i].joint=vehicle.joints[i].mimicp;
   	     mimic[i].offset=vehicle.joints[i].mimic->offset;
   	     mimic[i].multiplier=vehicle.joints[i].mimic->multiplier;
-	     if(vehicle.joints[i].name.find("slidercrank")!=vehicle.joints[i].name.length())
+	     if(vehicle.joints[i].name.find("slidercrank")!=string::npos)
 		mimic[i].sliderCrank=1;
+	     else
+		mimic[i].sliderCrank=0;	
 	   }
 	}
 
