@@ -88,7 +88,6 @@
       <p>0</p>
       <y>0</y>
     </orientation>
-    
     <virtualCamera>
       <name>bowtech1</name>
       <relativeTo>part0</relativeTo>
@@ -96,7 +95,7 @@
     <resh> 240 </resh>
       <position>
         <x>-0.2</x>
-	<y>0.1</y>
+	    <y>-0.1</y>
         <z> 0 </z>
       </position>
       <orientation>
@@ -104,18 +103,16 @@
         <p>0</p>
         <y>1.57 </y>
       </orientation>      
-      <baseline> 0.2 </baseline>
-      <frameId> stereo </frameId>
     </virtualCamera>
     
     <virtualCamera>
-      <name>bowtech2</name>
+      <name>stereo_down_left</name>
       <relativeTo>part0</relativeTo>
-      <resw> 320</resw>
-      <resh> 240 </resh>
+      <resw>1024</resw>
+      <resh>768</resh>
       <position>
-        <x>-0.2</x>
-        <y> -0.1 </y>
+        <x>-0.5</x>
+        <y>-0.06</y>
         <z> 0 </z>
       </position>  
       <orientation>
@@ -124,25 +121,45 @@
         <y>1.57 </y>
       </orientation>
       <baseline> 0.0 </baseline>
-      <frameId> stereo </frameId>
+      <frameId> stereo_down </frameId>
+      <parameters>
+        <fx>681.186</fx>
+        <fy>681.186</fy>
+        <x0>512</x0>
+        <y0>384</y0>
+        <f>100.0</f>
+        <n>0.05</n>
+        <k>0.0</k>
+      </parameters>
     </virtualCamera>
-    
-    <rangeSensor>
-      <name>sonar</name>
+
+    <virtualCamera>
+      <name>stereo_down_right</name>
       <relativeTo>part0</relativeTo>
-      <range>10</range>
-      <visible>1</visible>
+      <resw>1024</resw>
+      <resh>768</resh>
       <position>
-        <x>-0.3</x>
-        <y>0</y>
-        <z>0</z>
+        <x>-0.5</x>
+        <y>0.06</y>
+        <z> 0 </z>
       </position>  
       <orientation>
         <r>0</r>
-        <p>1.57</p>
-        <y>0</y>
+        <p>0</p>
+        <y>1.57 </y>
       </orientation>
-    </rangeSensor>
+      <baseline> 0.12 </baseline>
+      <frameId> stereo_down </frameId>
+      <parameters>
+        <fx>681.186</fx>
+        <fy>681.186</fy>
+        <x0>512</x0>
+        <y0>384</y0>
+        <f>100.0</f>
+        <n>0.05</n>
+        <k>0.0</k>
+      </parameters>
+    </virtualCamera>
   </vehicle>
 
   <object>
@@ -204,20 +221,15 @@
 	<vehicleName> girona500 </vehicleName>
     </ROSJointStateToArm>
     <VirtualCameraToROSImage> 
-      <cameraName>bowtech1</cameraName>
-      <imageTopic> /stereo/right/image_raw</imageTopic>
-      <infoTopic> /stereo/right/camera_info </infoTopic>
+      <cameraName>stereo_down_left</cameraName>
+      <imageTopic> /stereo_down/left/image_raw</imageTopic>
+      <infoTopic> /stereo_down/left/camera_info </infoTopic>
     </VirtualCameraToROSImage>
         <VirtualCameraToROSImage> 
-      <cameraName>bowtech2</cameraName>
-      <imageTopic> /stereo/left/image_raw</imageTopic>
-      <infoTopic>  /stereo/left/camera_info </infoTopic>
+      <cameraName>stereo_down_right</cameraName>
+      <imageTopic> /stereo_down/right/image_raw</imageTopic>
+      <infoTopic>  /stereo_down/right/camera_info </infoTopic>
     </VirtualCameraToROSImage>
-    <RangeSensorToROSRange>
-      <name>sonar</name>
-      <topic> /uwsim/g500/range </topic>
-      <rate>10</rate>
-    </RangeSensorToROSRange>
   </rosInterfaces>
 </UWSimScene>
 
