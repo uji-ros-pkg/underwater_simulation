@@ -576,6 +576,8 @@
 	extractUIntChar(child,rosInterface.posy);
       else if(child->get_name()=="scale")
 	extractFloatChar(child,rosInterface.scale);
+      else if(child->get_name()=="visualize")
+	extractIntChar(child,rosInterface.visualize);
     }
   }
 
@@ -588,6 +590,7 @@
       rosInterface.rate=10; //Default rate
       rosInterface.posx=rosInterface.posy=0;
       rosInterface.scale=1;
+      rosInterface.visualize=0;
       rosInterface.type=ROSInterfaceInfo::Unknown;
       if(child->get_name()=="ROSOdomToPAT"){
 	rosInterface.type=ROSInterfaceInfo::ROSOdomToPAT;

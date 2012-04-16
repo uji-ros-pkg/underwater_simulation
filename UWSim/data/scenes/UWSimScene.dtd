@@ -83,7 +83,7 @@
 <!ELEMENT joint (#PCDATA)>
 
 <!-- elementos rosinterfaces -->
-<!ELEMENT ROSOdomToPAT (topic,vehicleName)>
+<!ELEMENT ROSOdomToPAT (topic,vehicleName, visualize?)>
 <!ELEMENT PATToROSOdom  (topic, vehicleName, rate?)>
 <!ELEMENT ArmToROSJointState  (topic, vehicleName, rate?)>
 <!ELEMENT ROSJointStateToArm  (topic,vehicleName)>
@@ -103,6 +103,7 @@
 <!ELEMENT cameraName (#PCDATA)>
 <!ELEMENT imageTopic (#PCDATA)>
 <!ELEMENT infoTopic (#PCDATA)>
+<!ELEMENT visualize (#PCDATA)>
 
 <!-- elementos vcamtoROSImage -->
 <!ELEMENT cam (#PCDATA)>

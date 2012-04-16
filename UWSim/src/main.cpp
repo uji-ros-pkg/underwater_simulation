@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
      
       boost::shared_ptr<ROSInterface> iface; 
       if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT)
-	iface=boost::shared_ptr<ROSOdomToPAT>(new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName));
+	iface=boost::shared_ptr<ROSOdomToPAT>(new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName,rosInterface.visualize));
 
       if(rosInterface.type==ROSInterfaceInfo::ROSTwistToPAT)
 	iface=boost::shared_ptr<ROSTwistToPAT>(new ROSTwistToPAT(root,rosInterface.topic,rosInterface.targetName));
@@ -430,6 +430,7 @@ int main(int argc, char *argv[])
      viewer.getWindows(windows);
      windows[0]->setWindowName("UWSim");
 
+    ros::start();
     while( !viewer.done() && ros::ok())
     {
       ROSInterface::setROSTime(ros::Time::now());

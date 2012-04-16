@@ -1,12 +1,12 @@
 #include "ROSInterface.h"
+#include "UWSimUtils.h"
+#include <osg/LineWidth>
 
 // static member
 ros::Time ROSInterface::current_time_;
 
 ROSSubscriberInterface::ROSSubscriberInterface(std::string topic):ROSInterface(topic) {
-  OSG_DEBUG << "ROSSubscriberVehicleInterface Thread starting... " << topic << std::endl;
   startThread();
-  OSG_DEBUG << "ROSSubscriberVehicleInterface Thread created" << std::endl;
 }
 
 /* Thread code */
@@ -18,7 +18,7 @@ void ROSSubscriberInterface::run() {
 ROSSubscriberInterface::~ROSSubscriberInterface(){join();}
 
 
-ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName): ROSSubscriberInterface(topic) {
+ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, int visualization, int max_waypoint_distance): ROSSubscriberInterface(topic) {
   findNodeVisitor findNode(vehicleName);
   rootNode->accept(findNode);
   osg::Node *first=findNode.getFirst();
@@ -28,10 +28,41 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
     transform=dynamic_cast<osg::MatrixTransform*>(first);
   }
   started=0; //Used in time
+  trajectory_initialized=false;
+  this->max_waypoint_distance=max_waypoint_distance;
+  enable_visualization=(visualization==1);
+
+  if (enable_visualization) {
+	  trajectory_points=new osg::Vec3Array;
+	  trajectory_points->push_back( osg::Vec3( 0,0,0 ) );
+	  color = new osg::Vec4Array; 
+	  color->push_back(osg::Vec4(0.0,0.0,0.0,0.0)); 
+	  trajectory=osg::ref_ptr<osg::Geometry>(new osg::Geometry);
+	  trajectory->setVertexArray(trajectory_points); 
+	  trajectory->setColorArray(color); 
+	  trajectory->setColorBinding(osg::Geometry::BIND_OVERALL); 
+	  prset=new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP);
+	  trajectory->addPrimitiveSet(prset);
+	  geode=osg::ref_ptr<osg::Geode>(new osg::Geode());
+	  geode->addDrawable(trajectory);
+	  osg::LineWidth* linewidth = new osg::LineWidth(); 
+	  linewidth->setWidth(4.0f); 
+	  geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON); 
+
+	  //Attach the trajectory to the localizedWorld node
+	  findNodeVisitor finder("localizedWorld");
+	  rootNode->accept(finder);
+	  std::vector<osg::Node*> node_list=finder.getNodeList();
+	  node_list[0]->asGroup()->addChild(geode);
+   }
 }
 
 void ROSOdomToPAT::createSubscriber(ros::NodeHandle &nh) {
+  ROS_INFO("ROSOdomToPAT subscriber on topic %s",topic.c_str());
   sub_ = nh.subscribe<nav_msgs::Odometry>(topic, 10, &ROSOdomToPAT::processData, this);
+  if (sub_==ros::Subscriber()) {
+	ROS_ERROR("ROSOdomToPAT::createSubscriber cannot subscribe to topic %s",topic.c_str());
+  }
 }
 
 void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
@@ -43,6 +74,28 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
   	odom->twist.twist.linear.x==0 && odom->twist.twist.linear.y==0 && odom->twist.twist.linear.z==0) {
       sMsv_osg.setRotate(osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w));
       sMsv_osg.setTrans(odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z);
+
+      //Store trajectory
+      if (enable_visualization) {
+	      if (trajectory_initialized) {
+		//std::cerr << "Distance to last point: " << (trajectory_points->back()-sMsv_osg.getTrans()).length() << std::endl;
+		if ((trajectory_points->back()-sMsv_osg.getTrans()).length()>max_waypoint_distance) {
+		      trajectory_points->push_back( osg::Vec3( odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z ) );
+		      color->push_back(osg::Vec4(0.0,1.0,0.0,0.6)); 
+		      trajectory->setVertexArray(trajectory_points); 
+		      trajectory->setColorArray(color); 
+		      trajectory->setColorBinding(osg::Geometry::BIND_OVERALL); 
+		      ((osg::DrawArrays*)prset)->setFirst(0);
+		      ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
+		      std::cerr << "Trajectory_points size: " << trajectory_points->size() << std::endl;
+		}
+	      } else {
+		      trajectory_points->clear();
+		      trajectory_points->push_back(osg::Vec3( odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z));
+		      color->push_back(osg::Vec4(0.0,1.0,0.0,0.6)); 
+		      trajectory_initialized=true;
+	      }
+	}
     } else {
       //Get the current vehicle position and attitude in an homogeneous matrix
       sMsv_osg=transform->getMatrix();
@@ -88,6 +141,7 @@ ROSTwistToPAT::ROSTwistToPAT(osg::Group *rootNode, std::string topic, std::strin
 }
 
 void ROSTwistToPAT::createSubscriber(ros::NodeHandle &nh) {
+  ROS_INFO("ROSTwistToPAT subscriber on topic %s",topic.c_str());
   sub_ = nh.subscribe<geometry_msgs::TwistStamped>(topic, 10, &ROSTwistToPAT::processData, this);
 }
 
@@ -183,6 +237,7 @@ ROSJointStateToArm::ROSJointStateToArm(std::string topic, boost::shared_ptr<Simu
 }
 
 void ROSJointStateToArm::createSubscriber(ros::NodeHandle &nh) {
+  ROS_INFO("ROSJointStateToArm subscriber on topic %s",topic.c_str());
   sub_ = nh.subscribe<sensor_msgs::JointState>(topic, 10, &ROSJointStateToArm::processData, this);
 }
 
@@ -219,6 +274,7 @@ ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_top
 
 void ROSImageToHUDCamera::createSubscriber(ros::NodeHandle &nh)
  {
+  ROS_INFO("ROSImageToHUDCamera subscriber on topic %s",topic.c_str());
   it.reset(new image_transport::ImageTransport(nh));
   OSG_DEBUG << "ROSImageToHUDCamera::createSubscriber Subscribing to image topic " << image_topic << std::endl;
   image_sub=it->subscribe(image_topic, 1, &ROSImageToHUDCamera::processData, this);	
@@ -284,6 +340,7 @@ PATToROSOdom::PATToROSOdom(osg::Group *rootNode,std::string vehicleName, std::st
 }
 
 void PATToROSOdom::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("PATToROSOdom publisher on topic %s",topic.c_str());
   pub_ = nh.advertise<nav_msgs::Odometry>(topic, 1);
 }
 
@@ -328,6 +385,7 @@ ArmToROSJointState::ArmToROSJointState(SimulatedIAUV *arm, std::string topic, in
 }
 
 void ArmToROSJointState::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("ArmToROSJointState publisher on topic %s",topic.c_str());
   pub_ = nh.advertise<sensor_msgs::JointState>(topic, 1);
 }
 
@@ -354,6 +412,7 @@ ArmToROSJointState::~ArmToROSJointState() {}
 VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate): ROSPublisherInterface	(info_topic,rate), cam(camera), image_topic(topic) {}
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("VirtualCameraToROSImage publisher on topic %s",topic.c_str()); 
   it.reset(new image_transport::ImageTransport(nh));
   img_pub_ = it->advertise(image_topic, 1);
   pub_=nh.advertise<sensor_msgs::CameraInfo>(topic, 1);
@@ -444,6 +503,7 @@ RangeSensorToROSRange::RangeSensorToROSRange(VirtualRangeSensor *rangesensor, st
 }
 
 void RangeSensorToROSRange::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("RangeSensorToROSRange publisher on topic %s",topic.c_str());
   pub_ = nh.advertise<sensor_msgs::Range>(topic, 1);
 }
 

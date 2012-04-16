@@ -268,6 +268,7 @@ public:
 		wMl.preMultRotate(osg::Quat(offsetr[2],osg::Vec3d(0,0,1)));
 		wMl.setTrans(offsetp[0],offsetp[1],offsetp[2]);
 		localizedWorld=new osg::MatrixTransform(wMl);
+		localizedWorld->setName("localizedWorld");
 		//add frame to localized world
 		osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
 		localizedWorld->asGroup()->addChild(axis);

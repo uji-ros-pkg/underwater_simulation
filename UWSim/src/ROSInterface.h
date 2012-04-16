@@ -24,6 +24,12 @@
 
 //OSG
 #include <OpenThreads/Thread>
+#include <osg/PrimitiveSet>
+#include <osg/Geode>
+#include <osg/Vec3>
+#include <osg/Vec4>
+#include <osg/Drawable>
+#include <osg/Geometry>
 
 //STL
 #include <vector>
@@ -49,7 +55,7 @@ class ROSInterface {
 protected:
 	std::string topic;
 	ros::NodeHandle nh_;
-    static ros::Time current_time_;
+	static ros::Time current_time_;
 
 public:
 	ROSInterface(std::string topic) {this->topic=topic;}
@@ -60,7 +66,7 @@ public:
      * Sets the static ros time in the ROSInterface,
      * to be called once per simulation step
      */
-	static void setROSTime(const ros::Time& time)
+    static void setROSTime(const ros::Time& time)
     {
       current_time_ = time;
     }
@@ -95,8 +101,18 @@ class ROSOdomToPAT: public ROSSubscriberInterface {
         ros::WallTime last;
         int started;
 
+	bool trajectory_initialized;
+	bool enable_visualization;
+	int max_waypoint_distance;
+	osg::PrimitiveSet *prset;
+	osg::Vec3Array *trajectory_points;
+	osg::Vec4Array *color;
+        osg::ref_ptr<osg::Geode> geode;         //Geometry node that draws the beam
+	osg::ref_ptr<osg::Geometry> trajectory;
+	
+
 public:
-	ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName);
+	ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, int visualization=0, int max_waypoint_distance=0.5);
 
 	virtual void createSubscriber(ros::NodeHandle &nh);
 

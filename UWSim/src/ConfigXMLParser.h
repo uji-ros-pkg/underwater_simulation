@@ -21,6 +21,7 @@ struct ROSInterfaceInfo{
   unsigned int w, h; //width and height if necessary
   unsigned int posx, posy; ///< default (x,y) position of the widget if necessary
   double scale; ///< default scale of the widget if necessary
+  int visualize; ///< If 1, enable visualization of the data. 0 by default
 };
 
 struct Parameters{
