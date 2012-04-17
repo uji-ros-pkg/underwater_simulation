@@ -478,12 +478,10 @@ void VirtualCameraToROSImage::publish() {
       //memcpy(&(img.data.front()),virtualdata,d*sizeof(char));
       //Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
       //the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
-      //looking towards bottom-right. Therefore it must be manually arranged, although this could be much improved:
+      //looking towards bottom-right. Therefore it must be manually arranged.
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
-        	for (unsigned int j=0; j<img.step; j++) {
-          		img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
-		}
+          memcpy(&(img.data[i*img.step]), &(virtualdata[(h-i-1)*img.step]), img.step);
         }
       else
 	memset(&(img.data.front()), 0, d);
