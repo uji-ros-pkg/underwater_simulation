@@ -72,9 +72,8 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
     //If velocity is zero, use the position reference. If not, use velocity
     if (odom->twist.twist.angular.x==0 && odom->twist.twist.angular.y==0 && odom->twist.twist.angular.z==0 &&
   	odom->twist.twist.linear.x==0 && odom->twist.twist.linear.y==0 && odom->twist.twist.linear.z==0) {
-      sMsv_osg.makeIdentity();
-      sMsv_osg.makeRotate(osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w));
-      sMsv_osg.makeTranslate(odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z);
+      sMsv_osg.setTrans(odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z);
+      sMsv_osg.setRotate(osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w));
 
       //Store trajectory
       if (enable_visualization) {

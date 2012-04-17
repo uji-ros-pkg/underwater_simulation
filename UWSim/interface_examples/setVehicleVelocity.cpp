@@ -33,13 +33,13 @@ int main(int argc, char **argv) {
 	ros::Rate r(25);
 	while (ros::ok()) {
 		nav_msgs::Odometry odom;
-		odom.pose.pose.position.x=0;
-		odom.pose.pose.position.y=0;
-		odom.pose.pose.position.z=0;
-		odom.pose.pose.orientation.x=0;
-		odom.pose.pose.orientation.y=0;
-		odom.pose.pose.orientation.z=0;
-		odom.pose.pose.orientation.w=0;
+		odom.pose.pose.position.x=0.0;
+		odom.pose.pose.position.y=0.0;
+		odom.pose.pose.position.z=0.0;
+		odom.pose.pose.orientation.x=0.0;
+		odom.pose.pose.orientation.y=0.0;
+		odom.pose.pose.orientation.z=0.0;
+		odom.pose.pose.orientation.w=1;
 
 		odom.twist.twist.linear.x=x;
 		odom.twist.twist.linear.y=y;
