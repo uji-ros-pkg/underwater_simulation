@@ -179,6 +179,37 @@ void ROSTwistToPAT::processData(const geometry_msgs::TwistStamped::ConstPtr& twi
 
 ROSTwistToPAT::~ROSTwistToPAT(){}
 
+ROSPoseToPAT::ROSPoseToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName): ROSSubscriberInterface(topic) {
+  findNodeVisitor findNode(vehicleName);
+  rootNode->accept(findNode);
+  osg::Node *first=findNode.getFirst();
+  if (first==NULL) {
+    transform=NULL;
+  } else {
+    transform=dynamic_cast<osg::MatrixTransform*>(first);
+  }
+}
+
+void ROSPoseToPAT::createSubscriber(ros::NodeHandle &nh) {
+  ROS_INFO("ROSPoseToPAT subscriber on topic %s",topic.c_str());
+  sub_ = nh.subscribe<geometry_msgs::Pose>(topic, 10, &ROSPoseToPAT::processData, this);
+}
+
+void ROSPoseToPAT::processData(const geometry_msgs::Pose::ConstPtr& pose) {
+  if (transform!=NULL) {
+    //vpHomogeneousMatrix sMsv;
+    osg::Matrixd sMsv_osg;
+
+    sMsv_osg.setTrans(pose->position.x,pose->position.y,pose->position.z);
+    sMsv_osg.setRotate(osg::Quat(pose->orientation.x, pose->orientation.y, pose->orientation.z, pose->orientation.w));
+
+    transform->setMatrix(sMsv_osg);
+
+  }
+}
+
+ROSPoseToPAT::~ROSPoseToPAT(){}
+
 /*
 class ROSNavigationDataToPAT: public ROSSubscriberInterface {
 	osg::PositionAttitudeTransform *transform;

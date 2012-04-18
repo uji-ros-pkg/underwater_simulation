@@ -206,6 +206,10 @@
       <topic> /uwsim/g500/range </topic>
       <rate>10</rate>
     </RangeSensorToROSRange>
+    <ROSPoseToPAT>
+      <topic> /dataPoseNavigator </topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSPoseToPAT>
   </rosInterfaces>
 </UWSimScene>
 

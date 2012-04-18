@@ -608,6 +608,8 @@
 	rosInterface.type=ROSInterfaceInfo::ROSImageToHUD;
       } else if(child->get_name()=="ROSTwistToPAT"){
 	rosInterface.type=ROSInterfaceInfo::ROSTwistToPAT;
+      } else if(child->get_name()=="ROSPoseToPAT"){
+	rosInterface.type=ROSInterfaceInfo::ROSPoseToPAT;
       }
 
       if (rosInterface.type!=ROSInterfaceInfo::Unknown) {

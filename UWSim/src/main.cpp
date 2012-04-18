@@ -335,6 +335,9 @@ int main(int argc, char *argv[])
 		if (iauvFile[j]->range_sensors[c].name==rosInterface.targetName)
 		   iface=boost::shared_ptr<RangeSensorToROSRange>(new RangeSensorToROSRange(&(iauvFile[j]->range_sensors[c]),rosInterface.topic, rosInterface.rate));
 
+      if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
+	iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));
+
       ROSInterfaces.push_back(iface);
       config.ROSInterfaces.pop_front();
     }

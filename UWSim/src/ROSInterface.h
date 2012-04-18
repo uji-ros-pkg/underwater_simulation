@@ -46,6 +46,7 @@
 #include <sensor_msgs/Range.h>
 #include <image_transport/image_transport.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Pose.h>
 //#include <cola2_common/NavigationData.h>
 
 //Max time (in seconds) between two consecutive control references
@@ -131,6 +132,17 @@ public:
 
 	virtual void processData(const geometry_msgs::TwistStamped::ConstPtr& odom);
 	~ROSTwistToPAT();
+};
+
+class ROSPoseToPAT: public ROSSubscriberInterface {
+	osg::ref_ptr<osg::MatrixTransform> transform;
+public:
+	ROSPoseToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName);
+
+	virtual void createSubscriber(ros::NodeHandle &nh);
+
+	virtual void processData(const geometry_msgs::Pose::ConstPtr& odom);
+	~ROSPoseToPAT();
 };
 
 /*

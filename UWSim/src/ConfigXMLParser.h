@@ -14,7 +14,7 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT} type_t;
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
