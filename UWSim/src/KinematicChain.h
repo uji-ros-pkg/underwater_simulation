@@ -41,8 +41,8 @@ public:
 
 	KinematicChain(int nlinks, int njoints);
 
-	void setJointPosition(double *q);
-	void setJointVelocity(double *qdot);
+	void setJointPosition(double *q, int n);
+	void setJointVelocity(double *qdot, int n);
 	void setJointPosition(std::vector<double> &q);
 	void setJointVelocity(std::vector<double> &qdot);
 	std::vector<double> getJointPosition();

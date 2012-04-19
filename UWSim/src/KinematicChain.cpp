@@ -17,9 +17,11 @@ KinematicChain::KinematicChain(int nlinks, int njoints) {
 	memset(&(q.front()),0,njoints*sizeof(double));
 }
 
-void KinematicChain::setJointPosition(double *newq) {
+void KinematicChain::setJointPosition(double *newq, int n) {
 	int offset=0;
 	for(int i=0;i<getNumberOfJoints();i++){
+	  if (i-offset>=n) break;
+
 	  if(jointType[i]==0 || mimic[i].joint!=i){
 	    offset++;
 	    q[i]=0;
@@ -36,9 +38,11 @@ void KinematicChain::setJointPosition(double *newq) {
 	updateJoints(q);
 }
 	
-void KinematicChain::setJointVelocity(double *qdot) {
+void KinematicChain::setJointVelocity(double *qdot, int n) {
 	int offset=0;
 	for (int i=0; i<getNumberOfJoints(); i++){
+	  if (i-offset>=n) break;
+
 	  if(jointType[i]==0 || mimic[i].joint!=i)
 	    offset++;
 	  else{
@@ -54,11 +58,11 @@ void KinematicChain::setJointVelocity(double *qdot) {
 }
 
 void KinematicChain::setJointPosition(std::vector<double> &q) {
-	setJointPosition(&(q.front()));
+	setJointPosition(&(q.front()), q.size());
 }
 
 void KinematicChain::setJointVelocity(std::vector<double> &qdot) {
-	setJointPosition(&(qdot.front()));
+	setJointPosition(&(qdot.front()), qdot.size());
 }
 
 std::vector<double> KinematicChain::getJointPosition() {

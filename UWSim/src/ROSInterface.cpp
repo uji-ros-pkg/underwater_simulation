@@ -276,20 +276,12 @@ void ROSJointStateToArm::processData(const sensor_msgs::JointState::ConstPtr& js
   //Receive request from client
   if (js->position.size()!=0) {
     //position command
-    double *q = new double [js->position.size()];
-    for (unsigned int i=0; i<js->position.size(); i++) {
-      q[i]=js->position[i];
-    }
-    arm->urdf->setJointPosition(q);
-    delete [] q;
+    std::vector<double> position=js->position;
+    arm->urdf->setJointPosition(position);
   } else if (js->velocity.size()!=0) {
     //velocity command
-    double *qdot = new double [js->velocity.size()];
-    for (unsigned int i=0; i<js->velocity.size(); i++) {
-      qdot[i]=js->velocity[i];
-    }
-    arm->urdf->setJointVelocity(qdot);
-    delete [] qdot;
+    std::vector<double> velocity=js->velocity;
+    arm->urdf->setJointVelocity(velocity);
   }
 }
 
