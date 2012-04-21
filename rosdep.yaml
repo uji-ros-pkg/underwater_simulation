@@ -13,9 +13,6 @@ libopenscenegraph:
 libfftw3:
   ubuntu: libfftw3-3 libfftw3-dev
 
-libmesa:
-  ubuntu: libgl1-mesa-dev libglu1-mesa-dev
-
 libxml++-2.6:
   ubuntu: libxml++2.6-2 libxml++2.6-dev
 

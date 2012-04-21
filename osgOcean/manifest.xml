@@ -21,7 +21,7 @@ for a problem is being discussed by the osgOcean community.
 <rosdep name="unrar"/>
 <rosdep name="libopenscenegraph"/>
 <rosdep name="libfftw3"/>
-<rosdep name="libmesa"/>
+<rosdep name="opengl"/>
 </package>
 
 
