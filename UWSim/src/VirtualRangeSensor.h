@@ -60,8 +60,7 @@ class VirtualRangeSensor
 		    //std::cerr << "Intersection point(local): " << localIntPoint.x() << " " << localIntPoint.y() << " " << worldIntPoint.z() << std::endl;
 		    distance_to_obstacle=(worldIntPoint-mStart.getTrans()).length();
 		    //std::cerr << "Distance to obstacle: " << distance_to_obstacle << std::endl;
-		}
-
+		} else distance_to_obstacle=range;
           }
 	  public:
 		double range, distance_to_obstacle;
