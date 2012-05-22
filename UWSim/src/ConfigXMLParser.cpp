@@ -496,6 +496,23 @@
       } else 
       	vehicle.range_sensors.push_back(rs);
     }
+
+    //get Hand link
+    for(unsigned int i=0;i<vehicle.object_pickers.size();i++){
+      found=0;
+      rs=vehicle.object_pickers.front();
+      vehicle.object_pickers.pop_front();
+      for(int j=0;j<vehicle.nlinks && !found;j++){
+	if(vehicle.links[j].name==rs.linkName){
+	  rs.link=j;
+	  found=1;
+	}
+      }
+      if(found==0) {
+	OSG_WARN << "ObjectPicker attached to unknown link: "<< rs.linkName<<". Will be ignored" << std::endl;
+      } else 
+      	vehicle.object_pickers.push_back(rs);
+    }
   }
 
   void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
@@ -526,6 +543,11 @@
 	aux.init();
 	processRangeSensor(child,aux);
 	vehicle.range_sensors.push_back(aux);	
+      } else if (child->get_name()=="objectPicker"){
+	rangeSensor aux;
+	aux.init();
+	processRangeSensor(child,aux);
+	vehicle.object_pickers.push_back(aux);	
       }
     }
   }
@@ -578,6 +600,8 @@
 	extractFloatChar(child,rosInterface.scale);
       else if(child->get_name()=="visualize")
 	extractIntChar(child,rosInterface.visualize);
+      else if(child->get_name()=="color")
+	extractPositionOrColor(child,rosInterface.color);
     }
   }
 
@@ -594,6 +618,7 @@
       rosInterface.type=ROSInterfaceInfo::Unknown;
       if(child->get_name()=="ROSOdomToPAT"){
 	rosInterface.type=ROSInterfaceInfo::ROSOdomToPAT;
+	rosInterface.color[0]=rosInterface.color[1]=rosInterface.color[2]=1;
       } else if(child->get_name()=="PATToROSOdom"){
 	rosInterface.type=ROSInterfaceInfo::PATToROSOdom;
       } else if(child->get_name()=="ArmToROSJointState") {

@@ -11,6 +11,10 @@
 
 VirtualRangeSensor::VirtualRangeSensor(){}
 
+VirtualRangeSensor::VirtualRangeSensor(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
+	init(name, root, trackNode, range, visible);
+}
+
 void VirtualRangeSensor::init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
 	this->name=name;
 	this->root=root;
@@ -29,7 +33,6 @@ void VirtualRangeSensor::init(std::string name, osg::Node *root, osg::Node *trac
 	trackNode->asGroup()->addChild(node_tracker->geode);
 }
 
-VirtualRangeSensor::VirtualRangeSensor(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
-	init(name, root, trackNode, range, visible);
-}
+
+
 

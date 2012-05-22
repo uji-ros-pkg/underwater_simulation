@@ -61,7 +61,7 @@ protected:
 public:
 	ROSInterface(std::string topic) {this->topic=topic;}
 
-	~ROSInterface(){}
+	virtual ~ROSInterface(){}
 
     /**
      * Sets the static ros time in the ROSInterface,
@@ -104,16 +104,17 @@ class ROSOdomToPAT: public ROSSubscriberInterface {
 
 	bool trajectory_initialized;
 	bool enable_visualization;
-	int max_waypoint_distance;
+	double max_waypoint_distance;
 	osg::PrimitiveSet *prset;
 	osg::Vec3Array *trajectory_points;
-	osg::Vec4Array *color;
         osg::ref_ptr<osg::Geode> geode;         //Geometry node that draws the beam
 	osg::ref_ptr<osg::Geometry> trajectory;
 	
 
 public:
-	ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, int visualization=0, int max_waypoint_distance=0.5);
+	ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName,double color[3], int visualization=0, double max_waypoint_distance=0.1);
+
+	void clearWaypoints(void);
 
 	virtual void createSubscriber(ros::NodeHandle &nh);
 

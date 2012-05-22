@@ -77,7 +77,8 @@ src/VirtualRangeSensor.cpp
 src/HUDCamera.cpp
 src/ConfigXMLParser.cpp
 src/UWSimUtils.cpp
-src/ROSInterface.cpp)
+src/ROSInterface.cpp
+src/ObjectPicker.cpp)
 
 rosbuild_add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 rosbuild_add_executable(setJointPosition interface_examples/setJointPosition.cpp)

@@ -8,7 +8,28 @@
 #include <iostream>
 #include <vector>
 
-typedef std::vector<osg::Node*> nodeListType; 
+//Node data used to check if an object is catchable or not.
+class NodeDataType : public osg::Referenced{
+    public:
+       NodeDataType(int catcha,double origP[3]=NULL,double origR[3]=NULL){ 
+	 catchable=catcha;
+	 if(origP!=NULL){
+	   originalPosition[0]=origP[0];
+	   originalPosition[1]=origP[1];
+	   originalPosition[2]=origP[2];
+	}
+	 if(origR!=NULL){
+	   originalRotation[0]=origR[0];
+	   originalRotation[1]=origR[1];
+	   originalRotation[2]=origR[2];
+	}
+       }; 
+       int catchable;
+       double originalPosition[3],originalRotation[3];
+       
+};
+
+typedef std::vector<osg::Node*> nodeListType;
 
 class findNodeVisitor : public osg::NodeVisitor { 
 public: 
@@ -90,6 +111,42 @@ public:
 	static osg::Node* createOSGCylinder( double radius, double height );
 	static osg::Node* createOSGSphere( double radius );
 
+};
+
+/***********/
+
+// Visitor to return the world coordinates of a node.
+// It traverses from the starting node to the parent.
+// The first time it reaches a root node, it stores the world coordinates of 
+// the node it started from.  The world coordinates are found by concatenating all 
+// the matrix transforms found on the path from the start node to the root node.
+class getWorldCoordOfNodeVisitor : public osg::NodeVisitor 
+{
+public:
+   getWorldCoordOfNodeVisitor();
+   virtual void apply(osg::Node &node);
+   osg::Matrixd* giveUpDaMat();
+private:
+   bool done;
+   osg::Matrix* wcMatrix;
+};
+
+// Given a valid node placed in a scene under a transform, return the
+// world coordinates in an osg::Matrix.
+// Creates a visitor that will update a matrix representing world coordinates
+// of the node, return this matrix.
+// (This could be a class member for something derived from node also.
+osg::Matrixd* getWorldCoords( osg::Node* node);
+
+//Class to get all the catchable objects
+
+class GetCatchableObjects : public osg::NodeVisitor{
+public:
+   GetCatchableObjects();
+   virtual void apply(osg::Node &node);
+   nodeListType& getNodeList() { return foundNodeList; }
+private:
+   nodeListType foundNodeList; 
 };
 
 #endif

@@ -208,3 +208,55 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
 
     return node;
 }
+
+
+/*****************/
+
+
+getWorldCoordOfNodeVisitor::getWorldCoordOfNodeVisitor(): osg::NodeVisitor(NodeVisitor::TRAVERSE_PARENTS), done(false){
+  wcMatrix= new osg::Matrixd();
+}
+
+void getWorldCoordOfNodeVisitor::apply(osg::Node &node){
+  if (!done){
+    if ( 0 == node.getNumParents() ){ // no parents
+      wcMatrix->set( osg::computeLocalToWorld(this->getNodePath()) );
+      done = true;
+    }
+    traverse(node);
+  }
+}
+
+osg::Matrixd* getWorldCoordOfNodeVisitor::giveUpDaMat() {
+  return wcMatrix;
+}
+
+osg::Matrixd* getWorldCoords( osg::Node* node) 
+{
+   getWorldCoordOfNodeVisitor* ncv = new getWorldCoordOfNodeVisitor();
+   if (node && ncv)
+   {
+      node->accept(*ncv);
+      return ncv->giveUpDaMat();
+   }
+   else
+   {
+      return NULL;
+   }
+} 
+
+// GETCATCHABLEOBJECTS
+
+GetCatchableObjects::GetCatchableObjects() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN){ 
+} 
+
+void GetCatchableObjects::apply(osg::Node &searchNode) 
+{ 
+   osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*> (searchNode.getUserData());
+   if (data!=NULL && data->catchable)
+   {
+      foundNodeList.push_back(&searchNode);
+   }
+   traverse(searchNode); 
+} 
+

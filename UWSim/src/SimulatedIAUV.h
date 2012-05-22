@@ -13,7 +13,7 @@
 #include "VirtualCamera.h"
 #include "ConfigXMLParser.h"
 #include "VirtualRangeSensor.h"
-
+#include "ObjectPicker.h"
 
 /* An I-AUV */
 class SimulatedIAUV
@@ -21,6 +21,7 @@ class SimulatedIAUV
 public:
 	std::vector<VirtualCamera> camview;
 	std::vector<VirtualRangeSensor> range_sensors;
+	std::vector<ObjectPicker> object_pickers;
 
 	typedef enum {ARM5,PA10} arm_t;
 
@@ -42,6 +43,7 @@ public:
 
 	unsigned int getNumCams() {return camview.size();}
 	unsigned int getNumRangeSensors() {return range_sensors.size();}
+	unsigned int getNumObjectPickers() {return object_pickers.size();}
 
 	~SimulatedIAUV() {
 		OSG_DEBUG << "Simulated IAUV destructor" << std::endl;

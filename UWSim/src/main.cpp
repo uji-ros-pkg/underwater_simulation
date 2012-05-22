@@ -210,7 +210,13 @@ int main(int argc, char *argv[])
        
       if(vehicle.jointValues.size() && siauv->urdf!=NULL){
         siauv->urdf->setJointPosition(vehicle.jointValues);
-      }  
+      }
+
+      
+      for(int j=0; j<vehicle.nlinks;j++){
+	NodeDataType * data= new NodeDataType(0);
+        siauv->urdf->link[j]->setUserData(data);
+      }
     }
 
     //Add objects added in config file.
@@ -224,6 +230,15 @@ int main(int argc, char *argv[])
 	osg::ref_ptr<osg::MatrixTransform> wMb=new osg::MatrixTransform(wMb_m);
 	scene->addObject(wMb, auxObject.file, &auxObject);
 	wMb->setName(auxObject.name);
+
+        if(auxObject.name!="terrain"){
+          NodeDataType * data= new NodeDataType(1,auxObject.position,auxObject.orientation);
+          wMb->setUserData(data);
+        }
+	else{
+          NodeDataType * data= new NodeDataType(0);
+          wMb->setUserData(data);
+        }
 
 	config.objects.pop_front();
     }
@@ -295,7 +310,7 @@ int main(int argc, char *argv[])
      
       boost::shared_ptr<ROSInterface> iface; 
       if(rosInterface.type==ROSInterfaceInfo::ROSOdomToPAT)
-	iface=boost::shared_ptr<ROSOdomToPAT>(new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName,rosInterface.visualize));
+	iface=boost::shared_ptr<ROSOdomToPAT>(new ROSOdomToPAT(root,rosInterface.topic,rosInterface.targetName,rosInterface.color,rosInterface.visualize));
 
       if(rosInterface.type==ROSInterfaceInfo::ROSTwistToPAT)
 	iface=boost::shared_ptr<ROSTwistToPAT>(new ROSTwistToPAT(root,rosInterface.topic,rosInterface.targetName));
@@ -329,11 +344,16 @@ int main(int argc, char *argv[])
       }
 
       if(rosInterface.type==ROSInterfaceInfo::RangeSensorToROSRange)
-	//Find corresponding VirtualRangeSensor Object on all the vehicles
-	for (int j=0; j<nvehicle ;j++)
+	//Find corresponding VirtualRangeSensor Object on all the vehicles (look for rangeSensors and objectPickers)
+	for (int j=0; j<nvehicle ;j++) {
 	  for (unsigned int c=0; c<iauvFile[j]->getNumRangeSensors(); c++)
 		if (iauvFile[j]->range_sensors[c].name==rosInterface.targetName)
 		   iface=boost::shared_ptr<RangeSensorToROSRange>(new RangeSensorToROSRange(&(iauvFile[j]->range_sensors[c]),rosInterface.topic, rosInterface.rate));
+	  for (unsigned int c=0; c<iauvFile[j]->getNumObjectPickers(); c++)
+		if (iauvFile[j]->object_pickers[c].name==rosInterface.targetName)
+		   iface=boost::shared_ptr<RangeSensorToROSRange>(new RangeSensorToROSRange(&(iauvFile[j]->object_pickers[c]),rosInterface.topic, rosInterface.rate));
+      }
+
 
       if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
 	iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));
@@ -367,7 +387,7 @@ int main(int argc, char *argv[])
 	    dispx+=iauvFile[j]->camview[i].width+20;
 	    wm->addChild(camWidgets[ncamwidgets]);
 	    camWidgets[ncamwidgets]->hide();
-	    viewer.addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene) );
+	    viewer.addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene, ROSInterfaces) );
 	    ncamwidgets++;
       }
     }

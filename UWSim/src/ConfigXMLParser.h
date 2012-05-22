@@ -22,6 +22,7 @@ struct ROSInterfaceInfo{
   unsigned int posx, posy; ///< default (x,y) position of the widget if necessary
   double scale; ///< default scale of the widget if necessary
   int visualize; ///< If 1, enable visualization of the data. 0 by default
+  double color[3]; // visualization color in rosodomtopat waypoints
 };
 
 struct Parameters{
@@ -96,7 +97,7 @@ struct Vehicle{
   std::vector<double> jointValues;
   std::vector<Material> materials;
   std::list<Vcam> Vcams;
-  std::list<rangeSensor> range_sensors;
+  std::list<rangeSensor> range_sensors, object_pickers;
 };
 
 struct Object{

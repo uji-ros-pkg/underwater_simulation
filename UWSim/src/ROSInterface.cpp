@@ -1,6 +1,7 @@
 #include "ROSInterface.h"
 #include "UWSimUtils.h"
 #include <osg/LineWidth>
+#include <osg/Material>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -18,7 +19,7 @@ void ROSSubscriberInterface::run() {
 ROSSubscriberInterface::~ROSSubscriberInterface(){join();}
 
 
-ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, int visualization, int max_waypoint_distance): ROSSubscriberInterface(topic) {
+ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName,double col[3], int visualization, double max_waypoint_distance): ROSSubscriberInterface(topic) {
   findNodeVisitor findNode(vehicleName);
   rootNode->accept(findNode);
   osg::Node *first=findNode.getFirst();
@@ -35,24 +36,38 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
   if (enable_visualization) {
 	  trajectory_points=new osg::Vec3Array;
 	  trajectory_points->push_back( osg::Vec3( 0,0,0 ) );
-	  color = new osg::Vec4Array; 
-	  color->push_back(osg::Vec4(0.0,0.0,0.0,0.0)); 
-	  trajectory=osg::ref_ptr<osg::Geometry>(new osg::Geometry);
+	  trajectory=osg::ref_ptr<osg::Geometry>(new osg::Geometry());
 	  trajectory->setVertexArray(trajectory_points); 
-	  trajectory->setColorArray(color); 
-	  trajectory->setColorBinding(osg::Geometry::BIND_OVERALL); 
+
+	  osg::Vec4Array* colors = new osg::Vec4Array;
+	  colors->push_back(osg::Vec4f(col[0],col[1],col[2],1.0f));
+  	  trajectory->setColorArray(colors);
+   	  trajectory->setColorBinding(osg::Geometry::BIND_OVERALL);
 	  prset=new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP);
 	  trajectory->addPrimitiveSet(prset);
+   	  trajectory->setUseDisplayList(false);
+
 	  geode=osg::ref_ptr<osg::Geode>(new osg::Geode());
 	  geode->addDrawable(trajectory);
-	  osg::LineWidth* linewidth = new osg::LineWidth(); 
+	  osg::LineWidth* linewidth = new osg::LineWidth();
 	  linewidth->setWidth(4.0f); 
-	  geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON); 
 
 	  //Attach the trajectory to the localizedWorld node
 	  findNodeVisitor finder("localizedWorld");
 	  rootNode->accept(finder);
 	  std::vector<osg::Node*> node_list=finder.getNodeList();
+
+	  geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+          osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+  	  static const char model_vertex[]   = "default_scene.vert";
+	  static const char model_fragment[] = "default_scene.frag";
+
+	  osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+	  program->addBindAttribLocation("aTangent", 6);
+
+	  geode->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);
+	  geode->getStateSet()->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
+	  geode->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
 	  node_list[0]->asGroup()->addChild(geode);
    }
 }
@@ -70,21 +85,18 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
     //vpHomogeneousMatrix sMsv;
     osg::Matrixd sMsv_osg;
     //If velocity is zero, use the position reference. If not, use velocity
-    if (odom->twist.twist.angular.x==0 && odom->twist.twist.angular.y==0 && odom->twist.twist.angular.z==0 &&
-  	odom->twist.twist.linear.x==0 && odom->twist.twist.linear.y==0 && odom->twist.twist.linear.z==0) {
+    //If position is not zero, use the position reference. If not, use velocity
+    if (odom->pose.pose.orientation.x!=0 || odom->pose.pose.orientation.y!=0 || odom->pose.pose.orientation.z!=0 ||
+  	odom->pose.pose.position.x!=0 || odom->pose.pose.position.y!=0 || odom->pose.pose.position.z!=0) {
       sMsv_osg.setTrans(odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z);
       sMsv_osg.setRotate(osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w));
 
       //Store trajectory
       if (enable_visualization) {
 	      if (trajectory_initialized) {
-		//std::cerr << "Distance to last point: " << (trajectory_points->back()-sMsv_osg.getTrans()).length() << std::endl;
 		if ((trajectory_points->back()-sMsv_osg.getTrans()).length()>max_waypoint_distance) {
 		      trajectory_points->push_back( osg::Vec3( odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z ) );
-		      color->push_back(osg::Vec4(0.0,1.0,0.0,0.6)); 
-		      trajectory->setVertexArray(trajectory_points); 
-		      trajectory->setColorArray(color); 
-		      trajectory->setColorBinding(osg::Geometry::BIND_OVERALL); 
+		      trajectory->setVertexArray(trajectory_points);
 		      ((osg::DrawArrays*)prset)->setFirst(0);
 		      ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
 		      std::cerr << "Trajectory_points size: " << trajectory_points->size() << std::endl;
@@ -92,7 +104,6 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
 	      } else {
 		      trajectory_points->clear();
 		      trajectory_points->push_back(osg::Vec3( odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.position.z));
-		      color->push_back(osg::Vec4(0.0,1.0,0.0,0.6)); 
 		      trajectory_initialized=true;
 	      }
 	}
@@ -124,6 +135,13 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom) {
     }
     transform->setMatrix(sMsv_osg);
   }
+}
+
+void ROSOdomToPAT::clearWaypoints() {
+  trajectory_points->clear();
+  ((osg::DrawArrays*)prset)->setFirst(0);
+  ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
+  trajectory_initialized=false;
 }
 
 ROSOdomToPAT::~ROSOdomToPAT(){}

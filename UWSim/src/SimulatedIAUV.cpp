@@ -112,6 +112,21 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
       range_sensors.push_back(VirtualRangeSensor(rs.name, oscene->localizedWorld, vMr, rs.range, (rs.visible)? true:false));
       OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
     }
+
+    //Adding object pickers
+    while(vehicleChars.object_pickers.size() > 0){
+      OSG_INFO << "Adding an object picker..." << std::endl;
+      rangeSensor rs;
+      rs=vehicleChars.object_pickers.front();
+      vehicleChars.object_pickers.pop_front();
+      osg::ref_ptr<osg::Transform> vMr=(osg::Transform*) new osg::PositionAttitudeTransform;	
+      vMr->asPositionAttitudeTransform()->setPosition(osg::Vec3d(rs.position[0],rs.position[1],rs.position[2]));
+      vMr->asPositionAttitudeTransform()->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
+      vMr->setName("ObjectPickerNode");
+      urdf->link[rs.link]->asGroup()->addChild(vMr);
+      object_pickers.push_back(ObjectPicker(rs.name, oscene->localizedWorld, vMr, rs.range, true));
+      OSG_INFO << "Done adding an object picker..." << std::endl;
+    }
   
   //Set-up a lamp attached to the vehicle: TODO
 /*

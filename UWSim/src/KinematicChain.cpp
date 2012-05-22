@@ -31,8 +31,14 @@ void KinematicChain::setJointPosition(double *newq, int n) {
 	      q[i]=limits[i].first;
 	    else if(newq[i-offset]>limits[i].second)
 	      q[i]=limits[i].second;
-	    else
-	      q[i]=newq[i-offset];
+	    else {
+	      if (!isnan(q[i]))
+	      	q[i]=newq[i-offset];
+	      else {
+		std::cerr << "KinematicChain::setJointPosition received NaN" << std::endl;
+		OSG_FATAL << "KinematicChain::setJointPosition received NaN" << std::endl;
+	      }
+	    }
 	  }
 	}
 	updateJoints(q);
