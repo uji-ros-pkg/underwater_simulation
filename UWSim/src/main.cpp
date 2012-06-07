@@ -297,6 +297,14 @@ int main(int argc, char *argv[])
       for (unsigned int i=0; i<iauvFile[j]->getNumCams(); i++) {
 	    iauvFile[j]->camview[i].textureCamera->addChild( scene->getScene() );
 	    root->addChild( iauvFile[j]->camview[i].textureCamera );
+
+	    //Add same fog as water fog
+            osg::Fog *fog = new osg::Fog();
+            fog->setMode(osg::Fog::EXP2);
+            fog->setFogCoordinateSource(osg::Fog::FRAGMENT_DEPTH);
+            fog->setDensity(config.fogDensity);
+            fog->setColor(osg::Vec4d(config.fogColor[0],config.fogColor[1],config.fogColor[2],1));
+            iauvFile[j]->camview[i].textureCamera->getOrCreateStateSet()->setAttributeAndModes(fog, osg::StateAttribute::ON);
       }
     }
 
