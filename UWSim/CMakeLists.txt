@@ -31,8 +31,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
-set(BUILD_ROS_INTERFACES 1)
-
 
 FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg)
 
@@ -65,7 +63,7 @@ LINK_DIRECTORIES(${BULLET_LIBRARY_DIR} ${OSGWORKS_LIBRARY_DIR} ${OSGBULLET_LIBRA
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
 
-rosbuild_add_executable(UWSim  src/main.cpp 
+rosbuild_add_library(uwsim 
 src/osgOceanScene.cpp
 src/SkyDome.cpp
 src/SphereSegment.cpp
@@ -78,8 +76,11 @@ src/HUDCamera.cpp
 src/ConfigXMLParser.cpp
 src/UWSimUtils.cpp
 src/ROSInterface.cpp
-src/ObjectPicker.cpp)
+src/ObjectPicker.cpp
+src/SceneBuilder.cpp
+src/ViewBuilder.cpp)
 
+rosbuild_add_executable(UWSim  src/main.cpp)
 rosbuild_add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 rosbuild_add_executable(setJointPosition interface_examples/setJointPosition.cpp)
 rosbuild_add_executable(setJointVelocity interface_examples/setJointVelocity.cpp)
@@ -91,7 +92,7 @@ rosbuild_add_executable(setVehicleDisturbances interface_examples/setVehicleDist
 rosbuild_add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp)
 rosbuild_add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
 
-TARGET_LINK_LIBRARIES(UWSim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(UWSim uwsim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(setJointPosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(setJointVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})

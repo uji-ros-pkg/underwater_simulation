@@ -13,8 +13,6 @@
 //UWSIM
 #include "SimulatorConfig.h"
 
-#ifdef BUILD_ROS_INTERFACES
-
 #include "URDFRobot.h"
 #include "SimulatedIAUV.h"
 #include "VirtualCamera.h"
@@ -52,7 +50,7 @@
 //Max time (in seconds) between two consecutive control references
 #define MAX_ELAPSED	1
 
-class ROSInterface {
+class ROSInterface: public OpenThreads::Thread {
 protected:
 	std::string topic;
 	ros::NodeHandle nh_;
@@ -83,7 +81,7 @@ public:
     }
 };
 
-class ROSSubscriberInterface: public OpenThreads::Thread, public ROSInterface {
+class ROSSubscriberInterface: public ROSInterface {
 protected:
 	ros::Subscriber sub_;
 public:
@@ -224,7 +222,7 @@ public:
 };
 
 
-class ROSPublisherInterface: public OpenThreads::Thread, public ROSInterface {
+class ROSPublisherInterface: public ROSInterface {
 protected:
 	int publish_rate;
 	ros::Publisher pub_;
@@ -295,5 +293,3 @@ public:
 };	
 #endif
 		
-#endif /* ROSINTERFACE_H_ */
-

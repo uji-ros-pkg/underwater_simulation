@@ -16,7 +16,7 @@ private:
     bool draw_frames_;    
 public:
     //vehicle track indicates whether the camera must automatically track the vehicle node
-    SceneEventHandler( osgWidget::Window* w, TextHUD* textHUD, osg::ref_ptr<osgOceanScene> scene, std::vector<boost::shared_ptr<ROSInterface> > ROSInterfaces):
+    SceneEventHandler( osgWidget::Window* w, TextHUD* textHUD, osg::ref_ptr<osgOceanScene> scene, std::vector<boost::shared_ptr<ROSInterface> > &ROSInterfaces):
         _scene(scene),
         _textHUD(textHUD),
 	_window(w),
