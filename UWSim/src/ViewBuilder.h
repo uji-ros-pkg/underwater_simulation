@@ -18,12 +18,14 @@ public:
 	boost::shared_ptr<osg::ArgumentParser> arguments;
 
 public:
+	osg::ref_ptr<osgWidget::WindowManager> wm;
 	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder);
 	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv);
 	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, boost::shared_ptr<osg::ArgumentParser> args);
 
 	osgViewer::View* getView() {return viewer.get();}
 	osgViewer::Viewer* getViewer() {return viewer.get();}
+	void init();
 
 	~ViewBuilder() {}
 

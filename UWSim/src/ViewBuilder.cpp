@@ -97,7 +97,7 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 	viewer->setSceneData( scene_builder->getRoot() );
 
 	OSG_INFO << "Starting window manager..." << std::endl;
-	osg::ref_ptr<osgWidget::WindowManager> wm = new osgWidget::WindowManager(
+	wm = new osgWidget::WindowManager(
 			viewer,
 			reswidth,
 			resheight,
@@ -129,14 +129,7 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 
 	//viewer->addEventHandler( new SceneEventHandler(NULL, hud.get(), scene ) );
 
-	OSG_INFO << "Creating application..." << std::endl;
-
-	viewer->setUpViewInWindow(
-			50,
-			50,
-			static_cast<int>(wm->getWidth()),
-			static_cast<int>(wm->getHeight())
-	);
+	
 
 	osg::ref_ptr<osg::Group>  appgroup  = new osg::Group();
 	osg::ref_ptr<osg::Camera> appcamera = wm->createParentOrthoCamera();
@@ -173,4 +166,14 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 	viewer->setSceneData(appgroup);
 
 	return true;
+}
+void ViewBuilder::init(){
+	OSG_INFO << "Creating application..." << std::endl;
+
+    viewer->setUpViewInWindow(
+		50,
+			50,
+			static_cast<int>(wm->getWidth()),
+			static_cast<int>(wm->getHeight())
+	);
 }

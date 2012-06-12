@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
 	builder.loadScene(config);
 
 	ViewBuilder view(config, &builder, arguments);
-
+	
+	view.init();
 	view.getViewer()->realize();
 	view.getViewer()->frame();
 
