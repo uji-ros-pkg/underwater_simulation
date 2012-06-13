@@ -20,7 +20,7 @@
     else if (in=="-M_PI_4")
       param=-M_PI_4;
     else
-      param= atof(in.c_str());	
+      param= boost::lexical_cast<double>(in.c_str());	
   }
 
   void ConfigFile::extractFloatChar(const xmlpp::Node* node,double &param){
