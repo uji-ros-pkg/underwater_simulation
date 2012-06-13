@@ -34,7 +34,7 @@
     </attenuation>
   </oceanState>
   <simParams>
-    <disableShaders> 0 </disableShaders>
+    <disableShaders> 1 </disableShaders>
     <resw> 800 </resw>
     <resh> 600 </resh>
     <offsetp>
