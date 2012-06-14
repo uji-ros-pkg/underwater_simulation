@@ -405,7 +405,7 @@ public:
         osg::ref_ptr<osg::Node> object = osgDB::readNodeFile(filename);
 
         if(!object.valid()){
-            osg::notify(osg::WARN) << "Could not find: " << filename << std::endl;
+            OSG_FATAL << "Error: could not find: " << filename << std::endl;
             return NULL;
         } else {
 			static const char model_vertex[]   = "default_scene.vert";

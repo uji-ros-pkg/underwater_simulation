@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 	arguments->getApplicationUsage()->addCommandLineOption("--configfile","Indicate config file location (default: data/scenes/cirs.xml). The rest of the options override the values defined in this file.");
 	arguments->getApplicationUsage()->addCommandLineOption("--v","Be verbose. (OSG notify level NOTICE)");
 	arguments->getApplicationUsage()->addCommandLineOption("--vv","Be much verbose. (OSG notify level DEBUG)");
+	arguments->getApplicationUsage()->addCommandLineOption("--dataPath <path>","Search for models in this path, besides the default ones");
 
 	unsigned int helpType = 0;
 	if ((helpType = arguments->readHelpType()))
@@ -56,6 +57,15 @@ int main(int argc, char *argv[])
 		arguments->writeErrorMessages(std::cout);
 
 		return 1;
+	}
+
+	std::string dataPath("");
+	while( arguments->read("--dataPath",dataPath));
+	//Add current folder to path
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));	
+	//Add dataPath folder to path
+	if (dataPath!=std::string("")) {
+		osgDB::Registry::instance()->getDataFilePathList().push_back(dataPath);	
 	}
 
 	string configfile=std::string(SIMULATOR_DATA_PATH)+"/scenes/cirs.xml";
