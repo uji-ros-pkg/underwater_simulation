@@ -162,12 +162,12 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length) {
 
 osg::Node * UWSimGeometry::createOSGBox( osg::Vec3 size )
 {
-    osg::ref_ptr<osg::Box> box = new osg::Box();
+    osg::Box *box = new osg::Box();
 
     box->setHalfLengths( size/2 );
 
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( box);
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+    osg::ShapeDrawable *shape = new osg::ShapeDrawable( box);
+    osg::Geode *geode = new osg::Geode();
     geode->addDrawable( shape );
 
     osg::Node* node = new osg::Group();
@@ -178,13 +178,13 @@ osg::Node * UWSimGeometry::createOSGBox( osg::Vec3 size )
 
 osg::Node* UWSimGeometry::createOSGCylinder( double radius, double height )
 {
-    osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder();
+    osg::Cylinder *cylinder = new osg::Cylinder();
 
     cylinder->setRadius( radius );
     cylinder->setHeight( height );
 
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( cylinder );
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+    osg::ShapeDrawable *shape = new osg::ShapeDrawable( cylinder );
+    osg::Geode *geode = new osg::Geode();
     geode->addDrawable( shape );
 
     osg::Node *node = new osg::Group();
@@ -195,15 +195,15 @@ osg::Node* UWSimGeometry::createOSGCylinder( double radius, double height )
 
 osg::Node * UWSimGeometry::createOSGSphere( double radius )
 {
-    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere();
+    osg::Sphere *sphere = new osg::Sphere();
 
     sphere->setRadius( radius );
 
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable( sphere );
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+    osg::ShapeDrawable *shape = new osg::ShapeDrawable( sphere );
+    osg::Geode *geode = new osg::Geode();
     geode->addDrawable( shape );
 
-    osg::ref_ptr<osg::Node> node = new osg::Group();
+    osg::Node *node = new osg::Group();
     node->asGroup()->addChild( geode );
 
     return node;
