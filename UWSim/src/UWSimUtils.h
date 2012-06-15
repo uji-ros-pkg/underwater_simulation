@@ -111,6 +111,9 @@ public:
 	static osg::Node* createOSGCylinder( double radius, double height );
 	static osg::Node* createOSGSphere( double radius );
 
+	/** Apply osgOcean-based state sets to a node */
+	static void applyStateSets(osg::Node*);
+
 };
 
 /***********/

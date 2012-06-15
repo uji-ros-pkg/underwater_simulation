@@ -6,6 +6,9 @@
 #include <osg/Switch>
 #include <osg/MatrixTransform>
 
+//#include <osgOcean/OceanScene>
+#include <osgOcean/ShaderManager>
+
 // Default constructor - initialize searchForName to "" and 
 // set the traversal mode to TRAVERSE_ALL_CHILDREN
 findNodeVisitor::findNodeVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN), 
@@ -209,6 +212,17 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
     return node;
 }
 
+void UWSimGeometry::applyStateSets(osg::Node *node) {
+          static const char model_vertex[]   = "default_scene.vert";
+          static const char model_fragment[] = "default_scene.frag";
+
+          osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+          program->addBindAttribLocation("aTangent", 6); 
+
+          node->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);
+          node->getStateSet()->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
+          node->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
+}
 
 /*****************/
 
