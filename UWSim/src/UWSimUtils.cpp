@@ -1,3 +1,4 @@
+#include "SimulatorConfig.h"
 #include "UWSimUtils.h"
 #include <osg/Material>
 #include <osg/ShapeDrawable>
@@ -5,6 +6,7 @@
 #include <osg/Geode>
 #include <osg/Switch>
 #include <osg/MatrixTransform>
+#include <osgDB/ReadFile>
 
 //#include <osgOcean/OceanScene>
 #include <osgOcean/ShaderManager>
@@ -213,6 +215,7 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
 }
 
 void UWSimGeometry::applyStateSets(osg::Node *node) {
+	  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
           static const char model_vertex[]   = "default_scene.vert";
           static const char model_fragment[] = "default_scene.frag";
 
