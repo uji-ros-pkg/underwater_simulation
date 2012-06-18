@@ -1,7 +1,7 @@
 
 #include "ConfigXMLParser.h"
 #include "SimulatorConfig.h"
-
+#include <osgDB/FileUtils>
 
   void ConfigFile::esPi(string in, double &param){
     in.erase(0, in.find_first_not_of("\t "));
@@ -409,9 +409,10 @@
   int ConfigFile::processURDFFile(string file, Vehicle &vehicle){
     urdf::Model model;
 
-    if (!model.initFile(std::string(SIMULATOR_ROOT_PATH)+file)){	
+    std::string file_fullpath=osgDB::findDataFile(file);
+    if (file_fullpath==std::string("") || !model.initFile(file_fullpath)){	
       std::cerr << "Failed to parse urdf file " << file << std::endl;
-      return -1;
+      exit(0);
     }
 
     OSG_INFO << "Successfully parsed urdf file " << file << std::endl;
@@ -688,12 +689,18 @@
       xmlpp::DomParser parser;
       parser.set_validate();
       parser.set_substitute_entities(); //We just want the text to be resolved/unescaped automatically.
-      parser.parse_file(fName);
-      if(parser)
-      {
-        //Walk the tree:
-        const xmlpp::Node* pNode = parser.get_document()->get_root_node(); //deleted by DomParser.
-        processXML(pNode);
+      std::string fName_fullpath=osgDB::findDataFile(fName);
+      if (fName_fullpath!=std::string("")) {
+      	parser.parse_file(fName_fullpath);
+     	if(parser)
+      	{
+        	//Walk the tree:
+        	const xmlpp::Node* pNode = parser.get_document()->get_root_node(); //deleted by DomParser.
+        	processXML(pNode);
+      	}
+      } else {
+      	std::cerr << "Cannot locate file " << fName <<  std::endl;
+	exit(0);
       }
     }
     catch(const std::exception& ex)
