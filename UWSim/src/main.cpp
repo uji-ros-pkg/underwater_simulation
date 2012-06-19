@@ -63,6 +63,8 @@ int main(int argc, char *argv[])
 	while( arguments->read("--dataPath",dataPath));
 	//Add current folder to path
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));	
+	//Add UWSim folder to path
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_ROOT_PATH));	
 	//Add dataPath folder to path
 	if (dataPath!=std::string("")) {
 		osgDB::Registry::instance()->getDataFilePathList().push_back(dataPath);	
