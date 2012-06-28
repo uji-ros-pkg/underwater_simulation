@@ -17,6 +17,7 @@
   <depend package="urdf_parser"/>
   <rosdep name="libxml++-2.6" />
   <rosdep name="boost" />
+  <rosdep name="libopenscenegraph" />
 
   <url>http://www.irs.uji.es/uwsim/</url>
   <export>

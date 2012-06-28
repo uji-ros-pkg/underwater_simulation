@@ -118,10 +118,10 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 			dispx+=scene_builder->iauvFile[j]->camview[i].width+20;
 			wm->addChild(camWidgets[ncamwidgets]);
 			camWidgets[ncamwidgets]->hide();
-			viewer->addEventHandler( new SceneEventHandler(camWidgets[ncamwidgets], hud.get(), scene_builder->getScene(), scene_builder->ROSInterfaces) );
 			ncamwidgets++;
 		}
 	}
+	viewer->addEventHandler( new SceneEventHandler(camWidgets, hud.get(), scene_builder->getScene(), scene_builder->ROSInterfaces, &config) );
 
 	for (unsigned int i=0; i<scene_builder->realcams.size(); i++) {
 		wm->addChild(scene_builder->realcams[i]->getWidgetWindow());

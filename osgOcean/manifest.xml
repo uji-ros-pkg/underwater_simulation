@@ -18,7 +18,6 @@ for a problem is being discussed by the osgOcean community.
   <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -losgOcean"/>
 </export>
 
-<rosdep name="unrar"/>
 <rosdep name="libopenscenegraph"/>
 <rosdep name="libfftw3"/>
 <rosdep name="opengl"/>

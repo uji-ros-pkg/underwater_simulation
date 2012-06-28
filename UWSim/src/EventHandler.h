@@ -3,27 +3,29 @@
 
 #include "SimulatedIAUV.h"
 #include "ROSInterface.h"
-
+#include "ConfigXMLParser.h"
 
 class SceneEventHandler : public osgGA::GUIEventHandler
 {
 private:
     osg::ref_ptr<osgOceanScene> _scene;
     osg::ref_ptr<TextHUD> _textHUD;
-    osg::ref_ptr<osgWidget::Window> _window;
+    std::vector<osg::ref_ptr<osgWidget::Window> > _windows;
     std::vector<boost::shared_ptr<ROSInterface> > _ROSInterfaces;
+    ConfigFile *_config;
 
     bool draw_frames_;    
 public:
     //vehicle track indicates whether the camera must automatically track the vehicle node
-    SceneEventHandler( osgWidget::Window* w, TextHUD* textHUD, osg::ref_ptr<osgOceanScene> scene, std::vector<boost::shared_ptr<ROSInterface> > &ROSInterfaces):
+    SceneEventHandler( std::vector<osg::ref_ptr<osgWidget::Window> > &windows, TextHUD* textHUD, osg::ref_ptr<osgOceanScene> scene, std::vector<boost::shared_ptr<ROSInterface> > &ROSInterfaces, ConfigFile *config):
         _scene(scene),
         _textHUD(textHUD),
-	_window(w),
+	_windows(windows),
 	_ROSInterfaces(ROSInterfaces),
 	draw_frames_(false)
     {
         	_textHUD->setSceneText("Clear Blue Sky");
+		_config=config;
     }
 
     virtual bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter&)
@@ -35,7 +37,12 @@ public:
 		
                 if(ea.getKey() == '1')
                 {
+		    ROS_INFO("Switch to Clear Blue Sky");
                     _scene->changeScene( osgOceanScene::CLEAR );
+        	    _scene->getOceanScene()->setUnderwaterFog(_config->fogDensity,  osg::Vec4f(_config->fogColor[0],_config->fogColor[1],_config->fogColor[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterDiffuse( osg::Vec4f(_config->color[0],_config->color[1],_config->color[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterAttenuation( osg::Vec3f(_config->attenuation[0], _config->attenuation[1], _config->attenuation[2]) );
+
                     _textHUD->setSceneText( "Clear Blue Sky" );
                     return false;
                 }
@@ -43,16 +50,23 @@ public:
                 {
                     _scene->changeScene( osgOceanScene::DUSK );
                     _textHUD->setSceneText( "Dusk" );
+        	    _scene->getOceanScene()->setUnderwaterFog(_config->fogDensity,  osg::Vec4f(_config->fogColor[0],_config->fogColor[1],_config->fogColor[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterDiffuse( osg::Vec4f(_config->color[0],_config->color[1],_config->color[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterAttenuation( osg::Vec3f(_config->attenuation[0], _config->attenuation[1], _config->attenuation[2]) );
                     return false;
                 }
                 else if(ea.getKey() == '3' )
 		{
                     _scene->changeScene( osgOceanScene::CLOUDY );
                     _textHUD->setSceneText( "Pacific Cloudy" );
+        	    _scene->getOceanScene()->setUnderwaterFog(_config->fogDensity,  osg::Vec4f(_config->fogColor[0],_config->fogColor[1],_config->fogColor[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterDiffuse( osg::Vec4f(_config->color[0],_config->color[1],_config->color[2],1) );
+        	    _scene->getOceanScene()->setUnderwaterAttenuation( osg::Vec3f(_config->attenuation[0], _config->attenuation[1], _config->attenuation[2]) );
                     return false;
                 } else if(ea.getKey() == 'c' )
 		{
-		    if (_window->isVisible()) _window->hide(); else _window->show();
+		    for (unsigned int i=0; i<_windows.size(); i++)
+		    	if (_windows[i]->isVisible()) _windows[i]->hide(); else _windows[i]->show();
                     return false;
                 } else if (ea.getKey() == 'f' ) {
 			//Search for 'switch_frames' nodes and toggle their values

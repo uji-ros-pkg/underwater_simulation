@@ -87,7 +87,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 
 
 	//Initialize ocean scene.
-	scene = new osgOceanScene(config.offsetp, config.offsetr, windDirection, windSpeed, depth, reflectionDamping, scale, isChoppy, choppyFactor, crestFoamHeight);
+	scene = new osgOceanScene(config.offsetp, config.offsetr, windDirection, windSpeed, depth, reflectionDamping, scale, isChoppy, choppyFactor, crestFoamHeight, false, "terrain");
 
 	if (disableShaders)
 	{

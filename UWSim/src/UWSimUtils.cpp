@@ -219,7 +219,7 @@ void UWSimGeometry::applyStateSets(osg::Node *node) {
           static const char model_vertex[]   = "default_scene.vert";
           static const char model_fragment[] = "default_scene.frag";
 
-          osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+          osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, "", "");
           program->addBindAttribLocation("aTangent", 6); 
 
           node->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);

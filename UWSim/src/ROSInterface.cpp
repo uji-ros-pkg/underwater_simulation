@@ -2,6 +2,7 @@
 #include "UWSimUtils.h"
 #include <osg/LineWidth>
 #include <osg/Material>
+#include <osgOcean/ShaderManager>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -62,7 +63,7 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
   	  static const char model_vertex[]   = "default_scene.vert";
 	  static const char model_fragment[] = "default_scene.frag";
 
-	  osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+	  osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, "", "");
 	  program->addBindAttribLocation("aTangent", 6);
 
 	  geode->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);

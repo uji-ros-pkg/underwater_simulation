@@ -1,6 +1,7 @@
 // ----------------------------------------------------
 //                  Text HUD Class
 // ----------------------------------------------------
+#include <osg/PositionAttitudeTransform>
 
 class TextHUD : public osg::Referenced
 {

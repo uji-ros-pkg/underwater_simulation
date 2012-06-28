@@ -74,7 +74,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	osg::Matrix linkBase;
 	osg::Matrix linkPost;
 	for (int i=0; i<vehicle.nlinks;i++) {
-	   osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, true);
+	   osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, "", "");
 	   program->addBindAttribLocation("aTangent", 6);
 
 	   link[i]->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);

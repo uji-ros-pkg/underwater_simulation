@@ -13,10 +13,9 @@ using namespace std;
 
 //#include "BulletPhysics.h"
 
-
 int main(int argc, char *argv[])
 {
-	osg::notify(osg::ALWAYS) << "UWSim; using osgOcean " << osgOceanGetVersion() << std::endl;
+	//osg::notify(osg::ALWAYS) << "UWSim; using osgOcean " << osgOceanGetVersion() << std::endl;
 
 	boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc,argv));
 	arguments->getApplicationUsage()->setApplicationName(arguments->getApplicationName());
@@ -63,8 +62,11 @@ int main(int argc, char *argv[])
 	while( arguments->read("--dataPath",dataPath));
 	//Add current folder to path
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));	
-	//Add UWSim folder to path
+	//Add UWSim folders to path
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+"/scenes");	
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));	
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_ROOT_PATH));	
+
 	//Add dataPath folder to path
 	if (dataPath!=std::string("")) {
 		osgDB::Registry::instance()->getDataFilePathList().push_back(dataPath);	
@@ -78,6 +80,8 @@ int main(int argc, char *argv[])
 	ros::init(argc,argv,"UWSim");
 	SceneBuilder builder(arguments);
 	builder.loadScene(config);
+
+	//BulletPhysics physics(config.offsetr,config.gravity,builder.getScene()->getOceanSurface());
 
 	ViewBuilder view(config, &builder, arguments);
 	

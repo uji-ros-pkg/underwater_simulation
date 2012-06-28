@@ -5,6 +5,7 @@
  *      Author: mprats
  */
 
+#include "osgOceanScene.h"
 #include "SimulatorConfig.h"
 #include "SimulatedIAUV.h"
 #include "URDFRobot.h"
