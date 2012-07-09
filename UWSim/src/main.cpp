@@ -76,8 +76,9 @@ int main(int argc, char *argv[])
 	while( arguments->read("--configfile",configfile));
 	ConfigFile config(configfile);
 
-
 	ros::init(argc,argv,"UWSim");
+	ros::start();
+
 	SceneBuilder builder(arguments);
 	builder.loadScene(config);
 
@@ -93,7 +94,6 @@ int main(int argc, char *argv[])
 	view.getViewer()->getWindows(windows);
 	windows[0]->setWindowName("UWSim");
 
-	ros::start();
 	while( !view.getViewer()->done() && ros::ok())
 	{
 		ROSInterface::setROSTime(ros::Time::now());
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	}
 	if (ros::ok()) ros::shutdown();
 
-	OSG_INFO << "Finished" << std::endl;
+	ROS_INFO("Finished");
 
 	return 0;
 }

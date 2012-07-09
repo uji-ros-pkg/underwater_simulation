@@ -4,6 +4,11 @@
 #include <osg/Material>
 #include <osgOcean/ShaderManager>
 
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/NavSatFix.h>
+#include <underwater_sensor_msgs/Pressure.h>
+#include <underwater_sensor_msgs/DVL.h>
+
 // static member
 ros::Time ROSInterface::current_time_;
 
@@ -421,6 +426,98 @@ void PATToROSOdom::publish() {
 	
 PATToROSOdom::~PATToROSOdom() {}
 
+
+ImuToROSImu::ImuToROSImu(InertialMeasurementUnit *imu, std::string topic, int rate): ROSPublisherInterface(topic,rate), imu_(imu) {
+}
+
+void ImuToROSImu::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("Imu publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<sensor_msgs::Imu>(topic, 1);
+}
+
+void ImuToROSImu::publish() {
+	if (imu_!=NULL) {
+		osg::Quat rot=imu_->getMeasurement();
+
+		sensor_msgs::Imu imu;
+		imu.header.stamp = getROSTime();
+		imu.header.frame_id="world";
+		imu.orientation.x=rot.x();
+		imu.orientation.y=rot.y();
+		imu.orientation.z=rot.z();
+		imu.orientation.w=rot.w();
+
+		imu.orientation_covariance[0]=imu.orientation_covariance[4]=imu.orientation_covariance[8]=std::pow(imu_->getStandardDeviation(),2);
+
+		pub_.publish(imu);
+	}
+}
+
+ImuToROSImu::~ImuToROSImu() {}
+
+
+PressureSensorToROS::PressureSensorToROS(PressureSensor *sensor, std::string topic, int rate): ROSPublisherInterface(topic,rate), sensor_(sensor) {
+}
+
+void PressureSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("PressureSensor publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<underwater_sensor_msgs::Pressure>(topic, 1);
+}
+
+void PressureSensorToROS::publish() {
+	if (sensor_!=NULL) {
+		double pressure=sensor_->getMeasurement();
+
+		underwater_sensor_msgs::Pressure v;
+		v.pressure=pressure;
+		v.header.stamp = getROSTime();
+		v.header.frame_id="world";
+
+		pub_.publish(v);
+	}
+}
+
+PressureSensorToROS::~PressureSensorToROS() {}
+
+void GPSSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("GPSSensor publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<sensor_msgs::NavSatFix>(topic, 1);
+}
+
+void GPSSensorToROS::publish() {
+	if (sensor_!=NULL) {
+		osg::Vec3d wTgps=sensor_->getMeasurement();
+
+		//publish only if near to the ocean surface
+		if (sensor_->depthBelowWater()<0.5) {
+			sensor_msgs::NavSatFix m;
+			m.latitude=wTgps[0];
+			m.longitude=wTgps[1];
+			m.position_covariance[0]=m.position_covariance[4]=m.position_covariance[8]=std::pow(sensor_->getStandardDeviation(),2);
+			m.position_covariance_type=m.COVARIANCE_TYPE_DIAGONAL_KNOWN;
+
+			pub_.publish(m);
+		}
+	}
+}
+
+void DVLSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("DVLSensor publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<underwater_sensor_msgs::DVL>(topic, 1);
+}
+
+void DVLSensorToROS::publish() {
+	if (sensor_!=NULL) {
+		osg::Vec3d vdvl=sensor_->getMeasurement();
+
+		underwater_sensor_msgs::DVL m;
+		m.bi_x_axis=vdvl.x();
+		m.bi_y_axis=vdvl.y();
+		m.bi_z_axis=vdvl.z();
+
+		pub_.publish(m);
+	}
+}
 
 ArmToROSJointState::ArmToROSJointState(SimulatedIAUV *arm, std::string topic, int rate): ROSPublisherInterface(topic,rate) {
   this->arm=arm->urdf;

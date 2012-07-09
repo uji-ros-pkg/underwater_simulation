@@ -135,6 +135,71 @@
         <y>0</y>
       </orientation>
     </rangeSensor>
+
+    <imu>
+      <name>imu</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>3.1415</y>
+      </orientation>
+      <std>0.00000001</std>
+    </imu>
+
+    <pressureSensor>
+      <name>pressureSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0.2</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>0</y>
+      </orientation>
+      <std>0.02</std>
+    </pressureSensor>
+    
+    <gpsSensor>
+      <name>GPSSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>0</y>
+      </orientation>
+      <std>0.00005</std>
+    </gpsSensor>
+
+    <dvlSensor>
+      <name>DVLSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>-0.75</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>3.9269908169872414</y>
+      </orientation>
+      <std>0.0015</std>
+    </dvlSensor>
+
   </vehicle>
 
   <object>
@@ -184,10 +249,6 @@
       <vehicleName> girona500 </vehicleName>
       <visualize> 1 </visualize>
     </ROSOdomToPAT>
-    <PATToROSOdom>
-      <topic> /uwsim/girona500_odom </topic>
-      <vehicleName> girona500 </vehicleName>
-    </PATToROSOdom>
     <ArmToROSJointState> 
 	<topic>/uwsim/joint_state</topic>
 	<vehicleName> girona500 </vehicleName>
@@ -207,9 +268,29 @@
       <rate>10</rate>
     </RangeSensorToROSRange>
     <ROSPoseToPAT>
-      <topic> /dataPoseNavigator </topic>
+      <topic> /g500/pose</topic>
       <vehicleName> girona500 </vehicleName>
     </ROSPoseToPAT>
+    <ImuToROSImu>
+      <name>imu</name>
+      <topic>g500/imu</topic>
+      <rate>20</rate>
+    </ImuToROSImu>
+    <PressureSensorToROS>
+      <name>pressureSensor</name>
+      <topic>g500/pressure</topic>
+      <rate>5</rate>
+    </PressureSensorToROS>
+    <GPSSensorToROS>
+      <name>GPSSensor</name>
+      <topic>g500/gps</topic>
+      <rate>1</rate>
+    </GPSSensorToROS>
+    <DVLSensorToROS>
+      <name>DVLSensor</name>
+      <topic>g500/dvl</topic>
+      <rate>5</rate>
+    </DVLSensorToROS>
   </rosInterfaces>
 </UWSimScene>
 

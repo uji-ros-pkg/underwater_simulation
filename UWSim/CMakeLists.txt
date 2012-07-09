@@ -78,7 +78,12 @@ src/UWSimUtils.cpp
 src/ROSInterface.cpp
 src/ObjectPicker.cpp
 src/SceneBuilder.cpp
-src/ViewBuilder.cpp)
+src/ViewBuilder.cpp
+src/InertialMeasurementUnit.cpp
+src/PressureSensor.cpp
+src/DVLSensor.cpp
+src/GPSSensor.cpp
+)
 
 rosbuild_add_executable(UWSim  src/main.cpp)
 rosbuild_add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
@@ -91,6 +96,7 @@ rosbuild_add_executable(setVehicleTwist interface_examples/setVehicleTwist.cpp)
 rosbuild_add_executable(setVehicleDisturbances interface_examples/setVehicleDisturbances.cpp)
 rosbuild_add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp)
 rosbuild_add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
+rosbuild_add_executable(setVehicleActuators interface_examples/setVehicleActuators.cpp)
 
 TARGET_LINK_LIBRARIES(UWSim uwsim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
@@ -103,4 +109,5 @@ TARGET_LINK_LIBRARIES(setVehicleTwist ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIB
 TARGET_LINK_LIBRARIES(setVehicleDisturbances ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(gotoAbsolutePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(gotoRelativePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(setVehicleActuators ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 

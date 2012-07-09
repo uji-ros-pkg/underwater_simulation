@@ -195,7 +195,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 
 		if(rosInterface.type==ROSInterfaceInfo::PATToROSOdom)
 			iface=boost::shared_ptr<PATToROSOdom>(new PATToROSOdom(root,rosInterface.targetName,rosInterface.topic,rosInterface.rate));
-
+		
 		if(rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm || rosInterface.type==ROSInterfaceInfo::ArmToROSJointState) {
 			//Find corresponding SimulatedIAUV Object
 			for (int j=0; j<nvehicle ;j++){
@@ -231,6 +231,35 @@ bool SceneBuilder::loadScene(ConfigFile config)
 				for (unsigned int c=0; c<iauvFile[j]->getNumObjectPickers(); c++)
 					if (iauvFile[j]->object_pickers[c].name==rosInterface.targetName)
 						iface=boost::shared_ptr<RangeSensorToROSRange>(new RangeSensorToROSRange(&(iauvFile[j]->object_pickers[c]),rosInterface.topic, rosInterface.rate));
+			}
+
+		if(rosInterface.type==ROSInterfaceInfo::ImuToROSImu)
+			//Find corresponding VirtualCamera Object on all the vehicles
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int i=0; i<iauvFile[j]->imus.size(); i++)
+					if (iauvFile[j]->imus[i].name==rosInterface.targetName)
+						iface=boost::shared_ptr<ImuToROSImu>(new ImuToROSImu(&(iauvFile[j]->imus[i]),rosInterface.topic, rosInterface.rate));
+			}
+
+		if(rosInterface.type==ROSInterfaceInfo::PressureSensorToROS)
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int i=0; i<iauvFile[j]->pressure_sensors.size(); i++)
+					if (iauvFile[j]->pressure_sensors[i].name==rosInterface.targetName)
+						iface=boost::shared_ptr<PressureSensorToROS>(new PressureSensorToROS(&(iauvFile[j]->pressure_sensors[i]),rosInterface.topic, rosInterface.rate));
+			}
+
+		if(rosInterface.type==ROSInterfaceInfo::GPSSensorToROS)
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int i=0; i<iauvFile[j]->gps_sensors.size(); i++)
+					if (iauvFile[j]->gps_sensors[i].name==rosInterface.targetName)
+						iface=boost::shared_ptr<GPSSensorToROS>(new GPSSensorToROS(&(iauvFile[j]->gps_sensors[i]),rosInterface.topic, rosInterface.rate));
+			}
+
+		if(rosInterface.type==ROSInterfaceInfo::DVLSensorToROS)
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int i=0; i<iauvFile[j]->dvl_sensors.size(); i++)
+					if (iauvFile[j]->dvl_sensors[i].name==rosInterface.targetName)
+						iface=boost::shared_ptr<DVLSensorToROS>(new DVLSensorToROS(&(iauvFile[j]->dvl_sensors[i]),rosInterface.topic, rosInterface.rate));
 			}
 
 		if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)

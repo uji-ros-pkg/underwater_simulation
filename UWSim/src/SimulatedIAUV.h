@@ -14,6 +14,10 @@
 #include "ConfigXMLParser.h"
 #include "VirtualRangeSensor.h"
 #include "ObjectPicker.h"
+#include "InertialMeasurementUnit.h"
+#include "PressureSensor.h"
+#include "GPSSensor.h"
+#include "DVLSensor.h"
 
 /* An I-AUV */
 class SimulatedIAUV
@@ -22,6 +26,10 @@ public:
 	std::vector<VirtualCamera> camview;
 	std::vector<VirtualRangeSensor> range_sensors;
 	std::vector<ObjectPicker> object_pickers;
+	std::vector<InertialMeasurementUnit> imus;
+	std::vector<PressureSensor> pressure_sensors;
+	std::vector<GPSSensor> gps_sensors;
+	std::vector<DVLSensor> dvl_sensors;
 
 	typedef enum {ARM5,PA10} arm_t;
 
@@ -31,7 +39,7 @@ public:
 	osg::ref_ptr<osg::MatrixTransform> baseTransform;
 
 	//SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype);
-        SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicle);
+	SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicle);
 
 	//void setVirtualCamera(std::string name, osg::Transform* transform, osg::Vec3d eye, osg::Vec3d orientation, osg::Vec3d upVector, int width, int height);
 

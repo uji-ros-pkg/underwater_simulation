@@ -1,0 +1,10 @@
+<launch>
+	<include file="$(find underwater_vehicle_dynamics)/launch/dynamics.launch">
+	   <arg name="namespace" value="g500" />
+	   <arg name="params" value="$(find underwater_vehicle_dynamics)/config/dynamics_g500.yaml" />
+	</include>
+
+	<arg name="scene" default="cirs.xml" />
+	<node name="UWSim" pkg="UWSim" type="UWSim" args="--configfile=$(arg scene)" output="screen" respawn="false" />
+</launch>
+

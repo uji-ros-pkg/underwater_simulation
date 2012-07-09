@@ -17,6 +17,9 @@
 #include "SimulatedIAUV.h"
 #include "VirtualCamera.h"
 #include "VirtualRangeSensor.h"
+#include "PressureSensor.h"
+#include "GPSSensor.h"
+#include "DVLSensor.h"
 #include "HUDCamera.h"
 #include "UWSimUtils.h"
 
@@ -251,6 +254,57 @@ public:
 	~PATToROSOdom();
 };
 
+class ImuToROSImu : public ROSPublisherInterface {
+	InertialMeasurementUnit *imu_;
+
+public:
+	ImuToROSImu(InertialMeasurementUnit *imu, std::string topic, int rate);
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+
+	~ImuToROSImu();
+};
+
+class PressureSensorToROS : public ROSPublisherInterface {
+	PressureSensor *sensor_;
+
+public:
+	PressureSensorToROS(PressureSensor *sensor, std::string topic, int rate);
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+
+	~PressureSensorToROS();
+};
+
+class GPSSensorToROS : public ROSPublisherInterface {
+	GPSSensor *sensor_;
+
+public:
+	GPSSensorToROS(GPSSensor *sensor, std::string topic, int rate) : ROSPublisherInterface(topic,rate), sensor_(sensor) {}
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+
+	~GPSSensorToROS() {}
+};
+
+class DVLSensorToROS : public ROSPublisherInterface {
+	DVLSensor *sensor_;
+
+public:
+	DVLSensorToROS(DVLSensor *sensor, std::string topic, int rate) : ROSPublisherInterface(topic,rate), sensor_(sensor) {}
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+
+	~DVLSensorToROS() {}
+};
 
 class ArmToROSJointState : public ROSPublisherInterface {
 	boost::shared_ptr<URDFRobot> arm;

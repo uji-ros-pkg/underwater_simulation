@@ -14,7 +14,8 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,
+	  	  	    ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS} type_t;
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -48,6 +49,42 @@ struct rangeSensor {
   int visible;
   int link;
   void init(){name="";linkName="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;range=0;visible=0;}
+};
+
+struct Imu {
+  string name;
+  string linkName;
+  double std; //standard deviation
+  double position[3],orientation[3];
+  int link;
+  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+};
+
+struct XMLPressureSensor {
+  string name;
+  string linkName;
+  double std; //standard deviation
+  double position[3],orientation[3];
+  int link;
+  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+};
+
+struct XMLGPSSensor {
+  string name;
+  string linkName;
+  double std; //standard deviation
+  double position[3],orientation[3];
+  int link;
+  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+};
+
+struct XMLDVLSensor {
+  string name;
+  string linkName;
+  double std; //standard deviation
+  double position[3],orientation[3];
+  int link;
+  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
 };
 
 struct Mimic{
@@ -98,6 +135,10 @@ struct Vehicle{
   std::vector<Material> materials;
   std::list<Vcam> Vcams;
   std::list<rangeSensor> range_sensors, object_pickers;
+  std::list<Imu> imus;
+  std::list<XMLPressureSensor> pressure_sensors;
+  std::list<XMLGPSSensor> gps_sensors;
+  std::list<XMLDVLSensor> dvl_sensors;
 };
 
 struct Object{
@@ -126,6 +167,10 @@ private:
   void processParameters(const xmlpp::Node*, Parameters *params);
   void processVcam(const xmlpp::Node* node, Vcam &vcam);
   void processRangeSensor(const xmlpp::Node* node, rangeSensor &rs);
+  void processImu(const xmlpp::Node* node, Imu &rs);
+  void processPressureSensor(const xmlpp::Node* node, XMLPressureSensor &ps);
+  void processDVLSensor(const xmlpp::Node* node, XMLDVLSensor &s);
+  void processGPSSensor(const xmlpp::Node* node, XMLGPSSensor &s);
   void processCamera(const xmlpp::Node* node);
   void processJointValues(const xmlpp::Node* node, std::vector<double> &jointValues, int &ninitJoints);
   void processVehicle(const xmlpp::Node* node, Vehicle &vehicle);
