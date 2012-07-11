@@ -8,10 +8,12 @@
 #include "VirtualCamera.h"
 #include "UWSimUtils.h"
 #include <iostream>
+#include "SceneBuilder.h"
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
+	this->uwsim_root=uwsim_root;
 	this->name=name;
 
 	this->trackNode=trackNode;
@@ -38,24 +40,26 @@ void VirtualCamera::init(std::string name, osg::Node *trackNode, int width, int 
         
 	renderTexture=new osg::Image();
 	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
+	depthTexture=new osg::Image();
+	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
 
 	createCamera();
 }
 
-VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(name, trackNode,width,height,baseline, frameId, NULL);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL);
 }
 
-VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
-	init(name, trackNode,width,height,baseline,frameId,params);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params);
 }
 
-VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(name, trackNode,width,height,0.0,"",params);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params);
 }
 
-VirtualCamera::VirtualCamera(std::string name, osg::Node *trackNode, int width, int height) {
-	init(name, trackNode,width,height,0.0,"", NULL);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL);
 }
 
 void VirtualCamera::createCamera()
@@ -73,13 +77,14 @@ void VirtualCamera::createCamera()
 
 	// The camera will render into the texture that we created earlier
 	textureCamera->attach(osg::Camera::COLOR_BUFFER, renderTexture.get());
+	textureCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture.get());
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 	
 	if(!paramsOn){
 	  //set default fov, near and far parameters
-	  textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 10);
+	  textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
 	  osg::Matrixd m;
 	  m=textureCamera->getProjectionMatrix();
 	  fx=m(0,0)*width/2.0;
@@ -101,10 +106,9 @@ void VirtualCamera::createCamera()
 	}
 
 	Tx = (-fx * baseline);
-	Ty = 0.0;
-	//make this camera track the node
-	osg::ref_ptr<MyNodeTrackerCallback> node_tracker = new MyNodeTrackerCallback;
-	node_tracker->setCamera(textureCamera.get());
+	Ty = 0.0;	
+
+	node_tracker = new MyNodeTrackerCallback(uwsim_root, depthTexture, textureCamera);
 	trackNode->setUpdateCallback(node_tracker);
 }
 
@@ -112,6 +116,7 @@ osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow() {
 	osg::ref_ptr<osgWidget::Box> box=new osgWidget::Box("VirtualCameraBox", osgWidget::Box::HORIZONTAL, true);
 	osg::ref_ptr<osgWidget::Widget> widget = new osgWidget::Widget("VirtualCameraWidget", width, height);
 	widget->setImage(renderTexture.get(),true,false);
+	//widget->setImage(depthTexture.get(),true,false);
 	box->addWidget(widget.get());
 	box->getBackground()->setColor(1.0f, 0.0f, 0.0f, 0.8f);
 	box->attachMoveCallback();

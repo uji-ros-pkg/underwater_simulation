@@ -85,6 +85,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 
 	osgOcean::ShaderManager::instance().enableShaders(!disableShaders);
 
+	root = new osg::Group;
 
 	//Initialize ocean scene.
 	scene = new osgOceanScene(config.offsetp, config.offsetr, windDirection, windSpeed, depth, reflectionDamping, scale, isChoppy, choppyFactor, crestFoamHeight, false, "terrain");
@@ -115,7 +116,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 	int nvehicle=config.vehicles.size();
 	for (int i=0; i<nvehicle; i++) {
 		Vehicle vehicle=config.vehicles.front();
-		boost::shared_ptr<SimulatedIAUV> siauv(new SimulatedIAUV(scene.get(),vehicle));
+		boost::shared_ptr<SimulatedIAUV> siauv(new SimulatedIAUV(this,vehicle));
 		iauvFile.push_back(siauv);
 		config.vehicles.pop_front();
 
@@ -160,7 +161,6 @@ bool SceneBuilder::loadScene(ConfigFile config)
 
 
 	//Set-up the scene graph and main loop
-	root = new osg::Group;
 	root->addChild(scene->getScene());
 
 	//   iauv->lightSource->addChild(scene->getScene());	//Add vehicles light sources to the scene. Check if can be added to the .osg file.

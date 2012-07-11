@@ -102,6 +102,7 @@
         <p>0</p>
         <y>1.57 </y>
       </orientation>
+      <showpath>2</showpath>  <!-- draws the FOV of the camera projected on the scene each 2 seconds -->
     </virtualCamera>
     <virtualCamera>
       <name>bowtech2</name>
@@ -262,6 +263,10 @@
       <imageTopic> /uwsim/camera1 </imageTopic>
       <infoTopic> /uwsim/camera1_info </infoTopic>
     </VirtualCameraToROSImage>
+    <ROSTwistToPAT>
+      <topic> /g500/twist</topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSTwistToPAT>
     <RangeSensorToROSRange>
       <name>sonar</name>
       <topic> /uwsim/g500/range </topic>

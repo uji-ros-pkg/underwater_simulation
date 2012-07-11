@@ -4,7 +4,7 @@
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
 <!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?)>
 <!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, rangeSensor*, imu*, pressureSensor*, gpsSensor*, dvlSensor*)>
-<!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?)>
+<!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?, showpath?)>
 <!ELEMENT rangeSensor (name,relativeTo,range,visible?,position?,orientation?)>
 <!ELEMENT imu (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT pressureSensor (name,relativeTo,position?,orientation?, std?)>
@@ -76,6 +76,7 @@
 <!ELEMENT k (#PCDATA)>
 <!ELEMENT baseline (#PCDATA)>
 <!ELEMENT frameId (#PCDATA)>
+<!ELEMENT showpath (#PCDATA)>
 
 <!--elementos rangeSensor -->
 <!ELEMENT range (#PCDATA)>

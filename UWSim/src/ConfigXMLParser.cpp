@@ -222,11 +222,11 @@ void ConfigFile::processVcam(const xmlpp::Node* node,Vcam &vcam){
 			extractFloatChar(child,vcam.baseLine);
 		} else if(child->get_name()=="frameId"){
 			extractStringChar(child,vcam.frameId);
-		}
-		else if(child->get_name()=="parameters"){
+		} else if(child->get_name()=="parameters"){
 			vcam.parameters.reset(new Parameters());
 			processParameters(child,vcam.parameters.get());
-		}
+		} else if(child->get_name()=="showpath")
+			extractFloatChar(child,vcam.showpath);
 	}
 
 }

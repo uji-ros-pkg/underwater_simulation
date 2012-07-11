@@ -98,7 +98,7 @@ rosbuild_add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp
 rosbuild_add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
 rosbuild_add_executable(setVehicleActuators interface_examples/setVehicleActuators.cpp)
 
-TARGET_LINK_LIBRARIES(UWSim uwsim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+TARGET_LINK_LIBRARIES(UWSim uwsim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} GLU)
 TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(setJointPosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
 TARGET_LINK_LIBRARIES(setJointVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})

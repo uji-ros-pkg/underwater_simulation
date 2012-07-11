@@ -5,6 +5,7 @@
  *      Author: mprats
  */
 
+#include "SceneBuilder.h"
 #include "osgOceanScene.h"
 #include "SimulatorConfig.h"
 #include "SimulatedIAUV.h"
@@ -76,7 +77,7 @@ SimulatedIAUV::SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype) {
 }
  */
 
-SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf(new URDFRobot(oscene->getOceanScene(),vehicleChars)) {
+SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(new URDFRobot(oscene->scene->getOceanScene(),vehicleChars)) {
 	name=vehicleChars.name;
 	baseTransform=new osg::MatrixTransform;
 
@@ -96,7 +97,8 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMc->asPositionAttitudeTransform()->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
 		vMc->asPositionAttitudeTransform()->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[vcam.link]->asGroup()->addChild(vMc);
-		camview.push_back(VirtualCamera(vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get()));
+		camview.push_back(VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get()));
+		if (vcam.showpath) camview[camview.size()-1].showPath(vcam.showpath);
 		OSG_INFO << "Done adding a virtual camera..." << std::endl;
 	}
 
@@ -110,7 +112,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMr->asPositionAttitudeTransform()->setPosition(osg::Vec3d(rs.position[0],rs.position[1],rs.position[2]));
 		vMr->asPositionAttitudeTransform()->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[rs.link]->asGroup()->addChild(vMr);
-		range_sensors.push_back(VirtualRangeSensor(rs.name, oscene->localizedWorld, vMr, rs.range, (rs.visible)? true:false));
+		range_sensors.push_back(VirtualRangeSensor(rs.name, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible)? true:false));
 		OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
 	}
 
@@ -121,11 +123,10 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		imu=vehicleChars.imus.front();
 		vehicleChars.imus.pop_front();
 		osg::ref_ptr<osg::Transform> vMi=(osg::Transform*) new osg::PositionAttitudeTransform;
-		std::cerr << "Imu position: " << imu.position[0] << " " << imu.position[1] << " " << imu.position[2] << std::endl;
 		vMi->asPositionAttitudeTransform()->setPosition(osg::Vec3d(imu.position[0],imu.position[1],imu.position[2]));
 		vMi->asPositionAttitudeTransform()->setAttitude(osg::Quat(imu.orientation[0],osg::Vec3d(1,0,0),imu.orientation[1],osg::Vec3d(0,1,0), imu.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[imu.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMi);
-		imus.push_back(InertialMeasurementUnit(imu.name, vMi, oscene->localizedWorld->getMatrix(), imu.std));
+		imus.push_back(InertialMeasurementUnit(imu.name, vMi, oscene->scene->localizedWorld->getMatrix(), imu.std));
 		OSG_INFO << "Done adding an IMU..." << std::endl;
 	}
 
@@ -139,7 +140,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMs->asPositionAttitudeTransform()->setPosition(osg::Vec3d(ps.position[0],ps.position[1],ps.position[2]));
 		vMs->asPositionAttitudeTransform()->setAttitude(osg::Quat(ps.orientation[0],osg::Vec3d(1,0,0),ps.orientation[1],osg::Vec3d(0,1,0), ps.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-		pressure_sensors.push_back(PressureSensor(ps.name, vMs, oscene->localizedWorld->getMatrix(), ps.std));
+		pressure_sensors.push_back(PressureSensor(ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
 		OSG_INFO << "Done adding an Pressure Sensor..." << std::endl;
 	}
 
@@ -153,7 +154,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMs->asPositionAttitudeTransform()->setPosition(osg::Vec3d(ps.position[0],ps.position[1],ps.position[2]));
 		vMs->asPositionAttitudeTransform()->setAttitude(osg::Quat(ps.orientation[0],osg::Vec3d(1,0,0),ps.orientation[1],osg::Vec3d(0,1,0), ps.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-		gps_sensors.push_back(GPSSensor(oscene, ps.name, vMs, oscene->localizedWorld->getMatrix(), ps.std));
+		gps_sensors.push_back(GPSSensor(oscene->scene, ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
 		OSG_INFO << "Done adding an GPS Sensor..." << std::endl;
 	}
 
@@ -167,7 +168,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMs->asPositionAttitudeTransform()->setPosition(osg::Vec3d(ps.position[0],ps.position[1],ps.position[2]));
 		vMs->asPositionAttitudeTransform()->setAttitude(osg::Quat(ps.orientation[0],osg::Vec3d(1,0,0),ps.orientation[1],osg::Vec3d(0,1,0), ps.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-		dvl_sensors.push_back(DVLSensor(ps.name, vMs, oscene->localizedWorld->getMatrix(), ps.std));
+		dvl_sensors.push_back(DVLSensor(ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
 		OSG_INFO << "Done adding an DVL Sensor..." << std::endl;
 	}
 
@@ -182,7 +183,7 @@ SimulatedIAUV::SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicleChars) : urdf
 		vMr->asPositionAttitudeTransform()->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
 		vMr->setName("ObjectPickerNode");
 		urdf->link[rs.link]->asGroup()->addChild(vMr);
-		object_pickers.push_back(ObjectPicker(rs.name, oscene->localizedWorld, vMr, rs.range, true));
+		object_pickers.push_back(ObjectPicker(rs.name, oscene->scene->localizedWorld, vMr, rs.range, true));
 		OSG_INFO << "Done adding an object picker..." << std::endl;
 	}
 

@@ -19,6 +19,8 @@
 #include "GPSSensor.h"
 #include "DVLSensor.h"
 
+class SceneBuilder; 
+
 /* An I-AUV */
 class SimulatedIAUV
 {
@@ -38,8 +40,7 @@ public:
 	//osg::LightSource* lightSource;	///< vehicle lamp
 	osg::ref_ptr<osg::MatrixTransform> baseTransform;
 
-	//SimulatedIAUV(osgOcean::OceanScene *oscene, arm_t armtype);
-	SimulatedIAUV(osgOceanScene *oscene, Vehicle vehicle);
+	SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicle);
 
 	//void setVirtualCamera(std::string name, osg::Transform* transform, osg::Vec3d eye, osg::Vec3d orientation, osg::Vec3d upVector, int width, int height);
 

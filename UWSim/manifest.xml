@@ -19,6 +19,7 @@
   <rosdep name="libxml++-2.6" />
   <rosdep name="boost" />
   <rosdep name="libopenscenegraph" />
+  <rosdep name="opengl" />
 
   <url>http://www.irs.uji.es/uwsim/</url>
   <export>
