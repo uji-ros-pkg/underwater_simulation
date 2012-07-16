@@ -1,0 +1,23 @@
+<package>
+  <description brief="underwater_vehicle_dynamics">
+
+     underwater_vehicle_dynamics
+
+  </description>
+  <author>Arnau Carrera, Narcís Palomeras, Mario Prats</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/underwater_vehicle_dynamics</url>
+
+  <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="rospy"/>
+  <depend package="tf"/>
+  <depend package="tf_conversions"/>
+  <depend package="kdl"/>
+
+</package>
+
+

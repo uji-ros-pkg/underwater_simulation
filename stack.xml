@@ -1,0 +1,10 @@
+<stack>
+  <description brief="underwater_simulation">Packages for Underwater Simulation. Includes UWSim, a ROS-based visualization/simulation system for underwater robotics</description>
+  <author>Maintained by Mario Prats</author>
+  <license>LGPL</license>  
+  <version>1.1</version>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.irs.uji.es/uwsim</url>
+  <depend stack="ros" />
+  <depend stack="robot_model" />
+</stack>

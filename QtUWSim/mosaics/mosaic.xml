@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE UWSimScene SYSTEM "UWSimScene.dtd" >
+
+<UWSimScene>
+  <simParams>
+    <disableShaders> 1 </disableShaders>
+    <resw> 1000 </resw>
+    <resh> 1000 </resh>
+   </simParams>
+   <camera>
+    <freeMotion> 1 </freeMotion>
+    <fov> 60 </fov>
+    <aspectRatio> 1.33 </aspectRatio>
+    <near> 1 </near>
+    <far> 10000 </far>
+    <position>
+      <x>0</x>
+      <y>0 </y>
+      <z>100 </z>
+    </position> 
+    <lookAt>
+      <x>0</x>
+      <y>0 </y>
+      <z>0 </z>
+    </lookAt>
+
+  </camera>
+
+  <object>
+    <name> ship </name>
+    <file> /home/toni/imagenes/mosaico.osg  </file>
+    <position>
+      <x> -82</x>
+      <y> -82 </y>
+      <z> 1 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>0 </y>
+    </orientation>
+  </object>
+
+</UWSimScene>
+

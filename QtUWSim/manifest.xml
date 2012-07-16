@@ -1,0 +1,28 @@
+<package>
+  <description brief="QtUWSim">
+
+     QtUWSim
+
+  </description>
+  <author>Antonio Peñalver, Juan Carlos García, Mario Prats</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/QtUWSim</url>
+  <depend package="roscpp"/>
+  <depend package="UWSim"/>
+  <depend package="osg_utils" />
+  <depend package="osg_markers" />
+  <depend package="osg_interactive_markers" />
+  <depend package="database_interface" />
+  <depend package="kinematics_base" />
+  <depend package="pluginlib" />
+  <depend package="ompl_ros_interface" />
+  <depend package="mar_robot" />
+  <depend package="visp" />
+  <depend package="tf" />  
+  <rosdep name="qt4"/>
+
+
+</package>
+
+

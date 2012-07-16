@@ -1,0 +1,14 @@
+<package>
+  <description brief="underwater_sensor_msgs">
+
+     underwater_sensor_msgs
+
+  </description>
+  <author>mprats</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/underwater_sensor_msgs</url>
+
+</package>
+
+

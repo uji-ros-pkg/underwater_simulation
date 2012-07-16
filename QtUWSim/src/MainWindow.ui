@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QtUWSim</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>900</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionXML"/>
+    <addaction name="actionCreateMosaic"/>
+    <addaction name="actionLoadMosaic"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionGrasp"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QDockWidget" name="dockHand">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>300</width>
+     <height>300</height>
+    </size>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Hands</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <widget class="QWidget" name="gridLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>-1</y>
+       <width>281</width>
+       <height>361</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="2">
+       <widget class="QListWidget" name="hands"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="newHandButton">
+        <property name="text">
+         <string>New</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="deleteHandButton">
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="pathButton">
+        <property name="text">
+         <string>New Path</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <action name="actionEsewe">
+   <property name="text">
+    <string>esewe</string>
+   </property>
+  </action>
+  <action name="actionXML">
+   <property name="text">
+    <string>&amp;Load XML</string>
+   </property>
+  </action>
+  <action name="actionLoad_a_new_XML">
+   <property name="text">
+    <string>Load a new XML</string>
+   </property>
+  </action>
+  <action name="actionCreateMosaic">
+   <property name="text">
+    <string>Create Mosaic</string>
+   </property>
+  </action>
+  <action name="actionLoadMosaic">
+   <property name="text">
+    <string>Load Mosaic</string>
+   </property>
+  </action>
+  <action name="actionGrasp">
+   <property name="text">
+    <string>Grasp Specification</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionTips_Tricks">
+   <property name="text">
+    <string>Tips and Tricks</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
