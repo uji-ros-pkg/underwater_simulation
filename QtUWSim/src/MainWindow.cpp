@@ -120,6 +120,15 @@ void MainWindow::loadXML(){
 		delete sceneBuilder;
 
 		//TODO: Progress bar
+		QProgressDialog progressDialog("Loading the XML file...", "Cancel process", 0, 100, this);
+		progressDialog.setWindowModality(Qt::WindowModal);
+		progressDialog.setCancelButton(0);
+		progressDialog.setValue(5);
+		QApplication::processEvents();
+		sleep(1.0);
+		progressDialog.setValue(10);
+//		cout<<"UwsimProgressBarUpdate = 10 "<<endl;
+
 		QStringList fichs=dialog->selectedFiles();
 		std::string fichero = fichs[0].toUtf8().constData();
 		ConfigFile config(fichero);
@@ -132,44 +141,47 @@ void MainWindow::loadXML(){
 		offsetr.push_back(config.offsetr[1]);
 		offsetr.push_back(config.offsetr[2]);
 		//sceneBuilder->stopROSInterfaces();
+		progressDialog.setValue(25);
 		sceneBuilder=new SceneBuilder();
 		sceneBuilder->loadScene(config);
+		progressDialog.setValue(50);
 		viewBuilder=new ViewBuilder(config, sceneBuilder);
 		view=viewBuilder->getView();
+		progressDialog.setValue(75);
 		scene=sceneBuilder->getScene();
 		root=sceneBuilder->getRoot();
 		viewWidget->updateViewerWidget(view);
+		progressDialog.setValue(100);
 	}
 }
 
 
 void MainWindow::createMosaic(){
 	QStringList mosaic_file;
-	QFileDialog *dialog=new QFileDialog(this, "Load texture Mosaic", ".", "Image Files (*)");
-	if(dialog->exec()){
-		QStringList textura=dialog->selectedFiles();
-		QFileDialog *dialog2=new QFileDialog(this, "Load height Mosaic", ".", "ImageFiles(*)");
-		int val=dialog2->exec();
+	QFileDialog *loadTextureDialog=new QFileDialog(this, "Load texture Mosaic", ".", "Image Files (*)");
+	if(loadTextureDialog->exec()){
+		QStringList textura=loadTextureDialog->selectedFiles();
+		QFileDialog *LoadHeightDialog=new QFileDialog(this, "Load height Mosaic", ".", "ImageFiles(*)");
+		int val=LoadHeightDialog->exec();
 		QStringList height;
 		if(val)
-			height=dialog2->selectedFiles();
-		QFileDialog *dialog3=new QFileDialog(this, "Save osg Mosaic", ".", "OSG Files (*.osg)");
-		dialog3->setAcceptMode(QFileDialog::AcceptSave);
-		if(dialog3->exec()){
-			dialog3->setDefaultSuffix("osg");
-			mosaic_file=dialog3->selectedFiles();
+			height=LoadHeightDialog->selectedFiles();
+		QFileDialog *SaveMosaicDialog=new QFileDialog(this, "Save osg Mosaic", ".", "OSG Files (*.osg)");
+		SaveMosaicDialog->setAcceptMode(QFileDialog::AcceptSave);
+		if(SaveMosaicDialog->exec()){
+			SaveMosaicDialog->setDefaultSuffix("osg");
+			mosaic_file=SaveMosaicDialog->selectedFiles();
 			QString arg;
 			QProcess *process;
 
-			QProgressDialog progress("Creating the mosaic...", "Cancel process", 0, 100, this);
-			progress.setWindowModality(Qt::WindowModal);
-			progress.setLabelText("Please, wait until the mosaic has been created.");
-			progress.setValue(5);
-			cout<<"UwsimProgressBarUpdate = 5 "<<endl;
+			QProgressDialog progressDialog("Please, wait until the mosaic has been created...", "Cancel process", 0, 100, this);
+			progressDialog.setWindowModality(Qt::WindowModal);
+			progressDialog.setCancelButton(0);
+			progressDialog.setValue(5);
 			QApplication::processEvents();
 			sleep(1.0);
-			progress.setValue(10);
-			cout<<"UwsimProgressBarUpdate = 10 "<<endl;
+			progressDialog.setValue(10);
+//			cout<<"UwsimProgressBarUpdate = 10 "<<endl;
 
 			arg="gdal_translate ";
 			arg.append(textura[0]);
@@ -190,8 +202,7 @@ void MainWindow::createMosaic(){
 				arg="osgdem --xx 0.08 --yy 0.08 -t texture.tif -l 3 -v 1 -o ";
 			}
 
-			progress.setValue(25);
-			cout<<"UwsimProgressBarUpdate = 25 "<<endl;
+			progressDialog.setValue(25);
 
 			image=new QImage("texture.tif");
 			int ancho=image->size().rwidth();
@@ -212,7 +223,7 @@ void MainWindow::createMosaic(){
 			osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
 			ConfigFile config(std::string (ros::package::getPath("QtUWSim"))+"/mosaics/mosaic.xml");
 			config.objects.front().file=mosaic_file[0].toUtf8().constData();
-			cout<<"Nombre del Fichero "<<config.objects.front().file<<endl;
+			cout<<"Nombre del fichero: "<<config.objects.front().file<<endl;
 			config.objects.front().position[0]=-((ancho*0.01)/2);
 			config.objects.front().position[1]=-((alto*0.01)/2);
 			offsetp.clear();
@@ -224,12 +235,10 @@ void MainWindow::createMosaic(){
 			offsetr.push_back(config.offsetr[1]);
 			offsetr.push_back(config.offsetr[2]);
 
-			progress.setValue(50);
-			cout<<"UwsimProgressBarUpdate = 50 "<<endl;
+			progressDialog.setValue(40);
 
 			sceneBuilder=new SceneBuilder();
-			progress.setValue(75);
-			cout<<"UwsimProgressBarUpdate = 75 "<<endl;
+			progressDialog.setValue(60);
 
 			sceneBuilder->loadScene(config);
 			viewBuilder=new ViewBuilder(config, sceneBuilder);
@@ -240,6 +249,7 @@ void MainWindow::createMosaic(){
 			spec=new PlanarGraspSpec(root);
 			view->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
 			viewWidget->updateViewerWidget(view);
+			progressDialog.setValue(80);
 			MosaicManipulator *tb=new MosaicManipulator;
 			osg::Vec3d eye, center, up;
 			oldManipulator=view->getCameraManipulator();
@@ -247,8 +257,7 @@ void MainWindow::createMosaic(){
 			tb->setHomePosition(eye, center, up);
 			oldManipulator=view->getCameraManipulator();
 			view->setCameraManipulator(tb);
-			progress.setValue(100);
-			cout<<"UwsimProgressBarUpdate = 100 "<<endl;
+			progressDialog.setValue(100);
 		}	 
 	}
 }
@@ -256,9 +265,9 @@ void MainWindow::createMosaic(){
 
 void MainWindow::loadMosaic(){
 	QStringList mosaic_file;
-	QFileDialog *dialog1=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg)");
-	if(dialog1->exec()){
-		mosaic_file=dialog1->selectedFiles();
+	QFileDialog *loadOsgDialog=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg)");
+	if(loadOsgDialog->exec()){
+		mosaic_file=loadOsgDialog->selectedFiles();
 		updateStatusBar(mosaic_file[0]);
 		delete viewBuilder;
 		delete(sceneBuilder);
