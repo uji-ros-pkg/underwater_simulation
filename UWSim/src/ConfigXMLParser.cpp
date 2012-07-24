@@ -174,6 +174,15 @@ void ConfigFile::processSimParams(const xmlpp::Node* node){
 			extractPositionOrColor(child,offsetp);
 		else if(child->get_name()=="offsetr")
 			extractPositionOrColor(child,offsetr);
+     		else if(child->get_name()=="gravity")
+			extractPositionOrColor(child,gravity);
+		else if(child->get_name()=="enablePhysics"){
+			extractIntChar(child,enablePhysics);
+			if(enablePhysics != 0 && enablePhysics!=1){
+				OSG_WARN << "ConfigFile::processSimParams: enablePhysics is not a binary value ( 0 1), using default value (1)" << std::endl;
+				enablePhysics=0;
+			}
+		}
 
 	}
 }
@@ -360,123 +369,132 @@ void ConfigFile::processPose(urdf::Pose pose, double position[3], double rpy[3],
 	pose.rotation.getQuaternion(quat[0],quat[1],quat[2],quat[3]);
 }
 
-int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, int nmat, std::vector<Material> &materials){
-	urdf::Geometry * geometry =visual->geometry.get();
+void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
 
-	if (geometry->type ==urdf::Geometry::MESH){
-		urdf::Mesh *mesh = dynamic_cast<urdf::Mesh*>(geometry);
-		link.file=mesh->filename;
-		link.type=0;
-	}
-	else if(geometry->type ==urdf::Geometry::BOX){
-		urdf::Box *box = dynamic_cast<urdf::Box*>(geometry);
-		link.type=1;
-		link.boxSize[0]=box->dim.x;
-		link.boxSize[1]=box->dim.y;
-		link.boxSize[2]=box->dim.z;
-	}
-	else if(geometry->type ==urdf::Geometry::CYLINDER){
-		urdf::Cylinder *cylinder = dynamic_cast<urdf::Cylinder*>(geometry);
-		link.type=2;
-		link.length=cylinder->length;
-		link.radius=cylinder->radius;
-	}
-	else if(geometry->type ==urdf::Geometry::SPHERE){
-		urdf::Sphere *sphere = dynamic_cast<urdf::Sphere*>(geometry);
-		link.type=3;
-		link.radius=sphere->radius;
-	}
-	processPose(visual->origin,link.position,link.rpy,link.quat);
+     if (geometry->type ==urdf::Geometry::MESH){
+        urdf::Mesh *mesh = dynamic_cast<urdf::Mesh*>(geometry);
+        geom->file=mesh->filename;
+	geom->type=0;
+     }
+     else if(geometry->type ==urdf::Geometry::BOX){
+        urdf::Box *box = dynamic_cast<urdf::Box*>(geometry);
+	geom->type=1;
+	geom->boxSize[0]=box->dim.x;
+	geom->boxSize[1]=box->dim.y;
+	geom->boxSize[2]=box->dim.z;
+     }
+     else if(geometry->type ==urdf::Geometry::CYLINDER){
+        urdf::Cylinder *cylinder = dynamic_cast<urdf::Cylinder*>(geometry);
+	geom->type=2;
+	geom->length=cylinder->length;
+	geom->radius=cylinder->radius;
+     }
+     else if(geometry->type ==urdf::Geometry::SPHERE){
+        urdf::Sphere *sphere = dynamic_cast<urdf::Sphere*>(geometry);
+	geom->type=3;
+	geom->radius=sphere->radius;
+     }
+  }
+  int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, int nmat, std::vector<Material> &materials){
+     processGeometry(visual->geometry.get(),link.geom.get());
+     processPose(visual->origin,link.position,link.rpy,link.quat);
 
 
-	//Material
-	//Search if it's a new materia
-	int found=0;
-	if(visual->material!=NULL){
-		for(int i=0;i<nmat && !found;i++){
-			if(visual->material_name==materials[i].name){
-				link.material=i;
-				found=1;
-			}
-		}
+     //Material
+     //Search if it's a new materia
+     int found=0;
+     if(visual->material!=NULL){
+       for(int i=0;i<nmat && !found;i++){
+	 if(visual->material_name==materials[i].name){
+	   link.material=i;
+	   found=1;
+	 }
+       }
 
-		if(!found){
-			materials[nmat].name=visual->material_name;
-			materials[nmat].r=visual->material->color.r;
-			materials[nmat].g=visual->material->color.g;
-			materials[nmat].b=visual->material->color.b;
-			materials[nmat].a=visual->material->color.a;
-			link.material=nmat;
-			nmat++;
-		}
-	}
-	else
-		link.material=-1;
-	return nmat;
-}
+       if(!found){
+	 materials[nmat].name=visual->material_name;
+	 materials[nmat].r=visual->material->color.r;
+	 materials[nmat].g=visual->material->color.g;
+	 materials[nmat].b=visual->material->color.b;
+	 materials[nmat].a=visual->material->color.a;
+	 link.material=nmat;
+	 nmat++;
+       }
+     }
+     else
+	link.material=-1;
+     return nmat;
+  }
 
-void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink){
-	jointVehicle.name=joint->name;
-	jointVehicle.axis[0]=joint->axis.x;
-	jointVehicle.axis[1]=joint->axis.y;
-	jointVehicle.axis[2]=joint->axis.z;
-	processPose(joint->parent_to_joint_origin_transform,jointVehicle.position,jointVehicle.rpy,jointVehicle.quat);
-	jointVehicle.child=childLink;
-	jointVehicle.parent=parentLink;
+  void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink){
+    jointVehicle.name=joint->name;
+    jointVehicle.axis[0]=joint->axis.x;
+    jointVehicle.axis[1]=joint->axis.y;
+    jointVehicle.axis[2]=joint->axis.z;
+    processPose(joint->parent_to_joint_origin_transform,jointVehicle.position,jointVehicle.rpy,jointVehicle.quat);
+    jointVehicle.child=childLink;
+    jointVehicle.parent=parentLink;
 
-	if(joint->type==6)
-		jointVehicle.type=0;
-	else if(joint->type==1 || joint->type==2)
-		jointVehicle.type=1;
-	else if(joint->type==3)
-		jointVehicle.type=2;
-	else{
-		OSG_WARN << "Unsupported type of joint in "<< joint->name << ", fixed joint will be used." << std::endl;
-		jointVehicle.type=0;
-	}
+    if(joint->type==6)
+	jointVehicle.type=0;
+    else if(joint->type==1 || joint->type==2)
+	jointVehicle.type=1;
+    else if(joint->type==3)
+	jointVehicle.type=2;
+    else{
+	OSG_WARN << "Unsupported type of joint in "<< joint->name << ", fixed joint will be used." << std::endl;
+	jointVehicle.type=0;
+    }
 
-	//Mimic
-	if(joint->mimic!=NULL){
-		jointVehicle.mimic.reset(new Mimic);
-		jointVehicle.mimic->jointName=joint->mimic->joint_name;
-		jointVehicle.mimic->offset=joint->mimic->offset;
-		jointVehicle.mimic->multiplier=joint->mimic->multiplier;
-	}
-	else
-		jointVehicle.mimic.reset();
+    //Mimic
+    if(joint->mimic!=NULL){
+      jointVehicle.mimic.reset(new Mimic);
+      jointVehicle.mimic->jointName=joint->mimic->joint_name;
+      jointVehicle.mimic->offset=joint->mimic->offset;
+      jointVehicle.mimic->multiplier=joint->mimic->multiplier;
+    }
+    else
+      jointVehicle.mimic.reset();
 
-	//limits
-	if(joint->limits!=NULL){
-		jointVehicle.lowLimit=joint->limits->lower;
-		jointVehicle.upLimit=joint->limits->upper;
-	}
-	else{
-		jointVehicle.lowLimit=-M_PI;
-		jointVehicle.upLimit=M_PI;
-	}
-}
+    //limits
+    if(joint->limits!=NULL){
+      jointVehicle.lowLimit=joint->limits->lower;
+      jointVehicle.upLimit=joint->limits->upper;
+    }
+    else{
+      jointVehicle.lowLimit=-M_PI;
+      jointVehicle.upLimit=M_PI;
+    }
+  }
 
-int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int nmat, std::vector<Material> &materials){
-	vehicle.links[nlink].name=link->name;
+  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int nmat, std::vector<Material> &materials){
+    vehicle.links[nlink].name=link->name;
+    vehicle.links[nlink].geom.reset( new Geometry);
+    if(link->visual)
+      nmat= processVisual(link->visual,vehicle.links[nlink],nmat, materials);
+    else{
+      vehicle.links[nlink].geom->type=4;
+      vehicle.links[nlink].material=-1;
+      memset(vehicle.links[nlink].position,0,3*sizeof(double));
+      memset(vehicle.links[nlink].rpy,0,3*sizeof(double));
+      memset(vehicle.links[nlink].quat,0,4*sizeof(double));
+      vehicle.links[nlink].quat[3]=1;
+    }
 
-	if(link->visual)
-		nmat= processVisual(link->visual,vehicle.links[nlink],nmat, materials);
-	else{
-		vehicle.links[nlink].type=4;
-		vehicle.links[nlink].material=-1;
-		memset(vehicle.links[nlink].position,0,3*sizeof(double));
-		memset(vehicle.links[nlink].rpy,0,3*sizeof(double));
-		memset(vehicle.links[nlink].quat,0,4*sizeof(double));
-		vehicle.links[nlink].quat[3]=1;
-	}
+    if(link->collision){
+	vehicle.links[nlink].cs.reset( new Geometry);
+	processGeometry(link->collision->geometry.get(),vehicle.links[nlink].cs.get());
+    }
+    else
+	vehicle.links[nlink].cs.reset();
 
-	int linkNumber=nlink;
-	for(uint i=0;i<link->child_joints.size();i++){
-		processJoint(link->child_joints[i],vehicle.joints[linkNumber],nlink,linkNumber+1);
-		linkNumber=processLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1,nmat,materials);
-	}
-	return linkNumber;
-}
+    int linkNumber=nlink;
+    for(uint i=0;i<link->child_joints.size();i++){
+       processJoint(link->child_joints[i],vehicle.joints[linkNumber],nlink,linkNumber+1);
+       linkNumber=processLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1,nmat,materials);
+    }
+    return linkNumber;
+  }
 
 int ConfigFile::processURDFFile(string file, Vehicle &vehicle){
 	urdf::Model model;
@@ -721,7 +739,20 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 	}
 }
 
-
+void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperties &pp){
+	xmlpp::Node::NodeList list = node->get_children();
+	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+		
+		if(child->get_name()=="mass")
+			extractFloatChar(child,pp.mass);
+		else if(child->get_name()=="inertia")
+			extractPositionOrColor(child,pp.inertia);
+		else if(child->get_name()=="collisionShapeType")
+			extractStringChar(child,pp.csType);		
+		
+	}
+}
 
 void ConfigFile::processObject(const xmlpp::Node* node,Object &object){
 	xmlpp::Node::NodeList list = node->get_children();
@@ -740,6 +771,12 @@ void ConfigFile::processObject(const xmlpp::Node* node,Object &object){
 			extractPositionOrColor(child,object.offsetp);
 		else if(child->get_name()=="offsetr")
 			extractPositionOrColor(child,object.offsetr);
+		else if(child->get_name()=="physics"){
+                        object.physicProperties.reset(new PhysicProperties);
+			object.physicProperties->init();
+			processPhysicProperties(child,*object.physicProperties);
+
+		}
 
 	}
 }
@@ -845,6 +882,7 @@ void ConfigFile::processXML(const xmlpp::Node* node){
 				Object  object;
 				memset(object.offsetp,0,3*sizeof(double));
 				memset(object.offsetr,0,3*sizeof(double));
+				object.physicProperties.reset();
 				processObject(child,object);
 				objects.push_back(object);
 			}
@@ -859,7 +897,9 @@ void ConfigFile::processXML(const xmlpp::Node* node){
 ConfigFile::ConfigFile(const std::string &fName){
 	memset(offsetr,0,3*sizeof(double));
 	memset(offsetp,0,3*sizeof(double));
+   	memset(gravity,0,3*sizeof(double));
 	camNear=camFar=-1;
+        enablePhysics=0;
 	try
 	{
 		xmlpp::DomParser parser;
@@ -887,9 +927,3 @@ ConfigFile::ConfigFile(const std::string &fName){
 	}
 
 }
-
-
-
-
-
-

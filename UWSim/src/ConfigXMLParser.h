@@ -93,16 +93,20 @@ struct Mimic{
   double offset,multiplier;
 };
 
+struct Geometry{
+  int type; //Related to geometry, 0: mesh from file, 1:box, 2:cylinder, 3:sphere, 4:NoVisual
+  double boxSize[3]; //only used in box type
+  double length, radius; //only used in cylinder and sphere types
+  string file; // only used in mesh type
+};
+
 struct Link{
   string name;
-  string file; // only used in mesh type
-  int type; //Related to geometry, 0: mesh from file, 1:box, 2:cylinder, 3:sphere, 4:NoVisual
   double position[3];
   double rpy[3];
   double quat[4];
-  double boxSize[3]; //only used in box type
-  double length, radius; //only used in cylinder and sphere types
   int material;
+  boost::shared_ptr<Geometry> cs, geom;
 };
 
 struct Joint{
@@ -142,12 +146,20 @@ struct Vehicle{
   std::list<XMLDVLSensor> dvl_sensors;
 };
 
+struct PhysicProperties{
+  double mass;
+  double inertia[3];
+  std::string csType;
+  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";};
+};
+
 struct Object{
   string name,file;
   double position[3];
   double orientation[3];
   double offsetp[3];
   double offsetr[3];
+  boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
 class ConfigFile{
@@ -175,12 +187,13 @@ private:
   void processCamera(const xmlpp::Node* node);
   void processJointValues(const xmlpp::Node* node, std::vector<double> &jointValues, int &ninitJoints);
   void processVehicle(const xmlpp::Node* node, Vehicle &vehicle);
+  void processPhysicProperties(const xmlpp::Node* node, PhysicProperties &pp);
   void processObject(const xmlpp::Node* node, Object &object);
   void processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &rosInterface);
   void processROSInterfaces(const xmlpp::Node* node);
   void processXML(const xmlpp::Node* node);
 
-
+  void processGeometry(urdf::Geometry * geometry, Geometry * geom);
   void processPose(urdf::Pose pose,double position[3], double rpy[3],double quat[4]);
   int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int nmat, std::vector<Material> &materials); //returns current material
   void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink);
@@ -191,9 +204,9 @@ private:
 
 public:
   double windx, windy,windSpeed,depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight, oceanSurfaceHeight,fogDensity;
-  int isNotChoppy, disableShaders, eye_in_hand,freeMotion,resw,resh ;
+  int isNotChoppy, disableShaders, eye_in_hand,freeMotion,resw,resh,enablePhysics ;
   string arm, vehicleToTrack;
-  double camPosition[3],camLookAt[3],fogColor[3],color[3],attenuation[3], offsetr[3], offsetp[3];
+  double camPosition[3],camLookAt[3],fogColor[3],color[3],attenuation[3], offsetr[3], offsetp[3],gravity[3];
   double camFov, camAspectRatio, camNear, camFar;
   list <Vehicle> vehicles;
   list <Object> objects;
