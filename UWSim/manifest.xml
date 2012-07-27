@@ -16,6 +16,7 @@
   <depend package="urdf"/>
   <depend package="urdf_parser"/>
   <depend package="underwater_sensor_msgs"/>
+  <depend package="resource_retriever"/>
   <rosdep name="libxml++-2.6" />
   <rosdep name="boost" />
   <rosdep name="libopenscenegraph" />

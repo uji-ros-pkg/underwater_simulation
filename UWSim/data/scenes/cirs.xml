@@ -15,7 +15,7 @@
     <crestFoamHeight> 2.2 </crestFoamHeight>
     <oceanSurfaceHeight> 0 </oceanSurfaceHeight>
     <fog>
-      <density> 0.1 </density>
+      <density> 0.1</density>
       <color>
 	<r>0</r>
 	<g>0.05</g>
@@ -47,6 +47,7 @@
       <y> 0</y>
       <z> -1.57 </z>
     </offsetr>
+    <enablePhysics> 1 </enablePhysics>
   </simParams>
   <camera>
     <freeMotion> 1 </freeMotion>
@@ -242,6 +243,15 @@
       <p>3.1415</p>
       <y>0</y>
     </orientation>
+    <physics>
+      <mass> 8 </mass>
+      <inertia> 
+        <x> 0</x>
+        <y> 0 </y>
+        <z> 0 </z>
+      </inertia>
+      <collisionShapeType> box </collisionShapeType>
+    </physics>
   </object>
 
   <rosInterfaces>
@@ -255,8 +265,9 @@
 	<vehicleName> girona500 </vehicleName>
     </ArmToROSJointState>
     <ROSJointStateToArm> 
-	<topic>/uwsim/joint_state_command</topic>
+	<topic>/joint_states</topic>
 	<vehicleName> girona500 </vehicleName>
+	<includesFixedAndMimic>1</includesFixedAndMimic>
     </ROSJointStateToArm>
     <VirtualCameraToROSImage> 
       <cameraName>bowtech1</cameraName>

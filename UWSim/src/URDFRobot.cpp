@@ -3,6 +3,8 @@
 #include <osgOcean/ShaderManager>
 #include <osg/ShapeDrawable>
 #include <osg/Material>
+#include <osgDB/Options>
+#include <osgDB/ReaderWriter>
 #include <math.h>
 
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
@@ -11,35 +13,14 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/textures"));
 
-   for(int i=0;i<vehicle.nlinks;i++){
-	if(vehicle.links[i].type==0){
-	//Find file in the package
-  	if(vehicle.links[i].file.rfind("/robot/"))
-    	   vehicle.links[i].file.erase(0,vehicle.links[i].file.rfind("/robot/")+7);
-	}
-   }
-
    link.resize(vehicle.nlinks);
 
    for(int i=0; i<vehicle.nlinks;i++) {
-	ScopedTimer buildSceneTimer("  · "+vehicle.links[i].file+": ", osg::notify(osg::ALWAYS));
-	if(vehicle.links[i].type==0){
-	  link[i] = osgDB::readNodeFile(vehicle.links[i].file);
-	  if(link[i] == NULL){
-	     std::cerr<<"Error reading file " << vehicle.links[i].file <<" Check URDF file." <<std::endl;
-	     exit(0);
-	  }
-        }
-	else if(vehicle.links[i].type==1){
-	  link[i] = UWSimGeometry::createOSGBox(osg::Vec3(vehicle.links[i].boxSize[0], vehicle.links[i].boxSize[1], vehicle.links[i].boxSize[2]));
-	}
-	else if(vehicle.links[i].type==2)
-	  link[i] = UWSimGeometry::createOSGCylinder(vehicle.links[i].radius,vehicle.links[i].length);
-	else if(vehicle.links[i].type==3)
-	  link[i] = UWSimGeometry::createOSGSphere(vehicle.links[i].radius);
-	else if(vehicle.links[i].type==4)
-	  link[i]=new osg::Group();
+	ScopedTimer buildSceneTimer("  · "+vehicle.links[i].geom->file+": ", osg::notify(osg::ALWAYS));
 
+	link[i]=UWSimGeometry::loadGeometry(vehicle.links[i].geom);
+	if(!link[i] )
+	  exit(0);
 	link[i]->setName(vehicle.links[i].name);
 
 	if(vehicle.links[i].material!=-1){ //Add material if exists
@@ -54,7 +35,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    bool success=true;
    for (int i=0; i<vehicle.nlinks;i++){
 	   if(!link[i].valid()){
-		osg::notify(osg::WARN) << "Could not find "<<vehicle.name<< " link" << i << ".osg "<<vehicle.links[i+1].file  << std::endl;
+		osg::notify(osg::WARN) << "Could not find "<<vehicle.name<< " link" << i << ".osg "<<vehicle.links[i+1].geom->file  << std::endl;
 		baseTransform=NULL;
 		success=false;
    	   }

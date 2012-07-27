@@ -87,8 +87,9 @@
 	<vehicleName> girona500 </vehicleName>
     </ArmToROSJointState>
     <ROSJointStateToArm> 
-	<topic>/uwsim/joint_state_command</topic>
+	<topic>/joint_states</topic>
 	<vehicleName>girona500</vehicleName>
+	<includesFixedAndMimic>1</includesFixedAndMimic>
     </ROSJointStateToArm>
   </rosInterfaces>
 

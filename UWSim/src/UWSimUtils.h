@@ -8,6 +8,13 @@
 #include <iostream>
 #include <vector>
 
+#include "ConfigXMLParser.h"
+#include <resource_retriever/retriever.h>
+#include <osgDB/Registry>
+#include <osgDB/FileNameUtils>
+#include <osg/Version>
+
+
 //Node data used to check if an object is catchable or not.
 class NodeDataType : public osg::Referenced{
     public:
@@ -74,6 +81,8 @@ private:
 
 };
 
+osg::Node * findRN(std::string target,osg::Group * root);
+
 
 class ScopedTimer
 {
@@ -111,8 +120,20 @@ public:
 	static osg::Node* createOSGCylinder( double radius, double height );
 	static osg::Node* createOSGSphere( double radius );
 
+	static osg::Node * retrieveResource(std::string name);
+	static osg::Node * loadGeometry(boost::shared_ptr<Geometry> geom);
+
 	/** Apply osgOcean-based state sets to a node */
 	static void applyStateSets(osg::Node*);
+
+private:
+
+  //Stream class for retrieveresource
+  struct membuf : std::streambuf{
+    membuf(char* begin, char* end) {
+        this->setg(begin, begin, end);
+    }
+  };
 
 };
 

@@ -202,8 +202,9 @@ public:
 
 class ROSJointStateToArm: public ROSSubscriberInterface {
 	boost::shared_ptr<SimulatedIAUV> arm;
+	bool includesFixedAndMimic_;
 public:
-	ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm);
+	ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm, bool includesFixedAndMimic);
 	virtual void createSubscriber(ros::NodeHandle &nh);
 
 	virtual void processData(const sensor_msgs::JointState::ConstPtr& js);

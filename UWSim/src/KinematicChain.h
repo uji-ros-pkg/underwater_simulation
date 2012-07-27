@@ -41,10 +41,19 @@ public:
 
 	KinematicChain(int nlinks, int njoints);
 
+	/** Sets joint positions and velocities. Assumes input vector includes fixed joints values (e.g like coming from joint_state_publisher) */
+	void setFullJointPosition(double *q, int n);
+	void setFullJointVelocity(double *qdot, int n);
+	void setFullJointPosition(std::vector<double> &q);
+	void setFullJointVelocity(std::vector<double> &qdot);
+
+	/** Sets joint positions and velocities. Assumes input vector does not include fixed joints */
 	void setJointPosition(double *q, int n);
 	void setJointVelocity(double *qdot, int n);
 	void setJointPosition(std::vector<double> &q);
 	void setJointVelocity(std::vector<double> &qdot);
+
+	/** Returns the joint values, not including the fixed joints */
 	std::vector<double> getJointPosition();
 
 

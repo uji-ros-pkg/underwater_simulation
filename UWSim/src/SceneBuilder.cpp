@@ -201,7 +201,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 			for (int j=0; j<nvehicle ;j++){
 				if (iauvFile[j]->name==rosInterface.targetName) {
 					if (rosInterface.type==ROSInterfaceInfo::ROSJointStateToArm)
-						iface=boost::shared_ptr<ROSJointStateToArm>(new ROSJointStateToArm(rosInterface.topic,iauvFile[j]));
+						iface=boost::shared_ptr<ROSJointStateToArm>(new ROSJointStateToArm(rosInterface.topic,iauvFile[j], (rosInterface.includesFixedAndMimic==0) ? false : true));
 					else
 						iface=boost::shared_ptr<ArmToROSJointState>(new ArmToROSJointState(iauvFile[j].get(),rosInterface.topic,rosInterface.rate));
 				}

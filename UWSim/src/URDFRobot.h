@@ -17,6 +17,7 @@ public:
 
 	std::vector<osg::Vec3d> joint_axis;
 
+
 	URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle);
 
 	~URDFRobot();

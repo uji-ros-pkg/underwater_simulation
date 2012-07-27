@@ -101,6 +101,12 @@ osg::Node* findRoutedNode::getFirst()
    else return rootList[0];
 }
 
+osg::Node * findRN(std::string target,osg::Group * root){
+  findRoutedNode findRN(target);
+  findRN.find(root);
+  return findRN.getFirst();
+}
+
 osg::Node* UWSimGeometry::createSwitchableFrame(double radius, double length) {
    osg::Switch *axis=new osg::Switch();
    axis->setNewChildDefaultValue(false);
@@ -227,6 +233,72 @@ void UWSimGeometry::applyStateSets(osg::Node *node) {
           node->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
 }
 
+osg::Node * UWSimGeometry::retrieveResource(std::string name){
+  //Load file in memory
+  resource_retriever::Retriever r;
+  resource_retriever::MemoryResource resource;
+
+  try{
+    resource = r.get(name); 
+  }
+  catch (resource_retriever::Exception& e){
+    ROS_ERROR("Failed to retrieve file: %s", e.what());
+    return NULL;
+  }
+
+  //Create stream with memory resource
+  membuf sbuf((char *)resource.data.get(),(char *)resource.data.get()+resource.size);
+  std::istream in(&sbuf);
+
+  //Get file extension and create options
+  std::string file_ext = osgDB::getFileExtension(name);
+  #if OSG_VERSION_MAJOR>=3
+  osg::ref_ptr<osgDB::Options> local_opt = new osgDB::Options;
+  #endif
+  
+  //Check if file format is supported, get readerwriter
+  osgDB::ReaderWriter* rw = osgDB::Registry::instance()->getReaderWriterForExtension(file_ext);
+  if(!rw){
+    std::cout<<"Data file format "<<file_ext<<" not supported"<<std::endl;
+    return NULL;
+  }
+
+  //Try loading the resource,
+  #if OSG_VERSION_MAJOR>=3
+  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( in,local_opt.get());
+  #else
+  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( in);
+  #endif
+  if (readResult.validNode())
+    return readResult.takeNode();
+  else
+    std::cout<<"Can't load file "<<name<<std::endl;
+  return NULL;
+
+}
+
+osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
+  if(geom->type==0){
+    osg::Node * node = retrieveResource(geom->file);
+    if(node == NULL){
+      std::cerr<<"Error reading file " << geom->file <<" Check URDF file." <<std::endl;
+    }
+    return node;
+  }
+  else if(geom->type==1){
+    return UWSimGeometry::createOSGBox(osg::Vec3(geom->boxSize[0], geom->boxSize[1], geom->boxSize[2]));
+  }
+  else if(geom->type==2)
+    return UWSimGeometry::createOSGCylinder(geom->radius,geom->length);
+  else if(geom->type==3)
+    return UWSimGeometry::createOSGSphere(geom->radius);
+  else if(geom->type==4)
+    return new osg::Group();
+  std::cerr<<"Unknown geometry type. "<<std::endl;
+  exit(0);
+  return NULL;
+}
+
 /*****************/
 
 
@@ -275,5 +347,10 @@ void GetCatchableObjects::apply(osg::Node &searchNode)
       foundNodeList.push_back(&searchNode);
    }
    traverse(searchNode); 
-} 
+}
+
+
+
+
+
 

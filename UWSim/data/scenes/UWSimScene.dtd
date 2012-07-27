@@ -2,8 +2,8 @@
 
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
-<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?)>
-<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, rangeSensor*, imu*, pressureSensor*, gpsSensor*, dvlSensor*)>
+<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?)>
+<!ELEMENT vehicle (name,file,useTF?, jointValues?,position?,orientation?,virtualCamera*, rangeSensor*, imu*, pressureSensor*, gpsSensor*, dvlSensor*)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?, showpath?)>
 <!ELEMENT rangeSensor (name,relativeTo,range,visible?,position?,orientation?)>
 <!ELEMENT imu (name,relativeTo,position?,orientation?, std?)>
@@ -11,7 +11,7 @@
 <!ELEMENT gpsSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT dvlSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT camera (freeMotion?,objectToTrack?,fov?,aspectRatio?,near?,far?,position?,lookAt?) >
-<!ELEMENT object (name,file,position,orientation,offsetp?,offsetr?)>
+<!ELEMENT object (name,file,position,orientation,offsetp?,offsetr?,physics?)>
 <!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?)>
 
 <!-- elementos comunes -->
@@ -53,6 +53,8 @@
 <!ELEMENT eye_in_hand (#PCDATA)>
 <!ELEMENT resw (#PCDATA)>
 <!ELEMENT resh (#PCDATA)>
+<!ELEMENT enablePhysics (#PCDATA)>
+<!ELEMENT gravity (x,y,z)>
 
 <!--elementos camera -->
 <!ELEMENT freeMotion (#PCDATA)>
@@ -85,6 +87,7 @@
 <!-- elementos vehicle -->
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT file (#PCDATA)>
+<!ELEMENT useTF (#PCDATA)>
 <!ELEMENT jointValues (joint+)>
 
 <!ELEMENT joint (#PCDATA)>
@@ -93,7 +96,7 @@
 <!ELEMENT ROSOdomToPAT (topic,vehicleName, visualize?)>
 <!ELEMENT PATToROSOdom  (topic, vehicleName, rate?)>
 <!ELEMENT ArmToROSJointState  (topic, vehicleName, rate?)>
-<!ELEMENT ROSJointStateToArm  (topic,vehicleName)>
+<!ELEMENT ROSJointStateToArm  (topic,vehicleName, includesFixedAndMimic?)>
 <!ELEMENT VirtualCameraToROSImage (cameraName,imageTopic,infoTopic,rate?)>
 <!ELEMENT RangeSensorToROSRange (name,topic,rate?)>
 <!ELEMENT ROSImageToHUD (width,height,posx?,posy?,scale?,imageTopic,infoTopic?)>
@@ -116,7 +119,14 @@
 <!ELEMENT imageTopic (#PCDATA)>
 <!ELEMENT infoTopic (#PCDATA)>
 <!ELEMENT visualize (#PCDATA)>
+<!ELEMENT includesFixedAndMimic (#PCDATA)>
 
 <!-- elementos vcamtoROSImage -->
 <!ELEMENT cam (#PCDATA)>
 <!ELEMENT info (#PCDATA)>
+
+<!-- elementos physics -->
+<!ELEMENT physics (mass,inertia,collisionShapeType)>
+<!ELEMENT mass (#PCDATA)>
+<!ELEMENT inertia (x,y,z)>
+<!ELEMENT collisionShapeType (#PCDATA)>

@@ -17,6 +17,23 @@ KinematicChain::KinematicChain(int nlinks, int njoints) {
 	memset(&(q.front()),0,njoints*sizeof(double));
 }
 
+void KinematicChain::setFullJointPosition(double *newq, int n) {
+	for(int i=0;i<getNumberOfJoints();i++){ 
+	    if(newq[i]<limits[i].first)
+	      q[i]=limits[i].first;
+	    else if(newq[i]>limits[i].second)
+	      q[i]=limits[i].second;
+	    else {
+	      if (!isnan(q[i]))
+	      	q[i]=newq[i];
+	      else {
+		OSG_FATAL << "KinematicChain::setJointPosition received NaN" << std::endl;
+	      }
+	    }
+	}
+	updateJoints(q);
+}
+
 void KinematicChain::setJointPosition(double *newq, int n) {
 	int offset=0;
 	for(int i=0;i<getNumberOfJoints();i++){
@@ -44,6 +61,18 @@ void KinematicChain::setJointPosition(double *newq, int n) {
 	updateJoints(q);
 }
 	
+void KinematicChain::setFullJointVelocity(double *qdot, int n) {
+	for (int i=0; i<getNumberOfJoints(); i++){
+	    if(q[i]+qdot[i]<limits[i].first)
+	      q[i]=limits[i].first;
+	    else if(q[i]+qdot[i]>limits[i].second)
+	      q[i]=limits[i].second;
+	    else
+	      q[i]+=qdot[i];
+	}
+	updateJoints(q);
+}
+
 void KinematicChain::setJointVelocity(double *qdot, int n) {
 	int offset=0;
 	for (int i=0; i<getNumberOfJoints(); i++){
@@ -61,6 +90,15 @@ void KinematicChain::setJointVelocity(double *qdot, int n) {
 	  }
 	}
 	updateJoints(q);
+}
+
+
+void KinematicChain::setFullJointPosition(std::vector<double> &q) {
+	setFullJointPosition(&(q.front()), q.size());
+}
+
+void KinematicChain::setFullJointVelocity(std::vector<double> &qdot) {
+	setFullJointPosition(&(qdot.front()), qdot.size());
 }
 
 void KinematicChain::setJointPosition(std::vector<double> &q) {

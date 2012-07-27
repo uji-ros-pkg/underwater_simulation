@@ -287,8 +287,9 @@ public:
 */
 
 
-ROSJointStateToArm::ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm): ROSSubscriberInterface(topic) {
+ROSJointStateToArm::ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm, bool includesFixedAndMimic): ROSSubscriberInterface(topic) {
   this->arm=arm;
+  includesFixedAndMimic_=includesFixedAndMimic;
 }
 
 void ROSJointStateToArm::createSubscriber(ros::NodeHandle &nh) {
@@ -301,11 +302,13 @@ void ROSJointStateToArm::processData(const sensor_msgs::JointState::ConstPtr& js
   if (js->position.size()!=0) {
     //position command
     std::vector<double> position=js->position;
-    arm->urdf->setJointPosition(position);
+    if (includesFixedAndMimic_) arm->urdf->setFullJointPosition(position);
+    else arm->urdf->setJointPosition(position);
   } else if (js->velocity.size()!=0) {
     //velocity command
     std::vector<double> velocity=js->velocity;
-    arm->urdf->setJointVelocity(velocity);
+    if (includesFixedAndMimic_) arm->urdf->setFullJointVelocity(velocity);
+    else arm->urdf->setJointVelocity(velocity);
   }
 }
 
