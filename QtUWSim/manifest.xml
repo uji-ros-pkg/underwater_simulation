@@ -13,14 +13,18 @@
   <depend package="osg_utils" />
   <depend package="osg_markers" />
   <depend package="osg_interactive_markers" />
+  <depend package="im_joint_state_publisher" />
+  <depend package="robot_state_publisher" />
+  <depend package="kdl_parser" />
   <depend package="database_interface" />
   <depend package="kinematics_base" />
   <depend package="pluginlib" />
   <depend package="ompl_ros_interface" />
-  <depend package="mar_robot" />
+  <depend package="mar_robot_arm5e" />
   <depend package="visp" />
   <depend package="tf" />  
   <rosdep name="qt4"/>
+  <rosdep name="sqlite3"/>
 
 
 </package>

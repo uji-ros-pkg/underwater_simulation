@@ -1,241 +1,133 @@
 #include "HandInteractiveMarker.h"
 
-	 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> handInteractiveMarkerServer;
+#include <ros/package.h>
 
+#include <kdl_parser/kdl_parser.hpp>
 
-
-void HandInteractiveMarker::frameCallback(const ros::TimerEvent&)
-{
-	static uint32_t counter = 0;
-
-	static tf::TransformBroadcaster br;
-
-	tf::Transform t;
-
-	ros::Time time = ros::Time::now();
-
-	t.setOrigin(tf::Vector3(0.0, 0.0, sin(float(counter)/140.0) * 2.0));
-	t.setRotation(tf::Quaternion(0.0, 0.0, 0.0, 1.0));
-	br.sendTransform(tf::StampedTransform(t, time, "base_link", "moving_frame"));
-
-	t.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-	t.setRotation(tf::createQuaternionFromRPY(0.0, float(counter)/140.0, 0.0));
-	br.sendTransform(tf::StampedTransform(t, time, "base_link", "rotating_frame"));
-
-	++counter;
+HandInteractiveMarker::HandInteractiveMarker(boost::shared_ptr<SceneBuilder> scene_builder, std::string name, std::string package, std::string path): scene_builder_(scene_builder), name_(name), stop_(false) {
+	fullpath_=ros::package::getPath(package)+"/"+path;
+	if (init()) startThread();
 }
 
-void handInteractiveMarkerProcessFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-{
-	std::ostringstream s;
-	s << "Feedback from marker '" << feedback->marker_name << "' "
-			<< " / control '" << feedback->control_name << "'";
-
-	std::ostringstream mouse_point_ss;
-	if( feedback->mouse_point_valid )
-	{
-		mouse_point_ss << " at " << feedback->mouse_point.x
-				<< ", " << feedback->mouse_point.y
-				<< ", " << feedback->mouse_point.z
-				<< " in frame " << feedback->header.frame_id;
-	}
-
-	switch ( feedback->event_type )
-	{
-	case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-		ROS_INFO_STREAM( s.str() << ": button click" << mouse_point_ss.str() << "." );
-		std::cout<<"button click-------------------------------"<<std::endl;
-		break;
-
-	case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
-		ROS_INFO_STREAM( s.str() << ": menu item " << feedback->menu_entry_id << " clicked" << mouse_point_ss.str() << "." );
-		break;
-
-	case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-		ROS_INFO_STREAM( s.str() << ": pose changed"
-				<< "\nposition = "
-				<< feedback->pose.position.x
-				<< ", " << feedback->pose.position.y
-				<< ", " << feedback->pose.position.z
-				<< "\norientation = "
-				<< feedback->pose.orientation.w
-				<< ", " << feedback->pose.orientation.x
-				<< ", " << feedback->pose.orientation.y
-				<< ", " << feedback->pose.orientation.z
-				<< "\nframe: " << feedback->header.frame_id
-				<< " time: " << feedback->header.stamp.sec << "sec, "
-				<< feedback->header.stamp.nsec << " nsec" );
-		std::cout<<"pose update-------------------------------"<<std::endl;
-		break;
-
-	case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
-		ROS_INFO_STREAM( s.str() << ": mouse down" << mouse_point_ss.str() << "." );
-		std::cout<<"mouse down-------------------------------"<<std::endl;
-		break;
-
-	case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
-		ROS_INFO_STREAM( s.str() << ": mouse up" << mouse_point_ss.str() << "." );
-		std::cout<<"mouse up-------------------------------"<<std::endl;
-		break;
-	}
-
-	handInteractiveMarkerServer->applyChanges();
-}
-
-HandInteractiveMarker::HandInteractiveMarker(std::string package, std::string path){
-	package_=package;
-	path_=path;
-	startThread();
+HandInteractiveMarker::HandInteractiveMarker(boost::shared_ptr<SceneBuilder> scene_builder, std::string name, std::string fullpath): scene_builder_(scene_builder), name_(name), stop_(false) {
+	fullpath_=fullpath;
+	if (init()) startThread();
 }
 
 HandInteractiveMarker::~HandInteractiveMarker(){
-	cancel();
+	scene_builder_->scene->localizedWorld->removeChild(uwsim_object->baseTransform);
+	stop_=true;
 	join();
-	handInteractiveMarkerServer.reset();
 }
 
-
-
-void HandInteractiveMarker::run(){
-
-	ros::NodeHandle n;
-	ros::Timer frame_timer = n.createTimer(ros::Duration(0.01), frameCallback);
-
-	handInteractiveMarkerServer.reset( new interactive_markers::InteractiveMarkerServer("basic_controls","",false) );
-
-	ros::Duration(0.1).sleep();
-
-	make6DofMarker( false );
-
-
-	handInteractiveMarkerServer->applyChanges();
-
+void HandInteractiveMarker::processIMFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback ) {
+	pose=feedback->pose;
+	tf::Quaternion q;
+	tf::quaternionMsgToTF(feedback->pose.orientation, q);
+	double roll, pitch, yaw;
+	btMatrix3x3(q).getRPY(roll, pitch, yaw);
+	uwsim_object->setVehiclePosition(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z, roll, pitch, yaw);
 }
 
-
-
-void HandInteractiveMarker::alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-{
-	geometry_msgs::Pose pose = feedback->pose;
-
-	pose.position.x = round(pose.position.x-0.5)+0.5;
-	pose.position.y = round(pose.position.y-0.5)+0.5;
-
-	ROS_INFO_STREAM( feedback->marker_name << ":"
-			<< " aligning position = "
-			<< feedback->pose.position.x
-			<< ", " << feedback->pose.position.y
-			<< ", " << feedback->pose.position.z
-			<< " to "
-			<< pose.position.x
-			<< ", " << pose.position.y
-			<< ", " << pose.position.z );
-
-	handInteractiveMarkerServer->setPose( feedback->marker_name, pose );
-	handInteractiveMarkerServer->applyChanges();
-}
-
-visualization_msgs::Marker HandInteractiveMarker::makeBox( visualization_msgs::InteractiveMarker &msg )
-{
-	visualization_msgs::Marker marker;
-
-	marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-	//marker.type = Marker::SPHERE;
-	std::string str_aux="package://";
-	str_aux+=package_;
-	str_aux+="/";
-	str_aux+=path_;
-	marker.mesh_resource=str_aux;
-	marker.mesh_use_embedded_materials=true;
-	marker.scale.x = msg.scale * 1;
-	marker.scale.y = msg.scale * 1;
-	marker.scale.z = msg.scale * 1;
-
-
-	marker.color.r = 0.5;
-	marker.color.g = 0.5;
-	marker.color.b = 0.5;
-	marker.color.a = 1.0;
-
-	return marker;
-}
-
-visualization_msgs::InteractiveMarkerControl& HandInteractiveMarker::makeBoxControl( visualization_msgs::InteractiveMarker &msg )
-{
-	visualization_msgs::InteractiveMarkerControl control;
-	control.always_visible = true;
-	control.markers.push_back( makeBox(msg) );
-	msg.controls.push_back( control );
-
-	return msg.controls.back();
-}
-
-void HandInteractiveMarker::saveMarker( visualization_msgs::InteractiveMarker int_marker )
-{
-	handInteractiveMarkerServer->insert(int_marker);
-
-	handInteractiveMarkerServer->setCallback(int_marker.name, &handInteractiveMarkerProcessFeedback);
-}
-
-void HandInteractiveMarker::make6DofMarker( bool fixed )
-{
-	visualization_msgs::InteractiveMarker int_marker;
-	int_marker.header.frame_id = "/base_link";
-
-	int_marker.scale = 1;
-	//int_marker.pose.position.y=-2;
-
-	int_marker.name = "simple_6dof";
-	int_marker.description = "";
-
-	// insert a box
-	makeBoxControl(int_marker);
-
-	visualization_msgs::InteractiveMarkerControl control;
-
-	if ( fixed )
-	{
-		int_marker.name += "_fixed";
-		int_marker.description += "\n(fixed orientation)";
-		control.orientation_mode = visualization_msgs::InteractiveMarkerControl::FIXED;
+bool HandInteractiveMarker::init() {
+	// gets the location of the robot description on the parameter server
+	KDL::Tree tree;
+	if (!kdl_parser::treeFromFile(fullpath_, tree)){
+		ROS_ERROR("Failed to extract kdl tree from xml robot description");
+		return false;
 	}
 
-	control.orientation.w = 1;
-	control.orientation.x = 1;
-	control.orientation.y = 0;
-	control.orientation.z = 0;
-	control.name = "rotate_x";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker.controls.push_back(control);
-	control.name = "move_x";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker.controls.push_back(control);
+	//Load the URDF model in UWSim
+	Vehicle v;
+	ConfigFile parser;
+	std::string fullpath_osg(fullpath_);
+	//FIXME: The following line is tricky. By default OSG cannot load .dae, whereas ROS needs .dae.
+	//This forces us to use different URDF for ROS and for UWSim, e.g file-ros.urdf (ROS) vs. file.urdf (UWSim)
+	//The following line removes the "-ros" part in order to load the UWSim urdf
+	//Should find a consistent solution. What about replacing .dae by .osg at the low level in UWSim?
+	fullpath_osg.erase(fullpath_osg.find_last_of("-"),4);
+	ROS_INFO_STREAM("URDF path is: "<< fullpath_osg);
+	parser.processURDFFile(fullpath_osg, v);
+	parser.postprocessVehicle(v);
+	v.name=name_;
+	uwsim_object=boost::shared_ptr<SimulatedIAUV>(new SimulatedIAUV(scene_builder_.get(), v));
+	uwsim_object->setVehiclePosition(0,0,0,0,0,0);
+	pose.position.x=0;
+	pose.position.y=0;
+	pose.position.z=0;
+	pose.orientation.x=0;
+	pose.orientation.y=0;
+	pose.orientation.z=0;
+	pose.orientation.w=1;
+	scene_builder_->scene->localizedWorld->addChild(uwsim_object->baseTransform);
+	//Create ROS interface
+	ros_joint_states=boost::shared_ptr<ROSJointStateToArm>(new ROSJointStateToArm("/joint_states", uwsim_object, true));
 
-	control.orientation.w = 1;
-	control.orientation.x = 0;
-	control.orientation.y = 1;
-	control.orientation.z = 0;
-	control.name = "rotate_z";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker.controls.push_back(control);
-	control.name = "move_z";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker.controls.push_back(control);
+	//Create the joint_state_publisher and the robot_state_publisher for the new URDF model
+	joint_state_publisher=boost::shared_ptr<im_joint_state_publisher::ImJointStatePublisher>(new im_joint_state_publisher::ImJointStatePublisher());
+	joint_state_publisher->loadNewRobot(fullpath_);
+	tf_state_publisher=boost::shared_ptr<robot_state_publisher::JointStateListener>(new robot_state_publisher::JointStateListener(tree));
 
-	control.orientation.w = 1;
-	control.orientation.x = 0;
-	control.orientation.y = 0;
-	control.orientation.z = 1;
-	control.name = "rotate_y";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-	int_marker.controls.push_back(control);
-	control.name = "move_y";
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-	int_marker.controls.push_back(control);
+	//Create an interactive marker server to manage the absolute position/attitude
+	im_server=boost::shared_ptr<interactive_markers::InteractiveMarkerServer>(new interactive_markers::InteractiveMarkerServer("hand_pose_im", "HandInteractiveMarker"));
 
-	handInteractiveMarkerServer->insert(int_marker);
-	
-	handInteractiveMarkerServer->setCallback(int_marker.name, &handInteractiveMarkerProcessFeedback);
+	// create an interactive marker for our server
+	visualization_msgs::InteractiveMarker int_marker;
+	int_marker.header.frame_id = "world";
+	int_marker.name = "hand_pose_im";
+	int_marker.description = "Hand Pose IM";
+
+	//TODO: set scale automatically according to the size of the hand
+
+	//Create the controls: translation and rotation on all the axis
+	visualization_msgs::InteractiveMarkerControl move_control;
+	move_control.name = "move_x";
+	move_control.orientation.w = 1;
+	move_control.orientation.x = 1;
+	move_control.orientation.y = 0;
+	move_control.orientation.z = 0;
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+	int_marker.controls.push_back(move_control);
+	move_control.name = "rotate_x";
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+	int_marker.controls.push_back(move_control);
+
+	move_control.name = "move_y";
+	move_control.orientation.w = 1;
+	move_control.orientation.x = 0;
+	move_control.orientation.y = 1;
+	move_control.orientation.z = 0;
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+	int_marker.controls.push_back(move_control);
+	move_control.name = "rotate_y";
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+	int_marker.controls.push_back(move_control);
+
+	move_control.name = "move_z";
+	move_control.orientation.w = 1;
+	move_control.orientation.x = 0;
+	move_control.orientation.y = 0;
+	move_control.orientation.z = 1;
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+	int_marker.controls.push_back(move_control);
+	move_control.name = "rotate_z";
+	move_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+	int_marker.controls.push_back(move_control);
+
+	// add the interactive marker to our collection &
+	// tell the server to call processFeedback() when feedback arrives for it
+	im_server->insert(int_marker, boost::bind( &HandInteractiveMarker::processIMFeedback, this, _1));
+
+	// 'commit' changes and send to all clients
+	im_server->applyChanges();
+
+	return true;
 }
 
-	
+void HandInteractiveMarker::run() {
+	ros::Rate r(50);
+	while (!stop_ && ros::ok()) {
+		ros::spinOnce();
+		r.sleep();
+	}
+}

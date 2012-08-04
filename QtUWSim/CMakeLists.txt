@@ -82,8 +82,10 @@ src/MainWindow.cpp
 src/MosaicManipulator.cpp
 src/PlanarGraspSpec.cpp
 src/HandInteractiveMarker.cpp
-src/GraspSpecification.cpp)
+src/GraspSpecification.cpp
+src/joint_state_listener.cpp
+)
 
 
 
-TARGET_LINK_LIBRARIES(QtUWSim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${OSGQT_LIB} ${QT_LIBRARIES} GLU)
+TARGET_LINK_LIBRARIES(QtUWSim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${OSGQT_LIB} ${QT_LIBRARIES} GLU sqlite3)

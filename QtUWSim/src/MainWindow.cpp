@@ -1,38 +1,92 @@
 #include <QFileDialog>
 #include <QStringList>
 #include <QProcess>
-#include "ROSInterface.h"
-#include "MainWindow.h"
-#include "MosaicEventHandler.h"
-#include <osg/Matrixd>
-#include <ros/package.h>
 #include <QFile>
 #include <QProgressDialog>
 
+#include "ROSInterface.h"
+#include "MainWindow.h"
+#include "MosaicEventHandler.h"
 
+#include <osg/Matrixd>
 
-
+#include <ros/package.h>
 
 using namespace std;
+
+static int dbRowCallback(void *map, int argc, char **argv, char **azColName)
+{
+	std::map<std::string,std::pair<std::string, std::string> > *local_map=(std::map<std::string,std::pair<std::string, std::string> >*)map;
+
+	local_map->insert(std::pair<std::string, std::pair<std::string, std::string> >(argv[0], std::pair<std::string,std::string>(argv[1], argv[2])));
+	return 0;
+}
+
+//TODO: Define an API for DB access that allows to later switch from sqlite to ROS database_interface
+void MainWindow::updateDBHandsList() {
+	map.clear();
+
+	char *zErrMsg;
+	int eres = sqlite3_exec(db, "SELECT * from hands", dbRowCallback, &map, &zErrMsg);
+	if( eres!=SQLITE_OK ){
+		std::cerr << "SQL error: " << zErrMsg << std::endl;;
+		sqlite3_free(zErrMsg);
+	}
+}
+
+bool MainWindow::deleteDBHand(std::string hand_name) {
+	char *zErrMsg;
+	int eres = sqlite3_exec(db, ("DELETE from hands where name='"+hand_name+"'").c_str(), 0, 0, &zErrMsg);
+	if( eres!=SQLITE_OK ){
+		std::cerr << "SQL error: " << zErrMsg << std::endl;;
+		sqlite3_free(zErrMsg);
+		return false;
+	}
+	updateDBHandsList();
+	return true;
+}
+
+bool MainWindow::insertDBHand(std::string hand_name, std::string hand_package, std::string hand_path) {
+	char *zErrMsg;
+	int eres = sqlite3_exec(db, ("INSERT into hands (name, package, path) values ('"+hand_name+"','"+hand_package+"','"+hand_path+"')").c_str(), 0, 0, &zErrMsg);
+	if( eres!=SQLITE_OK ){
+		std::cerr << "SQL error: " << zErrMsg << std::endl;;
+		sqlite3_free(zErrMsg);
+		return false;
+	}
+	updateDBHandsList();
+	return true;
+}
+
 
 MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
 
 	ui.setupUi(this);
-	
+
 	openedFileName = new QLabel("No file opened. Default scene loaded");
 	oldManipulator=NULL;
-	marker_cli=NULL;
+	joint_marker_cli=NULL;
+	hand_marker_cli=NULL;
 	marker=NULL;
 	spec=NULL;
 	grasp=NULL;
-	database=new database_interface::PostgresqlDatabase("arkadia.act.uji.es", "5432", "postgres", "irslab2012", "handsBD");
+	//database=new database_interface::PostgresqlDatabase("arkadia.act.uji.es", "5432", "postgres", "****", "handsBD");
+	//TODO: Allow the user to specify a custom sqlite DB file, instead of the default QtUWSim/handsDB
+	int rc = sqlite3_open((ros::package::getPath("QtUWSim")+std::string("/handsDB")).c_str(), &db);
+	if( rc ) {
+		ROS_ERROR("Can't open database: %s", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(0);
+	} else {
+		updateDBHandsList();
+	}
 
 	string configfile=std::string(SIMULATOR_DATA_PATH)+"/scenes/cirs.xml";
 	while( arguments->read("--configfile",configfile));
 	ConfigFile config(configfile);
-	sceneBuilder=new SceneBuilder(arguments);
+	sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder(arguments));
 	sceneBuilder->loadScene(config);
-	viewBuilder=new ViewBuilder(config, sceneBuilder, arguments);
+	viewBuilder=new ViewBuilder(config, sceneBuilder.get(), arguments);
 	view=viewBuilder->getView();
 	scene=sceneBuilder->getScene();
 	root=sceneBuilder->getRoot();
@@ -93,7 +147,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
 
 	//FIXME: Set base_link and IM topic from arguments or XML
 	frame_manager=FrameManager::instance();
-	frame_manager->setFixedFrame("/base_link");
+	frame_manager->setFixedFrame("world");
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(rosSpin()));
 	timer.start(100);
@@ -102,7 +156,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
 	connect(ui.actionLoadMosaic, SIGNAL(triggered()), this, SLOT(loadMosaic()));
 	connect(ui.actionGrasp, SIGNAL(triggered()), this, SLOT(graspSpecification()));
 	connect(ui.newHandButton, SIGNAL(clicked()), this, SLOT(newHand()));
-	connect(ui.hands, SIGNAL(itemSelectionChanged()), this, SLOT(handChanged()));
+	connect(ui.hands, SIGNAL(itemSelectionChanged()), this, SLOT(handChanged())); //TODO: why not itemDoubleClick()?
 	connect(ui.deleteHandButton, SIGNAL(clicked()),this, SLOT(deleteHand()));
 	connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
 	createStatusBar();
@@ -114,10 +168,12 @@ MainWindow::~MainWindow(){}
 
 
 void MainWindow::loadXML(){
+	//FIXME: dialog is not deleted at the end -> memory leak. This code is full of them :(
+	//		 USE SMART POINTERS or take care of pointers!
 	QFileDialog *dialog= new QFileDialog(this, "Load XML", ".","XML Files (*.xml)");
 	if(dialog->exec()){
 		delete viewBuilder;
-		delete sceneBuilder;
+		sceneBuilder.reset();
 
 		//TODO: Progress bar
 		QProgressDialog progressDialog("Loading the XML file...", "Cancel process", 0, 100, this);
@@ -127,7 +183,7 @@ void MainWindow::loadXML(){
 		QApplication::processEvents();
 		sleep(1.0);
 		progressDialog.setValue(10);
-//		cout<<"UwsimProgressBarUpdate = 10 "<<endl;
+		//		cout<<"UwsimProgressBarUpdate = 10 "<<endl;
 
 		QStringList fichs=dialog->selectedFiles();
 		std::string fichero = fichs[0].toUtf8().constData();
@@ -142,10 +198,10 @@ void MainWindow::loadXML(){
 		offsetr.push_back(config.offsetr[2]);
 		//sceneBuilder->stopROSInterfaces();
 		progressDialog.setValue(25);
-		sceneBuilder=new SceneBuilder();
+		sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder());
 		sceneBuilder->loadScene(config);
 		progressDialog.setValue(50);
-		viewBuilder=new ViewBuilder(config, sceneBuilder);
+		viewBuilder=new ViewBuilder(config, sceneBuilder.get());
 		view=viewBuilder->getView();
 		progressDialog.setValue(75);
 		scene=sceneBuilder->getScene();
@@ -181,7 +237,7 @@ void MainWindow::createMosaic(){
 			QApplication::processEvents();
 			sleep(1.0);
 			progressDialog.setValue(10);
-//			cout<<"UwsimProgressBarUpdate = 10 "<<endl;
+			//			cout<<"UwsimProgressBarUpdate = 10 "<<endl;
 
 			arg="gdal_translate ";
 			arg.append(textura[0]);
@@ -218,7 +274,7 @@ void MainWindow::createMosaic(){
 				process->execute(arg);
 			}
 			delete viewBuilder;
-			delete(sceneBuilder);
+			sceneBuilder.reset();
 
 			osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
 			ConfigFile config(std::string (ros::package::getPath("QtUWSim"))+"/mosaics/mosaic.xml");
@@ -237,11 +293,11 @@ void MainWindow::createMosaic(){
 
 			progressDialog.setValue(40);
 
-			sceneBuilder=new SceneBuilder();
+			sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder());
 			progressDialog.setValue(60);
 
 			sceneBuilder->loadScene(config);
-			viewBuilder=new ViewBuilder(config, sceneBuilder);
+			viewBuilder=new ViewBuilder(config, sceneBuilder.get());
 			view=viewBuilder->getView();
 			scene=sceneBuilder->getScene();
 			root=sceneBuilder->getRoot();
@@ -270,7 +326,7 @@ void MainWindow::loadMosaic(){
 		mosaic_file=loadOsgDialog->selectedFiles();
 		updateStatusBar(mosaic_file[0]);
 		delete viewBuilder;
-		delete(sceneBuilder);
+		sceneBuilder.reset();
 		osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
 		ConfigFile config(std::string (ros::package::getPath("QtUWSim"))+"/mosaics/mosaic.xml");
 		config.objects.front().file=mosaic_file[0].toUtf8().constData();
@@ -283,9 +339,9 @@ void MainWindow::loadMosaic(){
 		offsetr.push_back(config.offsetr[1]);
 		offsetr.push_back(config.offsetr[2]);
 
-		sceneBuilder=new SceneBuilder();
+		sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder());
 		sceneBuilder->loadScene(config);
-		viewBuilder=new ViewBuilder(config, sceneBuilder);
+		viewBuilder=new ViewBuilder(config, sceneBuilder.get());
 		view=viewBuilder->getView();
 		scene=sceneBuilder->getScene();
 		root=sceneBuilder->getRoot();
@@ -303,28 +359,32 @@ void MainWindow::loadMosaic(){
 
 
 void MainWindow::graspSpecification(){
-	if(!database->isConnected()){
-		std::cerr<<"Database failed to connect"<<endl;
+	//if(!database->isConnected()){
+	//	std::cerr<<"Database failed to connect"<<endl;
+	//}
+	//else{
+	for(int i=ui.hands->count()-1; i>=0 ; i--){
+		ui.hands->removeItemWidget(ui.hands->takeItem(i));
 	}
-	else{
-		for(int i=ui.hands->count()-1; i>=0 ; i--){
-			ui.hands->removeItemWidget(ui.hands->takeItem(i));
-		}
-		/*for(int i=configurations->count()-1; i>=0; i--){
+	/*for(int i=configurations->count()-1; i>=0; i--){
 			configurations->removeItemWidget(configurations->takeItem(i));
 		}*/
-		ui.dockHand->show();
-		//dockConfigurations->show();
+	ui.dockHand->show();
+	//dockConfigurations->show();
 
 
-		if(!database->getList(handsDB)){
-			std::cerr<<"Failed to get list of hands"<<endl;
-		}
+	//if(!database->getList(handsDB)){
+	//	std::cerr<<"Failed to get list of hands"<<endl;
+	//}
 
-		for(size_t i=0; i<handsDB.size(); i++){
-			ui.hands->addItem(handsDB[i]->name_hand.data().c_str());
-		}
+	//for(size_t i=0; i<handsDB.size(); i++){
+	//	ui.hands->addItem(handsDB[i]->name_hand.data().c_str());
+	//}
+	std::map<std::string,std::pair<std::string, std::string> >::iterator it;
+	for(it=map.begin(); it!=map.end(); it++){
+		ui.hands->addItem(it->first.c_str());
 	}
+	//}
 	//ompl_ros_interface::OmplRos *ompl_ros=new ompl_ros_interface::OmplRos();
 	//ompl_ros->run();    
 }
@@ -337,29 +397,34 @@ void MainWindow::newHand(){
 		std::string packagePath=ros::package::getPath(packageHand.toUtf8().constData());
 		if(packagePath!="")
 		{
-			QFileDialog *dialog=new QFileDialog(this, "Path to new hand", packagePath.c_str(), "OSG Files (*.osg)");
+			QFileDialog *dialog=new QFileDialog(this, "Path to new hand", packagePath.c_str(), "URDF Files (*.urdf)");
 			if(dialog->exec()){
 				QString pathHand=dialog->selectedFiles()[0];
 				QString nameHand=QInputDialog::getText(this, "Insert the name of the hand", "Hand's name", QLineEdit::Normal, "",&ok);
 				if(ok && !nameHand.isEmpty()){
-					int max=0;
-					for(size_t i=0; i<handsDB.size(); i++){
-						if(max<handsDB[i]->hand_id.data())
-							max=handsDB[i]->hand_id.data();
-					}
-					Hands newHand;
-					newHand.hand_id.data()=max+1;
-					newHand.name_hand.data()=nameHand.toUtf8().constData();
-					newHand.package_ros.data()=packageHand.toUtf8().constData();
-					newHand.path.data()=pathHand.split(packagePath.c_str())[1].toUtf8().constData();
-					if(!database->insertIntoDatabase(&newHand))
+					//int max=0;
+					//for(size_t i=0; i<handsDB.size(); i++){
+					//	if(max<handsDB[i]->hand_id.data())
+					//		max=handsDB[i]->hand_id.data();
+					//}
+					//Hands newHand;
+					//newHand.hand_id.data()=max+1;
+					//newHand.name_hand.data()=nameHand.toUtf8().constData();
+					//newHand.package_ros.data()=packageHand.toUtf8().constData();
+					//newHand.path.data()=pathHand.split(packagePath.c_str())[1].toUtf8().constData();
+					//if(!database->insertIntoDatabase(&newHand))
+					//	std::cerr <<"Hand insertion failed"<<std::endl;
+					//else{
+					//	
+					//	ui.hands->addItem(newHand.name_hand.data().c_str());
+					//	if(!database->getList(handsDB)){
+					//		std::cerr<<"Failed to get list of hands"<<endl;
+					//	}
+					//}
+					if(!insertDBHand(nameHand.toUtf8().constData(), packageHand.toUtf8().constData(), pathHand.split(packagePath.c_str())[1].toUtf8().constData()))
 						std::cerr <<"Hand insertion failed"<<std::endl;
 					else{
-						
-						ui.hands->addItem(newHand.name_hand.data().c_str());
-						if(!database->getList(handsDB)){
-							std::cerr<<"Failed to get list of hands"<<endl;
-						}
+						ui.hands->addItem(nameHand.toUtf8().constData()); //TODO: Call to a method updateUIHandList
 					}
 				}
 			}
@@ -370,9 +435,9 @@ void MainWindow::newHand(){
 			QErrorMessage *error=new QErrorMessage();
 			packageHand.prepend("couldn't find package ");
 			error->showMessage(packageHand);
-			if(!database->getList(handsDB)){
-				std::cerr<<"Failed to get list of hands"<<endl;
-			}
+			//if(!database->getList(handsDB)){
+			//	std::cerr<<"Failed to get list of hands"<<endl;
+			//}
 		}
 	}
 }
@@ -386,53 +451,78 @@ void MainWindow::handChanged(){
 		delete(marker);
 		marker=NULL;
 	}
-	if(marker_cli!=NULL){
-		delete(marker_cli);
-		marker_cli=NULL;
+	if(joint_marker_cli!=NULL){
+		delete(joint_marker_cli);
+		joint_marker_cli=NULL;
 	}
 	if(ui.hands->currentRow()!=-1){
-		int cont=0;
+		//int cont=0;
 
-		while((handsDB[cont]->name_hand.data()!=ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData())   &&  (cont < ui.hands->count())){
-			cont++;
-		}
-		if(cont< ui.hands->count()){
-			marker_cli= new InteractiveMarkerDisplay("osg_im","/basic_controls/update", scene->localizedWorld, *(frame_manager->getTFClient()));
-			marker=new HandInteractiveMarker(handsDB[cont]->package_ros.data(),handsDB[cont]->path.data());
-		}
+		//while((handsDB[cont]->name_hand.data()!=ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData())   &&  (cont < ui.hands->count())){
+		//cont++;
+		//}
+		//if(cont< ui.hands->count()){
+		//joint_marker_cli= new InteractiveMarkerDisplay("osg_im","/basic_controls/update", scene->localizedWorld, *(frame_manager->getTFClient()));
+		//marker=new HandInteractiveMarker(handsDB[cont]->package_ros.data(),handsDB[cont]->path.data());
+		//}
+		joint_marker_cli= new InteractiveMarkerDisplay("osg_im","/IM_JOINT_SERVER/update", scene->localizedWorld, *(frame_manager->getTFClient()));
+		hand_marker_cli= new InteractiveMarkerDisplay("osg_hand_im","/hand_pose_im/update", scene->localizedWorld, *(frame_manager->getTFClient()));
+		marker=new HandInteractiveMarker(sceneBuilder,
+				ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData(),
+				map[ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData()].first,
+				map[ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData()].second);
 	}
 }
 
 
 void MainWindow::deleteHand(){
-	int cont=0;
-	if(ui.hands->currentRow()!=-1){
-		while((handsDB[cont]->name_hand.data()!=ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData())   &&  (cont < ui.hands->count())){
-			cont++;
-		}
-		if(cont< ui.hands->count()){
-			if(!database->deleteFromDatabase(handsDB[cont].get())){
-				std::cerr <<"Hand delete failed"<<std::endl;
-			}
-			int file=ui.hands->currentRow();
-			ui.hands->setCurrentRow(-1);
-			ui.hands->removeItemWidget(ui.hands->takeItem(file));
-		}	
+	//int cont=0;
+	//if(ui.hands->currentRow()!=-1){
+	//while((handsDB[cont]->name_hand.data()!=ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData())   &&  (cont < ui.hands->count())){
+	//cont++;
+	//}
+	//if(cont< ui.hands->count()){
+	//if(!database->deleteFromDatabase(handsDB[cont].get())){
+	//std::cerr <<"Hand delete failed"<<std::endl;
+	//}
+	//int file=ui.hands->currentRow();
+	//ui.hands->setCurrentRow(-1);
+	//ui.hands->removeItemWidget(ui.hands->takeItem(file));
+	//}
+	//}
+	if (deleteDBHand(ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData())) {
+		int file=ui.hands->currentRow();
+		ui.hands->setCurrentRow(-1);
+		ui.hands->removeItemWidget(ui.hands->takeItem(file));
 	}
+
 }
 void MainWindow::newPath(){
 	if(grasp!=NULL){
-		grasp->newPath(offsetp,offsetr,sceneBuilder);
+		grasp->newPath(offsetp,offsetr,sceneBuilder.get());
 	}
 }
 
 
 void MainWindow::rosSpin(){
+	static tf::TransformBroadcaster br;
+
+	if (marker && marker->uwsim_object && marker->uwsim_object->baseTransform) {
+		//Publish the tf of the HandInteractiveMarker base frame
+		geometry_msgs::Pose pose=marker->pose;
+
+		tf::Transform transform;
+		transform.setOrigin( tf::Vector3(pose.position.x,pose.position.y, pose.position.z) );
+		transform.setRotation( tf::Quaternion(pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w) );
+		br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", marker->uwsim_object->urdf->link[0]->getName())); //FIXME: multiple vehicles
+	}
+
 	ros::spinOnce();
 	double currSimTime = view->getFrameStamp()->getSimulationTime();
 	double elapsed( currSimTime - prevSimTime );
-	if(marker_cli!=NULL){
-		marker_cli->update(elapsed, elapsed);
+	if(joint_marker_cli!=NULL && hand_marker_cli!=NULL){
+		joint_marker_cli->update(elapsed, elapsed);
+		hand_marker_cli->update(elapsed, elapsed);
 	}
 	prevSimTime=currSimTime;
 }
@@ -440,9 +530,9 @@ void MainWindow::rosSpin(){
 
 void MainWindow::about(){
 	QMessageBox::about(this, tr("About QtUWSim"),
-	tr("<h2>QtUWSim</h2>"
-			"<p>Software developed at <a href=\"http://www.irs.uji.es\">Interactive & Robotic Systems Lab</a></p>"
-			"<p>Please, visit the <a href=\"http://www.irs.uji.es/uwsim\">official website</a> for news and the <a href=\"http://www.irs.uji.es/uwsim/wiki\">wiki</a> for help and info.</p>"));
+			tr("<h2>QtUWSim</h2>"
+					"<p>Software developed at <a href=\"http://www.irs.uji.es\">Interactive & Robotic Systems Lab</a></p>"
+					"<p>Please, visit the <a href=\"http://www.irs.uji.es/uwsim\">official website</a> for news and the <a href=\"http://www.irs.uji.es/uwsim/wiki\">wiki</a> for help and info.</p>"));
 }
 
 

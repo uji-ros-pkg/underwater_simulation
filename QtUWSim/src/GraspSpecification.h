@@ -24,6 +24,8 @@ private:
 	std::vector<double> offsetp_;
 	std::vector<double> offsetr_;
 
+	bool stop_;
+
 	void ReadFeedbackCallback(const visualization_msgs::InteractiveMarkerFeedback::ConstPtr& msg);
 public:
 	GraspSpecification();

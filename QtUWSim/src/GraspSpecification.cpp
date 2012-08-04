@@ -5,18 +5,18 @@
  *      Author: toni
  */
 #include "GraspSpecification.h"
-#include <mar_robot/ARM5Arm.h>
+#include <mar_robot_arm5e/ARM5Arm.h>
 #include <visp/vpColVector.h>
 #include <visp/vpHomogeneousMatrix.h>
 #include <tf/transform_datatypes.h>
 
-GraspSpecification::GraspSpecification(){
+GraspSpecification::GraspSpecification(): stop_(false) {
 	feedback_sub=nh_.subscribe<visualization_msgs::InteractiveMarkerFeedback>("/basic_controls/feedback",1,&GraspSpecification::ReadFeedbackCallback, this);
 }
 
 GraspSpecification::~GraspSpecification(){
+	stop_=true;
 	join();
-	cancel();
 }
 void GraspSpecification::ReadFeedbackCallback(const visualization_msgs::InteractiveMarkerFeedback::ConstPtr& msg){
 	lastFeedback=msg;
@@ -27,8 +27,8 @@ void GraspSpecification::newPath(std::vector<double> offsetp, std::vector<double
 	scene=sceneBuilder;
 	cout<<"Posicion Final: "<<lastFeedback->pose.position.x<<" "<<lastFeedback->pose.position.y<<" "<<lastFeedback->pose.position.z<<std::endl;
 	if(this->isRunning()){
+		stop_=true;
 		join();
-		cancel();
 	}
 	startThread();
 }
@@ -98,7 +98,7 @@ void GraspSpecification::run(){
 
 
 
-	while((finalPose-actualPose).euclideanNorm()>0.0001) {
+	while(!stop_ && (finalPose-actualPose).euclideanNorm()>0.0001) {
 		incrementPose=0.00001*(finalPose-actualPose);
 		int index=0;
 		for(int i=1; i<10; i++){
