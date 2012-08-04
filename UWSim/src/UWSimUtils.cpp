@@ -281,7 +281,23 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
   if(geom->type==0){
     osg::Node * node = retrieveResource(geom->file);
     if(node == NULL){
-      std::cerr<<"Error reading file " << geom->file <<" Check URDF file." <<std::endl;
+    	std::cerr << "Could not load " << geom->file << std::endl;
+
+    	//Try to find an .osg/.ive replacement
+    	if (osgDB::getFileExtension(geom->file)!=std::string("osg") && osgDB::getFileExtension(geom->file)!=std::string("ive")) {
+    		std::string file_osg(geom->file);
+    		std::string file_ive(geom->file);
+    		file_osg.replace(file_osg.find_last_of("."), 4, ".osg");
+    		file_ive.replace(file_ive.find_last_of("."), 4, ".ive");
+
+    		std::cerr << "Looking for .osg or .ive replacement " << file_osg << std::endl;
+    		node = retrieveResource(file_osg);
+    		if (node==NULL) retrieveResource(file_ive);
+    		if (node==NULL) {
+    			std::cerr << "Couldn't load geometry, and .osg/.ive replacement not found" << std::endl;
+    		    std::cerr <<"Error reading file " << geom->file <<" Check URDF file." << std::endl;
+    		}
+    	}
     }
     return node;
   }
