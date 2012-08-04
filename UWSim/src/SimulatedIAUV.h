@@ -50,6 +50,9 @@ public:
 	void setVehiclePosition(double p[6]) {setVehiclePosition(p[0],p[1],p[2], p[3], p[4], p[5]);}
 	void setVehiclePosition(osg::Matrixd m);
 
+	//setName
+	void setName(std::string name) {this->name=name;}
+
 	unsigned int getNumCams() {return camview.size();}
 	unsigned int getNumRangeSensors() {return range_sensors.size();}
 	unsigned int getNumObjectPickers() {return object_pickers.size();}

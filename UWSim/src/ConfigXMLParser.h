@@ -12,6 +12,7 @@
 using namespace std;
 #include <cstdlib>
 #include <list>
+#include <vector>
 
 struct ROSInterfaceInfo{
   typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,
@@ -166,8 +167,8 @@ struct Object{
   boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
-class ConfigFile{
-private:
+class ConfigFile {
+public:
 
   void esPi(string in,double &param);
 
@@ -216,7 +217,15 @@ public:
   list <Object> objects;
   list <ROSInterfaceInfo> ROSInterfaces;
 
+  /** Constructor from an XML file
+   * Parses the file and stores values in local attributes
+   */
   ConfigFile(const std::string &fName);
+
+  /** Empty constructor
+   * Use this for calling the parsing methods manually
+   */
+  ConfigFile() {}
 };
 
 #endif
