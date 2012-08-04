@@ -40,14 +40,7 @@ bool HandInteractiveMarker::init() {
 	//Load the URDF model in UWSim
 	Vehicle v;
 	ConfigFile parser;
-	std::string fullpath_osg(fullpath_);
-	//FIXME: The following line is tricky. By default OSG cannot load .dae, whereas ROS needs .dae.
-	//This forces us to use different URDF for ROS and for UWSim, e.g file-ros.urdf (ROS) vs. file.urdf (UWSim)
-	//The following line removes the "-ros" part in order to load the UWSim urdf
-	//Should find a consistent solution. What about replacing .dae by .osg at the low level in UWSim?
-	fullpath_osg.erase(fullpath_osg.find_last_of("-"),4);
-	ROS_INFO_STREAM("URDF path is: "<< fullpath_osg);
-	parser.processURDFFile(fullpath_osg, v);
+	parser.processURDFFile(fullpath_, v);
 	parser.postprocessVehicle(v);
 	v.name=name_;
 	uwsim_object=boost::shared_ptr<SimulatedIAUV>(new SimulatedIAUV(scene_builder_.get(), v));

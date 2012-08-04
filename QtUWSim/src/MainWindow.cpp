@@ -145,7 +145,6 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
 	ui.dockHand->hide();
 	//dockConfigurations->hide();*/
 
-	//FIXME: Set base_link and IM topic from arguments or XML
 	frame_manager=FrameManager::instance();
 	frame_manager->setFixedFrame("world");
 
