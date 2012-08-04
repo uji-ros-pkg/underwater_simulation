@@ -16,3 +16,6 @@ libfftw3:
 libxml++-2.6:
   ubuntu: libxml++2.6-2 libxml++2.6-dev
 
+sqlite3:
+  ubuntu: sqlite3 libsqlite3-dev
+
