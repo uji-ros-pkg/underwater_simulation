@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot name="girona500">
+ 
+  <link name="part4_base">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_base.osg"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="part4_jaw1">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_jaw1.osg"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="part4_to_part4_jaw1" type="revolute">
+    <parent link="part4_base"/>
+    <child link="part4_jaw1"/>
+    <limit effort="1000.0" lower="0" upper="0.6" velocity="0.5"/>
+    <axis xyz="0 -1 0"/>
+    <origin rpy="0 0 0" xyz="0.07 0 0.04"/>
+  </joint>
+
+
+  <link name="part4_jaw2">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_jaw2.osg"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="part4_to_part4_jaw2" type="continuous">
+    <parent link="part4_base"/>
+    <child link="part4_jaw2"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 0" xyz="0.07 0 -0.04"/>
+    <mimic joint="part4_to_part4_jaw1" multiplier="1" offset="0"/>
+  </joint>
+
+</robot>
