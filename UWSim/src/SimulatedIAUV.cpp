@@ -228,6 +228,13 @@ void SimulatedIAUV::setVehiclePosition(double x, double y, double z, double roll
 	setVehiclePosition(transform);
 }
 
+void SimulatedIAUV::setVehiclePosition(osg::Vec3d trans, osg::Quat rot) {
+	osg::Matrixd wMv;
+	wMv.setTrans(trans);
+	wMv.setRotate(rot);
+
+	setVehiclePosition(wMv);
+}
 
 void SimulatedIAUV::setVehiclePosition(osg::Matrixd m){
 	baseTransform->setMatrix(m);

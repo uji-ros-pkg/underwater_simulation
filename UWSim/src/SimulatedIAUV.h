@@ -47,6 +47,7 @@ public:
 	//setPosition
 	void setVehiclePosition(double x, double y, double z, double yaw) {setVehiclePosition(x,y,z,0,0,yaw);}
 	void setVehiclePosition(double x, double y, double z, double roll, double pitch, double yaw);
+	void setVehiclePosition(osg::Vec3d trans, osg::Quat rot);
 	void setVehiclePosition(double p[6]) {setVehiclePosition(p[0],p[1],p[2], p[3], p[4], p[5]);}
 	void setVehiclePosition(osg::Matrixd m);
 
