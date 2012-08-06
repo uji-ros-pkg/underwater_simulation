@@ -22,11 +22,11 @@ HandInteractiveMarker::~HandInteractiveMarker(){
 
 void HandInteractiveMarker::processIMFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback ) {
 	pose=feedback->pose;
-	tf::Quaternion q;
-	tf::quaternionMsgToTF(feedback->pose.orientation, q);
-	double roll, pitch, yaw;
-	btMatrix3x3(q).getRPY(roll, pitch, yaw);
-	uwsim_object->setVehiclePosition(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z, roll, pitch, yaw);
+//	tf::Quaternion q;
+//	tf::quaternionMsgToTF(feedback->pose.orientation, q);
+//	double roll, pitch, yaw;
+//	btMatrix3x3(q).getRPY(roll, pitch, yaw);
+	uwsim_object->setVehiclePosition(osg::Vec3d(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z), osg::Quat(feedback->pose.orientation.x, feedback->pose.orientation.y, feedback->pose.orientation.z, feedback->pose.orientation.w));
 }
 
 bool HandInteractiveMarker::init() {
