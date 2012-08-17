@@ -17,9 +17,14 @@ public:
 	
 private:
 	osg::Group* root;
+
+	//TODO:
 	bool axis;
 	osg::Geode* axis1, *axis2;
-	std::vector<osg::Geode*> vecLines;
+
+	//template bounding box
+    osg::ref_ptr<osg::Geode> t_geode;
+    osg::ref_ptr<osg::MatrixTransform> t_transform;
 };
 
 #endif

@@ -48,30 +48,36 @@ private:
 	//  std::vector<boost::shared_ptr<Hands> > handsDB;
 	std::map<std::string, std::pair<std::string,std::string> > map;
 
-	osgViewer::View *view;
 	osg::Group* root;
-	osg::ref_ptr<osgOceanScene> scene;
-	osgGA::CameraManipulator* oldManipulator;
-
 	QTimer timer;
-	boost::shared_ptr<SceneBuilder> sceneBuilder;
-	ViewBuilder *viewBuilder; 		//FIXME: Use smart pointers
-	ViewerWidget* viewWidget; 		//FIXME: Use smart pointers
-	PlanarGraspSpec* spec; 			//FIXME: Use smart pointers
-	HandInteractiveMarker *marker; 	//FIXME: Use smart pointers
 	//  database_interface::PostgresqlDatabase *database;
 	sqlite3 *db; 					//FIXME: Use smart pointers
-	GraspSpecification *grasp; 		//FIXME: Use smart pointers
+	ros::Time prevSimTime;
+	std::vector<double> offsetr, offsetp;
 
+	//Mosaic mode
+	osg::ref_ptr<osgViewer::Viewer> mosaic_viewer;	//Viewer when in mosaic mode
+	PlanarGraspSpec* spec; 			//FIXME: Use smart pointers
+	GraspSpecification *grasp; 		//FIXME: Use smart pointers
+	osgGA::CameraManipulator* oldManipulator;
+
+	//Scene mode
+	boost::shared_ptr<SceneBuilder> sceneBuilder;
+	osg::ref_ptr<osgOceanScene> scene;
+	boost::shared_ptr<ViewBuilder> viewBuilder; 		//FIXME: Use smart pointers
+	ViewerWidget* viewWidget; 		//FIXME: Use smart pointers
+
+	//Interactive markers
+	HandInteractiveMarker *marker; 	//FIXME: Use smart pointers
 	boost::shared_ptr<FrameManager> frame_manager;
 	InteractiveMarkerDisplay *joint_marker_cli;
 	InteractiveMarkerDisplay *hand_marker_cli;
-	double prevSimTime;
-	std::vector<double> offsetr, offsetp;
 
 	Ui::MainWindowClass ui;
 
 	QLabel *openedFileName;
+
+	boost::shared_ptr<osg::ArgumentParser> arguments_;
 
 	void updateDBHandsList();
 	bool deleteDBHand(std::string hand_name);

@@ -143,8 +143,12 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		wMb_m.setTrans(auxObject.position[0],auxObject.position[1],auxObject.position[2]);
 
 		osg::ref_ptr<osg::MatrixTransform> wMb=new osg::MatrixTransform(wMb_m);
-		scene->addObject(wMb, auxObject.file, &auxObject);
+		osg::Node *object=scene->addObject(wMb, auxObject.file, &auxObject);
 		wMb->setName(auxObject.name);
+		if (object!=NULL) {
+			object->setName(auxObject.name);
+			objects.push_back(osg::ref_ptr<osg::Node>(object));
+		}
 		
 		//FIXME: Do not trust on object name
 		if(auxObject.name!="terrain") {

@@ -18,7 +18,7 @@
       </geometry>
     </visual>
   </link>
-  <joint name="1_finger_base_to_finger_slider" type="continuous">
+  <joint name="1_finger_base_to_finger_slider" type="prismatic">
     <parent link="1_finger_base"/>
     <child link="1_finger_slider"/>
     <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>
@@ -69,7 +69,7 @@
       </geometry>
     </visual>
   </link>
-  <joint name="2_finger_base_to_finger_slider" type="continuous">
+  <joint name="2_finger_base_to_finger_slider" type="prismatic">
     <parent link="2_finger_base"/>
     <child link="2_finger_slider"/>
     <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>
@@ -120,7 +120,7 @@
       </geometry>
     </visual>
   </link>
-  <joint name="3_finger_base_to_finger_slider" type="continuous">
+  <joint name="3_finger_base_to_finger_slider" type="prismatic">
     <parent link="3_finger_base"/>
     <child link="3_finger_slider"/>
     <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>

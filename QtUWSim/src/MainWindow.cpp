@@ -9,6 +9,7 @@
 #include "MosaicEventHandler.h"
 
 #include <osg/Matrixd>
+#include <osg/ComputeBoundsVisitor>
 
 #include <ros/package.h>
 
@@ -59,7 +60,7 @@ bool MainWindow::insertDBHand(std::string hand_name, std::string hand_package, s
 }
 
 
-MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
+MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): arguments_(arguments) {
 
 	ui.setupUi(this);
 
@@ -86,14 +87,13 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments){
 	ConfigFile config(configfile);
 	sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder(arguments));
 	sceneBuilder->loadScene(config);
-	viewBuilder=new ViewBuilder(config, sceneBuilder.get(), arguments);
-	view=viewBuilder->getView();
+	viewBuilder=boost::shared_ptr<ViewBuilder>(new ViewBuilder(config, sceneBuilder.get(), arguments));
 	scene=sceneBuilder->getScene();
 	root=sceneBuilder->getRoot();
 
 
-	prevSimTime =view->getFrameStamp()->getSimulationTime();
-	viewWidget=new ViewerWidget(view);
+	prevSimTime = ros::Time::now();
+	viewWidget=new ViewerWidget(viewBuilder->getView());
 	viewWidget->setGeometry(200,200,800,600);  
 	setCentralWidget(viewWidget);
 
@@ -171,10 +171,11 @@ void MainWindow::loadXML(){
 	//		 USE SMART POINTERS or take care of pointers!
 	QFileDialog *dialog= new QFileDialog(this, "Load XML", ".","XML Files (*.xml)");
 	if(dialog->exec()){
-		delete viewBuilder;
-		sceneBuilder.reset();
+		if (viewBuilder)
+			viewBuilder.reset();
+		if (sceneBuilder)
+			sceneBuilder.reset();
 
-		//TODO: Progress bar
 		QProgressDialog progressDialog("Loading the XML file...", "Cancel process", 0, 100, this);
 		progressDialog.setWindowModality(Qt::WindowModal);
 		progressDialog.setCancelButton(0);
@@ -187,6 +188,7 @@ void MainWindow::loadXML(){
 		QStringList fichs=dialog->selectedFiles();
 		std::string fichero = fichs[0].toUtf8().constData();
 		ConfigFile config(fichero);
+		//TODO: What is local offsetp and offsetr for? can't use those inside config?
 		offsetp.clear();
 		offsetr.clear();
 		offsetp.push_back(config.offsetp[0]);
@@ -197,15 +199,14 @@ void MainWindow::loadXML(){
 		offsetr.push_back(config.offsetr[2]);
 		//sceneBuilder->stopROSInterfaces();
 		progressDialog.setValue(25);
-		sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder());
+		sceneBuilder.reset(new SceneBuilder());
 		sceneBuilder->loadScene(config);
 		progressDialog.setValue(50);
-		viewBuilder=new ViewBuilder(config, sceneBuilder.get());
-		view=viewBuilder->getView();
+		viewBuilder.reset(new ViewBuilder(config, sceneBuilder.get()));
 		progressDialog.setValue(75);
 		scene=sceneBuilder->getScene();
 		root=sceneBuilder->getRoot();
-		viewWidget->updateViewerWidget(view);
+		viewWidget->updateViewerWidget(viewBuilder->getView());
 		progressDialog.setValue(100);
 	}
 }
@@ -272,7 +273,7 @@ void MainWindow::createMosaic(){
 				arg="rm height.tif";
 				process->execute(arg);
 			}
-			delete viewBuilder;
+			viewBuilder.reset();
 			sceneBuilder.reset();
 
 			osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
@@ -296,22 +297,21 @@ void MainWindow::createMosaic(){
 			progressDialog.setValue(60);
 
 			sceneBuilder->loadScene(config);
-			viewBuilder=new ViewBuilder(config, sceneBuilder.get());
-			view=viewBuilder->getView();
+			viewBuilder=boost::shared_ptr<ViewBuilder>(new ViewBuilder(config, sceneBuilder.get()));
 			scene=sceneBuilder->getScene();
 			root=sceneBuilder->getRoot();
 			if (spec!= NULL) delete spec;
 			spec=new PlanarGraspSpec(root);
-			view->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
-			viewWidget->updateViewerWidget(view);
+			viewBuilder->getView()->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
+			viewWidget->updateViewerWidget(viewBuilder->getView());
 			progressDialog.setValue(80);
 			MosaicManipulator *tb=new MosaicManipulator;
 			osg::Vec3d eye, center, up;
-			oldManipulator=view->getCameraManipulator();
+			oldManipulator=viewBuilder->getView()->getCameraManipulator();
 			oldManipulator->getHomePosition(eye, center, up);
 			tb->setHomePosition(eye, center, up);
-			oldManipulator=view->getCameraManipulator();
-			view->setCameraManipulator(tb);
+			oldManipulator=viewBuilder->getView()->getCameraManipulator();
+			viewBuilder->getView()->setCameraManipulator(tb);
 			progressDialog.setValue(100);
 		}	 
 	}
@@ -320,12 +320,54 @@ void MainWindow::createMosaic(){
 
 void MainWindow::loadMosaic(){
 	QStringList mosaic_file;
-	QFileDialog *loadOsgDialog=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg)");
+	QFileDialog *loadOsgDialog=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg *.ive)");
 	if(loadOsgDialog->exec()){
 		mosaic_file=loadOsgDialog->selectedFiles();
 		updateStatusBar(mosaic_file[0]);
-		delete viewBuilder;
-		sceneBuilder.reset();
+		if (viewBuilder)
+			viewBuilder.reset();
+		if (sceneBuilder)
+			sceneBuilder.reset();
+
+		osg::Node *mosaic_node=osgDB::readNodeFile(mosaic_file[0].toStdString());
+		if (mosaic_node!=NULL) {
+			root=new osg::Group();
+			root->addChild(mosaic_node);
+			mosaic_viewer=osg::ref_ptr<osgViewer::Viewer>(new osgViewer::Viewer());
+			mosaic_viewer->setSceneData(root);
+			mosaic_viewer->setCameraManipulator(new MosaicManipulator());
+
+			//get object center and bounds
+			osg::ComputeBoundsVisitor cbVisitor;
+			mosaic_node->accept(cbVisitor);
+			osg::BoundingBox bs = cbVisitor.getBoundingBox();
+			osg::BoundingSphere bsphere;
+			bsphere.expandBy(bs);
+
+			//Get the minimum bbox dimension, and set the camera looking along that direction
+			osg::Vec3d geom_up(1,0,0);
+			if ((bs.yMax()-bs.yMin()) < (bs.xMax()-bs.xMin())) {
+				geom_up=osg::Vec3d(0,1,0);
+			    if ((bs.zMax()-bs.zMin()) < (bs.yMax()-bs.yMin())) geom_up=osg::Vec3d(0,0,1);
+			} else if ((bs.zMax()-bs.zMin()) < (bs.xMax()-bs.xMin())) geom_up=osg::Vec3d(0,0,1);
+
+			//Get the maximum bbox dimension, and set the camera up vector along that direction
+			osg::Vec3d geom_longest(1,0,0);
+			if ((bs.yMax()-bs.yMin()) > (bs.xMax()-bs.xMin())) {
+				geom_longest=osg::Vec3d(0,1,0);
+			    if ((bs.zMax()-bs.zMin()) > (bs.yMax()-bs.yMin())) geom_longest=osg::Vec3d(0,0,1);
+			} else if ((bs.zMax()-bs.zMin()) > (bs.xMax()-bs.xMin())) geom_longest=osg::Vec3d(0,0,1);
+
+			mosaic_viewer->getCameraManipulator()->setHomePosition(bs.center()+osg::Vec3d(geom_up[0]*4.5*bsphere.radius(),geom_up[1]*4.5*bsphere.radius(),geom_up[2]*4.5*bsphere.radius()), bs.center(), geom_longest);
+			mosaic_viewer->getCameraManipulator()->home(0);
+			if (spec!=NULL) delete spec;
+			spec=new PlanarGraspSpec(root);
+			//view->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
+			viewWidget->updateViewerWidget(mosaic_viewer);
+		}
+
+
+		/*
 		osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
 		ConfigFile config(std::string (ros::package::getPath("QtUWSim"))+"/mosaics/mosaic.xml");
 		config.objects.front().file=mosaic_file[0].toUtf8().constData();
@@ -351,8 +393,14 @@ void MainWindow::loadMosaic(){
 		oldManipulator=view->getCameraManipulator();
 		osg::Vec3d eye, center, up;
 		oldManipulator->getHomePosition(eye, center, up);
-		tb->setHomePosition(eye, center, up);
-		view->setCameraManipulator(tb);
+
+		//get object center and bounds
+		osg::BoundingSphere bs=sceneBuilder->objects[0]->getBound();
+		std::cerr << "object bound center: " << bs.center() << std::endl;
+		std::cerr << "object bound radius: " << bs.radius() << std::endl;
+		oldManipulator->setHomePosition(bs.center()+osg::Vec3d(0,0,10), bs.center(), up);
+		//view->setCameraManipulator(tb);
+	*/
 	}
 }
 
@@ -517,11 +565,11 @@ void MainWindow::rosSpin(){
 	}
 
 	ros::spinOnce();
-	double currSimTime = view->getFrameStamp()->getSimulationTime();
-	double elapsed( currSimTime - prevSimTime );
+	ros::Time currSimTime = ros::Time::now();
+	ros::Duration elapsed= currSimTime - prevSimTime ;
 	if(joint_marker_cli!=NULL && hand_marker_cli!=NULL){
-		joint_marker_cli->update(elapsed, elapsed);
-		hand_marker_cli->update(elapsed, elapsed);
+		joint_marker_cli->update(elapsed.toSec(), elapsed.toSec());
+		hand_marker_cli->update(elapsed.toSec(), elapsed.toSec());
 	}
 	prevSimTime=currSimTime;
 }

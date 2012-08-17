@@ -46,19 +46,23 @@ public:
 					MosaicManipulator *manipulator=dynamic_cast<MosaicManipulator*> (view->getCameraManipulator());
 					manipulator->disableManipulator(true);
 					point1_w=osg::Vec3(x,y,0);
-					point1=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],1.1);
+					point1=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],intersections.begin()->getWorldIntersectPoint()[2]);
+					std::cerr << "point: " << point1 << std::endl;
 					_spec->addPoint(point1);
 				}
 				if(points==1){
 					point2_w=osg::Vec3(x,y,0);
-					point2=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],1.1);
+					point2=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],intersections.begin()->getWorldIntersectPoint()[2]);
+					std::cerr << "point: " << point2 << std::endl;
 					_spec->addPoint(point2);
 				}
 				if(points==2){
 					point3_w=osg::Vec3(x,y,0);
-					point3=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],1.1);
+					point3=osg::Vec3(intersections.begin()->getWorldIntersectPoint()[0],intersections.begin()->getWorldIntersectPoint()[1],intersections.begin()->getWorldIntersectPoint()[2]);
+					std::cerr << "point: " << point3 << std::endl;
 					_spec->addPoint(point3);
-					 point4=osg::Vec3(point3[0]+point1[0]-point2[0], point3[1]+point1[1]-point2[1],1.1);
+					 point4=osg::Vec3(point3[0]+point1[0]-point2[0], point3[1]+point1[1]-point2[1],point3[2]+point1[2]-point2[2]);
+					std::cerr << "point: " << point4 << std::endl;
 					_spec->addLine(point1, point2);
 					_spec->addLine(point2, point3);
 					_spec->addLine(point3, point4);
@@ -95,7 +99,7 @@ public:
 								_viewer->frame();
 								
 								QString arg="cp /tmp/target_aux_1_0.png ";
-								arg.append(target_file[0]);
+								arg.append(target_file[0]); //FIXME: not safe
 								QProcess *process;
 								process->execute(arg);
 								arg="rm /tmp/target_aux_1_0.png";
