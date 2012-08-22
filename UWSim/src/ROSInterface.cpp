@@ -548,13 +548,17 @@ void ArmToROSJointState::publish() {
 ArmToROSJointState::~ArmToROSJointState() {}
 	
 
-VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate): ROSPublisherInterface	(info_topic,rate), cam(camera), image_topic(topic) {}
+VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate): ROSPublisherInterface(info_topic,rate), cam(camera), image_topic(topic) {
+  it.reset(new image_transport::ImageTransport(nh_));
+}
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
   ROS_INFO("VirtualCameraToROSImage publisher on topic %s",topic.c_str()); 
-  it.reset(new image_transport::ImageTransport(nh));
-  img_pub_ = it->advertise(image_topic, 1);
-  pub_=nh.advertise<sensor_msgs::CameraInfo>(topic, 1);
+  while (!it) {
+        ROS_INFO("VirtualCameraToROSImage Waiting for transport to be initialized...");
+  }
+  img_pub_ = it->advertise(image_topic, 1); 
+  pub_=nh.advertise<sensor_msgs::CameraInfo>(topic, 1); 
 }
 
 void VirtualCameraToROSImage::publish() {
