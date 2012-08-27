@@ -56,9 +56,10 @@ private:
 	std::vector<double> offsetr, offsetp;
 
 	//Mosaic mode
-	osg::ref_ptr<osgViewer::Viewer> mosaic_viewer;	//Viewer when in mosaic mode
-	PlanarGraspSpec* spec; 			//FIXME: Use smart pointers
+	osg::ref_ptr<osgViewer::Viewer> mosaic_viewer_;	//Viewer when in mosaic mode
+	std::vector<boost::shared_ptr<PlanarGraspSpec> > planar_grasp_spec_;
 	GraspSpecification *grasp; 		//FIXME: Use smart pointers
+	std::map<QListWidgetItem*, int > widget_to_spec_;
 	osgGA::CameraManipulator* oldManipulator;
 
 	//Scene mode
@@ -95,6 +96,13 @@ void loadXML();
 void rosSpin();
 void createMosaic();
 void loadMosaic();
+
+void showIntervention2DPanel();
+void newIntervention2D();
+void deleteIntervention2D();
+void graspIntervention2D();
+void selectedIntervention2D();
+
 void graspSpecification();
 void newHand();
 void handChanged();

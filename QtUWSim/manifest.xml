@@ -23,6 +23,7 @@
   <depend package="mar_robot_arm5e" />
   <depend package="visp" />
   <depend package="tf" />  
+  <depend package="pcl" />  
   <rosdep name="qt4"/>
   <rosdep name="sqlite3"/>
 

@@ -1,99 +1,25 @@
 #include "PlanarGraspSpec.h"
 #include <osg/LineWidth>
 #include <osg/Point>
-
-#include <osgManipulator/TabBoxDragger>
-#include <osgManipulator/TabBoxTrackballDragger>
-#include <osgManipulator/TabPlaneDragger>
-#include <osgManipulator/TabPlaneTrackballDragger>
-#include <osgManipulator/TrackballDragger>
-#include <osgManipulator/Translate1DDragger>
-#include <osgManipulator/Translate2DDragger>
-#include <osgManipulator/TranslateAxisDragger>
-#include <osgManipulator/RotateSphereDragger>
+#include <osg/AutoTransform>
+#include <osgManipulator/AntiSquish>
 
 #include <UWSimUtils.h>
 
-/** A custom, initially empty CompositeDragger */
-class CustomCompositeDragger: public osgManipulator::CompositeDragger {
-public:
-        CustomCompositeDragger() : CompositeDragger() {}
 
-        ~CustomCompositeDragger() {}
-};
-
-
-/** A custom RotateCylinder that removes material state set when released */
-class CustomRotateCylinderDragger: public osgManipulator::RotateCylinderDragger {
-
-public:
-        CustomRotateCylinderDragger() {
-                //Modify the default rotation axis
-                osg::Cylinder *c=new osg::Cylinder();
-                c->setRotation(osg::Quat(M_PI_2,osg::Vec3d(1,0,0)));
-                _projector = new osgManipulator::CylinderPlaneProjector(c);
-        }
-
-//        bool handle (const osgManipulator::PointerInfo &pi, const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &us);
-
-        ~CustomRotateCylinderDragger() {}
-};
-
-
-osgManipulator::Dragger* createDragger(const std::string& name)
+osgManipulator::Dragger* PlanarGraspSpec::createTemplateDragger()
 {
-
-	CustomCompositeDragger *cd=new CustomCompositeDragger();
-
-	osgManipulator::RotateCylinderDragger *rotate_dragger=new osgManipulator::RotateCylinderDragger();
-
-	//Create  geometry for rotate dragger
-    osg::Vec3Array* vertices = new osg::Vec3Array(4);
-    (*vertices)[0] = osg::Vec3(0.6,-0.1,0);
-    (*vertices)[1] = osg::Vec3(0.6,0.1,0);
-    (*vertices)[2] = osg::Vec3(0.65,0.1,0);
-    (*vertices)[3] = osg::Vec3(0.65,-0.1,0);
-
-    osg::Geometry* geometry = new osg::Geometry();
-    geometry->setVertexArray(vertices);
-    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,vertices->size()));
-
-    osg::Geode* geode = new osg::Geode;
-    geode->setName("Dragger Handle");
-    geode->addDrawable(geometry);
-
-    geode->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-    osg::LineWidth* linewidth = new osg::LineWidth();
-    linewidth->setWidth(5.0f);
-    geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
-
-
-	rotate_dragger->addChild(geode);
-	osg::Matrixd scalem=rotate_dragger->getMatrix();
-	scalem.setRotate(osg::Quat(M_PI_2, osg::Vec3d(1,0,0)));
-	rotate_dragger->setMatrix(scalem);
-	cd->addChild(rotate_dragger);
-	cd->addDragger(rotate_dragger);
-
-
-	osgManipulator::TabPlaneDragger *translate_dragger=new osgManipulator::TabPlaneDragger();
-	translate_dragger->setupDefaultGeometry();
-	cd->addChild(translate_dragger);
-	cd->addDragger(translate_dragger);
-
-	cd->setParentDragger(cd->getParentDragger());
-
-	return cd;
+	osgManipulator::CustomTabPlaneTrackballDragger *tpt_dragger=new osgManipulator::CustomTabPlaneTrackballDragger();
+	tpt_dragger->setupDefaultGeometry();
+	return tpt_dragger;
 }
 
-osg::Node* addDraggerToScene(osg::Node* scene)
+osg::Node* PlanarGraspSpec::addDraggerToScene(osg::Node* scene, osgManipulator::Dragger *dragger)
 {
     scene->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
     osg::MatrixTransform* selection = new osg::MatrixTransform;
     selection->addChild(scene);
-
-    osgManipulator::Dragger* dragger = createDragger("PlanarGraspSpec Dragger");
 
     osg::Group* root = new osg::Group;
     root->addChild(selection);
@@ -119,114 +45,113 @@ osg::Node* addDraggerToScene(osg::Node* scene)
     return root;
 }
 
-PlanarGraspSpec::PlanarGraspSpec(osg::Group* group){
+PlanarGraspSpec::PlanarGraspSpec(std::string name, osg::Group* group): name_(name) {
 	root=group;
-	axis=false;
 
 	//Create the template bounding box using osg draggers
 	t_geode = new osg::Geode;
-	t_transform = new osg::MatrixTransform;
+	t_transform = new osg::MatrixTransform; //TODO: Place it in the center of the view (z of the mosaic; x,y of camera)
 	osg::Matrixd transform;
 	transform.setRotate(osg::Quat(M_PI_2, osg::Vec3d(1,0,0)));
-	transform.setTrans(0,0,0.01);
+	transform.setTrans(/*group->getBound().center()+*/osg::Vec3d(0,0,0.01));
 	t_transform->setMatrix(osg::Matrixd(transform));
-	t_transform.get()->addChild(addDraggerToScene(t_geode.get()));
+	t_dragger_=createTemplateDragger();
+	t_transform.get()->addChild(addDraggerToScene(t_geode.get(), t_dragger_));
 
 	root->addChild(t_transform.get());
 }
 
-void PlanarGraspSpec::addLine(osg::Vec3 point1, osg::Vec3 point2){
-	//TODO: create a line between point1 and point2, and embed it into a dragger that allows setting the
-	//      start and ending points
+osg::Geode* PlanarGraspSpec::GraspDragger::createGraspDraggerGeometry() {
+	//Create  geometry for the grasp dragger end
+	osg::Vec3Array* vertices = new osg::Vec3Array(3);
+	(*vertices)[0] = osg::Vec3(-0.04, 0, -0.04);
+	(*vertices)[1] = osg::Vec3(0.04, 0, 0);
+	(*vertices)[2] = osg::Vec3(-0.04, 0, 0.04);
 
-	/*
-	osg::Geode *geode=new osg::Geode;
-	osg::Geometry *g=new osg::Geometry;
-	osg::ref_ptr<osg::Vec3Array> points (new osg::Vec3Array());
-	osg::ref_ptr<osg::Vec4Array> color (new osg::Vec4Array());
+	osg::Vec4Array* color= new osg::Vec4Array(1);
+	(*color)[0] = osg::Vec4f(0, 0, 1.0, 1.0);
 
+	osg::Geometry* geometry = new osg::Geometry();
+	geometry->setVertexArray(vertices);
+	geometry->setColorArray(color);
+	geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+	geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES,0,vertices->size()));
 
-	points->push_back(point1);
-	points->push_back(point2);
+	osg::Geode* geode = new osg::Geode;
+	geode->setName("Grasp Dragger End");
+	geode->addDrawable(geometry);
 
-	color->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
-	g->setVertexArray(points.get());
-	g->setColorArray(color.get());
-	g->setColorBinding(osg::Geometry::BIND_OVERALL);
-	g->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points->size()));
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+	return geode;
+}
 
+osg::Geode* PlanarGraspSpec::GraspDragger::createGraspLineGeometry() {
+	//Create  geometry for the grasp line that joins the grasp ends
+	l_vertices = new osg::Vec3Array(2);
+	(*l_vertices)[0] = tdragger1_->getMatrix().getTrans();
+	(*l_vertices)[1] = tdragger2_->getMatrix().getTrans();
+
+	osg::Vec4Array* color= new osg::Vec4Array(1);
+	(*color)[0] = osg::Vec4f(1.0, 0, 0.0, 1.0);
+
+	l_geometry = new osg::Geometry();
+	l_geometry->setVertexArray(l_vertices);
+	l_geometry->setColorArray(color);
+	l_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+	l_prset=new osg::DrawArrays(osg::PrimitiveSet::LINES,0,l_vertices->size());
+	l_geometry->addPrimitiveSet(l_prset);
+
+	osg::Geode* geode = new osg::Geode;
+	geode->setName("Grasp Dragger Line");
+	geode->addDrawable(l_geometry);
+
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 	osg::LineWidth* linewidth = new osg::LineWidth();
 	linewidth->setWidth(4.0f);
-	geode->addDrawable( g);
 	geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
-	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-	root->addChild(geode);
-	vecLines.push_back(geode);
-	*/
-}
-void PlanarGraspSpec::addPoint(osg::Vec3 center){
+	return geode;
 }
 
-void PlanarGraspSpec::drawAxis(osg::Vec3 center, osg::Vec3 pointer){
-	//TODO: Create a UWSimGeometry::frame and embed it in a rotatecylinder dragger
+PlanarGraspSpec::GraspDragger::GraspDragger() : CompositeDragger() {
+	tdragger1_=new osgManipulator::Translate2DDragger();
+	tdragger1_->addChild(createGraspDraggerGeometry());
 
-	/*
-	if(axis){
-		root->removeChild(axis1);
-		root->removeChild(axis2);
-	}
-	osg::Geometry *g=new osg::Geometry;
-	osg::Geometry *g2=new osg::Geometry;
-	osg::ref_ptr<osg::Vec3Array> points (new osg::Vec3Array());
-	osg::ref_ptr<osg::Vec4Array> color (new osg::Vec4Array());
-	osg::ref_ptr<osg::Vec3Array> points2 (new osg::Vec3Array());
-	osg::ref_ptr<osg::Vec4Array> color2 (new osg::Vec4Array());
+	tdragger2_=new osgManipulator::Translate2DDragger();
+	tdragger2_->addChild(createGraspDraggerGeometry());
 
-	osg::Vec3 unitary=osg::Vec3((pointer[0]-center[0])/(sqrt(pow(pointer[0]-center[0],2)+pow(pointer[1]-center[1],2))),
-			(pointer[1]-center[1])/(sqrt(pow(pointer[0]-center[0],2)+pow(pointer[1]-center[1],2))), 1.1);
+//    float pixelSize = 50.0f;
+//    osg::MatrixTransform* scaler = new osg::MatrixTransform;
+//    scaler->setMatrix(osg::Matrix::scale(pixelSize, pixelSize, pixelSize));
+//
+//    osg::AutoTransform *at = new osg::AutoTransform;
+//    at->setAutoScaleToScreen(true);
+//    at->addChild(scaler);
+//    scaler->addChild(tdragger1_);
 
+	osgManipulator::AntiSquish* as = new osgManipulator::AntiSquish;
+	as->addChild(tdragger1_);
 
+	osg::Matrixd local_transform;
+	local_transform.setTrans(-0.8,0,0.05);
+	local_transform.setRotate(osg::Quat(0, osg::Vec3d(0,1,0)));
+	tdragger1_->setMatrix(local_transform);
+	local_transform.setTrans(0.8,0,0.05);
+	local_transform.setRotate(osg::Quat(M_PI, osg::Vec3d(0,1,0)));
+	tdragger2_->setMatrix(local_transform);
+	addChild(as);
+	addDragger(tdragger1_);
+	addChild(tdragger2_);
+	addDragger(tdragger2_);
 
+	addChild(createGraspLineGeometry());
 
-	osg::Vec3 point=osg::Vec3(center[0]+unitary[0]*5, center[1]+unitary[1]*5,1.1);
-	osg::Vec3 point2=osg::Vec3(center[0]-unitary[1]*5, center[1]+unitary[0]*5,1.1);
-
-
-	points->push_back(center);
-	points->push_back(point);
-	points2->push_back(center);
-	points2->push_back(point2);
-
-	color->push_back(osg::Vec4(1.0,0.0,0.0,1.0));
-	color2->push_back(osg::Vec4(0.0,1.0,0.0,1.0));
-	g->setVertexArray(points.get());
-	g->setColorArray(color.get());
-	g->setColorBinding(osg::Geometry::BIND_OVERALL);
-	g->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points->size()));
-	axis1=new osg::Geode();
-	axis1->addDrawable( g);
-	axis1->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	root->addChild(axis1);
-	g2->setVertexArray(points2.get());
-	g2->setColorArray(color2.get());
-	g2->setColorBinding(osg::Geometry::BIND_OVERALL);
-	g2->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points2->size()));
-	axis2=new osg::Geode();
-	axis2->addDrawable( g2);
-	axis2->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	root->addChild(axis2);
-	axis=true;
-*/
+    setHandleEvents(true);
+	setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
 }
-void PlanarGraspSpec::deleteLines(){
-	/*
-	axis=false;
-	root->removeChild(axis1);
-	root->removeChild(axis2);
-	for(int i=0; i<vecLines.size();i++){
-		root->removeChild(vecLines[i]);
-	}
-	vecLines.clear();
-*/
+
+void PlanarGraspSpec::createGraspDragger() {
+	g_dragger_=new GraspDragger();
+	((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addDragger(g_dragger_);
+	((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addChild(g_dragger_);
 }

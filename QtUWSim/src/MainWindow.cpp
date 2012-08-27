@@ -4,12 +4,15 @@
 #include <QFile>
 #include <QProgressDialog>
 
-#include "ROSInterface.h"
+#include <ROSInterface.h>
+#include <osgPCDLoader.h>
 #include "MainWindow.h"
 #include "MosaicEventHandler.h"
+#include "MosaicManipulator.h"
 
 #include <osg/Matrixd>
 #include <osg/ComputeBoundsVisitor>
+#include <osgGA/TrackballManipulator>
 
 #include <ros/package.h>
 
@@ -69,7 +72,6 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	joint_marker_cli=NULL;
 	hand_marker_cli=NULL;
 	marker=NULL;
-	spec=NULL;
 	grasp=NULL;
 	//database=new database_interface::PostgresqlDatabase("arkadia.act.uji.es", "5432", "postgres", "****", "handsBD");
 	//TODO: Allow the user to specify a custom sqlite DB file, instead of the default QtUWSim/handsDB
@@ -143,6 +145,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 
 
 	ui.dockHand->hide();
+	ui.dockIntervention2D->hide();
 	//dockConfigurations->hide();*/
 
 	frame_manager=FrameManager::instance();
@@ -153,6 +156,14 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	connect(ui.actionXML, SIGNAL(triggered()), this, SLOT(loadXML()));
 	connect(ui.actionCreateMosaic, SIGNAL(triggered()), this, SLOT(createMosaic()));
 	connect(ui.actionLoadMosaic, SIGNAL(triggered()), this, SLOT(loadMosaic()));
+
+	connect(ui.actionIntervention2D, SIGNAL(triggered()), this, SLOT(showIntervention2DPanel()));
+	connect(ui.newIntervention2D, SIGNAL(clicked()), this, SLOT(newIntervention2D()));
+	connect(ui.deleteIntervention2D, SIGNAL(clicked()), this, SLOT(deleteIntervention2D()));
+	connect(ui.graspIntervention2D, SIGNAL(clicked()), this, SLOT(graspIntervention2D()));
+	connect(ui.Intervention2DList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedIntervention2D()));
+
+
 	connect(ui.actionGrasp, SIGNAL(triggered()), this, SLOT(graspSpecification()));
 	connect(ui.newHandButton, SIGNAL(clicked()), this, SLOT(newHand()));
 	connect(ui.hands, SIGNAL(itemSelectionChanged()), this, SLOT(handChanged())); //TODO: why not itemDoubleClick()?
@@ -300,9 +311,9 @@ void MainWindow::createMosaic(){
 			viewBuilder=boost::shared_ptr<ViewBuilder>(new ViewBuilder(config, sceneBuilder.get()));
 			scene=sceneBuilder->getScene();
 			root=sceneBuilder->getRoot();
-			if (spec!= NULL) delete spec;
-			spec=new PlanarGraspSpec(root);
-			viewBuilder->getView()->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
+			planar_grasp_spec_.clear();
+			planar_grasp_spec_.push_back(boost::shared_ptr<PlanarGraspSpec>(new PlanarGraspSpec("spec",root)));
+			viewBuilder->getView()->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget));
 			viewWidget->updateViewerWidget(viewBuilder->getView());
 			progressDialog.setValue(80);
 			MosaicManipulator *tb=new MosaicManipulator;
@@ -320,7 +331,7 @@ void MainWindow::createMosaic(){
 
 void MainWindow::loadMosaic(){
 	QStringList mosaic_file;
-	QFileDialog *loadOsgDialog=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg *.ive)");
+	QFileDialog *loadOsgDialog=new QFileDialog(this, "Load osg Mosaic", ".", "OSG Files (*.osg *.ive *.pcd)");
 	if(loadOsgDialog->exec()){
 		mosaic_file=loadOsgDialog->selectedFiles();
 		updateStatusBar(mosaic_file[0]);
@@ -329,13 +340,26 @@ void MainWindow::loadMosaic(){
 		if (sceneBuilder)
 			sceneBuilder.reset();
 
-		osg::Node *mosaic_node=osgDB::readNodeFile(mosaic_file[0].toStdString());
+		osg::Node *mosaic_node;
+		boost::shared_ptr<osgPCDLoader<pcl::PointXYZRGB> > pcd_geode;
+		if (osgDB::getFileExtension(mosaic_file[0].toStdString())=="pcd") {
+			//Load PCD
+			pcd_geode.reset(new osgPCDLoader<pcl::PointXYZRGB>(mosaic_file[0].toStdString()));
+			mosaic_node=pcd_geode->getGeode();
+		} else {
+			//Load osg / ive
+			mosaic_node=osgDB::readNodeFile(mosaic_file[0].toStdString());
+		}
+
 		if (mosaic_node!=NULL) {
 			root=new osg::Group();
 			root->addChild(mosaic_node);
-			mosaic_viewer=osg::ref_ptr<osgViewer::Viewer>(new osgViewer::Viewer());
-			mosaic_viewer->setSceneData(root);
-			mosaic_viewer->setCameraManipulator(new MosaicManipulator());
+			mosaic_viewer_=osg::ref_ptr<osgViewer::Viewer>(new osgViewer::Viewer());
+			mosaic_viewer_->setSceneData(root);
+			if (osgDB::getFileExtension(mosaic_file[0].toStdString())=="pcd")
+				mosaic_viewer_->setCameraManipulator(new osgGA::TrackballManipulator());
+			else
+				mosaic_viewer_->setCameraManipulator(new MosaicManipulator());
 
 			//get object center and bounds
 			osg::ComputeBoundsVisitor cbVisitor;
@@ -358,49 +382,12 @@ void MainWindow::loadMosaic(){
 			    if ((bs.zMax()-bs.zMin()) > (bs.yMax()-bs.yMin())) geom_longest=osg::Vec3d(0,0,1);
 			} else if ((bs.zMax()-bs.zMin()) > (bs.xMax()-bs.xMin())) geom_longest=osg::Vec3d(0,0,1);
 
-			mosaic_viewer->getCameraManipulator()->setHomePosition(bs.center()+osg::Vec3d(geom_up[0]*4.5*bsphere.radius(),geom_up[1]*4.5*bsphere.radius(),geom_up[2]*4.5*bsphere.radius()), bs.center(), geom_longest);
-			mosaic_viewer->getCameraManipulator()->home(0);
-			if (spec!=NULL) delete spec;
-			spec=new PlanarGraspSpec(root);
-			//view->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
-			viewWidget->updateViewerWidget(mosaic_viewer);
+			mosaic_viewer_->getCameraManipulator()->setHomePosition(bs.center()+osg::Vec3d(geom_up[0]*1*bsphere.radius(),geom_up[1]*1*bsphere.radius(),geom_up[2]*1*bsphere.radius()), bs.center(), geom_longest);
+			mosaic_viewer_->getCameraManipulator()->home(0);
+			planar_grasp_spec_.clear();
+			//view->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget));
+			viewWidget->updateViewerWidget(mosaic_viewer_);
 		}
-
-
-		/*
-		osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(mosaic_file[0].toUtf8().constData()));
-		ConfigFile config(std::string (ros::package::getPath("QtUWSim"))+"/mosaics/mosaic.xml");
-		config.objects.front().file=mosaic_file[0].toUtf8().constData();
-		offsetp.clear();
-		offsetr.clear();
-		offsetp.push_back(config.offsetp[0]);
-		offsetp.push_back(config.offsetp[1]);
-		offsetp.push_back(config.offsetp[2]);
-		offsetr.push_back(config.offsetr[0]);
-		offsetr.push_back(config.offsetr[1]);
-		offsetr.push_back(config.offsetr[2]);
-
-		sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder());
-		sceneBuilder->loadScene(config);
-		viewBuilder=new ViewBuilder(config, sceneBuilder.get());
-		view=viewBuilder->getView();
-		scene=sceneBuilder->getScene();
-		root=sceneBuilder->getRoot();
-		spec=new PlanarGraspSpec(root);
-		view->addEventHandler(new MosaicEventHandler(spec, this, viewWidget));
-		viewWidget->updateViewerWidget(view);
-		MosaicManipulator *tb=new MosaicManipulator;
-		oldManipulator=view->getCameraManipulator();
-		osg::Vec3d eye, center, up;
-		oldManipulator->getHomePosition(eye, center, up);
-
-		//get object center and bounds
-		osg::BoundingSphere bs=sceneBuilder->objects[0]->getBound();
-		std::cerr << "object bound center: " << bs.center() << std::endl;
-		std::cerr << "object bound radius: " << bs.radius() << std::endl;
-		oldManipulator->setHomePosition(bs.center()+osg::Vec3d(0,0,10), bs.center(), up);
-		//view->setCameraManipulator(tb);
-	*/
 	}
 }
 
@@ -436,6 +423,64 @@ void MainWindow::graspSpecification(){
 	//ompl_ros->run();    
 }
 
+void MainWindow::showIntervention2DPanel(){
+	ui.dockIntervention2D->show();
+}
+
+void MainWindow::newIntervention2D(){
+	bool ok;
+	QString interventionName=QInputDialog::getText(this, "Name", "Name", QLineEdit::Normal, "",&ok);
+	if (ok) {
+		boost::shared_ptr<PlanarGraspSpec> spec(new PlanarGraspSpec(interventionName.toStdString(), root));
+		planar_grasp_spec_.push_back(spec);
+		osg::Vec3d eye, center, up;
+		mosaic_viewer_->getCamera()->getViewMatrixAsLookAt(eye, center, up);
+		spec->setTemplateScale(eye[2]/2);
+		eye[2]=0.01;
+		spec->setTemplateOrigin(eye);
+
+		ui.Intervention2DList->addItem(interventionName.toStdString().c_str());
+		widget_to_spec_.insert(std::pair<QListWidgetItem*, int>(ui.Intervention2DList->item(ui.Intervention2DList->count()-1), planar_grasp_spec_.size()-1));
+	}
+}
+
+void MainWindow::deleteIntervention2D(){
+	QListWidgetItem *item=ui.Intervention2DList->currentItem();
+	if (item) {
+		widget_to_spec_.erase(item);
+
+		std::vector<boost::shared_ptr<PlanarGraspSpec> >::iterator it=planar_grasp_spec_.begin();
+		for(; it<planar_grasp_spec_.end(); it++) {
+			if (item->text().toStdString() == (*it)->getName()) {
+				planar_grasp_spec_.erase(it);
+			}
+		}
+		delete item;
+	}
+}
+
+void MainWindow::graspIntervention2D(){
+	//TODO: Compute a grasp, allow the user to adjust it
+	QListWidgetItem *item=ui.Intervention2DList->currentItem();
+	planar_grasp_spec_[widget_to_spec_[item]]->createGraspDragger();
+}
+
+void MainWindow::selectedIntervention2D(){
+	QListWidgetItem *item=ui.Intervention2DList->currentItem();
+	std::cerr << "Called selectedIntervention2D " << widget_to_spec_[item] << std::endl;
+	if (item) {
+		//Unselect all
+		for (int i=0; i<planar_grasp_spec_.size(); i++) planar_grasp_spec_[i]->setUnselected();
+
+		//Select the new one and update info
+	    planar_grasp_spec_[widget_to_spec_[item]]->setSelected();
+		std::stringstream ss_position, ss_scale;
+		ss_position << planar_grasp_spec_[widget_to_spec_[item]]->getTemplateOrigin();
+		ui.labelPositionValue->setText(ss_position.str().c_str());
+		ss_scale << planar_grasp_spec_[widget_to_spec_[item]]->getTemplateScale();
+		ui.labelScaleValue->setText(ss_scale.str().c_str());
+	}
+}
 
 void MainWindow::newHand(){
 	bool ok;

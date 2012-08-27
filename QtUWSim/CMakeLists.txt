@@ -83,6 +83,8 @@ src/MosaicManipulator.cpp
 src/PlanarGraspSpec.cpp
 src/HandInteractiveMarker.cpp
 src/GraspSpecification.cpp
+src/CustomTrackballDragger.cpp
+src/CustomTabPlaneTrackballDragger.cpp
 src/joint_state_listener.cpp
 )
 
