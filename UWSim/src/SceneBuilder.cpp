@@ -16,7 +16,8 @@ using namespace std;
 
 SceneBuilder::SceneBuilder() {
 	int argc=0;
-	char **argv=NULL;
+	char *argv[1];
+	argv[0]=NULL;
 	arguments.reset(new osg::ArgumentParser(&argc, argv));
 }
 
