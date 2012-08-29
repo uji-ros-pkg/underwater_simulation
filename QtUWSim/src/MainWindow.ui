@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>900</height>
+    <height>972</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,8 +35,9 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
-    <addaction name="actionGrasp"/>
     <addaction name="actionIntervention2D"/>
+    <addaction name="actionIntervention3D"/>
+    <addaction name="actionScene_Configuration"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -71,7 +72,10 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QDockWidget" name="dockHand">
+  <widget class="QDockWidget" name="dockIntervention3D">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="sizePolicy">
     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
      <horstretch>0</horstretch>
@@ -88,7 +92,7 @@
     <bool>false</bool>
    </property>
    <property name="windowTitle">
-    <string>Hands</string>
+    <string>3d Intervention</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -105,7 +109,11 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="2">
-       <widget class="QListWidget" name="hands"/>
+       <widget class="QListWidget" name="hands">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="newHandButton">
@@ -121,14 +129,1111 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QPushButton" name="pathButton">
-        <property name="text">
-         <string>New Path</string>
-        </property>
-       </widget>
-      </item>
      </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockSceneConfig">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>300</width>
+     <height>300</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>Scene Configuration</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <widget class="QTabWidget" name="tabScenceConfig">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>291</width>
+       <height>571</height>
+      </rect>
+     </property>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabOceanState">
+      <attribute name="title">
+       <string>OceanState</string>
+      </attribute>
+      <widget class="QDoubleSpinBox" name="windXDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>105</x>
+         <y>10</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="windSpeedDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>50</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wind (x,y)</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="windYDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>10</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windSpeedLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>50</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wind Speed</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="depthDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>90</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="depthLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>90</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Depth</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="reflectionDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>130</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="reflectionLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>130</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Reflection</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="waveScaleDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>170</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="waveScaleLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>170</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wave Scale</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="isNotChoppyDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>210</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="isNotChoppyLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>210</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Is not choppy</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="choppyFactorDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>250</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="choppyFactorLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>250</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Choopy Factor</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="crestFoamLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>290</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Crest Foam</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="crestFoamDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>290</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="surfaceHeightLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>330</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Surface Height</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="surfaceHeightDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>330</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="fogDensityLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>370</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Fog Density</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="fogDensityDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>370</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="fogColorRDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>95</x>
+         <y>410</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windLabel_2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>410</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Fog Color</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="fogColorBDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>225</x>
+         <y>410</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="fogColorGDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>410</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="oceanColorBDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>225</x>
+         <y>450</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="oceanColorGDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>450</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windLabel_3">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>450</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Ocean Color</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="oceanColorRDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>95</x>
+         <y>450</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="attenuationLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>490</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Attenuation</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="attenuationGDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>490</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="attenuationRDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>95</x>
+         <y>490</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="attenuationBDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>225</x>
+         <y>490</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabSimParams">
+      <attribute name="title">
+       <string>SimParams</string>
+      </attribute>
+      <widget class="QDoubleSpinBox" name="disableShadersDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>10</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="disableShadersLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>110</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Disable Shaders</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="resolutionWDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>155</x>
+         <y>50</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>800.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>2048.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+       <property name="value">
+        <double>800.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="resolutionLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>50</y>
+         <width>110</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Resolution (w,h)</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="resolutionHDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>50</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>600.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1536.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="offsetRLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>90</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Offset r</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetRyDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>155</x>
+         <y>90</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetRxDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>90</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetRzDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>90</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="offsetPLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>130</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Offset p</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetPyDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>155</x>
+         <y>130</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetPxDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>130</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="offsetPzDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>130</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabCamera">
+      <attribute name="title">
+       <string>Camera</string>
+      </attribute>
+      <widget class="QLabel" name="cameraPositionwindLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>250</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Position</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="cameraLookatLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>290</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Look At</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="freeMotionDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>10</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="freeMotionLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Free Motion</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="nearDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>170</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="nearLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>170</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Near</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="fovDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>90</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="fovLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>90</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Fov</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="aspectRatioDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>130</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="aspectRatioLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>130</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Aspect Ratio</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="objectToTrackdepthLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>50</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Object to track</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="farDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>195</x>
+         <y>210</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="farLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>210</y>
+         <width>105</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Far</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraLookatYDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>155</x>
+         <y>290</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraPositionYDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>155</x>
+         <y>250</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraPositionXDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>250</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraLookatZDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>290</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraLookatXDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>290</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="cameraPositionZDoubleSpin">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>250</y>
+         <width>60</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-99.989999999999995</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="SaveDataSceneButton">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>580</y>
+       <width>121</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save Data Scene</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="LoadSceneButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>580</y>
+       <width>97</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Load Scene</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -300,6 +1405,16 @@
   <action name="actionLoadPointCloud">
    <property name="text">
     <string>Load Point Cloud</string>
+   </property>
+  </action>
+  <action name="actionIntervention3D">
+   <property name="text">
+    <string>3D Intervention</string>
+   </property>
+  </action>
+  <action name="actionScene_Configuration">
+   <property name="text">
+    <string>Scene Configuration</string>
    </property>
   </action>
  </widget>

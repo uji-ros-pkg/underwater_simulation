@@ -143,10 +143,43 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	dockConfigurations->setWidget(configurationsWidget);
 	addDockWidget(Qt::LeftDockWidgetArea, dockConfigurations);*/
 
+	/////////////////////////////////////////////////////////////////////////////
+	//Section to fill the "Tool->Scene configuration->OceanState" data////////////////////////
+	ui.windXDoubleSpin->setValue(config.windx);
+	ui.windYDoubleSpin->setValue(config.windy);
+	ui.windSpeedDoubleSpin->setValue(config.windSpeed);
+	ui.depthDoubleSpin->setValue(config.depth);
+	ui.reflectionDoubleSpin->setValue(config.reflectionDamping);
+	ui.waveScaleDoubleSpin->setValue(config.waveScale);
+	ui.isNotChoppyDoubleSpin->setValue(config.isNotChoppy);
+	ui.choppyFactorDoubleSpin->setValue(config.choppyFactor);
+	ui.crestFoamDoubleSpin->setValue(config.crestFoamHeight);
+	ui.surfaceHeightDoubleSpin->setValue(config.oceanSurfaceHeight);
+	ui.fogDensityDoubleSpin->setValue(config.fogDensity);
+	ui.fogColorRDoubleSpin->setValue(config.fogColor[0]); ui.fogColorGDoubleSpin->setValue(config.fogColor[1]); ui.fogColorBDoubleSpin->setValue(config.fogColor[2]);
+	ui.oceanColorRDoubleSpin->setValue(config.color[0]); ui.oceanColorGDoubleSpin->setValue(config.color[1]); ui.oceanColorBDoubleSpin->setValue(config.color[2]);
+	ui.attenuationRDoubleSpin->setValue(config.attenuation[0]); ui.attenuationGDoubleSpin->setValue(config.attenuation[1]); ui.attenuationBDoubleSpin->setValue(config.attenuation[2]);
+	//Section to fill the "Tool->Scene configuration->SimParams" data////////////////////////
+	ui.disableShadersDoubleSpin->setValue(config.disableShaders);
+	ui.resolutionWDoubleSpin->setValue(config.resw);
+	ui.resolutionHDoubleSpin->setValue(config.resh);
+	ui.offsetRxDoubleSpin->setValue(config.offsetr[0]);ui.offsetRyDoubleSpin->setValue(config.offsetr[1]);ui.offsetRzDoubleSpin->setValue(config.offsetr[2]);
+	ui.offsetPxDoubleSpin->setValue(config.offsetp[0]);ui.offsetPyDoubleSpin->setValue(config.offsetp[1]);ui.offsetPzDoubleSpin->setValue(config.offsetp[2]);
+	//Section to fill the "Tool->Scene configuration->Camera" data////////////////////////
+	ui.freeMotionDoubleSpin->setValue(config.freeMotion);
+	ui.fovDoubleSpin->setValue(config.camFov);
+	ui.aspectRatioDoubleSpin->setValue(config.camAspectRatio);
+	ui.nearDoubleSpin->setValue(config.camNear);
+	ui.farDoubleSpin->setValue(config.camFar);
+	ui.cameraPositionXDoubleSpin->setValue(config.camPosition[0]); ui.cameraPositionYDoubleSpin->setValue(config.camPosition[1]); ui.cameraPositionZDoubleSpin->setValue(config.camPosition[2]);
+	ui.cameraLookatXDoubleSpin->setValue(config.camLookAt[0]); ui.cameraLookatYDoubleSpin->setValue(config.camLookAt[1]); ui.cameraLookatZDoubleSpin->setValue(config.camLookAt[2]);
+	/////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
 
-	ui.dockHand->hide();
+
+	ui.dockIntervention3D->hide();
 	ui.dockIntervention2D->hide();
-	//dockConfigurations->hide();*/
+	ui.dockSceneConfig->hide();
 
 	frame_manager=FrameManager::instance();
 	frame_manager->setFixedFrame("world");
@@ -163,14 +196,15 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	connect(ui.graspIntervention2D, SIGNAL(clicked()), this, SLOT(graspIntervention2D()));
 	connect(ui.Intervention2DList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedIntervention2D()));
 
-
-	connect(ui.actionGrasp, SIGNAL(triggered()), this, SLOT(graspSpecification()));
+	connect(ui.actionIntervention3D, SIGNAL(triggered()), this, SLOT(graspSpecification()));
 	connect(ui.newHandButton, SIGNAL(clicked()), this, SLOT(newHand()));
 	connect(ui.hands, SIGNAL(itemSelectionChanged()), this, SLOT(handChanged())); //TODO: why not itemDoubleClick()?
 	connect(ui.deleteHandButton, SIGNAL(clicked()),this, SLOT(deleteHand()));
 	connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
 	createStatusBar();
-	connect(ui.pathButton, SIGNAL(clicked()),this,SLOT(newPath()));
+	connect(ui.actionScene_Configuration, SIGNAL(triggered()), this, SLOT(sceneConfiguration()));
+	connect(ui.LoadSceneButton, SIGNAL(clicked()),this,SLOT(loadNewScene()));
+
 }
 
 
@@ -403,9 +437,9 @@ void MainWindow::graspSpecification(){
 	/*for(int i=configurations->count()-1; i>=0; i--){
 			configurations->removeItemWidget(configurations->takeItem(i));
 		}*/
-	ui.dockHand->show();
-	//dockConfigurations->show();
-
+	ui.dockIntervention2D->hide();
+	ui.dockSceneConfig->hide();
+	ui.dockIntervention3D->show();
 
 	//if(!database->getList(handsDB)){
 	//	std::cerr<<"Failed to get list of hands"<<endl;
@@ -424,6 +458,8 @@ void MainWindow::graspSpecification(){
 }
 
 void MainWindow::showIntervention2DPanel(){
+	ui.dockIntervention3D->hide();
+	ui.dockSceneConfig->hide();
 	ui.dockIntervention2D->show();
 }
 
@@ -589,11 +625,6 @@ void MainWindow::deleteHand(){
 	}
 
 }
-void MainWindow::newPath(){
-	if(grasp!=NULL){
-		grasp->newPath(offsetp,offsetr,sceneBuilder.get());
-	}
-}
 
 
 void MainWindow::rosSpin(){
@@ -638,4 +669,10 @@ void MainWindow::createStatusBar(){
 void MainWindow::updateStatusBar(const QString name){
 	openedFileName->setText(name);
 	ui.statusbar->update();
+}
+
+void MainWindow::sceneConfiguration(){
+	ui.dockIntervention3D->hide();
+	ui.dockIntervention2D->hide();
+	ui.dockSceneConfig->show();
 }

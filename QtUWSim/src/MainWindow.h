@@ -110,7 +110,7 @@ void deleteHand();
 void about();
 void createStatusBar();
 void updateStatusBar(const QString name);
-void newPath();
+void sceneConfiguration();
 };
 
 #endif
