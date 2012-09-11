@@ -3,8 +3,6 @@
 #include <osgOcean/ShaderManager>
 #include <osg/ShapeDrawable>
 #include <osg/Material>
-#include <osgDB/Options>
-#include <osgDB/ReaderWriter>
 #include <math.h>
 
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
