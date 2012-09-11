@@ -8,6 +8,10 @@
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
 
+#if OSG_VERSION_MAJOR>=3
+#include <osgDB/Options>
+#endif
+
 //#include <osgOcean/OceanScene>
 #include <osgOcean/ShaderManager>
 
