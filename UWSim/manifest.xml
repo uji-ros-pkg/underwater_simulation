@@ -24,7 +24,7 @@
 
   <url>http://www.irs.uji.es/uwsim/</url>
   <export>
-    <cpp cflags="-I${prefix}/src" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -luwsim"/>
+    <cpp cflags="-I${prefix}/src" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -luwsim -lGLU"/>
   </export>
 
 
