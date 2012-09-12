@@ -251,8 +251,9 @@ osg::Node * UWSimGeometry::retrieveResource(std::string name){
   }
 
   //Create stream with memory resource
-  membuf sbuf((char *)resource.data.get(),(char *)resource.data.get()+resource.size);
-  std::istream in(&sbuf);
+  std::stringstream buffer;
+  buffer.write((char *)resource.data.get(),resource.size);
+
 
   //Get file extension and create options
   std::string file_ext = osgDB::getFileExtension(name);
@@ -269,9 +270,9 @@ osg::Node * UWSimGeometry::retrieveResource(std::string name){
 
   //Try loading the resource,
   #if OSG_VERSION_MAJOR>=3
-  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( in,local_opt.get());
+  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( buffer,local_opt.get());
   #else
-  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( in);
+  osgDB::ReaderWriter::ReadResult readResult = rw->readNode( buffer);
   #endif
   if (readResult.validNode())
     return readResult.takeNode();
