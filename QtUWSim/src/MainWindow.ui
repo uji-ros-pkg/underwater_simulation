@@ -1282,6 +1282,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="deleteIntervention2D">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Delete</string>
         </property>
@@ -1310,6 +1313,9 @@
       </item>
       <item row="2" column="1">
        <widget class="QPushButton" name="exportIntervention2D">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Export</string>
         </property>
@@ -1317,6 +1323,9 @@
       </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="graspIntervention2D">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Define Grasp</string>
         </property>

@@ -85,6 +85,7 @@ src/HandInteractiveMarker.cpp
 src/GraspSpecification.cpp
 src/CustomTrackballDragger.cpp
 src/CustomTabPlaneTrackballDragger.cpp
+src/CustomTabPlaneDragger.cpp
 src/joint_state_listener.cpp
 )
 

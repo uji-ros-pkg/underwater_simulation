@@ -13,6 +13,7 @@
 //osgManipulator - Copyright (C) 2007 Fugro-Jason B.V.
 
 #include "CustomTabPlaneTrackballDragger.h"
+#include "CustomTabPlaneDragger.h"
 
 #include <osg/ShapeDrawable>
 #include <osg/Geometry>
@@ -26,13 +27,16 @@ using namespace osgManipulator;
 
 CustomTabPlaneTrackballDragger::CustomTabPlaneTrackballDragger()
 {
-    _trackballDragger = new CustomTrackballDragger(false);
+	_tabPlaneDragger = new CustomTabPlaneDragger();
+	addChild(_tabPlaneDragger.get());
+	addDragger(_tabPlaneDragger.get());
+	_trackballDragger = new CustomTrackballDragger(false);
     addChild(_trackballDragger.get());
     addDragger(_trackballDragger.get());
 
-    _tabPlaneDragger = new TabPlaneDragger();
-    addChild(_tabPlaneDragger.get());
-    addDragger(_tabPlaneDragger.get());
+
+    //_trackballDragger->addChild(_tabPlaneDragger.get());
+    //_trackballDragger->addDragger(_tabPlaneDragger.get());
 
     setParentDragger(getParentDragger());
 }

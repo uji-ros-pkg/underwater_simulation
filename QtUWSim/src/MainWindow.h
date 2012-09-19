@@ -61,6 +61,8 @@ private:
 	GraspSpecification *grasp; 		//FIXME: Use smart pointers
 	std::map<QListWidgetItem*, int > widget_to_spec_;
 	osgGA::CameraManipulator* oldManipulator;
+	osg::Switch* switches;
+
 
 	//Scene mode
 	boost::shared_ptr<SceneBuilder> sceneBuilder;
@@ -102,6 +104,7 @@ void newIntervention2D();
 void deleteIntervention2D();
 void graspIntervention2D();
 void selectedIntervention2D();
+void exportIntervention2D();
 
 void graspSpecification();
 void newHand();

@@ -16,6 +16,7 @@ osgManipulator::Dragger* PlanarGraspSpec::createTemplateDragger()
 
 osg::Node* PlanarGraspSpec::addDraggerToScene(osg::Node* scene, osgManipulator::Dragger *dragger)
 {
+	cout<<"Voy a dibujar el dragger"<<endl;
     scene->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
     osg::MatrixTransform* selection = new osg::MatrixTransform;
@@ -26,7 +27,7 @@ osg::Node* PlanarGraspSpec::addDraggerToScene(osg::Node* scene, osgManipulator::
     root->addChild(dragger);
 
     float scale = scene->getBound().radius() * 1.6;
-    dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) *
+    dragger->setMatrix(osg::Matrix::scale(1, 1,1) *
                        osg::Matrix::translate(scene->getBound().center()));
 
     dragger->addTransformUpdating(selection);
@@ -47,6 +48,7 @@ osg::Node* PlanarGraspSpec::addDraggerToScene(osg::Node* scene, osgManipulator::
 
 PlanarGraspSpec::PlanarGraspSpec(std::string name, osg::Group* group): name_(name) {
 	root=group;
+	haveGrasp_=false;
 
 	//Create the template bounding box using osg draggers
 	t_geode = new osg::Geode;
@@ -129,8 +131,8 @@ PlanarGraspSpec::GraspDragger::GraspDragger() : CompositeDragger() {
 //    at->addChild(scaler);
 //    scaler->addChild(tdragger1_);
 
-	osgManipulator::AntiSquish* as = new osgManipulator::AntiSquish;
-	as->addChild(tdragger1_);
+	//osgManipulator::AntiSquish* as = new osgManipulator::AntiSquish;
+	//as->addChild(tdragger1_);
 
 	osg::Matrixd local_transform;
 	local_transform.setTrans(-0.8,0,0.05);
@@ -139,7 +141,8 @@ PlanarGraspSpec::GraspDragger::GraspDragger() : CompositeDragger() {
 	local_transform.setTrans(0.8,0,0.05);
 	local_transform.setRotate(osg::Quat(M_PI, osg::Vec3d(0,1,0)));
 	tdragger2_->setMatrix(local_transform);
-	addChild(as);
+	//addChild(as);
+	addChild(tdragger1_);
 	addDragger(tdragger1_);
 	addChild(tdragger2_);
 	addDragger(tdragger2_);
@@ -152,6 +155,11 @@ PlanarGraspSpec::GraspDragger::GraspDragger() : CompositeDragger() {
 
 void PlanarGraspSpec::createGraspDragger() {
 	g_dragger_=new GraspDragger();
+	//GraspDragger *g=new GraspDragger();
 	((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addDragger(g_dragger_);
 	((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addChild(g_dragger_);
+	//((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addDragger(g);
+	//((osgManipulator::CustomTabPlaneTrackballDragger*)t_dragger_)->addChild(g);
+	//g_dragger_array_.push_back(g);
+	haveGrasp_=true;
 }

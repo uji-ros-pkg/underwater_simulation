@@ -22,8 +22,7 @@ class PlanarGraspSpec
 
 	/** A dragger for setting an antipodal grasp */
 	class GraspDragger: public osgManipulator::CompositeDragger {
-		osgManipulator::Translate2DDragger *tdragger1_;
-		osgManipulator::Translate2DDragger *tdragger2_;
+
 
 		osg::Vec3Array* l_vertices; //Grasp line vertex info
 		osg::Geometry* l_geometry; //Grasp line geometry
@@ -33,6 +32,8 @@ class PlanarGraspSpec
 		osg::Geode* createGraspLineGeometry();
 
 	public:
+		osgManipulator::Translate2DDragger *tdragger1_;
+		osgManipulator::Translate2DDragger *tdragger2_;
 		GraspDragger();
 
 		virtual bool handle(const osgManipulator::PointerInfo& pi, const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa) {
@@ -64,6 +65,10 @@ class PlanarGraspSpec
 	};
 
 public:
+	osgManipulator::Dragger* t_dragger_;
+	//std::vector<osg::ref_ptr<GraspDragger> > g_dragger_array_;
+	GraspDragger *g_dragger_;
+	osg::ref_ptr<osg::MatrixTransform> t_transform;
 	PlanarGraspSpec(std::string name, osg::Group*);
 
 	std::string getName() {return name_;}
@@ -87,6 +92,7 @@ public:
 	/** Gets the origin of the template */
 	osg::Vec3d getTemplateOrigin() {
 		return t_transform->getMatrix().getTrans();
+
 	}
 
 	/** Sets the scale of the template */
@@ -99,6 +105,13 @@ public:
 	osg::Vec3d getTemplateScale() {
 		return t_dragger_->getMatrix().getScale();
 	}
+	/** Gets the center of the template */
+	osg::Vec3d getTemplateCenter(){
+		return t_dragger_->getMatrix().getTrans();
+	}
+	bool haveGrasp(){
+		return haveGrasp_;
+	}
 
 	void createGraspDragger();
 
@@ -109,13 +122,15 @@ public:
 private:
 	std::string name_;
 	osg::Group* root;
+	osg::Switch* sw;
 
 	//template bounding box and draggers
     osg::ref_ptr<osg::Geode> t_geode;
-    osg::ref_ptr<osg::MatrixTransform> t_transform;
-    osgManipulator::Dragger* t_dragger_; //Main composite dragger for the template
+    //osg::ref_ptr<osg::MatrixTransform> t_transform;
+    //osgManipulator::Dragger* t_dragger_; //Main composite dragger for the template
 
-    GraspDragger *g_dragger_;
+    //GraspDragger *g_dragger_;
+    bool haveGrasp_;
 
     osg::Node* addDraggerToScene(osg::Node* scene, osgManipulator::Dragger *dragger);
     osgManipulator::Dragger* createTemplateDragger();

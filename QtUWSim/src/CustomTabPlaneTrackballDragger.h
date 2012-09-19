@@ -17,6 +17,7 @@
 #define OSGMANIPULATOR_CUSTOMTABPLANETRACKBALLDRAGGER 1
 
 #include "CustomTrackballDragger.h"
+#include "CustomTabPlaneDragger.h"
 #include <osgManipulator/TabPlaneDragger>
 
 namespace osgManipulator {
@@ -43,7 +44,8 @@ class OSGMANIPULATOR_EXPORT CustomTabPlaneTrackballDragger : public CompositeDra
 
     public:
         osg::ref_ptr<CustomTrackballDragger> _trackballDragger;
-        osg::ref_ptr<TabPlaneDragger>  _tabPlaneDragger;
+        //osg::ref_ptr<TabPlaneDragger>  _tabPlaneDragger;
+        osg::ref_ptr<CustomTabPlaneDragger> _tabPlaneDragger;
 };
 
 

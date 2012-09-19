@@ -84,7 +84,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 		updateDBHandsList();
 	}
 
-	string configfile=std::string(SIMULATOR_DATA_PATH)+"/scenes/cirs.xml";
+	string configfile=std::string(SIMULATOR_DATA_PATH)+"/scenes/init.xml";
 	while( arguments->read("--configfile",configfile));
 	ConfigFile config(configfile);
 	sceneBuilder=boost::shared_ptr<SceneBuilder>(new SceneBuilder(arguments));
@@ -96,16 +96,16 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 
 	prevSimTime = ros::Time::now();
 	viewWidget=new ViewerWidget(viewBuilder->getView());
-	viewWidget->setGeometry(200,200,800,600);  
+	viewWidget->setGeometry(200,200,800,600);
 	setCentralWidget(viewWidget);
 
 
-	offsetp.push_back(config.offsetp[0]);
-	offsetp.push_back(config.offsetp[1]);
-	offsetp.push_back(config.offsetp[2]);
-	offsetr.push_back(config.offsetr[0]);
-	offsetr.push_back(config.offsetr[1]);
-	offsetr.push_back(config.offsetr[2]);
+	//offsetp.push_back(config.offsetp[0]);
+	//offsetp.push_back(config.offsetp[1]);
+	//offsetp.push_back(config.offsetp[2]);
+	//offsetr.push_back(config.offsetr[0]);
+	//offsetr.push_back(config.offsetr[1]);
+	//offsetr.push_back(config.offsetr[2]);
 
 
 	/*dockHands=new QDockWidget("Hands",this);
@@ -159,6 +159,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	ui.fogColorRDoubleSpin->setValue(config.fogColor[0]); ui.fogColorGDoubleSpin->setValue(config.fogColor[1]); ui.fogColorBDoubleSpin->setValue(config.fogColor[2]);
 	ui.oceanColorRDoubleSpin->setValue(config.color[0]); ui.oceanColorGDoubleSpin->setValue(config.color[1]); ui.oceanColorBDoubleSpin->setValue(config.color[2]);
 	ui.attenuationRDoubleSpin->setValue(config.attenuation[0]); ui.attenuationGDoubleSpin->setValue(config.attenuation[1]); ui.attenuationBDoubleSpin->setValue(config.attenuation[2]);
+
 	//Section to fill the "Tool->Scene configuration->SimParams" data////////////////////////
 	ui.disableShadersDoubleSpin->setValue(config.disableShaders);
 	ui.resolutionWDoubleSpin->setValue(config.resw);
@@ -195,6 +196,7 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 	connect(ui.deleteIntervention2D, SIGNAL(clicked()), this, SLOT(deleteIntervention2D()));
 	connect(ui.graspIntervention2D, SIGNAL(clicked()), this, SLOT(graspIntervention2D()));
 	connect(ui.Intervention2DList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedIntervention2D()));
+	connect(ui.exportIntervention2D, SIGNAL(clicked()), this, SLOT(exportIntervention2D()));
 
 	connect(ui.actionIntervention3D, SIGNAL(triggered()), this, SLOT(graspSpecification()));
 	connect(ui.newHandButton, SIGNAL(clicked()), this, SLOT(newHand()));
@@ -234,14 +236,14 @@ void MainWindow::loadXML(){
 		std::string fichero = fichs[0].toUtf8().constData();
 		ConfigFile config(fichero);
 		//TODO: What is local offsetp and offsetr for? can't use those inside config?
-		offsetp.clear();
+		/*offsetp.clear();
 		offsetr.clear();
 		offsetp.push_back(config.offsetp[0]);
 		offsetp.push_back(config.offsetp[1]);
 		offsetp.push_back(config.offsetp[2]);
 		offsetr.push_back(config.offsetr[0]);
 		offsetr.push_back(config.offsetr[1]);
-		offsetr.push_back(config.offsetr[2]);
+		offsetr.push_back(config.offsetr[2]);*/
 		//sceneBuilder->stopROSInterfaces();
 		progressDialog.setValue(25);
 		sceneBuilder.reset(new SceneBuilder());
@@ -384,7 +386,6 @@ void MainWindow::loadMosaic(){
 			//Load osg / ive
 			mosaic_node=osgDB::readNodeFile(mosaic_file[0].toStdString());
 		}
-
 		if (mosaic_node!=NULL) {
 			root=new osg::Group();
 			root->addChild(mosaic_node);
@@ -401,26 +402,27 @@ void MainWindow::loadMosaic(){
 			osg::BoundingBox bs = cbVisitor.getBoundingBox();
 			osg::BoundingSphere bsphere;
 			bsphere.expandBy(bs);
-
 			//Get the minimum bbox dimension, and set the camera looking along that direction
 			osg::Vec3d geom_up(1,0,0);
 			if ((bs.yMax()-bs.yMin()) < (bs.xMax()-bs.xMin())) {
 				geom_up=osg::Vec3d(0,1,0);
 			    if ((bs.zMax()-bs.zMin()) < (bs.yMax()-bs.yMin())) geom_up=osg::Vec3d(0,0,1);
 			} else if ((bs.zMax()-bs.zMin()) < (bs.xMax()-bs.xMin())) geom_up=osg::Vec3d(0,0,1);
-
 			//Get the maximum bbox dimension, and set the camera up vector along that direction
 			osg::Vec3d geom_longest(1,0,0);
 			if ((bs.yMax()-bs.yMin()) > (bs.xMax()-bs.xMin())) {
 				geom_longest=osg::Vec3d(0,1,0);
 			    if ((bs.zMax()-bs.zMin()) > (bs.yMax()-bs.yMin())) geom_longest=osg::Vec3d(0,0,1);
 			} else if ((bs.zMax()-bs.zMin()) > (bs.xMax()-bs.xMin())) geom_longest=osg::Vec3d(0,0,1);
-
 			mosaic_viewer_->getCameraManipulator()->setHomePosition(bs.center()+osg::Vec3d(geom_up[0]*1*bsphere.radius(),geom_up[1]*1*bsphere.radius(),geom_up[2]*1*bsphere.radius()), bs.center(), geom_longest);
 			mosaic_viewer_->getCameraManipulator()->home(0);
 			planar_grasp_spec_.clear();
 			//view->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget));
 			viewWidget->updateViewerWidget(mosaic_viewer_);
+			cout<<"LLego hasta despues"<<endl;
+			switches=new osg::Switch();
+			cout<<"LLego hasta despues"<<endl;
+			root->addChild(switches);
 		}
 	}
 }
@@ -467,7 +469,7 @@ void MainWindow::newIntervention2D(){
 	bool ok;
 	QString interventionName=QInputDialog::getText(this, "Name", "Name", QLineEdit::Normal, "",&ok);
 	if (ok) {
-		boost::shared_ptr<PlanarGraspSpec> spec(new PlanarGraspSpec(interventionName.toStdString(), root));
+		boost::shared_ptr<PlanarGraspSpec> spec(new PlanarGraspSpec(interventionName.toStdString(), switches));
 		planar_grasp_spec_.push_back(spec);
 		osg::Vec3d eye, center, up;
 		mosaic_viewer_->getCamera()->getViewMatrixAsLookAt(eye, center, up);
@@ -477,14 +479,24 @@ void MainWindow::newIntervention2D(){
 
 		ui.Intervention2DList->addItem(interventionName.toStdString().c_str());
 		widget_to_spec_.insert(std::pair<QListWidgetItem*, int>(ui.Intervention2DList->item(ui.Intervention2DList->count()-1), planar_grasp_spec_.size()-1));
+		ui.Intervention2DList->setCurrentRow(ui.Intervention2DList->count()-1);
+		switches->setAllChildrenOff();
+		switches->setChildValue(planar_grasp_spec_[widget_to_spec_[ui.Intervention2DList->currentItem()]]->t_transform,true);
+		ui.deleteIntervention2D->setEnabled(true);
+
+
+
+
 	}
 }
 
 void MainWindow::deleteIntervention2D(){
 	QListWidgetItem *item=ui.Intervention2DList->currentItem();
 	if (item) {
-		widget_to_spec_.erase(item);
+		cout<<"Borrar: "<<widget_to_spec_[item]<<endl;
+		int currentRow=ui.Intervention2DList->currentRow();
 
+		widget_to_spec_.erase(item);
 		std::vector<boost::shared_ptr<PlanarGraspSpec> >::iterator it=planar_grasp_spec_.begin();
 		for(; it<planar_grasp_spec_.end(); it++) {
 			if (item->text().toStdString() == (*it)->getName()) {
@@ -492,6 +504,21 @@ void MainWindow::deleteIntervention2D(){
 			}
 		}
 		delete item;
+		for(int i=currentRow; i<ui.Intervention2DList->size().rheight();i++){
+					widget_to_spec_[ui.Intervention2DList->item(i)]-=1;
+		}
+		item=ui.Intervention2DList->currentItem();
+		switches->setAllChildrenOff();
+		if(item){
+			switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,true);
+			ui.graspIntervention2D->setEnabled(!planar_grasp_spec_[widget_to_spec_[item]]->haveGrasp());
+			ui.exportIntervention2D->setEnabled(planar_grasp_spec_[widget_to_spec_[item]]->haveGrasp());
+		}
+		else{
+			ui.deleteIntervention2D->setEnabled(false);
+			ui.graspIntervention2D->setEnabled(false);
+			ui.exportIntervention2D->setEnabled(false);
+		}
 	}
 }
 
@@ -499,6 +526,8 @@ void MainWindow::graspIntervention2D(){
 	//TODO: Compute a grasp, allow the user to adjust it
 	QListWidgetItem *item=ui.Intervention2DList->currentItem();
 	planar_grasp_spec_[widget_to_spec_[item]]->createGraspDragger();
+	ui.exportIntervention2D->setEnabled(true);
+	ui.graspIntervention2D->setEnabled(false);
 }
 
 void MainWindow::selectedIntervention2D(){
@@ -515,6 +544,218 @@ void MainWindow::selectedIntervention2D(){
 		ui.labelPositionValue->setText(ss_position.str().c_str());
 		ss_scale << planar_grasp_spec_[widget_to_spec_[item]]->getTemplateScale();
 		ui.labelScaleValue->setText(ss_scale.str().c_str());
+
+		switches->setAllChildrenOff();
+		switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,true);
+		ui.graspIntervention2D->setEnabled(!planar_grasp_spec_[widget_to_spec_[item]]->haveGrasp());
+		ui.exportIntervention2D->setEnabled(planar_grasp_spec_[widget_to_spec_[item]]->haveGrasp());
+
+	}
+}
+
+void MainWindow::exportIntervention2D(){
+
+	QListWidgetItem *item=ui.Intervention2DList->currentItem();
+	if(item){
+		QFileDialog *dialog=new QFileDialog(this, "Save Target Template", ".", "Image (*.png)");
+		dialog->setAcceptMode(QFileDialog::AcceptSave);
+		if(dialog->exec()){
+			QFileDialog *dialog_txt=new QFileDialog(this, "Save Points Data", ".", "Text (*.txt)");
+				dialog_txt->setAcceptMode(QFileDialog::AcceptSave);
+				if(dialog_txt->exec()){
+					dialog->setDefaultSuffix("png");
+					QStringList target_file=dialog->selectedFiles();
+					dialog_txt->setDefaultSuffix("txt");
+					QStringList points_file=dialog_txt->selectedFiles();
+
+
+
+					osg::Vec3d center,center_aux, scale;
+					center_aux=planar_grasp_spec_[widget_to_spec_[item]]->getTemplateCenter();
+					center=planar_grasp_spec_[widget_to_spec_[item]]->getTemplateOrigin();
+					center[0]+=center_aux[0];
+					center[1]-=center_aux[2];
+
+					osg::Vec3 br, bl, tr, tl, g1, g2;
+
+					osg::MatrixList worldMatrices=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getWorldMatrices();
+					for(osg::MatrixList::iterator itr=worldMatrices.begin();
+							itr !=worldMatrices.end(); itr++)
+					{
+						osg::Matrix& matrix=*itr;
+						bl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
+						br=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
+						tl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
+						tr=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
+
+					}
+
+					worldMatrices=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->getWorldMatrices();
+					for(osg::MatrixList::iterator itr=worldMatrices.begin();
+							itr !=worldMatrices.end(); itr++)
+					{
+						osg::Matrix& matrix=*itr;
+						g1=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
+						g2=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
+					}
+
+
+					float maxX=max(max(max(max(max(br[0],bl[0]),tr[0]),tl[0]),g1[0]),g2[0]);
+					float minX=min(min(min(min(min(br[0],bl[0]),tr[0]),tl[0]),g1[0]),g2[0]);
+					float maxY=max(max(max(max(max(br[1],bl[1]),tr[1]),tl[1]),g1[1]),g2[1]);
+					float minY=min(min(min(min(min(br[1],bl[1]),tr[1]),tl[1]),g1[1]),g2[1]);
+
+					//Render to texture
+					osg::Vec3d eye,cent, up;
+					mosaic_viewer_->getCameraManipulator()->getHomePosition(eye,cent,up);
+					mosaic_viewer_->getCameraManipulator()->setHomePosition(osg::Vec3d(center[0],center[1],std::max(maxX-minX,maxY-minY)),center,osg::Vec3d(0,0,1));
+					mosaic_viewer_->getCameraManipulator()->home(0);
+					//switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,false);
+
+					osgViewer::ScreenCaptureHandler::ScreenCaptureHandler::WriteToFile *operation=new osgViewer::ScreenCaptureHandler::ScreenCaptureHandler::WriteToFile("/tmp/template_grasp","png");
+					osgViewer::ScreenCaptureHandler *capture=new osgViewer::ScreenCaptureHandler(operation);
+					capture->captureNextFrame(*mosaic_viewer_->getViewerBase());
+					viewWidget->frame();
+
+
+
+					worldMatrices=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getWorldMatrices();
+					for(osg::MatrixList::iterator itr=worldMatrices.begin();
+							itr !=worldMatrices.end(); itr++)
+					{
+						osg::Matrix& matrix=*itr;
+						bl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
+						br=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
+						tl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
+						tr=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
+
+					}
+
+					worldMatrices=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->getWorldMatrices();
+					for(osg::MatrixList::iterator itr=worldMatrices.begin();
+							itr !=worldMatrices.end(); itr++)
+					{
+						osg::Matrix& matrix=*itr;
+						g1=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
+						g2=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
+					}
+
+					osg::Matrix win=mosaic_viewer_->getCamera()->getViewport()->computeWindowMatrix();
+					osg::Matrix view=mosaic_viewer_->getCamera()->getViewMatrix();
+					osg::Matrix proj=mosaic_viewer_->getCamera()->getProjectionMatrix();
+
+
+
+				  osg::Geode *geode=new osg::Geode;
+				  osg::Geometry *g=new osg::Geometry;
+				  osg::ref_ptr<osg::Vec3Array> points (new osg::Vec3Array());
+				  osg::ref_ptr<osg::Vec4Array> color (new osg::Vec4Array());
+
+
+				  points->push_back(osg::Vec3(g1[0]-10,g1[1],g1[2]));
+				  points->push_back(osg::Vec3(g1[0]+10,g1[1],g1[2]));
+
+				  points->push_back(osg::Vec3(g1[0],g1[1]-10,g1[2]));
+				  points->push_back(osg::Vec3(g1[0],g1[1]+10,g1[2]));
+
+				  color->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
+				  g->setVertexArray(points.get());
+				  g->setColorArray(color.get());
+				  g->setColorBinding(osg::Geometry::BIND_OVERALL);
+				  g->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points->size()));
+
+				  geode->addDrawable( g);
+				  geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+				  root->addChild(geode);
+
+
+
+				  osg::Geode *geode2=new osg::Geode;
+				  osg::Geometry *g21=new osg::Geometry;
+				  osg::ref_ptr<osg::Vec3Array> points2 (new osg::Vec3Array());
+				  osg::ref_ptr<osg::Vec4Array> color2 (new osg::Vec4Array());
+
+
+				  points2->push_back(osg::Vec3(g2[0]-10,g2[1],g2[2]));
+				  points2->push_back(osg::Vec3(g2[0]+10,g2[1],g2[2]));
+
+				  points2->push_back(osg::Vec3(g2[0],g2[1]-10,g2[2]));
+				  points2->push_back(osg::Vec3(g2[0],g2[1]+10,g2[2]));
+
+				  color2->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
+				  g21->setVertexArray(points2.get());
+				  g21->setColorArray(color2.get());
+				  g21->setColorBinding(osg::Geometry::BIND_OVERALL);
+				  g21->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points2->size()));
+
+				  geode2->addDrawable( g21);
+				  geode2->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+				  root->addChild(geode2);
+
+
+
+
+				  osg::Geode *geode22=new osg::Geode;
+				  osg::Geometry *g212=new osg::Geometry;
+				  osg::ref_ptr<osg::Vec3Array> points22 (new osg::Vec3Array());
+				  osg::ref_ptr<osg::Vec4Array> color22 (new osg::Vec4Array());
+
+
+				  points22->push_back(osg::Vec3(g1[0]-10,g1[1],g1[2]));
+				  points22->push_back(osg::Vec3(g1[0]+10,g1[1],g1[2]));
+
+				  points22->push_back(osg::Vec3(g1[0],g1[1]-10,g1[2]));
+				  points22->push_back(osg::Vec3(g1[0],g1[1]+10,g1[2]));
+
+				  color22->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
+				  g212->setVertexArray(points22.get());
+				  g212->setColorArray(color22.get());
+				  g212->setColorBinding(osg::Geometry::BIND_OVERALL);
+				  g212->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points22->size()));
+
+				  geode22->addDrawable( g212);
+				  geode22->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+				  root->addChild(geode22);
+
+
+					br=br*view*proj*win;
+					bl=bl*view*proj*win;
+					tr=tr*view*proj*win;
+					tl=tl*view*proj*win;
+					g1=g1*view*proj*win;
+					g2=g2*view*proj*win;
+
+
+
+
+
+
+
+					QString arg="cp /tmp/template_grasp_1_0.png ";
+					arg.append(target_file[0]);
+					QProcess *process;
+					process->execute(arg);
+					arg="rm /tmp/template_grasp_1_0.png";
+					process->execute(arg);
+
+
+
+					QFile file(points_file[0]);
+					file.open(QIODevice::WriteOnly | QIODevice::Text);
+					QTextStream out(&file);
+					out<<br[0]<<","<<br[1]<<endl;
+					out<<bl[0]<<","<<bl[1]<<endl;
+					out<<tr[0]<<","<<tr[1]<<endl;
+					out<<tl[0]<<","<<tl[1]<<endl;
+					out<<g1[0]<<","<<g1[1]<<endl;
+					out<<g2[0]<<","<<g2[1]<<endl;
+					file.close();
+					switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,true);
+					//mosaic_viewer_->getCameraManipulator()->setHomePosition(eye,cent,up);
+					//mosaic_viewer_->getCameraManipulator()->home(0);
+				}
+		}
+
 	}
 }
 
