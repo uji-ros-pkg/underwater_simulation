@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<robot name="UNIBOHand">
+  <link name="wrist">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/wrist.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="1_finger_base">
+  </link>
+  <link name="1_finger_slider">
+    <visual>
+      <origin rpy="0  0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerSlider.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="1_finger_base_to_finger_slider" type="continuous">
+    <parent link="1_finger_base"/>
+    <child link="1_finger_slider"/>
+    <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <limit effort="1" lower="-1.3324" upper="0" velocity="1"/>
+  </joint>
+  <link name="1_finger_crank">
+    <visual>
+      <origin rpy="0 0 0.2376" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerCrank.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="1_slidercrank_fingerJoint" type="continuous">
+    <parent link="1_finger_slider"/>
+    <child link="1_finger_crank"/>
+    <origin rpy="0 0 -0.4752" xyz="0 -0.065211341 0 "/>
+    <mimic joint="1_finger_base_to_finger_slider" multiplier="-1" offset="1"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <link name="1_finger">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/finger.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="1_finger_crank_to_finger" type="continuous">
+    <parent link="1_finger_crank"/>
+    <child link="1_finger"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.065211341 0"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <joint name="1_wrist_to_finger_base" type="fixed">
+    <parent link="wrist"/>
+    <child link="1_finger_base"/>
+    <origin rpy=" 0  0 0" xyz="-0.13975 -0.04648 0"/>
+  </joint>
+  <link name="2_finger_base">
+  </link>
+  <link name="2_finger_slider">
+    <visual>
+      <origin rpy="0  0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerSlider.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="2_finger_base_to_finger_slider" type="continuous">
+    <parent link="2_finger_base"/>
+    <child link="2_finger_slider"/>
+    <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <limit effort="1" lower="-1.3324" upper="0" velocity="1"/>
+  </joint>
+  <link name="2_finger_crank">
+    <visual>
+      <origin rpy="0 0 0.2376" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerCrank.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="2_slidercrank_fingerJoint" type="continuous">
+    <parent link="2_finger_slider"/>
+    <child link="2_finger_crank"/>
+    <origin rpy="0 0 -0.4752" xyz="0 -0.065211341 0 "/>
+    <mimic joint="2_finger_base_to_finger_slider" multiplier="-1" offset="1"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <link name="2_finger">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/finger.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="2_finger_crank_to_finger" type="continuous">
+    <parent link="2_finger_crank"/>
+    <child link="2_finger"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.065211341 0"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <joint name="2_wrist_to_finger_base" type="fixed">
+    <parent link="wrist"/>
+    <child link="2_finger_base"/>
+    <origin rpy=" -2.1 0 0" xyz="-0.13975 0.023244 0.04026"/>
+  </joint>
+  <link name="3_finger_base">
+  </link>
+  <link name="3_finger_slider">
+    <visual>
+      <origin rpy="0  0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerSlider.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="3_finger_base_to_finger_slider" type="continuous">
+    <parent link="3_finger_base"/>
+    <child link="3_finger_slider"/>
+    <origin rpy=" 0  0 0.2376" xyz="0 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <limit effort="1" lower="-1.3324" upper="0" velocity="1"/>
+  </joint>
+  <link name="3_finger_crank">
+    <visual>
+      <origin rpy="0 0 0.2376" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/fingerCrank.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="3_slidercrank_fingerJoint" type="continuous">
+    <parent link="3_finger_slider"/>
+    <child link="3_finger_crank"/>
+    <origin rpy="0 0 -0.4752" xyz="0 -0.065211341 0 "/>
+    <mimic joint="3_finger_base_to_finger_slider" multiplier="-1" offset="1"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <link name="3_finger">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://UWSim/data/robot/UNIBO/finger.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="3_finger_crank_to_finger" type="continuous">
+    <parent link="3_finger_crank"/>
+    <child link="3_finger"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.065211341 0"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <joint name="3_wrist_to_finger_base" type="fixed">
+    <parent link="wrist"/>
+    <child link="3_finger_base"/>
+    <origin rpy=" 2.1   0 0" xyz="-0.13975 0.023244 -0.04026"/>
+  </joint>
+</robot>
+
