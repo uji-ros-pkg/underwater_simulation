@@ -18,8 +18,9 @@ bool MosaicManipulator::trackball(osg::Vec3d& axis, float& angle, float p1x, flo
 
 	float a=sqrt(pow(p1x,2)+pow(p1y,2));
 	float b=sqrt(pow(p2x,2)+pow(p2y,2));
-	if(a==0 || b==0)
+	if(a==0 || b==0){
 		angle=0;
+	}
 	else
 	{
 		angle=osg::inRadians(acos((p1x*p2x+p1y*p2y)/(a*b)));

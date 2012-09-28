@@ -16,6 +16,34 @@
 
 #include <ros/package.h>
 
+
+
+#include <sensor_msgs/image_encodings.h>
+#include <cv_bridge/cv_bridge.h>
+#include <actionlib/server/simple_action_server.h>
+#include <actionlib/client/simple_action_client.h>
+#include <auv_msgs/PerformInterventionStrategyAction.h>
+#include <auv_msgs/SetInterventionConfig.h>
+#include <auv_msgs/InterventionSpec.h>
+
+#include <mar_perception/VirtualImage.h>
+
+#include <visp/vpImage.h>
+#include <visp/vpImageIo.h>
+//#include <visp/vpDisplayX.h>
+#include <visp/vpImageConvert.h>
+#include <visp/vpPoint.h>
+#include <visp/vpImagePoint.h>
+#include <visp/vpPixelMeterConversion.h>
+
+#include <kdl/frames.hpp>
+
+#include <odat/training_data.h>
+#include <odat_ros/conversions.h>
+#include <object_detection/shape_processing.h>
+#include <vision_msgs/TrainingData.h>
+#include <vision_msgs/TrainDetector.h>
+
 using namespace std;
 
 static int dbRowCallback(void *map, int argc, char **argv, char **azColName)
@@ -69,10 +97,8 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 
 	openedFileName = new QLabel("No file opened. Default scene loaded");
 	oldManipulator=NULL;
-	joint_marker_cli=NULL;
-	hand_marker_cli=NULL;
-	marker=NULL;
-	grasp=NULL;
+	//marker=NULL;
+	//grasp=NULL;
 	//database=new database_interface::PostgresqlDatabase("arkadia.act.uji.es", "5432", "postgres", "****", "handsBD");
 	//TODO: Allow the user to specify a custom sqlite DB file, instead of the default QtUWSim/handsDB
 	int rc = sqlite3_open((ros::package::getPath("QtUWSim")+std::string("/handsDB")).c_str(), &db);
@@ -95,9 +121,9 @@ MainWindow::MainWindow(boost::shared_ptr<osg::ArgumentParser> arguments): argume
 
 
 	prevSimTime = ros::Time::now();
-	viewWidget=new ViewerWidget(viewBuilder->getView());
+	viewWidget=boost::shared_ptr<ViewerWidget>(new ViewerWidget(viewBuilder->getView()));
 	viewWidget->setGeometry(200,200,800,600);
-	setCentralWidget(viewWidget);
+	setCentralWidget(viewWidget.get());
 
 
 	//offsetp.push_back(config.offsetp[0]);
@@ -235,16 +261,7 @@ void MainWindow::loadXML(){
 		QStringList fichs=dialog->selectedFiles();
 		std::string fichero = fichs[0].toUtf8().constData();
 		ConfigFile config(fichero);
-		//TODO: What is local offsetp and offsetr for? can't use those inside config?
-		/*offsetp.clear();
-		offsetr.clear();
-		offsetp.push_back(config.offsetp[0]);
-		offsetp.push_back(config.offsetp[1]);
-		offsetp.push_back(config.offsetp[2]);
-		offsetr.push_back(config.offsetr[0]);
-		offsetr.push_back(config.offsetr[1]);
-		offsetr.push_back(config.offsetr[2]);*/
-		//sceneBuilder->stopROSInterfaces();
+
 		progressDialog.setValue(25);
 		sceneBuilder.reset(new SceneBuilder());
 		sceneBuilder->loadScene(config);
@@ -256,6 +273,7 @@ void MainWindow::loadXML(){
 		viewWidget->updateViewerWidget(viewBuilder->getView());
 		progressDialog.setValue(100);
 	}
+	delete(dialog);
 }
 
 
@@ -349,7 +367,7 @@ void MainWindow::createMosaic(){
 			root=sceneBuilder->getRoot();
 			planar_grasp_spec_.clear();
 			planar_grasp_spec_.push_back(boost::shared_ptr<PlanarGraspSpec>(new PlanarGraspSpec("spec",root)));
-			viewBuilder->getView()->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget));
+			viewBuilder->getView()->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget.get()));
 			viewWidget->updateViewerWidget(viewBuilder->getView());
 			progressDialog.setValue(80);
 			MosaicManipulator *tb=new MosaicManipulator;
@@ -360,8 +378,12 @@ void MainWindow::createMosaic(){
 			oldManipulator=viewBuilder->getView()->getCameraManipulator();
 			viewBuilder->getView()->setCameraManipulator(tb);
 			progressDialog.setValue(100);
-		}	 
+			delete(process);
+		}
+		delete(SaveMosaicDialog);
+		delete(LoadHeightDialog);
 	}
+	delete(loadTextureDialog);
 }
 
 
@@ -419,12 +441,11 @@ void MainWindow::loadMosaic(){
 			planar_grasp_spec_.clear();
 			//view->addEventHandler(new MosaicEventHandler(planar_grasp_spec_[0].get(), this, viewWidget));
 			viewWidget->updateViewerWidget(mosaic_viewer_);
-			cout<<"LLego hasta despues"<<endl;
 			switches=new osg::Switch();
-			cout<<"LLego hasta despues"<<endl;
 			root->addChild(switches);
 		}
 	}
+	delete(loadOsgDialog);
 }
 
 
@@ -576,17 +597,17 @@ void MainWindow::exportIntervention2D(){
 					center[0]+=center_aux[0];
 					center[1]-=center_aux[2];
 
-					osg::Vec3 br, bl, tr, tl, g1, g2;
+					osg::Vec3 br, bl, tr, tl, g1, g2, br_m, bl_m, tr_m, tl_m, g1_m, g2_m;
 
 					osg::MatrixList worldMatrices=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getWorldMatrices();
 					for(osg::MatrixList::iterator itr=worldMatrices.begin();
 							itr !=worldMatrices.end(); itr++)
 					{
 						osg::Matrix& matrix=*itr;
-						bl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
-						br=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
-						tl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
-						tr=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
+						bl_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
+						br_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
+						tl_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
+						tr_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
 
 					}
 
@@ -595,28 +616,29 @@ void MainWindow::exportIntervention2D(){
 							itr !=worldMatrices.end(); itr++)
 					{
 						osg::Matrix& matrix=*itr;
-						g1=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
-						g2=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
+						g1_m=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
+						g2_m=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
 					}
 
 
-					float maxX=max(max(max(max(max(br[0],bl[0]),tr[0]),tl[0]),g1[0]),g2[0]);
-					float minX=min(min(min(min(min(br[0],bl[0]),tr[0]),tl[0]),g1[0]),g2[0]);
-					float maxY=max(max(max(max(max(br[1],bl[1]),tr[1]),tl[1]),g1[1]),g2[1]);
-					float minY=min(min(min(min(min(br[1],bl[1]),tr[1]),tl[1]),g1[1]),g2[1]);
+					float maxX=max(max(max(max(max(br_m[0],bl_m[0]),tr_m[0]),tl_m[0]),g1_m[0]),g2_m[0]);
+					float minX=min(min(min(min(min(br_m[0],bl_m[0]),tr_m[0]),tl_m[0]),g1_m[0]),g2_m[0]);
+					float maxY=max(max(max(max(max(br_m[1],bl_m[1]),tr_m[1]),tl_m[1]),g1_m[1]),g2_m[1]);
+					float minY=min(min(min(min(min(br_m[1],bl_m[1]),tr_m[1]),tl_m[1]),g1_m[1]),g2_m[1]);
 
 					//Render to texture
 					osg::Vec3d eye,cent, up;
 					mosaic_viewer_->getCameraManipulator()->getHomePosition(eye,cent,up);
-					mosaic_viewer_->getCameraManipulator()->setHomePosition(osg::Vec3d(center[0],center[1],std::max(maxX-minX,maxY-minY)),center,osg::Vec3d(0,0,1));
+					osg::Matrix matView=mosaic_viewer_->getCameraManipulator()->getMatrix();
+					mosaic_viewer_->getCameraManipulator()->setHomePosition(osg::Vec3d(center[0],center[1],2*std::max(std::max(center[0]-minX,maxX-center[0]),std::max(center[1]-minY,maxY-center[1]))),center,osg::Vec3d(1,0,0));
 					mosaic_viewer_->getCameraManipulator()->home(0);
-					//switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,false);
+					switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,false);
 
 					osgViewer::ScreenCaptureHandler::ScreenCaptureHandler::WriteToFile *operation=new osgViewer::ScreenCaptureHandler::ScreenCaptureHandler::WriteToFile("/tmp/template_grasp","png");
 					osgViewer::ScreenCaptureHandler *capture=new osgViewer::ScreenCaptureHandler(operation);
 					capture->captureNextFrame(*mosaic_viewer_->getViewerBase());
 					viewWidget->frame();
-
+					delete(capture);
 
 
 					worldMatrices=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getWorldMatrices();
@@ -624,10 +646,10 @@ void MainWindow::exportIntervention2D(){
 							itr !=worldMatrices.end(); itr++)
 					{
 						osg::Matrix& matrix=*itr;
-						bl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
-						br=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
-						tl=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
-						tr=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
+						bl_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomLeftHandleNode()->getBound().center() * matrix;
+						br_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getBottomRightHandleNode()->getBound().center() * matrix;
+						tl_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopLeftHandleNode()->getBound().center() * matrix;
+						tr_m=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getTopRightHandleNode()->getBound().center() * matrix;
 
 					}
 
@@ -636,8 +658,8 @@ void MainWindow::exportIntervention2D(){
 							itr !=worldMatrices.end(); itr++)
 					{
 						osg::Matrix& matrix=*itr;
-						g1=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
-						g2=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
+						g1_m=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger1_->getBound().center()* matrix;
+						g2_m=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
 					}
 
 					osg::Matrix win=mosaic_viewer_->getCamera()->getViewport()->computeWindowMatrix();
@@ -646,84 +668,16 @@ void MainWindow::exportIntervention2D(){
 
 
 
-				  osg::Geode *geode=new osg::Geode;
-				  osg::Geometry *g=new osg::Geometry;
-				  osg::ref_ptr<osg::Vec3Array> points (new osg::Vec3Array());
-				  osg::ref_ptr<osg::Vec4Array> color (new osg::Vec4Array());
-
-
-				  points->push_back(osg::Vec3(g1[0]-10,g1[1],g1[2]));
-				  points->push_back(osg::Vec3(g1[0]+10,g1[1],g1[2]));
-
-				  points->push_back(osg::Vec3(g1[0],g1[1]-10,g1[2]));
-				  points->push_back(osg::Vec3(g1[0],g1[1]+10,g1[2]));
-
-				  color->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
-				  g->setVertexArray(points.get());
-				  g->setColorArray(color.get());
-				  g->setColorBinding(osg::Geometry::BIND_OVERALL);
-				  g->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points->size()));
-
-				  geode->addDrawable( g);
-				  geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-				  root->addChild(geode);
 
 
 
-				  osg::Geode *geode2=new osg::Geode;
-				  osg::Geometry *g21=new osg::Geometry;
-				  osg::ref_ptr<osg::Vec3Array> points2 (new osg::Vec3Array());
-				  osg::ref_ptr<osg::Vec4Array> color2 (new osg::Vec4Array());
+					br=br_m*view*proj*win;
+					bl=bl_m*view*proj*win;
+					tr=tr_m*view*proj*win;
+					tl=tl_m*view*proj*win;
+					g1=g1_m*view*proj*win;
+					g2=g2_m*view*proj*win;
 
-
-				  points2->push_back(osg::Vec3(g2[0]-10,g2[1],g2[2]));
-				  points2->push_back(osg::Vec3(g2[0]+10,g2[1],g2[2]));
-
-				  points2->push_back(osg::Vec3(g2[0],g2[1]-10,g2[2]));
-				  points2->push_back(osg::Vec3(g2[0],g2[1]+10,g2[2]));
-
-				  color2->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
-				  g21->setVertexArray(points2.get());
-				  g21->setColorArray(color2.get());
-				  g21->setColorBinding(osg::Geometry::BIND_OVERALL);
-				  g21->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points2->size()));
-
-				  geode2->addDrawable( g21);
-				  geode2->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-				  root->addChild(geode2);
-
-
-
-
-				  osg::Geode *geode22=new osg::Geode;
-				  osg::Geometry *g212=new osg::Geometry;
-				  osg::ref_ptr<osg::Vec3Array> points22 (new osg::Vec3Array());
-				  osg::ref_ptr<osg::Vec4Array> color22 (new osg::Vec4Array());
-
-
-				  points22->push_back(osg::Vec3(g1[0]-10,g1[1],g1[2]));
-				  points22->push_back(osg::Vec3(g1[0]+10,g1[1],g1[2]));
-
-				  points22->push_back(osg::Vec3(g1[0],g1[1]-10,g1[2]));
-				  points22->push_back(osg::Vec3(g1[0],g1[1]+10,g1[2]));
-
-				  color22->push_back(osg::Vec4(1.0,1.0,0.0,1.0));
-				  g212->setVertexArray(points22.get());
-				  g212->setColorArray(color22.get());
-				  g212->setColorBinding(osg::Geometry::BIND_OVERALL);
-				  g212->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,points22->size()));
-
-				  geode22->addDrawable( g212);
-				  geode22->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-				  root->addChild(geode22);
-
-
-					br=br*view*proj*win;
-					bl=bl*view*proj*win;
-					tr=tr*view*proj*win;
-					tl=tl*view*proj*win;
-					g1=g1*view*proj*win;
-					g2=g2*view*proj*win;
 
 
 
@@ -737,25 +691,181 @@ void MainWindow::exportIntervention2D(){
 					process->execute(arg);
 					arg="rm /tmp/template_grasp_1_0.png";
 					process->execute(arg);
-
+					delete(process);
+					QImage *image= new QImage(target_file[0]);
+					int im_height=image->height();
 
 
 					QFile file(points_file[0]);
 					file.open(QIODevice::WriteOnly | QIODevice::Text);
 					QTextStream out(&file);
-					out<<br[0]<<","<<br[1]<<endl;
-					out<<bl[0]<<","<<bl[1]<<endl;
-					out<<tr[0]<<","<<tr[1]<<endl;
-					out<<tl[0]<<","<<tl[1]<<endl;
-					out<<g1[0]<<","<<g1[1]<<endl;
-					out<<g2[0]<<","<<g2[1]<<endl;
+					out<<br[0]<<","<<im_height-br[1]<<endl;
+					out<<bl[0]<<","<<im_height-bl[1]<<endl;
+					out<<tr[0]<<","<<im_height-tr[1]<<endl;
+					out<<tl[0]<<","<<im_height-tl[1]<<endl;
+					out<<g1[0]<<","<<im_height-g1[1]<<endl;
+					out<<g2[0]<<","<<im_height-g2[1]<<endl;
 					file.close();
 					switches->setChildValue(planar_grasp_spec_[widget_to_spec_[item]]->t_transform,true);
-					//mosaic_viewer_->getCameraManipulator()->setHomePosition(eye,cent,up);
-					//mosaic_viewer_->getCameraManipulator()->home(0);
+					mosaic_viewer_->getCameraManipulator()->setHomePosition(eye,cent,up);
+					mosaic_viewer_->getCameraManipulator()->setByMatrix(matView);
+
+
+
+
+
+					ros::NodeHandle nh;
+
+					vpImage<vpRGBa> Ic;
+					vpImageIo::read(Ic,target_file[0].toStdString());
+					//vpDisplayX window(Ic);
+
+					vpImagePoint clicks[3];
+					std::string uji_intervention_config_topic;
+					uji_intervention_config_topic="Nombre del servicio";
+					ros::ServiceClient config_client_=nh.serviceClient<auv_msgs::SetInterventionConfig>(uji_intervention_config_topic);
+					ros::Publisher training_data_pub_;
+					training_data_pub_ = nh.advertise<vision_msgs::TrainingData>("/trainer_node/training_data", 1);
+					ROS_INFO("Call to %s", uji_intervention_config_topic.c_str());
+					auv_msgs::SetInterventionConfig tracking_init_msg;
+					tracking_init_msg.request.spec.id="intervencion_prueba";
+					tracking_init_msg.request.spec.camera_frame=std::string(target_file[0].toStdString());
+					tracking_init_msg.request.spec.roi.x_offset=bl[0];
+					tracking_init_msg.request.spec.roi.y_offset=bl[1];
+					tracking_init_msg.request.spec.roi.width=vpImagePoint::distance(vpImagePoint(tl[0],tl[1]),vpImagePoint(tr[0],tr[1]));
+					tracking_init_msg.request.spec.roi.height=vpImagePoint::distance(vpImagePoint(bl[0],bl[1]),vpImagePoint(tl[0],tl[1]));
+					tracking_init_msg.request.spec.roi_rotation=atan2(tr[1]-tl[1],tr[0]-tl[0]);
+
+
+					//Compute tMg in pixels (grasp frame wrt to template frame)
+					vpHomogeneousMatrix iMt_p(tracking_init_msg.request.spec.roi.x_offset, tracking_init_msg.request.spec.roi.y_offset, 0, 0, 0, tracking_init_msg.request.spec.roi_rotation);
+
+
+					 vpHomogeneousMatrix iMg_p;
+					 iMg_p=vpHomogeneousMatrix((g1[0]+g2[0])/2, g1[1]+g2[1]/2, 0, 0, 0, 0)*
+							vpHomogeneousMatrix(0,0,0,M_PI,0,0)*
+						  vpHomogeneousMatrix(0,0,0,0,0,-atan2(g1[0]-(g1[0]+g2[0])/2, g1[1]-(g1[1]+g2[1])/2));
+
+					 vpHomogeneousMatrix tMg_p=iMt_p.inverse()*iMg_p;
+
+					auv_msgs::InterventionStrategySpec strat_spec_msg;
+					strat_spec_msg.preshape=strat_spec_msg.PRESHAPE_CYLINDRICAL_PRECISION;
+					//strat_spec_msg.grasp_frame.translation.x=tMg_p[0][3]*TSIZE_X/tracking_init_msg.request.spec.roi.width;
+					//strat_spec_msg.grasp_frame.translation.y=tMg_p[1][3]*TSIZE_Y/tracking_init_msg.request.spec.roi.height;
+					strat_spec_msg.grasp_frame.translation.x=std::abs(tr_m[0]-tl_m[0]);
+					strat_spec_msg.grasp_frame.translation.y=std::abs(tl_m[1]-bl_m[0]);
+					strat_spec_msg.grasp_frame.translation.z=0;
+					KDL::Rotation tRg(tMg_p[0][0], tMg_p[0][1], tMg_p[0][2], tMg_p[1][0], tMg_p[1][1], tMg_p[1][2],  tMg_p[2][0], tMg_p[2][1], tMg_p[2][2]);
+					tRg.GetQuaternion(strat_spec_msg.grasp_frame.rotation.x, strat_spec_msg.grasp_frame.rotation.y, strat_spec_msg.grasp_frame.rotation.z, strat_spec_msg.grasp_frame.rotation.w);
+
+					geometry_msgs::Point32 p1,p2;
+					p1.x=g1[0]; p1.y=g1[1]; p1.z=0;
+					p2.x=g2[0]; p2.y=g2[1]; p2.z=0;
+					strat_spec_msg.p1=p1;
+					strat_spec_msg.p2=p2;
+
+					auv_msgs::InterventionTaskSpec task_spec_msg;
+					task_spec_msg.task_type=task_spec_msg.TASK_RECOVERY;
+					task_spec_msg.strategy_spec.push_back(strat_spec_msg);
+
+					tracking_init_msg.request.spec.task_spec.push_back(task_spec_msg);
+					if (config_client_.call(tracking_init_msg))
+					{
+						ROS_INFO("  Result: %d", tracking_init_msg.response.ok);
+					}
+					else
+					{
+						ROS_ERROR("Failed to call service %s", uji_intervention_config_topic.c_str());
+					}
+
+
+					ROS_INFO("Sending training message to detector...");
+					std::vector<cv::Point> cv_polygon;
+					cv_polygon.push_back(cv::Point(bl[0],bl[1]));
+					cv_polygon.push_back(cv::Point(tl[0],tl[1]));
+					cv_polygon.push_back(cv::Point(tr[0],tr[1]));
+					cv_polygon.push_back(cv::Point(br[0],br[1]));
+
+					odat::Pose2D polygon_pose;
+					polygon_pose.x=tracking_init_msg.request.spec.roi.x_offset;
+					polygon_pose.y=tracking_init_msg.request.spec.roi.y_offset;
+					polygon_pose.theta=tracking_init_msg.request.spec.roi_rotation;
+					ROS_INFO_STREAM("polygon pose: " << polygon_pose.x << " " << polygon_pose.y << " " << polygon_pose.theta);
+					cv::Mat Imat;
+					vpImageConvert::convert(Ic,Imat);
+
+					odat::TrainingData training_data;
+						    training_data.image = Imat;
+						    training_data.mask.roi = object_detection::shape_processing::boundingRect(cv_polygon);
+						    training_data.mask.mask = object_detection::shape_processing::minimalMask(cv_polygon);
+
+						    training_data.image_pose = polygon_pose;
+
+						    vision_msgs::TrainingData training_data_msg;
+						    odat_ros::toMsg(training_data, training_data_msg);
+						    training_data_msg.object_id = tracking_init_msg.request.spec.id;
+
+						    training_data_pub_.publish(training_data_msg);
+						    ROS_INFO("Training message published.");
+						    cv::imwrite(ros::package::getPath("trident_uji_pkg")+"/training_images/training_image_" + tracking_init_msg.request.spec.id + ".png", Imat);
+
+
+
+
+						ros::ServiceClient training_service_client_;
+						training_service_client_ = nh.serviceClient<vision_msgs::TrainDetector>("/object_detector/train");
+						if (training_service_client_.exists()) {
+							ROS_INFO("Calling detector training service...");
+							sensor_msgs::ImageConstPtr training_image_msg_;
+							vision_msgs::TrainDetector training;
+							training.request.object_id = tracking_init_msg.request.spec.id;
+
+							assert(Imat.type() == CV_8UC3);
+							cv_bridge::CvImage cv_image;
+							cv_image.image = Imat;
+							cv_image.encoding = sensor_msgs::image_encodings::BGR8;
+							cv_image.toImageMsg(training.request.image_left);
+
+							training.request.outline.points.resize(cv_polygon.size());
+							for (size_t i = 0; i < cv_polygon.size(); ++i)
+							{
+								training.request.outline.points[i].x = cv_polygon[i].x;
+								training.request.outline.points[i].y = cv_polygon[i].y;
+								training.request.outline.points[i].z = 0;
+							}
+							geometry_msgs::Point32 grasp_point;
+							training.request.outline.points.push_back(p1);
+							training.request.outline.points.push_back(p2);
+							training.request.image_pose.x=tracking_init_msg.request.spec.roi.x_offset;
+							training.request.image_pose.y=tracking_init_msg.request.spec.roi.y_offset;
+							training.request.image_pose.theta=tracking_init_msg.request.spec.roi_rotation;
+							if (training_service_client_.call(training))
+							{
+								if (training.response.success == false)
+								{
+									ROS_ERROR("Training failed: %s", training.response.message.c_str());
+								}
+								else
+								{
+									ROS_INFO("Training succeeded: %s", training.response.message.c_str());
+								}
+							}
+							else
+							{
+								ROS_ERROR("Training service call failed!");
+							}
+						} else {
+							ROS_INFO("Training service not detected");
+						}
+
+
+
+
 				}
+				delete(dialog_txt);
 		}
 
+		delete(dialog);
 	}
 }
 
@@ -797,6 +907,7 @@ void MainWindow::newHand(){
 					}
 				}
 			}
+			delete(dialog);
 		}
 	}
 	else{
@@ -804,6 +915,7 @@ void MainWindow::newHand(){
 			QErrorMessage *error=new QErrorMessage();
 			packageHand.prepend("couldn't find package ");
 			error->showMessage(packageHand);
+			delete(error);
 			//if(!database->getList(handsDB)){
 			//	std::cerr<<"Failed to get list of hands"<<endl;
 			//}
@@ -813,16 +925,14 @@ void MainWindow::newHand(){
 
 
 void MainWindow::handChanged(){
-	if(grasp!=NULL)
-		delete(grasp);
-	grasp=new GraspSpecification();
-	if(marker!=NULL){
-		delete(marker);
-		marker=NULL;
+	if(grasp)
+		grasp.reset();
+	grasp=boost::shared_ptr<GraspSpecification>(new GraspSpecification);
+	if(marker){
+		marker.reset();
 	}
-	if(joint_marker_cli!=NULL){
-		delete(joint_marker_cli);
-		joint_marker_cli=NULL;
+	if(joint_marker_cli){
+		joint_marker_cli.reset();
 	}
 	if(ui.hands->currentRow()!=-1){
 		//int cont=0;
@@ -834,12 +944,12 @@ void MainWindow::handChanged(){
 		//joint_marker_cli= new InteractiveMarkerDisplay("osg_im","/basic_controls/update", scene->localizedWorld, *(frame_manager->getTFClient()));
 		//marker=new HandInteractiveMarker(handsDB[cont]->package_ros.data(),handsDB[cont]->path.data());
 		//}
-		joint_marker_cli= new InteractiveMarkerDisplay("osg_im","/IM_JOINT_SERVER/update", scene->localizedWorld, *(frame_manager->getTFClient()));
-		hand_marker_cli= new InteractiveMarkerDisplay("osg_hand_im","/hand_pose_im/update", scene->localizedWorld, *(frame_manager->getTFClient()));
-		marker=new HandInteractiveMarker(sceneBuilder,
+		joint_marker_cli= boost::shared_ptr<InteractiveMarkerDisplay>(new InteractiveMarkerDisplay("osg_im","/IM_JOINT_SERVER/update", scene->localizedWorld, *(frame_manager->getTFClient())));
+		hand_marker_cli= boost::shared_ptr<InteractiveMarkerDisplay>(new InteractiveMarkerDisplay("osg_hand_im","/hand_pose_im/update", scene->localizedWorld, *(frame_manager->getTFClient())));
+		marker=boost::shared_ptr<HandInteractiveMarker>(new HandInteractiveMarker(sceneBuilder,
 				ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData(),
 				map[ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData()].first,
-				map[ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData()].second);
+				map[ui.hands->item(ui.hands->currentRow())->text().toUtf8().constData()].second));
 	}
 }
 
@@ -884,7 +994,7 @@ void MainWindow::rosSpin(){
 	ros::spinOnce();
 	ros::Time currSimTime = ros::Time::now();
 	ros::Duration elapsed= currSimTime - prevSimTime ;
-	if(joint_marker_cli!=NULL && hand_marker_cli!=NULL){
+	if(joint_marker_cli && hand_marker_cli){
 		joint_marker_cli->update(elapsed.toSec(), elapsed.toSec());
 		hand_marker_cli->update(elapsed.toSec(), elapsed.toSec());
 	}

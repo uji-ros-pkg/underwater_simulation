@@ -135,10 +135,10 @@ PlanarGraspSpec::GraspDragger::GraspDragger() : CompositeDragger() {
 	//as->addChild(tdragger1_);
 
 	osg::Matrixd local_transform;
-	local_transform.setTrans(-0.8,0,0.05);
+	local_transform.setTrans(-0.8,0.2,0.06);
 	local_transform.setRotate(osg::Quat(0, osg::Vec3d(0,1,0)));
 	tdragger1_->setMatrix(local_transform);
-	local_transform.setTrans(0.8,0,0.05);
+	local_transform.setTrans(0.8,0.2,0.06);
 	local_transform.setRotate(osg::Quat(M_PI, osg::Vec3d(0,1,0)));
 	tdragger2_->setMatrix(local_transform);
 	//addChild(as);

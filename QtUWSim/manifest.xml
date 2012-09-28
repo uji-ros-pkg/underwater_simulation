@@ -23,7 +23,12 @@
   <depend package="mar_robot_arm5e" />
   <depend package="visp" />
   <depend package="tf" />  
-  <depend package="pcl" />  
+  <depend package="pcl" />
+  <depend package="cv_bridge" />
+  <depend package="auv_msgs" />
+  <depend package="mar_perception" />
+  <depend package="vision_msgs" />
+  <depend package="object_detection" />  
   <rosdep name="qt4"/>
   <rosdep name="sqlite3"/>
 

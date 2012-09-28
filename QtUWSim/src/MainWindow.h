@@ -58,7 +58,7 @@ private:
 	//Mosaic mode
 	osg::ref_ptr<osgViewer::Viewer> mosaic_viewer_;	//Viewer when in mosaic mode
 	std::vector<boost::shared_ptr<PlanarGraspSpec> > planar_grasp_spec_;
-	GraspSpecification *grasp; 		//FIXME: Use smart pointers
+	boost::shared_ptr<GraspSpecification> grasp;
 	std::map<QListWidgetItem*, int > widget_to_spec_;
 	osgGA::CameraManipulator* oldManipulator;
 	osg::Switch* switches;
@@ -67,14 +67,14 @@ private:
 	//Scene mode
 	boost::shared_ptr<SceneBuilder> sceneBuilder;
 	osg::ref_ptr<osgOceanScene> scene;
-	boost::shared_ptr<ViewBuilder> viewBuilder; 		//FIXME: Use smart pointers
-	ViewerWidget* viewWidget; 		//FIXME: Use smart pointers
+	boost::shared_ptr<ViewBuilder> viewBuilder;
+	boost::shared_ptr<ViewerWidget> viewWidget;
 
 	//Interactive markers
-	HandInteractiveMarker *marker; 	//FIXME: Use smart pointers
+	boost::shared_ptr<HandInteractiveMarker> marker;
 	boost::shared_ptr<FrameManager> frame_manager;
-	InteractiveMarkerDisplay *joint_marker_cli;
-	InteractiveMarkerDisplay *hand_marker_cli;
+	boost::shared_ptr<InteractiveMarkerDisplay> joint_marker_cli;
+	boost::shared_ptr<InteractiveMarkerDisplay> hand_marker_cli;
 
 	Ui::MainWindowClass ui;
 

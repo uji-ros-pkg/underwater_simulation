@@ -88,6 +88,8 @@ src/CustomTabPlaneTrackballDragger.cpp
 src/CustomTabPlaneDragger.cpp
 src/joint_state_listener.cpp
 )
+rosbuild_add_executable(intervention_config src/intervention_config_client.cpp
+)
 
 
 
