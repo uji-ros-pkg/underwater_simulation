@@ -103,7 +103,8 @@
         <p>0</p>
         <y>1.57 </y>
       </orientation>
-      <showpath>2</showpath>  <!-- draws the FOV of the camera projected on the scene each 2 seconds -->
+      <!-- draws the FOV of the camera projected on the scene each 2 seconds -->
+      <!-- <showpath>2</showpath>  -->
     </virtualCamera>
     <virtualCamera>
       <name>bowtech2</name>
