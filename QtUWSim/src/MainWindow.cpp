@@ -590,7 +590,6 @@ void MainWindow::exportIntervention2D(){
 					QStringList points_file=dialog_txt->selectedFiles();
 
 
-
 					osg::Vec3d center,center_aux, scale;
 					center_aux=planar_grasp_spec_[widget_to_spec_[item]]->getTemplateCenter();
 					center=planar_grasp_spec_[widget_to_spec_[item]]->getTemplateOrigin();
@@ -620,7 +619,6 @@ void MainWindow::exportIntervention2D(){
 						g2_m=planar_grasp_spec_[widget_to_spec_[item]]->g_dragger_->tdragger2_->getBound().center()* matrix;
 					}
 
-
 					float maxX=max(max(max(max(max(br_m[0],bl_m[0]),tr_m[0]),tl_m[0]),g1_m[0]),g2_m[0]);
 					float minX=min(min(min(min(min(br_m[0],bl_m[0]),tr_m[0]),tl_m[0]),g1_m[0]),g2_m[0]);
 					float maxY=max(max(max(max(max(br_m[1],bl_m[1]),tr_m[1]),tl_m[1]),g1_m[1]),g2_m[1]);
@@ -639,7 +637,6 @@ void MainWindow::exportIntervention2D(){
 					capture->captureNextFrame(*mosaic_viewer_->getViewerBase());
 					viewWidget->frame();
 					delete(capture);
-
 
 					worldMatrices=((osgManipulator::CustomTabPlaneTrackballDragger*)planar_grasp_spec_[widget_to_spec_[item]]->t_dragger_)->_tabPlaneDragger->getCorners()->getWorldMatrices();
 					for(osg::MatrixList::iterator itr=worldMatrices.begin();
@@ -670,14 +667,12 @@ void MainWindow::exportIntervention2D(){
 
 
 
-
 					br=br_m*view*proj*win;
 					bl=bl_m*view*proj*win;
 					tr=tr_m*view*proj*win;
 					tl=tl_m*view*proj*win;
 					g1=g1_m*view*proj*win;
 					g2=g2_m*view*proj*win;
-
 
 
 
@@ -694,7 +689,6 @@ void MainWindow::exportIntervention2D(){
 					delete(process);
 					QImage *image= new QImage(target_file[0]);
 					int im_height=image->height();
-
 
 					QFile file(points_file[0]);
 					file.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -713,7 +707,6 @@ void MainWindow::exportIntervention2D(){
 
 
 
-
 					ros::NodeHandle nh;
 
 					vpImage<vpRGBa> Ic;
@@ -722,7 +715,7 @@ void MainWindow::exportIntervention2D(){
 
 					vpImagePoint clicks[3];
 					std::string uji_intervention_config_topic;
-					uji_intervention_config_topic="Nombre del servicio";
+					uji_intervention_config_topic="Nombre_del_servicio";
 					ros::ServiceClient config_client_=nh.serviceClient<auv_msgs::SetInterventionConfig>(uji_intervention_config_topic);
 					ros::Publisher training_data_pub_;
 					training_data_pub_ = nh.advertise<vision_msgs::TrainingData>("/trainer_node/training_data", 1);
