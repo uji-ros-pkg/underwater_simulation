@@ -259,12 +259,12 @@
     </VirtualCameraToROSImage>
     <VirtualCameraToROSImage> 
       <cameraName>stereo_down_left</cameraName>
-      <imageTopic> /stereo_down/left/image_rect_color</imageTopic>
+      <imageTopic> /stereo_down/left/image_raw</imageTopic>
       <infoTopic> /stereo_down/left/camera_info </infoTopic>
     </VirtualCameraToROSImage>
     <VirtualCameraToROSImage> 
       <cameraName>stereo_down_right</cameraName>
-      <imageTopic> /stereo_down/right/image_rect_color</imageTopic>
+      <imageTopic> /stereo_down/right/image_raw</imageTopic>
       <infoTopic>  /stereo_down/right/camera_info </infoTopic>
     </VirtualCameraToROSImage>
     <RangeSensorToROSRange>
