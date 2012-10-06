@@ -1,7 +1,7 @@
 download_and_build: downloaded all
 
 DATAFILE=UWSim-data.tgz
-RVIZ_DATAFILE=UWSim-data-rviz.tgz
+RVIZ_DATAFILE=UWSim-dta-rviz.tgz
 
 downloaded:
 	wget http://uji-ros-pkg.googlecode.com/files/$(DATAFILE) && tar xvf $(DATAFILE) && rm $(DATAFILE)
