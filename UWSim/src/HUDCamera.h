@@ -39,7 +39,7 @@ public:
 
 
 	/** Constructor from the image and info topics */
-	HUDCamera(unsigned int width, unsigned int height, unsigned int posx=0, unsigned int posy=0, double scale=1);
+	HUDCamera(unsigned int width, unsigned int height, unsigned int posx=0, unsigned int posy=0, double scale=1,int blackWhite=0);
 
 	bool ready() {return ready_;}
 

@@ -99,7 +99,7 @@
 <!ELEMENT ROSJointStateToArm  (topic,vehicleName)>
 <!ELEMENT VirtualCameraToROSImage (cameraName,imageTopic,infoTopic,rate?)>
 <!ELEMENT RangeSensorToROSRange (name,topic,rate?)>
-<!ELEMENT ROSImageToHUD (width,height,posx?,posy?,scale?,imageTopic,infoTopic?)>
+<!ELEMENT ROSImageToHUD (width,height,posx?,posy?,scale?,blackWhite?,imageTopic,infoTopic?)>
 <!ELEMENT ROSTwistToPAT (topic,vehicleName)>
 <!ELEMENT ROSPoseToPAT (topic,vehicleName)>
 <!ELEMENT ImuToROSImu (name, topic, rate?)>
@@ -111,6 +111,7 @@
 <!ELEMENT height (#PCDATA)>
 <!ELEMENT posx (#PCDATA)>
 <!ELEMENT posy (#PCDATA)>
+<!ELEMENT blackWhite (#PCDATA)>
 <!ELEMENT scale (#PCDATA)>
 <!ELEMENT topic (#PCDATA)>
 <!ELEMENT vehicleName (#PCDATA)>

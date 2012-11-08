@@ -1,15 +1,22 @@
 #include "HUDCamera.h"
 #include <string.h>
+#include <iostream>
 
-HUDCamera::HUDCamera(unsigned int width, unsigned int height, unsigned int posx, unsigned int posy, double scale) {
+HUDCamera::HUDCamera(unsigned int width, unsigned int height, unsigned int posx, unsigned int posy, double scale, int blackWhite) {
 	this->width=width;
 	this->height=height;
 	this->posx=posx;
 	this->posy=posy;
 	this->scale=scale;
 	osg_image=new osg::Image();
-	osg_image->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
-	memset(osg_image->data(),0,width*height*3*sizeof(unsigned char));
+	if(blackWhite){
+	  osg_image->allocateImage(width, height, 1, GL_LUMINANCE, GL_UNSIGNED_BYTE);
+	  memset(osg_image->data(),0,width*height*1*sizeof(unsigned char));
+	}
+	else{
+	  osg_image->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
+	  memset(osg_image->data(),0,width*height*3*sizeof(unsigned char));
+	}
 
 	ready_=false;
 	//OSG_INFO << "HUDCamera::HUDCamera Constructor finished " << info_topic << std::endl;

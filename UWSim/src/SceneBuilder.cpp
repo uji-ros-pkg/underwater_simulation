@@ -216,7 +216,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate));
 			}
 		if(rosInterface.type==ROSInterfaceInfo::ROSImageToHUD) {
-			boost::shared_ptr<HUDCamera> realcam(new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale));
+			boost::shared_ptr<HUDCamera> realcam(new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale,rosInterface.blackWhite));
 			iface=boost::shared_ptr<ROSImageToHUDCamera>(new ROSImageToHUDCamera(rosInterface.topic, rosInterface.infoTopic, realcam.get()));
 			realcams.push_back(realcam);
 		}

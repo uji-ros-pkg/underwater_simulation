@@ -802,6 +802,12 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo &r
 			extractUIntChar(child,rosInterface.posx);
 		else if(child->get_name()=="posy")
 			extractUIntChar(child,rosInterface.posy);
+		else if(child->get_name()=="blackWhite")
+			extractUIntChar(child,rosInterface.blackWhite);
+			if (rosInterface.blackWhite!=0 && rosInterface.blackWhite!=1) {
+				OSG_WARN <<"ConfigFile::processCamera: blackWhite is not a binary value ( 0 1), using default value (0)" << std::endl;
+				rosInterface.blackWhite=0;
+			}
 		else if(child->get_name()=="scale")
 			extractFloatChar(child,rosInterface.scale);
 		else if(child->get_name()=="visualize")
