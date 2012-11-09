@@ -313,7 +313,7 @@ ROSJointStateToArm::~ROSJointStateToArm(){
 }
 
 
-ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_topic, HUDCamera *camera): 
+ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_topic, boost::shared_ptr<HUDCamera>camera): 
 	ROSSubscriberInterface(info_topic),
 	cam(camera),
 	image_topic(topic)

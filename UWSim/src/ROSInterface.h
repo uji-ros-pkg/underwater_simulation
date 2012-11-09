@@ -216,7 +216,7 @@ class ROSImageToHUDCamera: public ROSSubscriberInterface {
 	image_transport::Subscriber image_sub;
 	std::string image_topic;
 public:
-	ROSImageToHUDCamera(std::string topic, std::string info_topic, HUDCamera *camera);
+	ROSImageToHUDCamera(std::string topic, std::string info_topic, boost::shared_ptr<HUDCamera> camera);
 
 	virtual void createSubscriber(ros::NodeHandle &nh);
 
