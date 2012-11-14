@@ -1,0 +1,24 @@
+<package>
+<description brief="osgWorks">
+
+This package contains a recent version of the osgWorks library (http://code.google.com/p/osgbullet/). 
+This ROS package does not intend to modify osgWorks
+in any way, it simply provides a convenient way to download and
+compile the library, because osgWorks is not available from an OS package
+manager. However, this package might contain some temporary patches to
+osgWorks while they are being applied upstream, or while a permanent fix
+for a problem is being discussed by the osgWorks community.
+
+</description>
+<author>VE-Suite project. Port to ROS by Mario Prats</author>
+<license>LGPL</license>
+<url>http://code.google.com/p/osgbullet/</url>
+<review status="unreviewed" notes=""/>
+<export>
+  <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -losgwControls -losgwQuery -losgwTools"/>
+</export>
+
+<rosdep name="libopenscenegraph"/>
+</package>
+
+

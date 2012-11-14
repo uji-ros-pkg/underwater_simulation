@@ -237,6 +237,7 @@ void UWSimGeometry::applyStateSets(osg::Node *node) {
           node->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
 }
 
+
 osg::Node * UWSimGeometry::retrieveResource(std::string name){
   //Load file in memory
   resource_retriever::Retriever r;
@@ -303,8 +304,6 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
   exit(0);
   return NULL;
 }
-
-/*****************/
 
 
 getWorldCoordOfNodeVisitor::getWorldCoordOfNodeVisitor(): osg::NodeVisitor(NodeVisitor::TRAVERSE_PARENTS), done(false){

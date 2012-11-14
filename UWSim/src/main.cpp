@@ -6,6 +6,7 @@
 #include "ConfigXMLParser.h"
 #include "SceneBuilder.h"
 #include "ViewBuilder.h"
+#include "PhysicsBuilder.h"
 
 #include "UWSimUtils.h"
 
@@ -82,7 +83,9 @@ int main(int argc, char *argv[])
 	SceneBuilder builder(arguments);
 	builder.loadScene(config);
 
-	//BulletPhysics physics(config.offsetr,config.gravity,builder.getScene()->getOceanSurface());
+        PhysicsBuilder physicsBuilder;
+        if(config.enablePhysics)
+	  physicsBuilder.loadPhysics(&builder,config);
 
 	ViewBuilder view(config, &builder, arguments);
 	
@@ -94,10 +97,20 @@ int main(int argc, char *argv[])
 	view.getViewer()->getWindows(windows);
 	windows[0]->setWindowName("UWSim");
 
+	double prevSimTime = 0.;
 	while( !view.getViewer()->done() && ros::ok())
 	{
 		ROSInterface::setROSTime(ros::Time::now());
 		ros::spinOnce();
+
+		if(config.enablePhysics){
+                  const double currSimTime = view.getViewer()->getFrameStamp()->getSimulationTime();
+                  double elapsed( currSimTime - prevSimTime );
+                  if( view.getViewer()->getFrameStamp()->getFrameNumber() < 3 ) 
+                    elapsed = 1./60.;
+                  physicsBuilder.physics->stepSimulation(elapsed, 4, elapsed/4. );
+                  prevSimTime = currSimTime;
+		}                
 
 		view.getViewer()->frame();
 	}

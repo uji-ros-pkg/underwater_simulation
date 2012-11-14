@@ -245,7 +245,7 @@
       <y>0</y>
     </orientation>
     <physics>
-      <mass> 8 </mass>
+      <mass> 15 </mass>
       <inertia> 
         <x> 0</x>
         <y> 0 </y>

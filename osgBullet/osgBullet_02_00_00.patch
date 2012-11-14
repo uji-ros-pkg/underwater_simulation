@@ -1,0 +1,12 @@
+diff -Naur ./CMakeLists.txt ../osgBullet_02_00_00_patched/CMakeLists.txt
+--- ./CMakeLists.txt	2011-10-27 02:06:30.000000000 +0200
++++ ../osgBullet_02_00_00_patched/CMakeLists.txt	2012-01-24 13:56:08.765791991 +0100
+@@ -39,7 +39,7 @@
+ INCLUDE( CMakeMacros )
+ 
+ include( FindOSGHelper )
+-include( FindBulletHelper )
++#include( FindBulletHelper )
+ 
+ FIND_PACKAGE( OSGWorks REQUIRED )
+ 

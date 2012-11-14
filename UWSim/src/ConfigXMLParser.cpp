@@ -179,10 +179,48 @@ void ConfigFile::processSimParams(const xmlpp::Node* node){
 		else if(child->get_name()=="enablePhysics"){
 			extractIntChar(child,enablePhysics);
 			if(enablePhysics != 0 && enablePhysics!=1){
-				OSG_WARN << "ConfigFile::processSimParams: enablePhysics is not a binary value ( 0 1), using default value (1)" << std::endl;
+				OSG_WARN << "ConfigFile::processSimParams: enablePhysics is not a binary value ( 0 1), using default value (0)" << std::endl;
 				enablePhysics=0;
 			}
+			physicsWater.init();
 		}
+		else if(child->get_name()=="physicsWater"){		
+			physicsWater.enable=1;
+			processPhysicsWater(child);
+		}
+
+	}
+}
+
+void ConfigFile::processPhysicsWater(const xmlpp::Node* node){
+	xmlpp::Node::NodeList list = node->get_children();
+	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+		if(child->get_name()=="position")
+			extractPositionOrColor(child,physicsWater.position);
+		else if(child->get_name()=="size")
+			processSize(child);
+		else if(child->get_name()=="resolution")
+			extractFloatChar(child,physicsWater.resolution);
+	}
+}
+
+void ConfigFile::processSize(const xmlpp::Node* node){
+	xmlpp::Node::NodeList list = node->get_children();
+	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+		if(child->get_name()=="minX")
+			extractFloatChar(child,physicsWater.size[0]);
+		else if(child->get_name()=="maxX")
+			extractFloatChar(child,physicsWater.size[1]);
+		else if(child->get_name()=="minY")
+			extractFloatChar(child,physicsWater.size[2]);
+		else if(child->get_name()=="maxY")
+			extractFloatChar(child,physicsWater.size[3]);
+		else if(child->get_name()=="minZ")
+			extractFloatChar(child,physicsWater.size[4]);
+		else if(child->get_name()=="maxZ")
+			extractFloatChar(child,physicsWater.size[5]);
 
 	}
 }

@@ -2,7 +2,7 @@
 
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
-<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?)>
+<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsWater?)>
 <!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?, showpath?)>
 <!ELEMENT rangeSensor (name,relativeTo,range,visible?,position?,orientation?)>
@@ -56,6 +56,15 @@
 <!ELEMENT resh (#PCDATA)>
 <!ELEMENT enablePhysics (#PCDATA)>
 <!ELEMENT gravity (x,y,z)>
+<!ELEMENT physicsWater (size,position,resolution)>
+<!ELEMENT size (minX,maxX,minY,maxY,minZ,maxZ)>
+<!ELEMENT resolution (#PCDATA)>
+<!ELEMENT minX (#PCDATA)>
+<!ELEMENT maxX (#PCDATA)>
+<!ELEMENT minY (#PCDATA)>
+<!ELEMENT maxY (#PCDATA)>
+<!ELEMENT minZ (#PCDATA)>
+<!ELEMENT maxZ (#PCDATA)>
 
 <!--elementos camera -->
 <!ELEMENT freeMotion (#PCDATA)>

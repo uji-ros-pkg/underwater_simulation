@@ -8,11 +8,6 @@
         <mesh filename="package://UWSim/data/robot/GIRONA500/g500_March11.osg"/>
       </geometry>
     </visual>
-    <collision>
-       <geometry>
-        <mesh filename="package://UWSim/data/robot/GIRONA500/g500_March11_collisionShape.osg"/>
-      </geometry>
-    </collision>
   </link>
 
   <link name="part0">
@@ -22,11 +17,6 @@
         <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part0.osg"/>
       </geometry>
     </visual>
-    <collision>
-       <geometry>
-        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part0_cs.osg"/>
-      </geometry>
-    </collision>
   </link>
 
   <joint name="baselink_to_part0" type="fixed">
