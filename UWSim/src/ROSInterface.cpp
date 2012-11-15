@@ -624,7 +624,9 @@ void VirtualCameraToROSImage::publish() {
       //looking towards bottom-right. Therefore it must be manually arranged.
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
-          memcpy(&(img.data[i*img.step]), &(virtualdata[(h-i-1)*img.step]), img.step);
+	  for (unsigned int j=0; j<img.step; j++) {
+ 	          		img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
+    	  }
         }
       else
 	memset(&(img.data.front()), 0, d);
