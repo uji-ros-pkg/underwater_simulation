@@ -14,8 +14,7 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,
-	  	  	    ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage} type_t;
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -34,12 +33,12 @@ struct Vcam{
   string name;
   string linkName, roscam, roscaminfo;
   std::string frameId; ///Frame Id for stereo camera images
-  int resw,resh,link;
+  int resw,resh,link,range;
   double showpath;
   double position[3],orientation[3];
   double baseLine; ///baseline for stereo cameras
   boost::shared_ptr<Parameters> parameters;
-  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();}
+  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();range=0;}
 };
 
 struct rangeSensor {
@@ -139,6 +138,7 @@ struct Vehicle{
   std::vector<double> jointValues;
   std::vector<Material> materials;
   std::list<Vcam> Vcams;
+  std::list<Vcam> VRangecams;
   std::list<rangeSensor> range_sensors, object_pickers;
   std::list<Imu> imus;
   std::list<XMLPressureSensor> pressure_sensors;

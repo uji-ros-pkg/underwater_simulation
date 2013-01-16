@@ -608,6 +608,24 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle){
 			vehicle.Vcams.push_back(aux);
 	}
 
+	//get range camera joint
+	Vcam aux2;
+	for(unsigned int i=0;i<vehicle.VRangecams.size();i++){
+		found=0;
+		aux2=vehicle.VRangecams.front();
+		vehicle.VRangecams.pop_front();
+		for(int j=0;j<vehicle.nlinks && !found;j++){
+			if(vehicle.links[j].name==aux2.linkName){
+				aux2.link=j;
+				found=1;
+			}
+		}
+		if(found==0) {
+			OSG_WARN << "ConfigFile::postProcessVehicle: Range Camera attached to unknown link: " << aux.linkName << " camera will be ignored" << std::endl;
+		} else
+			vehicle.VRangecams.push_back(aux2);
+	}
+
 	//get Range sensor joint
 	rangeSensor rs;
 	for(unsigned int i=0;i<vehicle.range_sensors.size();i++){
@@ -743,6 +761,13 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processVcam(child,aux);
 			vehicle.Vcams.push_back(aux);
+		}
+		else if (child->get_name()=="virtualRangeImage"){
+			Vcam aux;
+			aux.init();
+			aux.range=1;
+			processVcam(child,aux);
+			vehicle.VRangecams.push_back(aux);
 		} else if (child->get_name()=="rangeSensor"){
 			rangeSensor aux;
 			aux.init();
@@ -877,6 +902,8 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 			rosInterface.type=ROSInterfaceInfo::ROSJointStateToArm;
 		} else if(child->get_name()=="VirtualCameraToROSImage") {
 			rosInterface.type=ROSInterfaceInfo::VirtualCameraToROSImage;
+		} else if(child->get_name()=="RangeImageSensorToROSImage") {
+			rosInterface.type=ROSInterfaceInfo::RangeImageSensorToROSImage;
 		} else if(child->get_name()=="RangeSensorToROSRange") {
 			rosInterface.type=ROSInterfaceInfo::RangeSensorToROSRange;
 		} else if(child->get_name()=="ROSImageToHUD") {

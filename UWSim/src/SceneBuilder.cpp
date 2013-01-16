@@ -141,6 +141,8 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		osg::Matrixd wMb_m;
 		wMb_m.makeRotate(osg::Quat(auxObject.orientation[0],osg::Vec3d(1,0,0),auxObject.orientation[1],osg::Vec3d(0,1,0), auxObject.orientation[2],osg::Vec3d(0,0,1) ));
 		wMb_m.setTrans(auxObject.position[0],auxObject.position[1],auxObject.position[2]);
+		//if(auxObject.name!="terrain")
+		//wMb_m.preMultScale(osg::Vec3d(5,2,1));
 
 		osg::ref_ptr<osg::MatrixTransform> wMb=new osg::MatrixTransform(wMb_m);
 		osg::Node *object=scene->addObject(wMb, auxObject.file, &auxObject);
@@ -215,7 +217,14 @@ bool SceneBuilder::loadScene(ConfigFile config)
 			for (int j=0; j<nvehicle ;j++) {
 				for (unsigned int c=0; c<iauvFile[j]->getNumCams(); c++) 
 					if (iauvFile[j]->camview[c].name==rosInterface.targetName) 
-						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate));
+						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate,0));
+			}
+		if(rosInterface.type==ROSInterfaceInfo::RangeImageSensorToROSImage) 
+			//Find corresponding VirtualCamera Object on all the vehicles
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int c=0; c<iauvFile[j]->getNumCams(); c++) 
+					if (iauvFile[j]->camview[c].name==rosInterface.targetName) 
+						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate,1));
 			}
 		if(rosInterface.type==ROSInterfaceInfo::ROSImageToHUD) {
 			boost::shared_ptr<HUDCamera> realcam(new HUDCamera(rosInterface.w,rosInterface.h, rosInterface.posx, rosInterface.posy, rosInterface.scale,rosInterface.blackWhite));

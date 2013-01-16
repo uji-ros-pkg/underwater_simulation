@@ -548,8 +548,9 @@ void ArmToROSJointState::publish() {
 ArmToROSJointState::~ArmToROSJointState() {}
 	
 
-VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate): ROSPublisherInterface(info_topic,rate), cam(camera), image_topic(topic) {
+VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate, int depth): ROSPublisherInterface(info_topic,rate), cam(camera), image_topic(topic) {
   it.reset(new image_transport::ImageTransport(nh_));
+  this->depth=depth;
 }
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
@@ -563,20 +564,28 @@ void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
 
 void VirtualCameraToROSImage::publish() {
   //OSG_DEBUG << "OSGImageToROSImage::publish entering" << std::endl;
-  if (cam->renderTexture!=NULL && cam->renderTexture->getTotalSizeInBytes()!=0) {
+  osg::ref_ptr<osg::Image> osgimage;
+  if(depth)
+    osgimage=cam->depthTexture;
+  else
+    osgimage=cam->renderTexture;
+  if (osgimage!=NULL && osgimage->getTotalSizeInBytes()!=0) {
     //OSG_DEBUG << "\t image size: " << cam->renderTexture->s() << " " << cam->renderTexture->t() << " " << cam->renderTexture->getTotalSizeInBytes() << std::endl;
     int w, h, d;
-    w=cam->renderTexture->s();
-    h=cam->renderTexture->t();
-    d=cam->renderTexture->getTotalSizeInBytes();
+    w=osgimage->s();
+    h=osgimage->t();
+    d=osgimage->getTotalSizeInBytes();
 
     if (d!=0) {
       sensor_msgs::Image img;
       sensor_msgs::CameraInfo img_info;
       img_info.header.stamp=img.header.stamp=getROSTime();
       img_info.header.frame_id=img.header.frame_id=cam->frameId;
-      img.encoding=std::string("rgb8");
-      
+      if(depth)
+        img.encoding=std::string("mono8");
+      else
+        img.encoding=std::string("rgb8");   
+  
       img.is_bigendian=0;
       img.height=h;
       img.width=w;
@@ -615,9 +624,9 @@ void VirtualCameraToROSImage::publish() {
       img_info.binning_x = 0;
       img_info.binning_y = 0;
       
-      img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;		
+      //img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;		
 	
-      char *virtualdata=(char*)cam->renderTexture->data();
+      char *virtualdata=(char*)osgimage->data();
       //memcpy(&(img.data.front()),virtualdata,d*sizeof(char));
       //Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
       //the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
@@ -625,7 +634,7 @@ void VirtualCameraToROSImage::publish() {
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
 	  for (unsigned int j=0; j<img.step; j++) {
- 	          		img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
+ 	         img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
     	  }
         }
       else

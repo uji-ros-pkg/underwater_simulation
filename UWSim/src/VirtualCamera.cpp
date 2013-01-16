@@ -12,7 +12,7 @@
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
 	this->uwsim_root=uwsim_root;
 	this->name=name;
 
@@ -37,29 +37,30 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
         }
 	else
 	  this->paramsOn=0;
+	this->range=range;
         
 	renderTexture=new osg::Image();
 	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
 	depthTexture=new osg::Image();
-	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
+	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE);
 
 	createCamera();
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL);
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0);
 }
 
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"",params);
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL);
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0);
 }
 
 void VirtualCamera::createCamera()
@@ -115,8 +116,10 @@ void VirtualCamera::createCamera()
 osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow() {
 	osg::ref_ptr<osgWidget::Box> box=new osgWidget::Box("VirtualCameraBox", osgWidget::Box::HORIZONTAL, true);
 	osg::ref_ptr<osgWidget::Widget> widget = new osgWidget::Widget("VirtualCameraWidget", width, height);
-	widget->setImage(renderTexture.get(),true,false);
-	//widget->setImage(depthTexture.get(),true,false);
+	if(!range)
+	  widget->setImage(renderTexture.get(),true,false);
+	else
+	  widget->setImage(depthTexture.get(),true,false);
 	box->addWidget(widget.get());
 	box->getBackground()->setColor(1.0f, 0.0f, 0.0f, 0.8f);
 	box->attachMoveCallback();
