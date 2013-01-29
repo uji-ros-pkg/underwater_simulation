@@ -565,10 +565,11 @@ void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
 void VirtualCameraToROSImage::publish() {
   //OSG_DEBUG << "OSGImageToROSImage::publish entering" << std::endl;
   osg::ref_ptr<osg::Image> osgimage;
-  if(depth)
+  if(depth){
     osgimage=cam->depthTexture;
-  else
+  }else{
     osgimage=cam->renderTexture;
+  }
   if (osgimage!=NULL && osgimage->getTotalSizeInBytes()!=0) {
     //OSG_DEBUG << "\t image size: " << cam->renderTexture->s() << " " << cam->renderTexture->t() << " " << cam->renderTexture->getTotalSizeInBytes() << std::endl;
     int w, h, d;

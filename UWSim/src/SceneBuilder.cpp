@@ -217,7 +217,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 			for (int j=0; j<nvehicle ;j++) {
 				for (unsigned int c=0; c<iauvFile[j]->getNumCams(); c++) 
 					if (iauvFile[j]->camview[c].name==rosInterface.targetName) 
-						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate,0));
+						iface=boost::shared_ptr<VirtualCameraToROSImage>(new VirtualCameraToROSImage(&(iauvFile[j]->camview[c]),rosInterface.topic, rosInterface.infoTopic, rosInterface.rate, rosInterface.depth));
 			}
 		if(rosInterface.type==ROSInterfaceInfo::RangeImageSensorToROSImage) 
 			//Find corresponding VirtualCamera Object on all the vehicles

@@ -107,7 +107,7 @@
 <!ELEMENT PATToROSOdom  (topic, vehicleName, rate?)>
 <!ELEMENT ArmToROSJointState  (topic, vehicleName, rate?)>
 <!ELEMENT ROSJointStateToArm  (topic,vehicleName)>
-<!ELEMENT VirtualCameraToROSImage (cameraName,imageTopic,infoTopic,rate?)>
+<!ELEMENT VirtualCameraToROSImage (cameraName,imageTopic,infoTopic,rate?,depth?)>
 <!ELEMENT RangeImageSensorToROSImage (cameraName,imageTopic,infoTopic,rate?)>
 <!ELEMENT RangeSensorToROSRange (name,topic,rate?)>
 <!ELEMENT ROSImageToHUD (width,height,posx?,posy?,scale?,blackWhite?,imageTopic,infoTopic?)>

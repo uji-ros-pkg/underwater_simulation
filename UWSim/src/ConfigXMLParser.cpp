@@ -865,18 +865,27 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo &r
 			extractUIntChar(child,rosInterface.posx);
 		else if(child->get_name()=="posy")
 			extractUIntChar(child,rosInterface.posy);
-		else if(child->get_name()=="blackWhite")
+		else if(child->get_name()=="blackWhite"){
 			extractUIntChar(child,rosInterface.blackWhite);
 			if (rosInterface.blackWhite!=0 && rosInterface.blackWhite!=1) {
-				OSG_WARN <<"ConfigFile::processCamera: blackWhite is not a binary value ( 0 1), using default value (0)" << std::endl;
+				OSG_WARN <<"ConfigFile::processROSInterface: blackWhite is not a binary value ( 0 1), using default value (0)" << std::endl;
 				rosInterface.blackWhite=0;
 			}
-		else if(child->get_name()=="scale")
+		}else if(child->get_name()=="depth"){
+			extractUIntChar(child,rosInterface.depth);
+			if (rosInterface.depth!=0 && rosInterface.depth!=1) {				
+				osg::notify(osg::ALWAYS)  <<"ConfigFile::processROSInterface: depth is not a binary value ( 0 1), using default value (0)" << std::endl;
+				rosInterface.depth=0;
+			}
+		}else if(child->get_name()=="scale")
 			extractFloatChar(child,rosInterface.scale);
 		else if(child->get_name()=="visualize")
 			extractIntChar(child,rosInterface.visualize);
 		else if(child->get_name()=="color")
 			extractPositionOrColor(child,rosInterface.color);
+		else if(child->get_name()=="text"){}//we ignore this as whitespace is treated as a whole child element}    
+		else
+			osg::notify(osg::ALWAYS)  <<"processROSInterface:: unexpected child: " << child->get_name() <<std::endl;			
 	}
 }
 

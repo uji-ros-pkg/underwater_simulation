@@ -19,7 +19,7 @@ struct ROSInterfaceInfo{
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
   unsigned int w, h; //width and height if necessary
-  unsigned int posx, posy, blackWhite; ///< default (x,y) position of the widget if necessary, blackWhite camera
+  unsigned int posx, posy, depth, blackWhite; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
   int visualize; ///< If 1, enable visualization of the data. 0 by default
   double color[3]; // visualization color in rosodomtopat waypoints
