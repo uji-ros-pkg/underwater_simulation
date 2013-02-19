@@ -900,6 +900,7 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 		rosInterface.scale=1;
 		rosInterface.visualize=0;
 		rosInterface.type=ROSInterfaceInfo::Unknown;
+		rosInterface.depth=0;
 		if(child->get_name()=="ROSOdomToPAT"){
 			rosInterface.type=ROSInterfaceInfo::ROSOdomToPAT;
 			rosInterface.color[0]=rosInterface.color[1]=rosInterface.color[2]=1;
