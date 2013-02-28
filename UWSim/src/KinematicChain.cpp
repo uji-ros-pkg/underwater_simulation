@@ -15,6 +15,7 @@ KinematicChain::KinematicChain(int nlinks, int njoints) {
 	limits.resize(njoints);
 	q.resize(njoints);
 	memset(&(q.front()),0,njoints*sizeof(double));
+	started=0;
 }
 
 void KinematicChain::setJointPosition(double *newq, int n) {
@@ -45,6 +46,18 @@ void KinematicChain::setJointPosition(double *newq, int n) {
 }
 	
 void KinematicChain::setJointVelocity(double *qdot, int n) {
+	//Time issues
+    double elapsed=0;
+    if (started!=0) {
+      ros::WallDuration t_diff = ros::WallTime::now() - last;
+      elapsed= t_diff.toSec();
+      //If elapsed>MAX_ELAPSED, consider this is sent by a different publisher, so that the counter has to restart
+      if (elapsed>1) elapsed=0;
+    }	
+    
+    started=1;
+    last = ros::WallTime::now();
+	
 	int offset=0;
 	for (int i=0; i<getNumberOfJoints(); i++){
 	  if (i-offset>=n) break;
@@ -52,12 +65,12 @@ void KinematicChain::setJointVelocity(double *qdot, int n) {
 	  if(jointType[i]==0 || mimic[i].joint!=i)
 	    offset++;
 	  else{
-	    if(q[i]+qdot[i-offset]<limits[i].first)
+	    if(q[i]+(qdot[i-offset]*elapsed)<limits[i].first)
 	      q[i]=limits[i].first;
-	    else if(q[i]+qdot[i-offset]>limits[i].second)
+	    else if(q[i]+(qdot[i-offset]*elapsed)>limits[i].second)
 	      q[i]=limits[i].second;
 	    else
-	      q[i]+=qdot[i-offset];
+	      q[i]+=qdot[i-offset]*elapsed;
 	  }
 	}
 	updateJoints(q);
@@ -68,7 +81,7 @@ void KinematicChain::setJointPosition(std::vector<double> &q) {
 }
 
 void KinematicChain::setJointVelocity(std::vector<double> &qdot) {
-	setJointPosition(&(qdot.front()), qdot.size());
+	setJointVelocity(&(qdot.front()), qdot.size());
 }
 
 std::vector<double> KinematicChain::getJointPosition() {

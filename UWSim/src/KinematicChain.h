@@ -10,6 +10,7 @@
 
 #include "SimulatorConfig.h"
 #include <osg/MatrixTransform>
+#include <ros/ros.h>
 
 #include <iostream>
 #include <string.h>
@@ -37,6 +38,9 @@ public:
 
 	//osg::MatrixTransform *tool_transform;	///< Transform between the end-effector and the tool base frame
 	//osg::ref_ptr<osg::Node> tool;		///< Pointer to the tool osg node
+	
+	ros::WallTime last;
+    int started;
 
 
 	KinematicChain(int nlinks, int njoints);
