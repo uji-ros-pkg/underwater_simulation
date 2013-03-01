@@ -400,6 +400,7 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
             OSG_FATAL << "Error: could not find: " << filename << std::endl;
             return NULL;
         } else {
+
 			static const char model_vertex[]   = "default_scene.vert";
 			static const char model_fragment[] = "default_scene.frag";
 
@@ -419,12 +420,19 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
 			linkBase.preMultTranslate(osg::Vec3d(-o->offsetp[0],-o->offsetp[1],-o->offsetp[2]));
    
 			osg::ref_ptr<osg::MatrixTransform> linkBaseTransform= new osg::MatrixTransform(linkBase);
+			//If object is not a group, create a group and make it son of it
+			if(object->asGroup()==NULL){
+			  osg::ref_ptr<osg::Node> aux=object;
+			  object= (osg::ref_ptr<osg::Node>)new osg::Group();
+			  object->asGroup()->addChild(aux.get());
+			}
 			linkBaseTransform->addChild(object);
 
 			osg::Matrix linkPost;
 			linkBase.invert(linkPost);
 
 			osg::ref_ptr<osg::MatrixTransform> linkPostTransform= new osg::MatrixTransform(linkPost);
+			
 			object->asGroup()->addChild(linkPostTransform);
 
 			transform->addChild(linkBaseTransform);

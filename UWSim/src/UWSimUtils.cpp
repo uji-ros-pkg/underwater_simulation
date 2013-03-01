@@ -289,6 +289,12 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
     if(node == NULL){
       std::cerr<<"Error reading file " << geom->file <<" Check URDF file." <<std::endl;
     }
+    //If node isn't a group create a group with it.
+    if(node->asGroup()==NULL){
+      osg::Node * aux=node;
+      node=new osg::Group();
+      node->asGroup()->addChild(aux);
+    }
     return node;
   }
   else if(geom->type==1){
