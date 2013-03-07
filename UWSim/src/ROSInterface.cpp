@@ -6,6 +6,7 @@
 
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/LaserScan.h>
 #include <underwater_sensor_msgs/Pressure.h>
 #include <underwater_sensor_msgs/DVL.h>
 
@@ -625,9 +626,9 @@ void VirtualCameraToROSImage::publish() {
       img_info.binning_x = 0;
       img_info.binning_y = 0;
       
-      //img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;		
+      //img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
 	
-      char *virtualdata=(char*)osgimage->data();
+      unsigned char *virtualdata=(unsigned char*)osgimage->data();
       //memcpy(&(img.data.front()),virtualdata,d*sizeof(char));
       //Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
       //the bottom-left looking towards up-right, whereas ROS sensor_msgs::Image::data expects origin on top-left
@@ -675,3 +676,45 @@ void RangeSensorToROSRange::publish() {
 }
 	
 RangeSensorToROSRange::~RangeSensorToROSRange() {}
+
+
+
+
+MultibeamSensorToROS::MultibeamSensorToROS(MultibeamSensor *multibeamSensor, std::string topic, int rate): ROSPublisherInterface(topic,rate), MB(multibeamSensor) {
+}
+
+void  MultibeamSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO(" MultibeamSensorToROS publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<sensor_msgs::LaserScan>(topic, 1);
+}
+
+void  MultibeamSensorToROS::publish() {
+  if (MB!=NULL) {
+    sensor_msgs::LaserScan ls;
+    ls.header.stamp = getROSTime();
+
+    double fov,aspect,near,far;
+
+    MB->textureCamera->getProjectionMatrixAsPerspective (fov,aspect,near,far);
+    ls.range_min=near;
+    ls.range_max=far;
+    ls.ranges.resize(MB->numpixels);
+
+    unsigned char * data= (unsigned char *)MB->depthTexture->data();
+    double a=far/(far-near);
+    double b=(far*near)/(near-far);
+
+    for(int i=0;i<MB->numpixels;i++){
+	double Z=((int)data[i])/256.0;
+        ls.ranges[i]=b/(Z-a);
+    }
+    /*r.radiation_type=sensor_msgs::Range::ULTRASOUND;
+    r.field_of_view=0;	//X axis of the sensor
+    r.min_range=0;
+    r.max_range=rs->range;
+    r.range= (rs->node_tracker!=NULL) ? rs->node_tracker->distance_to_obstacle : r.max_range;*/	
+    pub_.publish(ls);
+  }
+}
+	
+ MultibeamSensorToROS::~MultibeamSensorToROS() {}

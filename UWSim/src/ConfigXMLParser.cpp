@@ -399,6 +399,26 @@ void ConfigFile::processCamera(const xmlpp::Node* node){
 	}
 }
 
+void ConfigFile::processMultibeamSensor(const xmlpp::Node* node, XMLMultibeamSensor &MB){
+	xmlpp::Node::NodeList list = node->get_children();
+	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+
+		if(child->get_name()=="position")
+			extractPositionOrColor(child,MB.position);
+		else if(child->get_name()=="relativeTo")
+			extractStringChar(child,MB.linkName);
+		else if(child->get_name()=="orientation")
+			extractOrientation(child,MB.orientation);
+		else if(child->get_name()=="name")
+			extractStringChar(child,MB.name);
+		else if(child->get_name()=="numpixels")
+			extractIntChar(child,MB.numpixels);
+		else if(child->get_name()=="fieldOfView")
+			extractFloatChar(child,MB.fieldOfView);
+	}
+}
+
 void ConfigFile::processPose(urdf::Pose pose, double position[3], double rpy[3], double quat[4]){
 	position[0]=pose.position.x;
 	position[1]=pose.position.y;
@@ -720,6 +740,26 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle){
 		}
 	}
 
+	//get multibeamSensor joint
+	{
+		XMLMultibeamSensor MB;
+		for(unsigned int i=0;i<vehicle.multibeam_sensors.size();i++){
+			found=0;
+			MB=vehicle.multibeam_sensors.front();
+			vehicle.multibeam_sensors.pop_front();
+			for(int j=0;j<vehicle.nlinks && !found;j++){
+				if(vehicle.links[j].name==MB.linkName){
+					MB.link=j;
+					found=1;
+				}
+			}
+			if(found==0) {
+				OSG_WARN << "ConfigFile::postProcessVehicle: multibeamSensor attached to unknown link: " << MB.linkName << ". Will be ignored"<< std::endl;
+			} else
+				vehicle.multibeam_sensors.push_back(MB);
+		}
+	}
+
 	//get Hand link
 	for(unsigned int i=0;i<vehicle.object_pickers.size();i++){
 		found=0;
@@ -798,6 +838,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processDVLSensor(child,aux);
 			vehicle.dvl_sensors.push_back(aux);
+		} else if (child->get_name()=="multibeamSensor"){
+			XMLMultibeamSensor aux;
+			aux.init();
+			processMultibeamSensor(child,aux);
+			vehicle.multibeam_sensors.push_back(aux);
 		}
 	}
 }
@@ -930,7 +975,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 			rosInterface.type=ROSInterfaceInfo::GPSSensorToROS;
 		} else if(child->get_name()=="DVLSensorToROS"){
 			rosInterface.type=ROSInterfaceInfo::DVLSensorToROS;
+		} else if(child->get_name()=="multibeamSensorToLaserScan"){
+			rosInterface.type=ROSInterfaceInfo::multibeamSensorToLaserScan;
 		}
+
 
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
 			processROSInterface(child,rosInterface);

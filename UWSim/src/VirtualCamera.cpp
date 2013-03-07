@@ -12,7 +12,7 @@
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov) {
 	this->uwsim_root=uwsim_root;
 	this->name=name;
 
@@ -25,6 +25,7 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	this->height=height;
 	this->baseline = baseline;
 	this->frameId = frameId;
+	this->fov=fov;
 	if(params!=NULL){
 	  this->fx=params->fx;
 	  this->fy=params->fy;
@@ -47,20 +48,25 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	createCamera();
 }
 
+
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov){//Used in multibeam
+  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov);
+}
+
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0);
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
-	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range);
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,0);
 }
 
 void VirtualCamera::createCamera()
@@ -85,7 +91,10 @@ void VirtualCamera::createCamera()
 	
 	if(!paramsOn){
 	  //set default fov, near and far parameters
-	  textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
+	  if(!fov)
+	    textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
+          else
+	    textureCamera->setProjectionMatrixAsPerspective(fov, 1.33, 0.8, 10);
 	  osg::Matrixd m;
 	  m=textureCamera->getProjectionMatrix();
 	  fx=m(0,0)*width/2.0;

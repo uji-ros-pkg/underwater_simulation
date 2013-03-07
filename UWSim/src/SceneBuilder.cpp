@@ -272,6 +272,12 @@ bool SceneBuilder::loadScene(ConfigFile config)
 					if (iauvFile[j]->dvl_sensors[i].name==rosInterface.targetName)
 						iface=boost::shared_ptr<DVLSensorToROS>(new DVLSensorToROS(&(iauvFile[j]->dvl_sensors[i]),rosInterface.topic, rosInterface.rate));
 			}
+		if(rosInterface.type==ROSInterfaceInfo::multibeamSensorToLaserScan)
+			for (int j=0; j<nvehicle ;j++) {
+				for (unsigned int i=0; i<iauvFile[j]->multibeam_sensors.size(); i++)
+					if (iauvFile[j]->multibeam_sensors[i].name==rosInterface.targetName)
+						iface=boost::shared_ptr<MultibeamSensorToROS>(new MultibeamSensorToROS(&(iauvFile[j]->multibeam_sensors[i]),rosInterface.topic, rosInterface.rate));
+			}
 
 		if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
 			iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));

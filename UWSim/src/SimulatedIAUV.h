@@ -18,6 +18,7 @@
 #include "PressureSensor.h"
 #include "GPSSensor.h"
 #include "DVLSensor.h"
+#include "MultibeamSensor.h"
 
 class SceneBuilder; 
 
@@ -33,6 +34,7 @@ public:
 	std::vector<PressureSensor> pressure_sensors;
 	std::vector<GPSSensor> gps_sensors;
 	std::vector<DVLSensor> dvl_sensors;
+	std::vector<MultibeamSensor> multibeam_sensors;
 
 	typedef enum {ARM5,PA10} arm_t;
 

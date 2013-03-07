@@ -230,6 +230,23 @@
 
     </virtualRangeImage>
 
+    <multibeamSensor>
+      <name>multibeam</name>
+      <relativeTo>part0</relativeTo>
+      <position>
+        <x>-0.2</x>
+        <y> 0.1 </y>
+        <z> 0 </z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>1.57 </y>
+      </orientation>
+      <numpixels>320</numpixels>
+      <fieldOfView>40</fieldOfView>
+    </multibeamSensor>
+
   </vehicle>
 
   <object>
@@ -339,6 +356,10 @@
       <imageTopic> /uwsim/rangecamera </imageTopic>
       <infoTopic> /uwsim/rangecamera_info </infoTopic>
     </RangeImageSensorToROSImage>
+    <multibeamSensorToLaserScan>
+      <name>multibeam</name>
+      <topic>g500/multibeam</topic>
+    </multibeamSensorToLaserScan>
   </rosInterfaces>
 </UWSimScene>
 

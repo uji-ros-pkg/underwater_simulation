@@ -21,6 +21,7 @@
 #include "GPSSensor.h"
 #include "DVLSensor.h"
 #include "HUDCamera.h"
+#include "MultibeamSensor.h"
 #include "UWSimUtils.h"
 
 //OSG
@@ -345,6 +346,18 @@ public:
 	void publish();
 	
 	~RangeSensorToROSRange();
+};
+
+class MultibeamSensorToROS : public ROSPublisherInterface {
+	MultibeamSensor *MB;
+public:
+	MultibeamSensorToROS(MultibeamSensor *multibeamSensor, std::string topic, int rate);
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+	
+	~MultibeamSensorToROS();
 };	
 #endif
 		

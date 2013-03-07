@@ -14,7 +14,7 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan} type_t;
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -87,6 +87,15 @@ struct XMLDVLSensor {
   void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
 };
 
+struct XMLMultibeamSensor {
+  string name;
+  string linkName;
+  double position[3],orientation[3];
+  int link, numpixels;
+  double fieldOfView;
+  void init(){name="";linkName=""; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+};
+
 struct Mimic{
   string jointName;
   double offset,multiplier;
@@ -144,6 +153,7 @@ struct Vehicle{
   std::list<XMLPressureSensor> pressure_sensors;
   std::list<XMLGPSSensor> gps_sensors;
   std::list<XMLDVLSensor> dvl_sensors;
+  std::list<XMLMultibeamSensor> multibeam_sensors;
 };
 
 struct PhysicProperties{
@@ -194,6 +204,7 @@ private:
   void processPressureSensor(const xmlpp::Node* node, XMLPressureSensor &ps);
   void processDVLSensor(const xmlpp::Node* node, XMLDVLSensor &s);
   void processGPSSensor(const xmlpp::Node* node, XMLGPSSensor &s);
+  void processMultibeamSensor(const xmlpp::Node* node, XMLMultibeamSensor &s);
   void processCamera(const xmlpp::Node* node);
   void processJointValues(const xmlpp::Node* node, std::vector<double> &jointValues, int &ninitJoints);
   void processVehicle(const xmlpp::Node* node, Vehicle &vehicle);
