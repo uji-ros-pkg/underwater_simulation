@@ -697,6 +697,9 @@ void  MultibeamSensorToROS::publish() {
     double fov,aspect,near,far;
 
     MB->textureCamera->getProjectionMatrixAsPerspective (fov,aspect,near,far);
+    ls.angle_min=-fov * M_PI / (180.0 * 2.0);
+    ls.angle_max=fov * M_PI / (180.0 * 2.0);
+    ls.angle_increment= (ls.angle_max - ls.angle_min) / MB->numpixels;
     ls.range_min=near;
     ls.range_max=far;
     ls.ranges.resize(MB->numpixels);
