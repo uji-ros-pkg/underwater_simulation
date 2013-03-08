@@ -83,6 +83,7 @@ src/InertialMeasurementUnit.cpp
 src/PressureSensor.cpp
 src/DVLSensor.cpp
 src/GPSSensor.cpp
+src/MultibeamSensor.cpp
 src/BulletPhysics.cpp
 src/PhysicsBuilder.cpp
 src/BulletHfFluid/btHfFluid.cpp

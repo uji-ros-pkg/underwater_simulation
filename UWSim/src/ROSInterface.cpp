@@ -699,6 +699,8 @@ void  MultibeamSensorToROS::publish() {
     ls.range_min=near;
     ls.range_max=far;
     ls.ranges.resize(MB->numpixels);
+    std::vector<double> tmp;
+    tmp.resize(MB->numpixels);
 
     unsigned char * data= (unsigned char *)MB->depthTexture->data();
     double a=far/(far-near);
@@ -706,8 +708,12 @@ void  MultibeamSensorToROS::publish() {
 
     for(int i=0;i<MB->numpixels;i++){
 	double Z=((int)data[i])/256.0;
-        ls.ranges[i]=b/(Z-a);
+        tmp[i]=b/(Z-a);
     }
+    for(int i=0;i<MB->numpixels;i++){
+	ls.ranges[i]=tmp[MB->remapVector[i].pixel1]*MB->remapVector[i].weight1+tmp[MB->remapVector[i].pixel2]*MB->remapVector[i].weight2;
+    }
+
     /*r.radiation_type=sensor_msgs::Range::ULTRASOUND;
     r.field_of_view=0;	//X axis of the sensor
     r.min_range=0;

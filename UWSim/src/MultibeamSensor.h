@@ -5,11 +5,16 @@
 
 
 class MultibeamSensor: public VirtualCamera{
+  struct Remap{
+    int pixel1,pixel2;
+    double weight1,weight2;
+  };
 
   public:
     int numpixels;
-    MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov):VirtualCamera(uwsim_root,name,trackNode,width,fov){this->numpixels=width;};
-
+    std::vector<Remap> remapVector;
+    MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov);
+    void preCalcTable(double fov);
 };
 
 #endif

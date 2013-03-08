@@ -93,8 +93,8 @@ void VirtualCamera::createCamera()
 	  //set default fov, near and far parameters
 	  if(!fov)
 	    textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
-          else
-	    textureCamera->setProjectionMatrixAsPerspective(fov, 1.33, 0.8, 10);
+          else //Used in multibeam, aspect ratio correction should be improved
+	    textureCamera->setProjectionMatrixAsPerspective(fov, 1+0.004464*fov, 0.8, 10);
 	  osg::Matrixd m;
 	  m=textureCamera->getProjectionMatrix();
 	  fx=m(0,0)*width/2.0;
