@@ -12,7 +12,7 @@
 <!ELEMENT pressureSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT gpsSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT dvlSensor (name,relativeTo,position?,orientation?, std?)>
-<!ELEMENT multibeamSensor (name,relativeTo,position?,orientation?, numpixels,fieldOfView)>
+<!ELEMENT multibeamSensor (name,relativeTo,position?,orientation?, initAngle,finalAngle, angleIncr,range)>
 <!ELEMENT camera (freeMotion?,objectToTrack?,fov?,aspectRatio?,near?,far?,position?,lookAt?) >
 <!ELEMENT object (name,file,position,orientation,offsetp?,offsetr?,physics?)>
 <!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?, (RangeImageSensorToROSImage*)?,(multibeamSensorToLaserScan*)?)>
@@ -97,8 +97,9 @@
 <!ELEMENT visible (#PCDATA)>
 
 <!--elementos multibeamSensor -->
-<!ELEMENT numpixels (#PCDATA)>
-<!ELEMENT fieldOfView (#PCDATA)>
+<!ELEMENT initAngle (#PCDATA)>
+<!ELEMENT finalAngle (#PCDATA)>
+<!ELEMENT angleIncr (#PCDATA)>
 
 <!-- elementos vehicle -->
 <!ELEMENT name (#PCDATA)>

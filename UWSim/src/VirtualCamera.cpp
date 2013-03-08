@@ -49,8 +49,11 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 }
 
 
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov){//Used in multibeam
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
+  this->far=range*1.2; //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
+  std::cout<<fov<<std::endl;
   init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov);
+
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
@@ -94,7 +97,7 @@ void VirtualCamera::createCamera()
 	  if(!fov)
 	    textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
           else //Used in multibeam, aspect ratio correction should be improved
-	    textureCamera->setProjectionMatrixAsPerspective(fov, 1+0.004464*fov, 0.8, 10);
+	    textureCamera->setProjectionMatrixAsPerspective(fov, 1+0.004464*fov, 0.8, far);
 	  osg::Matrixd m;
 	  m=textureCamera->getProjectionMatrix();
 	  fx=m(0,0)*width/2.0;

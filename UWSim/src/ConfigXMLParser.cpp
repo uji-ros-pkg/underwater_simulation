@@ -412,10 +412,14 @@ void ConfigFile::processMultibeamSensor(const xmlpp::Node* node, XMLMultibeamSen
 			extractOrientation(child,MB.orientation);
 		else if(child->get_name()=="name")
 			extractStringChar(child,MB.name);
-		else if(child->get_name()=="numpixels")
-			extractIntChar(child,MB.numpixels);
-		else if(child->get_name()=="fieldOfView")
-			extractFloatChar(child,MB.fieldOfView);
+		else if(child->get_name()=="initAngle")
+			extractFloatChar(child,MB.initAngle);
+		else if(child->get_name()=="finalAngle")
+			extractFloatChar(child,MB.finalAngle);
+		else if(child->get_name()=="angleIncr")
+			extractFloatChar(child,MB.angleIncr);
+		else if(child->get_name()=="range")
+			extractFloatChar(child,MB.range);
 	}
 }
 

@@ -1,14 +1,18 @@
 #include "MultibeamSensor.h"
 
 
-MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov):
-  VirtualCamera(uwsim_root,name,trackNode,width,fov){
+MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode,  double initAngle,double finalAngle,double alpha,double range):
+  VirtualCamera(uwsim_root,name,trackNode,fabs(finalAngle-initAngle)/alpha+1,fabs(finalAngle-initAngle),range){
 
-  this->numpixels=width;
-  preCalcTable(fov);
+  this->numpixels=fabs(finalAngle-initAngle)/alpha+1;
+  this->range=range;
+  this->initAngle=initAngle;
+  this->finalAngle=finalAngle;
+  this->angleIncr=alpha;
+  preCalcTable();
 };
 
-void MultibeamSensor::preCalcTable(double fov){
+void MultibeamSensor::preCalcTable(){
   
   //Create matrix to unproject camera points to real world
   osg::Matrix *MVPW=new osg::Matrix(textureCamera->getViewMatrix() * textureCamera->getProjectionMatrix() * textureCamera->getViewport()->computeWindowMatrix());
@@ -45,7 +49,7 @@ void MultibeamSensor::preCalcTable(double fov){
 	//std::cout<<remapVector[current].weight1<<" "<<remapVector[current].weight2<<" "<<remapVector[current].weight1+remapVector[current].weight2<<std::endl;
       }
       current++;
-      //std::cout<<current<<" "<<i<<std::endl;
+      std::cout<<current<<" "<<i<<std::endl;
     }
     lastTheta=theta;
     //std::cout<<" THETA: "<<theta<<"Current point: "<<current*alpha<<"Error: "<<theta-i*alpha<<"asd: "<<current<<std::endl;

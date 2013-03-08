@@ -162,7 +162,7 @@ public:
 	osg::ref_ptr<osg::Image> renderTexture;  //RGB image
 	osg::ref_ptr<osg::Image> depthTexture;	//Range image
 
-	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, double fov);
+	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, double fov, double range);
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height);
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
     	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId);

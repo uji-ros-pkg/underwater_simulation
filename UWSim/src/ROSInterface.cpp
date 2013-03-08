@@ -697,11 +697,11 @@ void  MultibeamSensorToROS::publish() {
     double fov,aspect,near,far;
 
     MB->textureCamera->getProjectionMatrixAsPerspective (fov,aspect,near,far);
-    ls.angle_min=-fov * M_PI / (180.0 * 2.0);
-    ls.angle_max=fov * M_PI / (180.0 * 2.0);
-    ls.angle_increment= (ls.angle_max - ls.angle_min) / MB->numpixels;
     ls.range_min=near;
-    ls.range_max=far;
+    ls.range_max=MB->range; //far plane should be higher (z-buffer resolution)
+    ls.angle_min=MB->initAngle * M_PI /180;
+    ls.angle_max=MB->finalAngle* M_PI /180;
+    ls.angle_increment=MB->angleIncr* M_PI /180;
     ls.ranges.resize(MB->numpixels);
     std::vector<double> tmp;
     tmp.resize(MB->numpixels);
@@ -713,6 +713,8 @@ void  MultibeamSensorToROS::publish() {
     for(int i=0;i<MB->numpixels;i++){
 	double Z=((int)data[i])/256.0;
         tmp[i]=b/(Z-a);
+	if(tmp[i]>MB->range)
+	  tmp[i]=MB->range;
     }
     for(int i=0;i<MB->numpixels;i++){
 	ls.ranges[i]=tmp[MB->remapVector[i].pixel1]*MB->remapVector[i].weight1+tmp[MB->remapVector[i].pixel2]*MB->remapVector[i].weight2;

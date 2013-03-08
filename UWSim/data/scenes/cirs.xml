@@ -243,8 +243,10 @@
         <p>0</p>
         <y>1.57 </y>
       </orientation>
-      <numpixels>320</numpixels>
-      <fieldOfView>40</fieldOfView>
+      <initAngle>-20</initAngle>
+      <finalAngle>20</finalAngle>
+      <angleIncr>0.1</angleIncr>
+      <range>10</range>
     </multibeamSensor>
 
   </vehicle>

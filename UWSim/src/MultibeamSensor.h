@@ -12,9 +12,10 @@ class MultibeamSensor: public VirtualCamera{
 
   public:
     int numpixels;
+    double range,initAngle,finalAngle,angleIncr;
     std::vector<Remap> remapVector;
-    MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov);
-    void preCalcTable(double fov);
+    MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, double initAngle,double finalAngle,double alpha,double range);
+    void preCalcTable();
 };
 
 #endif

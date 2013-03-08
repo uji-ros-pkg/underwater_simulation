@@ -198,7 +198,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		vMs->asPositionAttitudeTransform()->setPosition(osg::Vec3d(MB.position[0],MB.position[1],MB.position[2]));
 		vMs->asPositionAttitudeTransform()->setAttitude(osg::Quat(MB.orientation[0],osg::Vec3d(1,0,0),MB.orientation[1],osg::Vec3d(0,1,0), MB.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[MB.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-		MultibeamSensor  mb=MultibeamSensor(oscene->root,MB.name,vMs,MB.numpixels,MB.fieldOfView);
+		MultibeamSensor  mb=MultibeamSensor(oscene->root,MB.name,vMs,MB.initAngle,MB.finalAngle,MB.angleIncr,MB.range);
 		multibeam_sensors.push_back(mb);
 		camview.push_back(mb);
 		OSG_INFO << "Done adding a Multibeam Sensor..." << std::endl;

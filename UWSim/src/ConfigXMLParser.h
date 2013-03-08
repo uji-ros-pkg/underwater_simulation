@@ -91,8 +91,8 @@ struct XMLMultibeamSensor {
   string name;
   string linkName;
   double position[3],orientation[3];
-  int link, numpixels;
-  double fieldOfView;
+  int link;
+  double initAngle,finalAngle,angleIncr,range;
   void init(){name="";linkName=""; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
 };
 
