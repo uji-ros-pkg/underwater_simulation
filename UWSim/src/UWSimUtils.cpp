@@ -1,3 +1,4 @@
+#include <ros/ros.h>
 #include "SimulatorConfig.h"
 #include "UWSimUtils.h"
 #include <osg/Material>

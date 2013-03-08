@@ -692,6 +692,7 @@ void  MultibeamSensorToROS::publish() {
   if (MB!=NULL) {
     sensor_msgs::LaserScan ls;
     ls.header.stamp = getROSTime();
+    ls.header.frame_id = MB->name;
 
     double fov,aspect,near,far;
 
