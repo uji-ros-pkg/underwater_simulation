@@ -43,7 +43,7 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	renderTexture=new osg::Image();
 	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
 	depthTexture=new osg::Image();
-	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE);
+	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
 
 	createCamera();
 }
@@ -51,7 +51,6 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
   this->far=range*1.2; //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  std::cout<<fov<<std::endl;
   init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov);
 
 }

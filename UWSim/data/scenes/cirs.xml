@@ -243,8 +243,8 @@
         <p>0</p>
         <y>1.57 </y>
       </orientation>
-      <initAngle>-20</initAngle>
-      <finalAngle>20</finalAngle>
+      <initAngle>-60</initAngle>
+      <finalAngle>60</finalAngle>
       <angleIncr>0.1</angleIncr>
       <range>10</range>
     </multibeamSensor>

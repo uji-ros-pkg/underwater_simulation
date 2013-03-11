@@ -8,6 +8,7 @@ class MultibeamSensor: public VirtualCamera{
   struct Remap{
     int pixel1,pixel2;
     double weight1,weight2;
+    double distort;
   };
 
   public:

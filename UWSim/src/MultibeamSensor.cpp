@@ -19,8 +19,9 @@ void MultibeamSensor::preCalcTable(){
   MVPW->invert(*MVPW);
 
   //Get real fov from camera
-  osg::Vec3d first=osg::Vec3d(0,0,1)*(*MVPW), last=osg::Vec3d(numpixels-1,0,1)*(*MVPW);
+  osg::Vec3d first=osg::Vec3d(0,0,1)*(*MVPW), last=osg::Vec3d(numpixels-1,0,1)*(*MVPW), center=osg::Vec3d(numpixels/2,0,1)*(*MVPW);
   double realfov=acos((first*last)/(last.length()*first.length()));
+  double thetacenter=acos((first*center)/(center.length()*first.length()));
   double alpha=realfov/(numpixels);
   //std::cout<<realfov<<" "<<alpha<<std::endl;
 
@@ -49,7 +50,9 @@ void MultibeamSensor::preCalcTable(){
 	//std::cout<<remapVector[current].weight1<<" "<<remapVector[current].weight2<<" "<<remapVector[current].weight1+remapVector[current].weight2<<std::endl;
       }
       current++;
-      std::cout<<current<<" "<<i<<std::endl;
+      remapVector[current].distort=1+fabs(theta-thetacenter)*fabs(theta-thetacenter)*fabs(theta-thetacenter)/1.3;
+      //std::cout<<theta<<":"<<tan(theta)<<" asd:"<<fx<<std::endl;
+      //std::cout<<current<<" "<<i<<std::endl;
     }
     lastTheta=theta;
     //std::cout<<" THETA: "<<theta<<"Current point: "<<current*alpha<<"Error: "<<theta-i*alpha<<"asd: "<<current<<std::endl;
