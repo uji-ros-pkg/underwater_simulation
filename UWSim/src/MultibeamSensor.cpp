@@ -49,8 +49,8 @@ void MultibeamSensor::preCalcTable(){
 	remapVector[current].weight2=dist/(dist+prevdist);
 	//std::cout<<remapVector[current].weight1<<" "<<remapVector[current].weight2<<" "<<remapVector[current].weight1+remapVector[current].weight2<<std::endl;
       }
-      current++;
       remapVector[current].distort=1+fabs(theta-thetacenter)*fabs(theta-thetacenter)*fabs(theta-thetacenter)/1.3;
+      current++;
       //std::cout<<theta<<":"<<tan(theta)<<" asd:"<<fx<<std::endl;
       //std::cout<<current<<" "<<i<<std::endl;
     }
