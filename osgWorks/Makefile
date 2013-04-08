@@ -6,6 +6,7 @@ TARBALL_URL= http://osgworks.googlecode.com/files/$(FILENAME)
 SOURCE_DIR = build/osgw2
 UNPACK_CMD = tar xvf
 MD5SUM_FILE = $(FILENAME).md5sum
+TARBALL_PATCH = osgWorks_isTransparent.patch
 include $(shell rospack find mk)/download_unpack_build.mk
 
 INSTALL_DIR = `rospack find osgWorks`/
