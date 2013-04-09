@@ -278,6 +278,33 @@ void ConfigFile::processVcam(const xmlpp::Node* node,Vcam &vcam){
 
 }
 
+///////////////////////////////////////////////////////////////////////////
+// MMC (UIB)
+///////////////////////////////////////////////////////////////////////////
+void ConfigFile::processSLProjector(const xmlpp::Node* node, slProjector &slp){
+  xmlpp::Node::NodeList list = node->get_children();
+  for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+    xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+    if(child->get_name()=="position")
+      extractPositionOrColor(child,slp.position);
+    else if(child->get_name()=="relativeTo")
+      extractStringChar(child,slp.linkName);
+    else if(child->get_name()=="orientation")
+      extractOrientation(child,slp.orientation);
+    else if(child->get_name()=="name")
+      extractStringChar(child,slp.name);
+    else if(child->get_name()=="fov")
+      extractFloatChar(child,slp.fov);
+    else if(child->get_name()=="visible")
+      extractIntChar(child,slp.visible);
+    else if(child->get_name()=="image_name")
+      extractStringChar(child,slp.image_name);
+  }
+}
+///////////////////////////////////////////////////////////////////////////
+// END MMC (UIB)
+///////////////////////////////////////////////////////////////////////////
+
 void ConfigFile::processRangeSensor(const xmlpp::Node* node, rangeSensor &rs){
 	xmlpp::Node::NodeList list = node->get_children();
 	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
@@ -650,6 +677,35 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle){
 			vehicle.VRangecams.push_back(aux2);
 	}
 
+    ///////////////////////////////////////////////////////////////////////////
+    // MMC (UIB)
+    ///////////////////////////////////////////////////////////////////////////
+    //get Structured Light Projector joint
+    slProjector slp;
+    for(unsigned int i = 0; i < vehicle.sls_projectors.size(); i++)
+    {
+      found = 0;
+      slp = vehicle.sls_projectors.front();
+      vehicle.sls_projectors.pop_front();
+      for(int j = 0; j < vehicle.nlinks && !found; j++)
+      {
+        if(vehicle.links[j].name == slp.linkName)
+        {
+          slp.link = j;
+          found = 1;
+        }
+      }
+      if(found == 0)
+      {
+        OSG_WARN << "ConfigFile::postProcessVehicle: Structured Light Projector attached to unknown link: " << slp.linkName << ". Will be ignored"<< std::endl;
+      } else {
+        vehicle.sls_projectors.push_back(slp);
+      }
+    }
+  ///////////////////////////////////////////////////////////////////////////
+  // END MMC (UIB)
+  ///////////////////////////////////////////////////////////////////////////
+
 	//get Range sensor joint
 	rangeSensor rs;
 	for(unsigned int i=0;i<vehicle.range_sensors.size();i++){
@@ -812,6 +868,17 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.range=1;
 			processVcam(child,aux);
 			vehicle.VRangecams.push_back(aux);
+        ///////////////////////////////////////////////////////////////////////////
+        // MMC (UIB)
+        ///////////////////////////////////////////////////////////////////////////
+        } else if (child->get_name()=="structuredLightProjector"){
+            slProjector aux;
+            aux.init();
+            processSLProjector(child,aux);
+            vehicle.sls_projectors.push_back(aux);
+        ///////////////////////////////////////////////////////////////////////////
+        // END MMC (UIB)
+        ///////////////////////////////////////////////////////////////////////////
 		} else if (child->get_name()=="rangeSensor"){
 			rangeSensor aux;
 			aux.init();

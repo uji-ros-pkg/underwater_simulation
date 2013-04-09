@@ -3,9 +3,10 @@
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
 <!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsWater?)>
-<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*)>
+<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?, showpath?)>
 <!ELEMENT virtualRangeImage (name,relativeTo,resw?,resh?,position?,orientation?,parameters?)>
+<!ELEMENT structuredLightProjector (name,relativeTo,fov,image_name,visible?,position?,orientation?)>
 <!ELEMENT rangeSensor (name,relativeTo,range,visible?,position?,orientation?)>
 <!ELEMENT objectPicker (name,relativeTo,range,position?,orientation?)>
 <!ELEMENT imu (name,relativeTo,position?,orientation?, std?)>
@@ -95,6 +96,9 @@
 <!--elementos rangeSensor -->
 <!ELEMENT range (#PCDATA)>
 <!ELEMENT visible (#PCDATA)>
+
+<!--elementos structuredLightProjector -->
+<!ELEMENT image_name (#PCDATA)>
 
 <!--elementos multibeamSensor -->
 <!ELEMENT initAngle (#PCDATA)>
