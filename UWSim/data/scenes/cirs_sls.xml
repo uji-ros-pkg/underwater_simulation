@@ -69,7 +69,7 @@
 
   <vehicle>
     <name>girona500</name>
-    <file>data/scenes/g500ARM5_sls2.urdf</file>
+    <file>data/scenes/g500ARM5_sls.urdf</file>
     <jointValues>
       <joint> 0 </joint>
       <joint> 0</joint>
