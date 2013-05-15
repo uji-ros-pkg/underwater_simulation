@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rosrun UWSim UWSim_binary
