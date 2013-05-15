@@ -1,52 +1,54 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(UWSim)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  sensor_msgs
+  nav_msgs
+  image_transport
+  uwsim_osgocean
+  urdf
+  urdf_parser
+  underwater_sensor_msgs
+  uwsim_osgbullet
+  uwsim_osgworks
+  resource_retriever
+  roscpp
+  libxml++-2.6
+  boost
+  libopenscenegraph
+  opengl
+)
 
+catkin_package(
+  INCLUDE_DIRS
+    include  
+  LIBRARIES
+    uwsim
+  CATKIN_DEPENDS
+    geometry_msgs
+    sensor_msgs
+    nav_msgs
+    image_transport
+    uwsim_osgocean
+    urdf
+    urdf_parser
+    underwater_sensor_msgs
+    uwsim_osgbullet
+    uwsim_osgworks
+    resource_retriever
+    roscpp
+    libxml++-2.6
+    boost
+    libopenscenegraph
+    opengl
+)
 
-rosbuild_init()
-
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
-
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#target_link_libraries(example ${PROJECT_NAME})
+find_package(Boost REQUIRED thread program_options system filesystem)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
 
 FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg)
-
-#FIXME: Physics still not implemented
-OPTION(BUILD_BULLET_PHYSICS "Add physics support with Bullet? (fix routes in CMakeLists)" OFF)
-IF (BUILD_BULLET_PHYSICS)
-        #FIXME: Remove hard-coded routes
-        #TODO: Create FindXXXX.cmake files instead
-        SET(BULLET_INCLUDE_DIR /home/mprats/local/bullet-2.78/include)
-        SET(BULLET_LIBRARY_DIR /home/mprats/local/bullet-2.78/build/lib)
-        SET(OSGWORKS_INCLUDE_DIR /home/mprats/local/osgWorks/build/include)
-        SET(OSGWORKS_LIBRARY_DIR /home/mprats/local/osgWorks/build/lib)
-        SET(OSGBULLET_INCLUDE_DIR /home/mprats/local/osgBullet/build/include)
-        SET(OSGBULLET_LIBRARY_DIR /home/mprats/local/osgBullet/build/lib)
-        SET(BULLET_LIBRARIES osgbBullet osgwControls osgwTools BulletCollision LinearMath BulletDynamics)
-ENDIF()
 
 SET(SIMULATOR_ROOT_PATH "${PROJECT_SOURCE_DIR}/")
 SET(SIMULATOR_DATA_PATH "${PROJECT_SOURCE_DIR}/data/")
@@ -63,7 +65,10 @@ LINK_DIRECTORIES(${BULLET_LIBRARY_DIR} ${OSGWORKS_LIBRARY_DIR} ${OSGBULLET_LIBRA
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
 
-rosbuild_add_library(uwsim 
+link_directories(${Boost_LIBRARY_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+
+add_library(uwsim 
 src/osgOceanScene.cpp
 src/SkyDome.cpp
 src/SphereSegment.cpp
@@ -96,29 +101,71 @@ src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
 src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
 )
 
-rosbuild_add_executable(UWSim  src/main.cpp)
-rosbuild_add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
-rosbuild_add_executable(setJointPosition interface_examples/setJointPosition.cpp)
-rosbuild_add_executable(setJointVelocity interface_examples/setJointVelocity.cpp)
-rosbuild_add_executable(setVehiclePosition interface_examples/setVehiclePosition.cpp)
-rosbuild_add_executable(setVehiclePose interface_examples/setVehiclePose.cpp)
-rosbuild_add_executable(setVehicleVelocity interface_examples/setVehicleVelocity.cpp)
-rosbuild_add_executable(setVehicleTwist interface_examples/setVehicleTwist.cpp)
-rosbuild_add_executable(setVehicleDisturbances interface_examples/setVehicleDisturbances.cpp)
-rosbuild_add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp)
-rosbuild_add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
-rosbuild_add_executable(setVehicleActuators interface_examples/setVehicleActuators.cpp)
+target_link_libraries(uwsim ${catkin_LIBRARIES})
+add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
-TARGET_LINK_LIBRARIES(UWSim uwsim ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} GLU)
-TARGET_LINK_LIBRARIES(makeVehicleSurvey ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setJointPosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setJointVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehiclePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehiclePosition ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleVelocity ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleTwist ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleDisturbances ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(gotoAbsolutePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(gotoRelativePose ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
-TARGET_LINK_LIBRARIES(setVehicleActuators ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES})
+add_executable(UWSim_binary  src/main.cpp)
+target_link_libraries(UWSim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
+target_link_libraries(makeVehicleSurvey uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setJointPosition interface_examples/setJointPosition.cpp)
+target_link_libraries(setJointPosition uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setJointVelocity interface_examples/setJointVelocity.cpp)
+target_link_libraries(setJointVelocity uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehiclePosition interface_examples/setVehiclePosition.cpp)
+target_link_libraries(setVehiclePosition uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehiclePose interface_examples/setVehiclePose.cpp)
+target_link_libraries(setVehiclePose uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehicleVelocity interface_examples/setVehicleVelocity.cpp)
+target_link_libraries(setVehicleVelocity uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehicleTwist interface_examples/setVehicleTwist.cpp)
+target_link_libraries(setVehicleTwist uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehicleDisturbances interface_examples/setVehicleDisturbances.cpp)
+target_link_libraries(setVehicleDisturbances uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(gotoAbsolutePose interface_examples/gotoAbsolutePose.cpp)
+target_link_libraries(gotoAbsolutePose uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(gotoRelativePose interface_examples/gotoRelativePose.cpp)
+target_link_libraries(gotoRelativePose uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(setVehicleActuators interface_examples/setVehicleActuators.cpp)
+target_link_libraries(setVehicleActuators uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+install(
+  TARGETS
+    uwsim
+    UWSim_binary
+    makeVehicleSurvey
+    setJointPosition
+    setJointVelocity
+    setVehiclePosition
+    setVehiclePose
+    setVehicleVelocity
+    setVehicleTwist
+    setVehicleDisturbances
+    gotoAbsolutePose
+    gotoRelativePose
+    setVehicleActuators
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+)
+
+install(DIRECTORY src/
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+   FILES_MATCHING PATTERN "UWSim" 
+)
