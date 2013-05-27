@@ -47,7 +47,7 @@
       <y> 0</y>
       <z> -1.57 </z>
     </offsetr>
-    <enablePhysics> 1 </enablePhysics>
+    <enablePhysics> 0 </enablePhysics>
   </simParams>
   <camera>
     <freeMotion> 1 </freeMotion>
@@ -70,7 +70,7 @@
 
   <vehicle>
     <name>girona500</name>
-    <file>data/scenes/g500ARM5.urdf</file>
+    <file>data/scenes/g500ARM5_laser.urdf</file>
     <jointValues>
       <joint> 0 </joint>
       <joint> 0</joint>
@@ -81,7 +81,7 @@
     <position>
       <x> 0</x>
       <y> 0 </y>
-      <z> 2.0 </z>
+      <z> 3.0 </z>
     </position>
     <orientation>
       <r>0</r>
@@ -122,6 +122,25 @@
         <y>1.57 </y>
       </orientation>
     </virtualCamera>
+
+    <structuredLightProjector>
+      <name>laser_projector</name>
+      <relativeTo>sls</relativeTo>
+      <fov>22</fov>
+      <image_name>data/textures/laser_texture.png</image_name>
+      <visible>0</visible>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>3.14</p>
+        <y>-1.57</y>
+      </orientation>
+    </structuredLightProjector>
+
     <rangeSensor>
       <name>sonar</name>
       <relativeTo>part0</relativeTo>

@@ -178,7 +178,7 @@
       <name>laser_projector</name>
       <relativeTo>sls</relativeTo>
       <fov>22</fov>
-      <image_name>data/textures/laser_texture3.png</image_name>
+      <image_name>data/textures/laser_texture.png</image_name>
       <visible>0</visible>
       <position>
         <x>0</x>
