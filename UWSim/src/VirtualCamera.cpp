@@ -10,6 +10,23 @@
 #include <iostream>
 #include "SceneBuilder.h"
 
+class UpdateVMI : public osg::Uniform::Callback
+{
+public:
+	UpdateVMI(osg::Camera* camera)
+		: mCamera(camera)
+	{
+	}
+	virtual void operator () (osg::Uniform* u, osg::NodeVisitor*)
+	{
+
+		u->set(mCamera->getInverseViewMatrix());
+	}
+
+protected:
+	osg::Camera* mCamera;
+};
+
 VirtualCamera::VirtualCamera(){}
 
 void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov) {
@@ -90,6 +107,7 @@ void VirtualCamera::createCamera()
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
 	
 	if(!paramsOn){
 	  //set default fov, near and far parameters
@@ -120,6 +138,9 @@ void VirtualCamera::createCamera()
 	Tx = (-fx * baseline);
 	Ty = 0.0;	
 
+	osg::Uniform* u = new osg::Uniform("osg_ViewMatrixInverse",textureCamera->getInverseViewMatrix());
+	u->setUpdateCallback( new UpdateVMI(textureCamera) );
+	textureCamera->getOrCreateStateSet()->addUniform( u );
 	node_tracker = new MyNodeTrackerCallback(uwsim_root, depthTexture, textureCamera);
 	trackNode->setUpdateCallback(node_tracker);
 }
