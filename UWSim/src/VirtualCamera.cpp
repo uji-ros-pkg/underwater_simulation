@@ -138,6 +138,7 @@ void VirtualCamera::createCamera()
 	Tx = (-fx * baseline);
 	Ty = 0.0;	
 
+	//Overwrites view matrix transform on virtual camera shaders (it makes it independent from main view)
 	osg::Uniform* u = new osg::Uniform("osg_ViewMatrixInverse",textureCamera->getInverseViewMatrix());
 	u->setUpdateCallback( new UpdateVMI(textureCamera) );
 	textureCamera->getOrCreateStateSet()->addUniform( u );

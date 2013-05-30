@@ -32,6 +32,29 @@ protected:
 	osg::Camera* mCamera;
 };
 
+class UpdateTextureLMVPM : public osg::Uniform::Callback
+{
+public:
+  UpdateTextureLMVPM(osg::Node* node,double fov)
+		: mNode(node), mfov(fov)
+  {
+  }
+  virtual void operator () (osg::Uniform* u, osg::NodeVisitor*)
+  {
+    osg::Vec3 position=getWorldCoords(mNode)->getTrans();
+    osg::Quat rotation=getWorldCoords(mNode)->getRotate();
+    osg::Vec3 up(0.0f,-1.0f,0.0f);
+    osg::Vec3 direction(0.0f, 0.0f, -1.0f);
+    osg::Matrixd lmvpm =osg::Matrixd::lookAt(position, position+rotation*direction, rotation*up) * osg::Matrixd::perspective(mfov,1.0,0.1,100)*osg::Matrixd::translate(0.5,0.5,0.5)* osg::Matrix::scale( 0.5, 0.5, 0.5 );
+
+u->set(lmvpm);
+  }
+protected:
+	osg::Node* mNode;
+double mfov;
+}; 
+
+
 VirtualSLSProjector::VirtualSLSProjector(){
     osg::ref_ptr<osg::Node> node = new osg::Node;
     osg::ref_ptr<osg::Node> root = new osg::Node;
@@ -64,24 +87,23 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
     // Add SLS projector!
     this->node->asGroup()->addChild(createSLNode(position, direction, fov, lightNum, textureUnit));
 
-    //Add a switchable frame geometry on the sensor frame
-    //osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
-    //this->node->asGroup()->addChild(axis);
-
+    //Create depth texture for shadow mapping test
     dbgDepthTexture = new osg::Texture2D;
-    dbgDepthTexture->setTextureSize(512, 512);
+    dbgDepthTexture->setTextureSize(512, 512);  //CHECK: Maybe we can use a smaller texture?
     dbgDepthTexture->setInternalFormat(GL_DEPTH_COMPONENT);
-    //dbgDepthTexture->setShadowTextureMode(osg::Texture2D::LUMINANCE);
-    //dbgDepthTexture->setShadowComparison(true);
-    //dbgDepthTexture->setShadowCompareFunc(osg::Texture::LEQUAL);
-    dbgDepthTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-    dbgDepthTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-    dbgDepthTexture->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER);
     dbgDepthTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
     dbgDepthTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
     root->getOrCreateStateSet()->setTextureAttributeAndModes(3,dbgDepthTexture,osg::StateAttribute::ON);
-
     camera.textureCamera->attach(osg::Camera::DEPTH_BUFFER,dbgDepthTexture);
+
+    osg::Texture2D* texture = new osg::Texture2D();
+    osg::Image* texture_to_project = osgDB::readImageFile(this->image_name);
+    assert(texture_to_project);
+    texture->setImage(texture_to_project);
+    texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_BORDER); // fa que la textura no es repeteixi continuament
+    texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_BORDER); // veure: http://lucera-project.blogspot.com.es/2010/06/opengl-wrap.html
+    texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_BORDER);
+    root->getOrCreateStateSet()->setTextureAttributeAndModes(4,texture,osg::StateAttribute::ON);
 
     /*camera = new osg::Camera;
     camera->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
@@ -104,7 +126,10 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
     //root->asGroup()->addChild(camera);
     osg::Uniform* u = new osg::Uniform("LightModelViewProjectionMatrix",lmvpm);
     u->setUpdateCallback( new UpdateLMVPM(camera.textureCamera) );
+    osg::Uniform* u2 = new osg::Uniform("textureViewProjectionMatrix",lmvpm);
+    u2->setUpdateCallback( new UpdateTextureLMVPM(node,fov) );
     root->getOrCreateStateSet()->addUniform( u );
+    root->getOrCreateStateSet()->addUniform( u2 );
 
 
 }
