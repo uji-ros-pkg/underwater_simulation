@@ -6,23 +6,19 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   nav_msgs
   image_transport
-  uwsim_osgocean
   urdf
   urdf_parser
   underwater_sensor_msgs
-  uwsim_osgbullet
-  uwsim_osgworks
   resource_retriever
   roscpp
-  libxml++-2.6
-  boost
-  libopenscenegraph
-  opengl
 )
 
+find_package(uwsim_osgocean REQUIRED)
+find_package(uwsim_osgworks REQUIRED)
+find_package(uwsim_osgbullet REQUIRED)
+find_package(uwsim_bullet REQUIRED)
+
 catkin_package(
-  INCLUDE_DIRS
-    include  
   LIBRARIES
     uwsim
   CATKIN_DEPENDS
@@ -30,18 +26,20 @@ catkin_package(
     sensor_msgs
     nav_msgs
     image_transport
-    uwsim_osgocean
     urdf
     urdf_parser
     underwater_sensor_msgs
-    uwsim_osgbullet
-    uwsim_osgworks
     resource_retriever
     roscpp
+  DEPENDS
     libxml++-2.6
     boost
-    libopenscenegraph
     opengl
+    libopenscenegraph
+    uwsim_osgocean
+    uwsim_osgworks
+    uwsim_osgocean
+    uwsim_bullet
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
@@ -57,16 +55,13 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/SimulatorConfig.h.cmake
   ${PROJECT_SOURCE_DIR}/src/SimulatorConfig.h
 )
 
+find_package(PkgConfig)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
-INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIR} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${LIBXML++_INCLUDE_DIRS})
-LINK_DIRECTORIES(${BULLET_LIBRARY_DIR} ${OSGWORKS_LIBRARY_DIR} ${OSGBULLET_LIBRARY_DIR} ${LIBXML++_LIBRARY_DIRS})
+INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
-
-link_directories(${Boost_LIBRARY_DIRS})
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(uwsim 
 src/osgOceanScene.cpp
@@ -101,11 +96,13 @@ src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
 src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
 )
 
-target_link_libraries(uwsim ${catkin_LIBRARIES})
+message("OPENSCENEGRAPH_LIBRARIES= ${OPENSCENEGRAPH_LIBRARIES}")
+
+target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
 add_executable(UWSim_binary  src/main.cpp)
-target_link_libraries(UWSim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(UWSim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU )
 
 add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 target_link_libraries(makeVehicleSurvey uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -168,4 +165,7 @@ install(DIRECTORY include/
 install(DIRECTORY src/
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
    FILES_MATCHING PATTERN "UWSim" 
+   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+               GROUP_READ GROUP_EXECUTE
+               WORLD_READ WORLD_EXECUTE
 )
