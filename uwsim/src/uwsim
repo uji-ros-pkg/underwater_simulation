@@ -17,4 +17,4 @@ then
 fi
 
 echo "Starting UWSim..."
-rosrun UWSim UWSim_binary --dataPath ~/.uwsim/data $@
+rosrun uwsim uwsim_binary --dataPath ~/.uwsim/data $@
