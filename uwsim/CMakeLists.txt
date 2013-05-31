@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(UWSim)
+project(uwsim)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
@@ -101,8 +101,8 @@ message("OPENSCENEGRAPH_LIBRARIES= ${OPENSCENEGRAPH_LIBRARIES}")
 target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
-add_executable(UWSim_binary  src/main.cpp)
-target_link_libraries(UWSim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU )
+add_executable(uwsim_binary  src/main.cpp)
+target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU )
 
 add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 target_link_libraries(makeVehicleSurvey uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -140,7 +140,7 @@ target_link_libraries(setVehicleActuators uwsim ${catkin_LIBRARIES} ${Boost_LIBR
 install(
   TARGETS
     uwsim
-    UWSim_binary
+    uwsim_binary
     makeVehicleSurvey
     setJointPosition
     setJointVelocity
@@ -164,7 +164,7 @@ install(DIRECTORY include/
 
 install(DIRECTORY src/
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-   FILES_MATCHING PATTERN "UWSim" 
+   FILES_MATCHING PATTERN "uwsim" 
    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                GROUP_READ GROUP_EXECUTE
                WORLD_READ WORLD_EXECUTE
