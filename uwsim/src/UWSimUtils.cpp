@@ -238,6 +238,8 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
 }
 
 void UWSimGeometry::applyStateSets(osg::Node *node) {
+          const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+ 
 	  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
           static const char model_vertex[]   = "default_scene.vert";
           static const char model_fragment[] = "default_scene.frag";
@@ -301,6 +303,8 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
     osg::Node * node = retrieveResource(geom->file);
     if(node == NULL) {
       //retrieve resource didn't succeed, let's search in the DATA PATH
+      const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/objects"));
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/terrain"));
