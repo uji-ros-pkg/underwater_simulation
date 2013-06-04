@@ -78,8 +78,11 @@ int main(int argc, char *argv[])
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));	
 	//Add UWSim folders to path
         const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
-	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+"/scenes");	
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));	
+
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH));	
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data");	
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data/scenes");	
 
 	//Add dataPath folder to path
 	if (dataPath!=std::string("")) {
