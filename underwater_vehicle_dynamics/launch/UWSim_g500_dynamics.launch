@@ -5,6 +5,6 @@
 	</include>
 
 	<arg name="scene" default="cirs.xml" />
-	<node name="UWSim" pkg="UWSim" type="UWSim" args="--configfile=$(arg scene)" output="screen" respawn="false" />
+	<node name="uwsim" pkg="uwsim" type="uwsim" args="--configfile=$(arg scene)" output="screen" respawn="false" />
 </launch>
 
