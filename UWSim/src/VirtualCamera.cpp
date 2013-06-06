@@ -48,7 +48,7 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	renderTexture=new osg::Image();
 	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
 	depthTexture=new osg::Image();
-	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
+	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE);
 
 	createCamera();
 }
