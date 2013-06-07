@@ -872,7 +872,28 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 		else if(child->get_name()=="inertia")
 			extractPositionOrColor(child,pp.inertia);
 		else if(child->get_name()=="collisionShapeType")
-			extractStringChar(child,pp.csType);		
+			extractStringChar(child,pp.csType);
+		else if(child->get_name()=="linearDamping"){
+			extractFloatChar(child,pp.linearDamping);		
+			if(pp.linearDamping>1.0)
+			  OSG_WARN << "ConfigFile::PhysicProperties: linearDamping is higher than 1.0."<< std::endl;
+		}
+		else if(child->get_name()=="angularDamping"){
+			extractFloatChar(child,pp.angularDamping);		
+			if(pp.linearDamping>1.0)
+			  OSG_WARN << "ConfigFile::PhysicProperties: angularDamping is higher than 1.0."<< std::endl;
+		}
+		else if(child->get_name()=="linearFactor")
+			extractPositionOrColor(child,pp.linearFactor);
+		else if(child->get_name()=="angularFactor")
+			extractPositionOrColor(child,pp.angularFactor);
+		else if(child->get_name()=="isKinematic"){
+			extractIntChar(child,pp.isKinematic);
+			if (pp.isKinematic!=0 && pp.isKinematic!=1) {
+				OSG_WARN <<"ConfigFile::PhysicProperties: isKinematic is not a binary value ( 0 1), using default value (0)" << std::endl;
+				freeMotion=0;
+			}
+		}
 		
 	}
 }

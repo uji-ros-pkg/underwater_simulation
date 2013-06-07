@@ -144,7 +144,12 @@
 <!ELEMENT info (#PCDATA)>
 
 <!-- elementos physics -->
-<!ELEMENT physics (mass,inertia,collisionShapeType)>
+<!ELEMENT physics (mass?,inertia?,collisionShapeType?,linearDamping?,angularDamping?,linearFactor?,angularFactor?,isKinematic?)>
 <!ELEMENT mass (#PCDATA)>
 <!ELEMENT inertia (x,y,z)>
 <!ELEMENT collisionShapeType (#PCDATA)>
+<!ELEMENT linearDamping (#PCDATA)>
+<!ELEMENT angularDamping (#PCDATA)>
+<!ELEMENT linearFactor (x,y,z)>
+<!ELEMENT angularFactor (x,y,z)>
+<!ELEMENT isKinematic (#PCDATA)>

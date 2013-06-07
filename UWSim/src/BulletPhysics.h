@@ -76,11 +76,8 @@ public:
 	BulletPhysics(double configGravity[3],osgOcean::OceanTechnique* oceanSurf,PhysicsWater physicsWater);
 
 	void setGravity(btVector3 g) {dynamicsWorld->setGravity( g );}
-
-	btRigidBody* addDynamicObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape = NULL );
-	btRigidBody* addKinematicObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape= NULL);
-
-	btRigidBody* addFloatingObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data ,osg::Node * colShape= NULL);
+	btRigidBody* addObject(osg::MatrixTransform *root, osg::Node *node,CollisionDataType * data,boost::shared_ptr<PhysicProperties> pp,osg::Node * colShape = NULL);
+	btRigidBody* addFloatingObject(osg::MatrixTransform *root, osg::Node *node,CollisionDataType * data,boost::shared_ptr<PhysicProperties> pp,osg::Node * colShape = NULL);
 
 	void stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep );
 	void printManifolds();
@@ -103,7 +100,6 @@ private:
 	void cleanManifolds();
 	btCollisionShape* GetCSFromOSG(osg::Node * node, collisionShapeType_t ctype);
 	btConvexShape* GetConvexCSFromOSG(osg::Node * node, collisionShapeType_t ctype);
-	btRigidBody* addObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape= NULL );
 
 	void updateOceanSurface();
 	
