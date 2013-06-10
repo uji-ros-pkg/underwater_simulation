@@ -34,15 +34,15 @@ int main(int argc, char **argv) {
 	while (ros::ok()) {
 		
 		sensor_msgs::JointState js;
-        	js.name.push_back(std::string("q1"));
+        	js.name.push_back(std::string("Slew"));
         	js.position.push_back(q[0]);
-        	js.name.push_back(std::string("q2"));
+        	js.name.push_back(std::string("Shoulder"));
         	js.position.push_back(q[1]);
-        	js.name.push_back(std::string("q3"));
+        	js.name.push_back(std::string("Elbow"));
         	js.position.push_back(q[2]);
-        	js.name.push_back(std::string("q4"));
+        	js.name.push_back(std::string("JawRotate"));
         	js.position.push_back(q[3]);
-        	js.name.push_back(std::string("q5"));
+        	js.name.push_back(std::string("JawOpening"));
         	js.position.push_back(q[4]);
 
         	position_pub.publish(js);

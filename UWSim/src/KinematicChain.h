@@ -34,6 +34,7 @@ public:
 	std::vector<osg::ref_ptr<osg::Node> > link;	///< pointers to link models
 	std::vector<double> q;			///< Joint values
 	std::vector<std::pair<double,double> > limits;		///<Limits for joints by default -PI , PI
+	std::vector<std::string> names;		//Names of the joints
 
 	std::vector<MimicArm> mimic;			//Mimic joints info
 	std::vector<int> jointType;			//type of joints 0 fixed, 1 rotation, 2 prismatic
@@ -52,8 +53,8 @@ public:
 
 	void setJointPosition(double *q, int n);
 	void setJointVelocity(double *qdot, int n);
-	void setJointPosition(std::vector<double> &q);
-	void setJointVelocity(std::vector<double> &qdot);
+	void setJointPosition(std::vector<double> &q,std::vector<std::string> names=std::vector<std::string>());
+	void setJointVelocity(std::vector<double> &qdot,std::vector<std::string> names=std::vector<std::string>());
 	std::vector<double> getJointPosition();
 
 
