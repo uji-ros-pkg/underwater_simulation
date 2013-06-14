@@ -213,8 +213,45 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
     btRigidBody* body = new btRigidBody( rb );
     body->setUserPointer(data);
 
-    body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
-    body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
+		
+    if(pp->maxAngularLimit[0]>=pp->minAngularLimit[0] || pp->maxAngularLimit[1]>=pp->minAngularLimit[1] || pp->maxAngularLimit[1]>=pp->minAngularLimit[1] ||
+	pp->maxLinearLimit[0]>=pp->minLinearLimit[0] || pp->maxLinearLimit[1]>=pp->minLinearLimit[1] || pp->maxLinearLimit[1]>=pp->minLinearLimit[1] ){
+		btRigidBody* pBodyB = new btRigidBody(0,motion, 0);
+		pBodyB->setActivationState(DISABLE_DEACTIVATION);
+
+		btTransform frameInA, frameInB;
+		frameInA = btTransform::getIdentity();
+		frameInB = btTransform::getIdentity();
+		if(pp->minAngularLimit[1]<pp->maxAngularLimit[1]){ //There is a constraint on Y axis (quaternions uncertainties can make it unstable)
+		  if(not (pp->minAngularLimit[0]<pp->maxAngularLimit[0] or pp->minAngularLimit[2]<pp->maxAngularLimit[2])){ //There is no constraint on X and Z so we rotate to move it
+		    frameInA.getBasis().setEulerZYX(0,0,1.57);
+		    frameInB.getBasis().setEulerZYX(0,0,1.57);
+		    double aux=pp->minAngularLimit[0];
+		    pp->minAngularLimit[0]=pp->minAngularLimit[1];
+		    pp->minAngularLimit[1]=aux;
+		    aux=pp->maxAngularLimit[0];
+		    pp->maxAngularLimit[0]=pp->maxAngularLimit[1];	
+		    pp->maxAngularLimit[1]=aux;
+		  }//TODO check other possible rotations to avoid aborting.
+		  else if (pp->minAngularLimit[1]<=-1.50 || pp->minAngularLimit[1]>=1.50){ //safety threshold
+		    std::cerr<<"Constraints in Y axis must be between -PI/2 PI/2"<<std::endl;
+		    exit(0);
+		  }
+		}
+
+		btGeneric6DofConstraint* pGen6DOF = new btGeneric6DofConstraint(*body, *pBodyB, frameInA, frameInB, true);
+		pGen6DOF->setLinearLowerLimit(btVector3(pp->minLinearLimit[0], pp->minLinearLimit[1], pp->minLinearLimit[2]));
+		pGen6DOF->setLinearUpperLimit(btVector3(pp->maxLinearLimit[0], pp->maxLinearLimit[1], pp->maxLinearLimit[2]));
+
+
+		pGen6DOF->setAngularLowerLimit(btVector3(pp->minAngularLimit[0], pp->minAngularLimit[1], pp->minAngularLimit[2]));
+		pGen6DOF->setAngularUpperLimit(btVector3(pp->maxAngularLimit[0], pp->maxAngularLimit[1], pp->maxAngularLimit[2]));
+
+		dynamicsWorld->addConstraint(pGen6DOF, true);
+	}
+
+    //body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
+    //body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
 
     body->setDamping(pp->linearDamping,pp->angularDamping);
 
@@ -289,8 +326,8 @@ btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::N
 
     body->setUserPointer(data);
 
-    body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
-    body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
+    //body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
+    //body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
 
     body->setDamping(pp->linearDamping,pp->angularDamping);
 

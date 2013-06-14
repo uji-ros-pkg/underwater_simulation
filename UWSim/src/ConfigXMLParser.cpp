@@ -883,10 +883,10 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 			if(pp.linearDamping>1.0)
 			  OSG_WARN << "ConfigFile::PhysicProperties: angularDamping is higher than 1.0."<< std::endl;
 		}
-		else if(child->get_name()=="linearFactor")
-			extractPositionOrColor(child,pp.linearFactor);
-		else if(child->get_name()=="angularFactor")
-			extractPositionOrColor(child,pp.angularFactor);
+		else if(child->get_name()=="minLinearLimit")
+			extractPositionOrColor(child,pp.minLinearLimit);
+		else if(child->get_name()=="maxLinearLimit")
+			extractPositionOrColor(child,pp.maxLinearLimit);
 		else if(child->get_name()=="isKinematic"){
 			extractIntChar(child,pp.isKinematic);
 			if (pp.isKinematic!=0 && pp.isKinematic!=1) {
@@ -894,6 +894,10 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 				freeMotion=0;
 			}
 		}
+		else if(child->get_name()=="minAngularLimit")
+			extractPositionOrColor(child,pp.minAngularLimit);
+		else if(child->get_name()=="maxAngularLimit")
+			extractPositionOrColor(child,pp.maxAngularLimit);
 		
 	}
 }

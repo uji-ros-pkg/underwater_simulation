@@ -173,11 +173,13 @@ struct PhysicProperties{
   double inertia[3];
   double linearDamping;
   double angularDamping;
-  double linearFactor[3];
-  double angularFactor[3];
+  double minLinearLimit[3];
+  double maxLinearLimit[3];
+  double minAngularLimit[3];
+  double maxAngularLimit[3];
   int isKinematic;
   std::string csType;
-  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";linearDamping=0;angularDamping=0;linearFactor[0]=1;linearFactor[1]=1;linearFactor[2]=1;angularFactor[0]=1;angularFactor[1]=1;angularFactor[2]=1;isKinematic=0;};
+  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";linearDamping=0;angularDamping=0;minLinearLimit[0]=1;minLinearLimit[1]=1;minLinearLimit[2]=1;maxLinearLimit[0]=0;maxLinearLimit[1]=0;maxLinearLimit[2]=0;isKinematic=0;minAngularLimit[0]=1;minAngularLimit[1]=1;minAngularLimit[2]=1;maxAngularLimit[0]=0;maxAngularLimit[1]=0;maxAngularLimit[2]=0;};
 };
 
 struct Object{
