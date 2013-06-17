@@ -40,6 +40,7 @@ public:
 	std::vector<GPSSensor> gps_sensors;
 	std::vector<DVLSensor> dvl_sensors;
 	std::vector<MultibeamSensor> multibeam_sensors;
+	boost::shared_ptr<SimulatedDevices> devices;
 
 	typedef enum {ARM5,PA10} arm_t;
 
