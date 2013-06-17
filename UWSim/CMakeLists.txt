@@ -95,6 +95,7 @@ src/BulletHfFluid/btHfFluidRigidCollisionConfiguration.cpp
 src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
 src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
 src/SimulatedDevices.cpp
+src/SimulatedDevice_Echo.cpp
 )
 
 rosbuild_add_executable(UWSim  src/main.cpp)

@@ -11,6 +11,7 @@
 
 #include "SimulatedDevices.h"
 #include "ConfigXMLParser.h"
+#include "SimulatedDevice_Echo.h"
 #include "ros/ros.h"
 
 //a list of "factories" to initialize and apply a device or rosinterface
@@ -22,6 +23,7 @@ static void initFactories(){
 	if (factories.size()>0) return;
 	//ADD NEW DEVICE/ROSINERFACE BEGIN
 
+	factories.push_back(SimulatedDeviceConfig::Ptr(new SimulatedDeviceConfig_Echo()));
 
 	//ADD NEW DEVICE/ROSINERFACE END
 	for (size_t i = 0; i< factories.size();++i)

@@ -159,8 +159,11 @@
 
 <!-- simulatedDevice -->
 <!ELEMENT simulatedDevice (name
+,echo?
 )>
 <!ELEMENT SimulatedDeviceROS (
-#PCDATA
+echoROS?
 )>
+<!ELEMENT echo (info)>
+<!ELEMENT echoROS (name, topic, rate?)>
 
