@@ -17,6 +17,7 @@
 #ifndef CONFIGXMLPARSER_H_
 #define CONFIGXMLPARSER_H_
 
+#include "SimulatedDevices.h"
 #include <libxml++/libxml++.h>
 #include <urdf/model.h>
 
@@ -26,7 +27,8 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan,SimulatedDevice} type_t;
+  string subtype;//type of SimulatedDevice
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -166,6 +168,7 @@ struct Vehicle{
   std::list<XMLGPSSensor> gps_sensors;
   std::list<XMLDVLSensor> dvl_sensors;
   std::list<XMLMultibeamSensor> multibeam_sensors;
+  std::vector<SimulatedDeviceConfig::Ptr> simulated_devices;
 };
 
 struct PhysicProperties{
@@ -200,7 +203,7 @@ struct PhysicsWater{
 };
 
 class ConfigFile{
-private:
+public://made process and extract methods public to be used in Simulated Devices implementations
 
   void esPi(string in,double &param);
 
@@ -255,5 +258,7 @@ public:
 
   ConfigFile(const std::string &fName);
 };
+
+
 
 #endif

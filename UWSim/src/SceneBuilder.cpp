@@ -294,6 +294,9 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
 			iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));
 
+		if(rosInterface.type==ROSInterfaceInfo::SimulatedDevice)
+			iface=SimulatedDevices::getInterface(rosInterface,iauvFile);
+
 		ROSInterfaces.push_back(iface);
 		config.ROSInterfaces.pop_front();
 	}

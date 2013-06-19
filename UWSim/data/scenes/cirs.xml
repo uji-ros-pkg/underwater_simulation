@@ -248,7 +248,12 @@
       <angleIncr>0.1</angleIncr>
       <range>10</range>
     </multibeamSensor>
-
+    <simulatedDevice>
+      <name>echo_example</name>
+      <echo>
+        <info>Echo info 123...</info>
+      </echo>
+    </simulatedDevice>
   </vehicle>
 
   <object>
@@ -366,6 +371,13 @@
       <name>multibeam</name>
       <topic>g500/multibeam</topic>
     </multibeamSensorToLaserScan>
+    <SimulatedDeviceROS>
+	  <echoROS>
+	    <name>echo_example</name>
+	    <topic>g500/echo</topic>
+	    <rate>1</rate>
+	  </echoROS>
+    </SimulatedDeviceROS>
   </rosInterfaces>
 </UWSimScene>
 
