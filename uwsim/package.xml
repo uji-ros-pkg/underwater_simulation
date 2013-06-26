@@ -19,7 +19,6 @@
   <build_depend>image_transport</build_depend>
   <build_depend>uwsim_osgocean</build_depend>
   <build_depend>urdf</build_depend>
-  <build_depend>urdf_parser</build_depend>
   <build_depend>underwater_sensor_msgs</build_depend> 
   <build_depend>uwsim_bullet</build_depend>
   <build_depend>uwsim_osgbullet</build_depend>
@@ -37,7 +36,6 @@
   <run_depend>image_transport</run_depend>
   <run_depend>uwsim_osgocean</run_depend>
   <run_depend>urdf</run_depend>
-  <run_depend>urdf_parser</run_depend>
   <run_depend>underwater_sensor_msgs</run_depend> 
   <run_depend>uwsim_bullet</run_depend>
   <run_depend>uwsim_osgbullet</run_depend>
