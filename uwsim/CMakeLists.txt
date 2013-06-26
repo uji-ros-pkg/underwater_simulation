@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   image_transport
   urdf
-  urdf_parser
   underwater_sensor_msgs
   resource_retriever
   roscpp
@@ -27,7 +26,6 @@ catkin_package(
     nav_msgs
     image_transport
     urdf
-    urdf_parser
     underwater_sensor_msgs
     resource_retriever
     roscpp
