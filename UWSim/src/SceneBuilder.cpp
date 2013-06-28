@@ -294,7 +294,14 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
 			iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));
 
-		ROSInterfaces.push_back(iface);
+		if(rosInterface.type==ROSInterfaceInfo::SimulatedDevice){
+			std::vector<boost::shared_ptr<ROSInterface> > ifaces = SimulatedDevices::getInterfaces(rosInterface,iauvFile);
+			for(size_t i=0; i<ifaces.size();++i)
+				ROSInterfaces.push_back(ifaces[i]);
+		}
+		
+		if (iface)
+			ROSInterfaces.push_back(iface);
 		config.ROSInterfaces.pop_front();
 	}
 	//root->addChild(physics.debugDrawer.getSceneGraph());
