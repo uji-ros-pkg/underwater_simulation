@@ -858,6 +858,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processMultibeamSensor(child,aux);
 			vehicle.multibeam_sensors.push_back(aux);
+		} else if (child->get_name()=="simulatedDevices"){
+			std::vector< SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
+			for (size_t i=0; i< auxs.size(); ++i)
+				if (auxs[i])
+					vehicle.simulated_devices.push_back(auxs[i]);
 		}
 	}
 }
@@ -933,7 +938,12 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo &r
 	xmlpp::Node::NodeList list = node->get_children();
 	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
 		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
-
+		if(child->get_name()!="text"){//adding all nodes as text for further processing by a SimulatedDevice
+			std::string text;
+			extractStringChar(child,text);
+			rosInterface.values[child->get_name()] = text;
+		}
+		
 		if(child->get_name()=="topic" || child->get_name()=="imageTopic" )
 			extractStringChar(child,rosInterface.topic);
 		else if(child->get_name()=="vehicleName" || child->get_name()=="cameraName" || child->get_name()=="name")
@@ -978,6 +988,7 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 	xmlpp::Node::NodeList list = node->get_children();
 	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
 		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+		xmlpp::Node* subchild=NULL;
 
 		ROSInterfaceInfo rosInterface;
 		rosInterface.rate=10; //Default rate
@@ -1017,11 +1028,24 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 			rosInterface.type=ROSInterfaceInfo::DVLSensorToROS;
 		} else if(child->get_name()=="multibeamSensorToLaserScan"){
 			rosInterface.type=ROSInterfaceInfo::multibeamSensorToLaserScan;
+		} else if(child->get_name()=="SimulatedDeviceROS"){
+			xmlpp::Node::NodeList sublist = child->get_children();
+				for(xmlpp::Node::NodeList::iterator subiter = sublist.begin(); subiter != sublist.end(); ++subiter){
+					xmlpp::Node* tempchild=dynamic_cast<const xmlpp::Node*>(*subiter);
+					if (tempchild!=NULL && tempchild->get_name()!="text"){
+						std::string subtype = tempchild->get_name();
+						//std::cout<< "subtype="<<subtype<<std::endl;
+						if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
+							rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
+							rosInterface.subtype = subtype.substr(0, subtype.length()-3);
+							subchild = tempchild;
+						}
+					}
+				}
 		}
 
-
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
-			processROSInterface(child,rosInterface);
+			processROSInterface(subchild!=NULL ? subchild : child, rosInterface);
 			ROSInterfaces.push_back(rosInterface);
 		}
 	}
