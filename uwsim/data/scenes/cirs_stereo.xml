@@ -216,6 +216,10 @@
       <y> 0</y>
       <z> -1.57 </z>
     </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
   </object>
 
 

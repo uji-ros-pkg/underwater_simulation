@@ -18,6 +18,7 @@ KinematicChain::KinematicChain(int nlinks, int njoints) {
 	jointType.resize(njoints);
 	mimic.resize(njoints);
 	limits.resize(njoints);
+	names.resize(njoints);
 	q.resize(njoints);
 	memset(&(q.front()),0,njoints*sizeof(double));
 	started=0;
@@ -81,12 +82,48 @@ void KinematicChain::setJointVelocity(double *qdot, int n) {
 	updateJoints(q);
 }
 
-void KinematicChain::setJointPosition(std::vector<double> &q) {
-	setJointPosition(&(q.front()), q.size());
+void KinematicChain::setJointPosition(std::vector<double> &q,std::vector<std::string> names) {
+	if(names.size()>0){
+	  std::vector<double> newq;
+	  for(int i=0;i<getNumberOfJoints();i++){
+	    if(not (jointType[i]==0 || mimic[i].joint!=i)){ //Check it is not fixed nor mimic
+	      int found=0;
+	      for(int j=0;j<names.size() && !found;j++){
+		if(this->names[i]==names[j]){
+		  found=1;
+		  newq.push_back(q[j]);
+	        }
+	      }
+	      if(!found)
+	        newq.push_back(this->q[i]);
+	    }
+	  }
+	  setJointPosition(&(newq.front()), newq.size());
+	}
+	else
+	  setJointPosition(&(q.front()), q.size());
 }
 
-void KinematicChain::setJointVelocity(std::vector<double> &qdot) {
-	setJointVelocity(&(qdot.front()), qdot.size());
+void KinematicChain::setJointVelocity(std::vector<double> &qdot,std::vector<std::string> names) {
+	if(names.size()>0){
+	  std::vector<double> newq;
+	  for(int i=0;i<getNumberOfJoints();i++){
+	    if(not (jointType[i]==0 || mimic[i].joint!=i)){ //Check it is not fixed nor mimic
+	      int found=0;
+	      for(int j=0;j<names.size() && !found;j++){
+		if(this->names[i]==names[j]){
+		  found=1;
+		  newq.push_back(qdot[j]);
+	        }
+	      }
+	      if(!found)
+	        newq.push_back(0.0);
+	    }
+	  }
+	  setJointVelocity(&(newq.front()), newq.size());
+	}
+	else
+	  setJointVelocity(&(qdot.front()), qdot.size());
 }
 
 std::vector<double> KinematicChain::getJointPosition() {

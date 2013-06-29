@@ -314,12 +314,14 @@ void ROSJointStateToArm::processData(const sensor_msgs::JointState::ConstPtr& js
   //Receive request from client
   if (js->position.size()!=0) {
     //position command
+    std::vector<std::string> names=js->name;
     std::vector<double> position=js->position;
-    arm->urdf->setJointPosition(position);
+    arm->urdf->setJointPosition(position,names);
   } else if (js->velocity.size()!=0) {
     //velocity command
+    std::vector<std::string> names=js->name;
     std::vector<double> velocity=js->velocity;
-    arm->urdf->setJointVelocity(velocity);
+    arm->urdf->setJointVelocity(velocity,names);
   }
 }
 

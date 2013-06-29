@@ -116,6 +116,10 @@
       <p>0 </p>
       <y>0 </y>
     </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
   </object>
 
   <rosInterfaces>

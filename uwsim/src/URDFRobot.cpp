@@ -129,6 +129,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	   joint_axis[i]=osg::Vec3d(vehicle.joints[i].axis[0],vehicle.joints[i].axis[1],vehicle.joints[i].axis[2]);
 	   jointType[i]=vehicle.joints[i].type;
 	   limits[i]=std::pair<double,double>(vehicle.joints[i].lowLimit,vehicle.joints[i].upLimit);
+	   names[i]=vehicle.joints[i].name;
 	}
 	
 	//Save mimic info

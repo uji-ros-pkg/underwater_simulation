@@ -171,8 +171,13 @@ struct Vehicle{
 struct PhysicProperties{
   double mass;
   double inertia[3];
+  double linearDamping;
+  double angularDamping;
+  double linearFactor[3];
+  double angularFactor[3];
+  int isKinematic;
   std::string csType;
-  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";};
+  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";linearDamping=0;angularDamping=0;linearFactor[0]=1;linearFactor[1]=1;linearFactor[2]=1;angularFactor[0]=1;angularFactor[1]=1;angularFactor[2]=1;isKinematic=0;};
 };
 
 struct Object{

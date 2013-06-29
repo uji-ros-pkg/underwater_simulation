@@ -173,8 +173,31 @@ btCollisionShape* BulletPhysics::GetCSFromOSG(osg::Node * node, collisionShapeTy
     return cs;
 }
 
-btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape) {
-    
+btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *node,CollisionDataType * data,boost::shared_ptr<PhysicProperties> pp,osg::Node * colShape){
+   //if not physic properties set default.
+   if(!pp){
+     pp.reset(new PhysicProperties);
+     pp->init();
+     if(data->isVehicle){
+	pp->isKinematic=1;
+	pp->csType="compound box";
+     }
+   }
+
+   collisionShapeType_t ctype =SHAPE_BOX;
+
+   if(pp->csType=="box")
+     ctype=BulletPhysics::SHAPE_BOX;
+   else if(pp->csType=="sphere")
+     ctype=BulletPhysics::SHAPE_SPHERE;
+   else if(pp->csType=="compound box")
+     ctype=BulletPhysics::SHAPE_COMPOUND_BOX;
+   else if(pp->csType=="trimesh")
+     ctype=BulletPhysics::SHAPE_TRIMESH;
+   else if(pp->csType=="compound trimesh")
+     ctype=BulletPhysics::SHAPE_COMPOUND_TRIMESH;
+   else
+     OSG_WARN << data->name<<" has an unknown collision shape type: "<<pp->csType<<". Using default box shape(dynamic) trimesh(kinematic). Check xml file, allowed collision shapes are 'box' 'compound box' 'trimesh' 'compound trimesh'." << std::endl;
 
    btCollisionShape* cs;
    if(colShape==NULL)
@@ -182,11 +205,18 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
    else
      cs=GetCSFromOSG( colShape, ctype);
 
+    btVector3 inertia=btVector3(pp->inertia[0],pp->inertia[1],pp->inertia[2]);
+
     MyMotionState* motion = new MyMotionState(node,root);
-    cs->calculateLocalInertia( mass, inertia );
-    btRigidBody::btRigidBodyConstructionInfo rb( mass, motion, cs, inertia );
+    cs->calculateLocalInertia( pp->mass, inertia  );
+    btRigidBody::btRigidBodyConstructionInfo rb( pp->mass, motion, cs,inertia);
     btRigidBody* body = new btRigidBody( rb );
     body->setUserPointer(data);
+
+    body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
+    body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
+
+    body->setDamping(pp->linearDamping,pp->angularDamping);
 
     //addRigidBody adds its own collision masks, changing after object creation do not update masks so objects are removed and readded in order to update masks to improve collisions performance.
     dynamicsWorld->addRigidBody( body);
@@ -199,10 +229,13 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
       dynamicsWorld->addCollisionObject(body,short( COL_OBJECTS),short(objectsCollidesWith));
     }
 
- 
+    body->setActivationState( DISABLE_DEACTIVATION );
+    if (pp->isKinematic) {
+      body->setCollisionFlags( body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
+    } 
+
 
     return( body );
-
 }
 
 //Buoyant Shapes only admits simple convex  shapes
@@ -218,8 +251,22 @@ btConvexShape* BulletPhysics::GetConvexCSFromOSG(osg::Node * node, collisionShap
     return cs;
 }
 
+btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::Node *node,CollisionDataType * data,boost::shared_ptr<PhysicProperties> pp,osg::Node * colShape){
+   if(!pp){
+     pp.reset(new PhysicProperties);
+     pp->init();
+   }
 
-btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape) {
+   collisionShapeType_t ctype =SHAPE_BOX;
+
+   if(pp->csType=="box")
+     ctype=BulletPhysics::SHAPE_BOX;
+   else if(pp->csType=="sphere")
+     ctype=BulletPhysics::SHAPE_SPHERE;
+   else
+     OSG_WARN << data->name<<" has an unknown collision shape type: "<<pp->csType<<". Using default box shape(dynamic) trimesh(kinematic). Check xml file, allowed collision shapes are 'box' 'compound box' 'trimesh' 'compound trimesh'." << std::endl;
+
+
 
    btConvexShape* cs;
    if(colShape==NULL)
@@ -227,18 +274,25 @@ btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::N
    else
      cs=GetConvexCSFromOSG( colShape, ctype);
 
+    btVector3 inertia=btVector3(pp->inertia[0],pp->inertia[1],pp->inertia[2]);
+
 
     MyMotionState* motion = new MyMotionState(node,root);
-    cs->calculateLocalInertia( mass, inertia );
+    cs->calculateLocalInertia( pp->mass, inertia );
 
     btHfFluidBuoyantConvexShape* buoyantShape = new btHfFluidBuoyantConvexShape(cs);
     buoyantShape->generateShape (btScalar(0.05f), btScalar(0.01f));
     buoyantShape->setFloatyness (btScalar(1.0f));
 
-    btRigidBody::btRigidBodyConstructionInfo rb( mass, motion, buoyantShape, inertia );
+    btRigidBody::btRigidBodyConstructionInfo rb( pp->mass, motion, buoyantShape, inertia );
     btRigidBody* body= new btRigidBody( rb );
 
     body->setUserPointer(data);
+
+    body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
+    body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
+
+    body->setDamping(pp->linearDamping,pp->angularDamping);
 
     //addRigidBody adds its own collision masks, changing after object creation do not update masks so objects are removed and readded in order to update masks to improve collisions performance.
       dynamicsWorld->addRigidBody( body);
@@ -247,21 +301,6 @@ btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::N
  
     body->setActivationState( DISABLE_DEACTIVATION );
     return( body );
-}
-
-btRigidBody* BulletPhysics::addDynamicObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape ) {
-	btRigidBody *b=addObject(root, node, mass,inertia,ctype,data,colShape);
-        b->setActivationState( DISABLE_DEACTIVATION );
-	return b;
-}
-
-btRigidBody* BulletPhysics::addKinematicObject(osg::MatrixTransform *root, osg::Node *node, btScalar mass, btVector3 inertia, collisionShapeType_t ctype, CollisionDataType * data,osg::Node * colShape) {
-	btRigidBody *b=addObject(root,node, mass,inertia,ctype,data,colShape);
-	if (b!=NULL) {
-	  b->setCollisionFlags( b->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
-          b->setActivationState( DISABLE_DEACTIVATION );
-	}  
-	return b;
 }
 
 
