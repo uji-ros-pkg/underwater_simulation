@@ -249,6 +249,16 @@
       <range>10</range>
     </multibeamSensor>
 
+    <simulatedDevices>
+      <echo>
+        <name>g500_echo1</name>
+        <info>Echo example 1</info>
+      </echo>
+      <echo>
+        <name>g500_echo2</name>
+        <info>Echo example 2</info>
+      </echo>
+    </simulatedDevices>
   </vehicle>
 
   <object>
@@ -366,6 +376,20 @@
       <name>multibeam</name>
       <topic>g500/multibeam</topic>
     </multibeamSensorToLaserScan>
+    <SimulatedDeviceROS>
+      <echoROS>
+        <name>g500_echo1</name>
+        <topic>g500/echo1</topic>
+        <rate>1</rate>
+      </echoROS>
+    </SimulatedDeviceROS>
+    <SimulatedDeviceROS>
+      <echoROS>
+        <name>g500_echo2</name>
+        <topic>g500/echo2</topic>
+        <rate>1</rate>
+      </echoROS>
+    </SimulatedDeviceROS>
   </rosInterfaces>
 </UWSimScene>
 

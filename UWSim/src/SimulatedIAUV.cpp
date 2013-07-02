@@ -224,6 +224,9 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		OSG_INFO << "Done adding an object picker..." << std::endl;
 	}
 
+	devices.reset(new SimulatedDevices());
+	devices->applyConfig(this, vehicleChars, oscene);
+
 	//Set-up a lamp attached to the vehicle: TODO
 	/*
   osg::Light *_light=new osg::Light;
