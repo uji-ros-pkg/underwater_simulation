@@ -126,7 +126,7 @@
     <structuredLightProjector>
       <name>laser_projector</name>
       <relativeTo>sls</relativeTo>
-      <fov>90</fov>
+      <fov>26</fov>
       <image_name>data/textures/laser_texture_bin.png</image_name>
       <visible>0</visible>
       <position>

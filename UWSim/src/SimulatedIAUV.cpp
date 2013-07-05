@@ -138,13 +138,14 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
                                    slp.orientation[2],
                                    osg::Vec3d(0,0,1) ));
     urdf->link[slp.link]->asGroup()->addChild(vMp);
-    camview.push_back(VirtualCamera(oscene->root, "slp_camera", vMp, 512, 512, 0.0, "", NULL,1));
+    //camview.push_back(VirtualCamera(oscene->root, "slp_camera", vMp, 512, 512,slp.fov,102.4));
     sls_projectors.push_back(VirtualSLSProjector(slp.name, 
                            oscene->root, //maybe oscene->scene->localizedWorld ?
                            vMp, 
                            slp.image_name, 
                            slp.fov, 
-                           (slp.visible)? true:false,camview.back()));
+                           (slp.visible)? true:false));
+    camview.push_back(sls_projectors.back().camera);
     OSG_INFO << "Done adding a structured light projector..." << std::endl;
   }
   ///////////////////////////////////////////////////////////////////////////
