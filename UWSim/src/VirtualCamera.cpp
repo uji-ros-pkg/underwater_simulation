@@ -15,6 +15,46 @@
 #include <iostream>
 #include "SceneBuilder.h"
 
+
+class UpdateUnderWater : public osg::Uniform::Callback{
+public:
+  UpdateUnderWater(osg::Camera* camera)
+    : mCamera(camera){ }
+  virtual void operator () (osg::Uniform* u, osg::NodeVisitor*){
+    u->set(true);  //TODO: Should check waterheight!!
+  }
+
+protected:
+  osg::Camera* mCamera;
+};
+
+class UpdateEye : public osg::Uniform::Callback{
+public:
+  UpdateEye(osg::Camera* camera)
+    : mCamera(camera){ }
+  virtual void operator () (osg::Uniform* u, osg::NodeVisitor*){
+    osg::Vec3d eye, center, up;
+    mCamera->getViewMatrixAsLookAt(eye,center,up);
+    u->set(eye);
+  }
+
+protected:
+  osg::Camera* mCamera;
+};
+
+class UpdateVMI : public osg::Uniform::Callback{
+public:
+  UpdateVMI(osg::Camera* camera)
+    : mCamera(camera){ }
+  virtual void operator () (osg::Uniform* u, osg::NodeVisitor*){
+    u->set(mCamera->getInverseViewMatrix());
+  }
+
+protected:
+  osg::Camera* mCamera;
+};
+ 
+
 VirtualCamera::VirtualCamera(){}
 
 void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov) {
@@ -125,8 +165,26 @@ void VirtualCamera::createCamera()
 	Tx = (-fx * baseline);
 	Ty = 0.0;	
 
+
 	node_tracker = new MyNodeTrackerCallback(uwsim_root, depthTexture, textureCamera);
 	trackNode->setUpdateCallback(node_tracker);
+
+
+	//Uniforms for independence from main camera (underwater effects on shaders)
+   	osg::Uniform* u = new osg::Uniform("osgOcean_EyeUnderwater",true);
+	u->setUpdateCallback( new UpdateUnderWater(textureCamera) );
+
+    	textureCamera->getOrCreateStateSet()->addUniform( u );
+	osg::Vec3d eye, center, up;
+	textureCamera->getViewMatrixAsLookAt(eye,center,up);
+   	osg::Uniform* u2 = new osg::Uniform("osgOcean_Eye",eye);
+	u2->setUpdateCallback( new UpdateEye(textureCamera) );
+    	textureCamera->getOrCreateStateSet()->addUniform( u2 );
+
+	osg::Uniform* u3 = new osg::Uniform("osg_ViewMatrixInverse",textureCamera->getInverseViewMatrix());
+	u3->setUpdateCallback( new UpdateVMI(textureCamera) );
+	textureCamera->getOrCreateStateSet()->addUniform( u3 );
+
 }
 
 osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow() {

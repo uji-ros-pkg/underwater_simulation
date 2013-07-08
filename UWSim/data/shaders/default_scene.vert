@@ -14,6 +14,7 @@ varying vec3 vNormal;
 varying vec3 vLightDir;
 varying vec3 vEyeVec;
 varying float vWorldHeight;
+varying vec4 color;
 
 void computeScattering( in vec3 eye, in vec3 worldVertex, out vec3 extinction, out vec3 inScattering )
 {
@@ -43,5 +44,6 @@ void main(void)
 
 	computeScattering( osgOcean_Eye, worldVertex.xyz, vExtinction, vInScattering);
 
+	color=gl_Color;
 	vWorldHeight = worldVertex.z;
 }

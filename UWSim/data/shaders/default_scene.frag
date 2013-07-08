@@ -24,6 +24,7 @@ varying vec3 vInScattering;
 varying vec3 vNormal;
 varying vec3 vLightDir;
 varying vec3 vEyeVec;
+varying vec4 color;
 
 varying float vWorldHeight;
 
@@ -72,7 +73,12 @@ float computeFogFactor( float density, float fogCoord )
 void main(void)
 {
 	vec4 textureColor = texture2D( uTextureMap, gl_TexCoord[0].st );
-	textureColor.set(0,0,0,0);
+	//textureColor.set(0,0,0,0);
+
+	  if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
+	    textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
+	  else
+            textureColor =color;
 
 	vec4 final_color;
 
