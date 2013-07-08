@@ -68,7 +68,7 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
     root->getOrCreateStateSet()->setTextureAttributeAndModes(4,texture,osg::StateAttribute::ON);
 
     //Shadow camera
-    camera=VirtualCamera(root->asGroup(), "slp_camera", node, texture_to_project->s(), texture_to_project->t(),fov,texture_to_project->s()/texture_to_project->t());
+    camera=VirtualCamera(root->asGroup(), "slp_camera", node, texture_to_project->s(), texture_to_project->t(),fov,texture_to_project->s()/(float)texture_to_project->t());
 
     //Create depth texture for shadow mapping test
     dbgDepthTexture = new osg::Texture2D;
