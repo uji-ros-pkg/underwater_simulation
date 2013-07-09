@@ -18,6 +18,8 @@ uniform bool osgOcean_EyeUnderwater;
 // -------------------
 
 uniform sampler2D uTextureMap;
+uniform sampler2D SLStex;
+uniform sampler2D SLStex2;
 
 varying vec3 vExtinction;
 varying vec3 vInScattering;
@@ -25,6 +27,9 @@ varying vec3 vNormal;
 varying vec3 vLightDir;
 varying vec3 vEyeVec;
 varying vec4 color;
+
+varying vec4 ShadowCoord;
+
 
 varying float vWorldHeight;
 
@@ -70,18 +75,40 @@ float computeFogFactor( float density, float fogCoord )
 	return exp2(density * fogCoord * fogCoord );
 }
 
-void main(void)
+void main()
 {
-	vec4 textureColor = texture2D( uTextureMap, gl_TexCoord[0].st );
+	vec4 textureColor;
 	//textureColor.set(0,0,0,0);
 
+
+	// ------------------------CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
+	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
+	
+	// Used to lower moiré pattern and self-shadowing
+	shadowCoordinateWdivide.z -= 0.0005;
+
+	float distanceFromLight = texture2D(SLStex,shadowCoordinateWdivide.st).z;
+	
+ 	float shadow = 1.0;
+ 	if (ShadowCoord.w > 0.0 )
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+	// ------------------------END CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
+
+	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
+	//check binary texture threshold, backprojection, shadow, out of texture bounds.
+	if( (texcolor.x+texcolor.y+texcolor.z)<2.0 && ShadowCoord.w > 0 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0)){
+	    textureColor = vec4( 0.0,1.0,0.0,1.0);
+	}
+	else{
 	  if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
 	    textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
 	  else
             textureColor =color;
 
-	vec4 final_color;
+	}
 
+
+	vec4 final_color;
 	float alpha;
 
     // Underwater

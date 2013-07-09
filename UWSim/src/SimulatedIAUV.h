@@ -18,6 +18,7 @@
 #include "VirtualCamera.h"
 #include "ConfigXMLParser.h"
 #include "VirtualRangeSensor.h"
+#include "VirtualSLSProjector.h"
 #include "ObjectPicker.h"
 #include "InertialMeasurementUnit.h"
 #include "PressureSensor.h"
@@ -34,6 +35,7 @@ public:
 	std::vector<VirtualCamera> camview;
 	std::vector<VirtualCamera> camrange;
 	std::vector<VirtualRangeSensor> range_sensors;
+    	std::vector<VirtualSLSProjector> sls_projectors;
 	std::vector<ObjectPicker> object_pickers;
 	std::vector<InertialMeasurementUnit> imus;
 	std::vector<PressureSensor> pressure_sensors;

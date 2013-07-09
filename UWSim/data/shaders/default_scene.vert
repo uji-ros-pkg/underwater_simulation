@@ -7,6 +7,8 @@ uniform vec3 osgOcean_UnderwaterAttenuation;
 uniform vec4 osgOcean_UnderwaterDiffuse;
 // -----------------
 
+uniform mat4 LightModelViewProjectionMatrix;
+
 varying vec3 vExtinction;
 varying vec3 vInScattering;
 
@@ -15,6 +17,9 @@ varying vec3 vLightDir;
 varying vec3 vEyeVec;
 varying float vWorldHeight;
 varying vec4 color;
+
+varying vec4 ShadowCoord;
+varying vec4 textureCoord;
 
 void computeScattering( in vec3 eye, in vec3 worldVertex, out vec3 extinction, out vec3 inScattering )
 {
@@ -41,6 +46,7 @@ void main(void)
 	vEyeVec = -vec3(gl_ModelViewMatrix*gl_Vertex);
 
 	vec4 worldVertex = (osg_ViewMatrixInverse*gl_ModelViewMatrix) * gl_Vertex;
+	ShadowCoord = LightModelViewProjectionMatrix*worldVertex;
 
 	computeScattering( osgOcean_Eye, worldVertex.xyz, vExtinction, vInScattering);
 

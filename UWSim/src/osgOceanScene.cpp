@@ -429,6 +429,8 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
 			object->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);
 			object->getStateSet()->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
 			object->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
+			object->getStateSet()->addUniform( new osg::Uniform( "SLStex", 3) );
+			object->getStateSet()->addUniform( new osg::Uniform( "SLStex2", 4) );
 			object->setNodeMask( _oceanScene->getNormalSceneMask() | _oceanScene->getReflectedSceneMask() | _oceanScene->getRefractedSceneMask() );
 
 			osg::Matrix linkBase;

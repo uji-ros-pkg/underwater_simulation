@@ -15,7 +15,6 @@
 #include <iostream>
 #include "SceneBuilder.h"
 
-
 class UpdateUnderWater : public osg::Uniform::Callback{
 public:
   UpdateUnderWater(osg::Camera* camera)
@@ -57,7 +56,7 @@ protected:
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far) {
 	this->uwsim_root=uwsim_root;
 	this->name=name;
 
@@ -71,6 +70,9 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	this->baseline = baseline;
 	this->frameId = frameId;
 	this->fov=fov;
+	this->aspectRatio=aspectRatio;
+	this->near=near;
+	this->far=far;
 	if(params!=NULL){
 	  this->fx=params->fx;
 	  this->fy=params->fy;
@@ -95,25 +97,29 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
-  this->far=range*1.2; //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov);
+  //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
+  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2);  //Aspect Ratio correction should be improved!
 
+}
+
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov, double aspectRatio) {  //Used in structured light projector as shadow camera
+	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,0);
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,50,1.33,0.18,20);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
-	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,0);
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,50,1.33,0.18,20);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,50,1.33,0.18,20);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,50,1.33,0.18,20);
 }
 
 void VirtualCamera::createCamera()
@@ -135,13 +141,11 @@ void VirtualCamera::createCamera()
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
 	
 	if(!paramsOn){
-	  //set default fov, near and far parameters
-	  if(!fov)
-	    textureCamera->setProjectionMatrixAsPerspective(50, 1.33, 0.18, 20);
-          else //Used in multibeam, aspect ratio correction should be improved
-	    textureCamera->setProjectionMatrixAsPerspective(fov, 1+0.004464*fov, 0.8, far);
+	  //set default fov, near and far parameters (default parameters on init function as some of them change depending on camera type (shadow,depth,texture))
+	  textureCamera->setProjectionMatrixAsPerspective(fov, aspectRatio, near, far);
 	  osg::Matrixd m;
 	  m=textureCamera->getProjectionMatrix();
 	  fx=m(0,0)*width/2.0;
@@ -164,7 +168,6 @@ void VirtualCamera::createCamera()
 
 	Tx = (-fx * baseline);
 	Ty = 0.0;	
-
 
 	node_tracker = new MyNodeTrackerCallback(uwsim_root, depthTexture, textureCamera);
 	trackNode->setUpdateCallback(node_tracker);

@@ -72,6 +72,7 @@ src/URDFRobot.cpp
 src/SimulatedIAUV.cpp
 src/VirtualCamera.cpp
 src/VirtualRangeSensor.cpp
+src/VirtualSLSProjector.cpp
 src/HUDCamera.cpp
 src/ConfigXMLParser.cpp
 src/UWSimUtils.cpp

@@ -56,6 +56,17 @@ struct Vcam{
   void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();range=0;}
 };
 
+struct slProjector {
+  string name;
+  string linkName;
+  string image_name;
+  double position[3],orientation[3];
+  double fov;
+  int visible;
+  int link;
+  void init(){name="";linkName="";image_name="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;fov=0;visible=0;}
+};
+
 struct rangeSensor {
   string name;
   string linkName;
@@ -163,6 +174,7 @@ struct Vehicle{
   std::vector<Material> materials;
   std::list<Vcam> Vcams;
   std::list<Vcam> VRangecams;
+  std::list<slProjector> sls_projectors;
   std::list<rangeSensor> range_sensors, object_pickers;
   std::list<Imu> imus;
   std::list<XMLPressureSensor> pressure_sensors;
@@ -222,6 +234,7 @@ public://made process and extract methods public to be used in Simulated Devices
   void processSize(const xmlpp::Node* node);
   void processParameters(const xmlpp::Node*, Parameters *params);
   void processVcam(const xmlpp::Node* node, Vcam &vcam);
+  void processSLProjector(const xmlpp::Node* node, slProjector &slp);
   void processRangeSensor(const xmlpp::Node* node, rangeSensor &rs);
   void processImu(const xmlpp::Node* node, Imu &rs);
   void processPressureSensor(const xmlpp::Node* node, XMLPressureSensor &ps);

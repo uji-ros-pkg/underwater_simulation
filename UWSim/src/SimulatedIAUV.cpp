@@ -123,6 +123,34 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		OSG_INFO << "Done adding a virtual camera..." << std::endl;
 	}
 
+	  // Adding Structured light projector
+	  while(vehicleChars.sls_projectors.size() > 0){
+	    OSG_INFO << "Adding a structured light projector..." << std::endl;
+	    slProjector slp;
+	    slp = vehicleChars.sls_projectors.front();
+	    vehicleChars.sls_projectors.pop_front();
+	    osg::ref_ptr<osg::Transform> vMp = (osg::Transform*) new osg::PositionAttitudeTransform;
+	    vMp->asPositionAttitudeTransform()->setPosition(osg::Vec3d(slp.position[0],
+		                           slp.position[1],
+		                           slp.position[2]));
+	    vMp->asPositionAttitudeTransform()->setAttitude(osg::Quat(slp.orientation[0],
+		                           osg::Vec3d(1,0,0),
+		                           slp.orientation[1],
+		                           osg::Vec3d(0,1,0), 
+		                           slp.orientation[2],
+		                           osg::Vec3d(0,0,1) ));
+	    urdf->link[slp.link]->asGroup()->addChild(vMp);
+	    //camview.push_back(VirtualCamera(oscene->root, "slp_camera", vMp, 512, 512,slp.fov,102.4));
+	    sls_projectors.push_back(VirtualSLSProjector(slp.name, 
+		                   oscene->root, //maybe oscene->scene->localizedWorld ?
+		                   vMp, 
+		                   slp.image_name, 
+		                   slp.fov, 
+		                   (slp.visible)? true:false));
+	    camview.push_back(sls_projectors.back().camera);
+	    OSG_INFO << "Done adding a structured light projector..." << std::endl;
+	  }
+
 	//Adding range sensors
 	while(vehicleChars.range_sensors.size() > 0){
 		OSG_INFO << "Adding a virtual range sensor..." << std::endl;
