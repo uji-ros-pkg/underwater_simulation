@@ -46,18 +46,22 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback {
 	      if(data!=NULL && data->catchable){
 
 	        std::cerr << "Picking object up." << std::endl;
+
+		osg::Node * objectTransf=i[0]->getParent(0)->getParent(0);  //Object->linkBaseTransform->transform
 	  
 		//Get coordinates to change them when changing position in graph
-		osg::Matrixd *originalpos=getWorldCoords(i[0]);
+		osg::Matrixd *originalpos=getWorldCoords(objectTransf);
 		osg::Matrixd *hand = getWorldCoords(trackNode);
 	    	hand->invert(*hand);
 
 	    	//ADD node in hand, remove object from original position.
-	    	trackNode->asTransform()->addChild(i[0]);
-	    	i[0]->getParent(0)->asGroup()->removeChild(i[0]);
+	    	trackNode->asTransform()->addChild(objectTransf);
+	    	objectTransf->getParent(0)->asGroup()->removeChild(objectTransf);
 
 	    	osg::Matrixd matrix=*originalpos * *hand;
-	    	i[0]->asTransform()->asMatrixTransform()->setMatrix(matrix);
+	    	objectTransf->asTransform()->asMatrixTransform()->setMatrix(matrix);
+
+
 
 	    	picked=true;
 	      }
