@@ -163,6 +163,7 @@ public:
 	double Tx, Ty; //Only for stereo.
 	std::string frameId; //Default=""
 	int paramsOn;
+	int bw;
 	
 	osg::ref_ptr<osg::Image> renderTexture;  //RGB image
 	osg::ref_ptr<osg::Image> depthTexture;	//Range image
@@ -172,10 +173,10 @@ public:
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height);
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
     	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId);
-    	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params, int range);
+    	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params, int range,int bw);
     	VirtualCamera();
     	
-	void init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far);
+	void init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far,int bw);
 
     	void createCamera();
 

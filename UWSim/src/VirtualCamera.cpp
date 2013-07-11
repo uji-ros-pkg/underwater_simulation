@@ -56,7 +56,7 @@ protected:
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far,int bw) {
 	this->uwsim_root=uwsim_root;
 	this->name=name;
 
@@ -86,6 +86,7 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	else
 	  this->paramsOn=0;
 	this->range=range;
+	this->bw=bw;
         
 	renderTexture=new osg::Image();
 	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
@@ -98,28 +99,28 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2);  //Aspect Ratio correction should be improved!
+  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2,0);  //Aspect Ratio correction should be improved!
 
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov, double aspectRatio) {  //Used in structured light projector as shadow camera
-	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20);
+	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,50,1.33,0.18,20);
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,50,1.33,0.18,20,0);
 }
 
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range) {
-	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,50,1.33,0.18,20);
+VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,int bw) {
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,50,1.33,0.18,20,bw);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,50,1.33,0.18,20);
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,50,1.33,0.18,20,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,50,1.33,0.18,20);
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,50,1.33,0.18,20,0);
 }
 
 void VirtualCamera::createCamera()

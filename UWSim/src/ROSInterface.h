@@ -329,6 +329,7 @@ class VirtualCameraToROSImage : public ROSPublisherInterface {
 	image_transport::Publisher img_pub_;
 	std::string image_topic;
 	int depth;
+	int bw;
 public:
 	VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate,int depth);
 

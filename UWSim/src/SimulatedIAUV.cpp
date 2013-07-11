@@ -102,7 +102,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		vMc->asPositionAttitudeTransform()->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
 		vMc->asPositionAttitudeTransform()->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[vcam.link]->asGroup()->addChild(vMc);
-		camview.push_back(VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get(),0));
+		camview.push_back(VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get(),0,vcam.bw));
 		if (vcam.showpath) camview[camview.size()-1].showPath(vcam.showpath);
 		OSG_INFO << "Done adding a virtual camera..." << std::endl;
 	}
@@ -118,7 +118,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		vMc->asPositionAttitudeTransform()->setPosition(osg::Vec3d(vcam.position[0],vcam.position[1],vcam.position[2]));
 		vMc->asPositionAttitudeTransform()->setAttitude(osg::Quat(vcam.orientation[0],osg::Vec3d(1,0,0),vcam.orientation[1],osg::Vec3d(0,1,0), vcam.orientation[2],osg::Vec3d(0,0,1) ));
 		urdf->link[vcam.link]->asGroup()->addChild(vMc);
-		camview.push_back(VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get(),1));
+		camview.push_back(VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId, vcam.parameters.get(),1,0));
 		if (vcam.showpath) camview[camview.size()-1].showPath(vcam.showpath);
 		OSG_INFO << "Done adding a virtual camera..." << std::endl;
 	}

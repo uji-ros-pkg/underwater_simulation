@@ -566,6 +566,7 @@ ArmToROSJointState::~ArmToROSJointState() {}
 VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate, int depth): ROSPublisherInterface(info_topic,rate), cam(camera), image_topic(topic) {
   it.reset(new image_transport::ImageTransport(nh_));
   this->depth=depth;
+  this->bw=camera->bw;
 }
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
@@ -650,7 +651,27 @@ void VirtualCameraToROSImage::publish() {
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
 	  for (unsigned int j=0; j<img.step; j++) {
- 	         img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
+		if(bw){
+		  if(j%3==0){
+		    img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j]*0.2989;
+		    img.data[(h-i-1)*img.step+j+1]=virtualdata[i*img.step+j]*0.2989;
+		    img.data[(h-i-1)*img.step+j+2]=virtualdata[i*img.step+j]*0.2989;			
+
+		  }
+		  if(j%3==1){
+		    img.data[(h-i-1)*img.step+j-1]+=virtualdata[i*img.step+j]*0.5870;
+		    img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j]*0.5870;
+		    img.data[(h-i-1)*img.step+j+1]+=virtualdata[i*img.step+j]*0.5870;
+
+		  }
+		  if(j%3==2){
+		    img.data[(h-i-1)*img.step+j-2]+=virtualdata[i*img.step+j]*0.1140;
+		    img.data[(h-i-1)*img.step+j-1]+=virtualdata[i*img.step+j]*0.1140;
+		    img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j]*0.1140;
+		  }
+		}
+		else  
+ 	          img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
     	  }
         }
       else

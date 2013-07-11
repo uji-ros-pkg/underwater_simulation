@@ -47,7 +47,7 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback {
 
 	        std::cerr << "Picking object up." << std::endl;
 
-		osg::Node * objectTransf=i[0]->getParent(0)->getParent(0);  //Object->linkBaseTransform->transform
+		osg::Node * objectTransf=i[0]->getParent(0)->getParent(0)->getParent(0);  //Object->linkBaseTransform->transform
 	  
 		//Get coordinates to change them when changing position in graph
 		osg::Matrixd *originalpos=getWorldCoords(objectTransf);

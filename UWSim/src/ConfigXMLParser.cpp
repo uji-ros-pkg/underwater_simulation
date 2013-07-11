@@ -285,6 +285,13 @@ void ConfigFile::processVcam(const xmlpp::Node* node,Vcam &vcam){
 			processParameters(child,vcam.parameters.get());
 		} else if(child->get_name()=="showpath")
 			extractFloatChar(child,vcam.showpath);
+		else if(child->get_name()=="grayscale"){
+			extractIntChar(child,vcam.bw);
+			if(vcam.bw != 0 && vcam.bw!=1){
+				OSG_WARN << "ConfigFile::processVcam: grayscale is not a binary value ( 0 1), using default value (0)" << std::endl;
+				vcam.bw=0;
+			}
+		}
 	}
 
 }
