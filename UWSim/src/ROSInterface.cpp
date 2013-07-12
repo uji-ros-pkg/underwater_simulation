@@ -599,6 +599,8 @@ void VirtualCameraToROSImage::publish() {
       img_info.header.stamp=img.header.stamp=getROSTime();
       img_info.header.frame_id=img.header.frame_id=cam->frameId;
       if(depth)
+        img.encoding=std::string("mono16");
+      else if(bw)
         img.encoding=std::string("mono8");
       else
         img.encoding=std::string("rgb8");   
@@ -650,25 +652,15 @@ void VirtualCameraToROSImage::publish() {
       //looking towards bottom-right. Therefore it must be manually arranged.
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
-	  for (unsigned int j=0; j<img.step; j++) {
+	  for (unsigned int j=0; (!bw && !depth && j<img.step) || (bw && j*3<img.step)  || (depth && j*2<img.step); j++) {
 		if(bw){
-		  if(j%3==0){
-		    img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j]*0.2989;
-		    img.data[(h-i-1)*img.step+j+1]=virtualdata[i*img.step+j]*0.2989;
-		    img.data[(h-i-1)*img.step+j+2]=virtualdata[i*img.step+j]*0.2989;			
-
-		  }
-		  if(j%3==1){
-		    img.data[(h-i-1)*img.step+j-1]+=virtualdata[i*img.step+j]*0.5870;
-		    img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j]*0.5870;
-		    img.data[(h-i-1)*img.step+j+1]+=virtualdata[i*img.step+j]*0.5870;
-
-		  }
-		  if(j%3==2){
-		    img.data[(h-i-1)*img.step+j-2]+=virtualdata[i*img.step+j]*0.1140;
-		    img.data[(h-i-1)*img.step+j-1]+=virtualdata[i*img.step+j]*0.1140;
-		    img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j]*0.1140;
-		  }
+		  img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j*3]*0.2989;
+		  img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*3+1]*0.5870;
+		  img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*3+2]*0.1140;
+		}
+	 	else if(depth){
+		  img.data[(h-i-1)*img.step+j]=j%2? virtualdata[i*img.step+j*2] : virtualdata[i*img.step+j*2+1];
+		  //img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*2+1];
 		}
 		else  
  	          img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
