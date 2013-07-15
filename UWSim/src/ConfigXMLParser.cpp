@@ -1084,6 +1084,8 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 			rosInterface.type=ROSInterfaceInfo::DVLSensorToROS;
 		} else if(child->get_name()=="multibeamSensorToLaserScan"){
 			rosInterface.type=ROSInterfaceInfo::multibeamSensorToLaserScan;
+		} else if(child->get_name()=="contactSensorToROS"){
+			rosInterface.type=ROSInterfaceInfo::contactSensorToROS;
 		} else if(child->get_name()=="SimulatedDeviceROS"){
 			xmlpp::Node::NodeList sublist = child->get_children();
 				for(xmlpp::Node::NodeList::iterator subiter = sublist.begin(); subiter != sublist.end(); ++subiter){
@@ -1102,7 +1104,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
 			processROSInterface(subchild!=NULL ? subchild : child, rosInterface);
-			ROSInterfaces.push_back(rosInterface);
+			if(rosInterface.type!=ROSInterfaceInfo::contactSensorToROS)
+  			  ROSInterfaces.push_back(rosInterface);
+			else
+ 			  ROSPhysInterfaces.push_back(rosInterface);
 		}
 	}
 }

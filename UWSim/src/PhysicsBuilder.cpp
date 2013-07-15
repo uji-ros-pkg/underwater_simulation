@@ -82,6 +82,20 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder,ConfigFile config)
     //wMb->setUserData(data); 
   }
 
+  //Add ROSPhysInterfaces
+  while(config.ROSPhysInterfaces.size()>0){
+    ROSInterfaceInfo rosInterface = config.ROSPhysInterfaces.front();
+
+    boost::shared_ptr<ROSInterface> iface; 
+
+    if(rosInterface.type==ROSInterfaceInfo::contactSensorToROS)
+	iface=boost::shared_ptr<contactSensorToROS>(new contactSensorToROS(scene_builder->root, physics, rosInterface.targetName, rosInterface.topic, rosInterface.rate));
+
+     scene_builder->ROSInterfaces.push_back(iface);
+     config.ROSPhysInterfaces.pop_front();
+
+  }
+
   OSG_INFO << "Physics Loaded!" << std::endl;
 
 }

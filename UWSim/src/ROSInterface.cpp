@@ -21,6 +21,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <underwater_sensor_msgs/Pressure.h>
 #include <underwater_sensor_msgs/DVL.h>
+#include <std_msgs/Bool.h>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -757,3 +758,46 @@ void  MultibeamSensorToROS::publish() {
 }
 	
  MultibeamSensorToROS::~MultibeamSensorToROS() {}
+
+contactSensorToROS::contactSensorToROS(osg::Group *rootNode,BulletPhysics * physics,std::string target, std::string topic, int rate): ROSPublisherInterface(topic,rate) {
+this->rootNode=rootNode;
+this->physics=physics;
+this->target=target;
+}
+
+void   contactSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("contactSensorToROS publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<std_msgs::Bool>(topic, 1);
+}
+
+void   contactSensorToROS::publish() {
+  int colliding=0;
+
+  for(int i=0;i<physics->getNumCollisions();i++){
+    btPersistentManifold * col = physics->getCollision(i);
+
+    //Get objects colliding
+    btRigidBody* obA = static_cast<btRigidBody*>(col->getBody0());
+    btRigidBody* obB = static_cast<btRigidBody*>(col->getBody1());  
+
+    //Check if target is involved in collision
+    CollisionDataType * data=(CollisionDataType *)obA->getUserPointer();  
+    CollisionDataType * data2=(CollisionDataType *)obB->getUserPointer();
+
+    int numContacts= col->getNumContacts();
+
+    if(data2->getObjectName()==target  || data->getObjectName()==target){
+      for (int j=0;j<numContacts ;j++){
+ 	btManifoldPoint pt = col->getContactPoint(j);
+	if(pt.getDistance()<0.f)
+          colliding=1;
+      }
+    }
+    
+  }
+  std_msgs::Bool msg;
+  msg.data=colliding;
+  pub_.publish(msg);
+}
+	
+  contactSensorToROS::~ contactSensorToROS() {}

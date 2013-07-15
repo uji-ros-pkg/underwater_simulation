@@ -79,7 +79,7 @@
       <joint>0.3 </joint>
     </jointValues>
     <position>
-      <x> 0</x>
+      <x> 0.1</x>
       <y> 0 </y>
       <z> 2.0 </z>
     </position>
@@ -390,6 +390,11 @@
         <rate>1</rate>
       </echoROS>
     </SimulatedDeviceROS>
+    <contactSensorToROS>
+      <name>girona500</name>
+      <topic>g500/contactSensor</topic>
+      <rate> 100 </rate>
+    </contactSensorToROS>
   </rosInterfaces>
 </UWSimScene>
 

@@ -27,7 +27,7 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan,SimulatedDevice} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan,SimulatedDevice, contactSensorToROS} type_t;
   string subtype; //type of a SimulatedDevice
   std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
   string topic, infoTopic, targetName;
@@ -268,6 +268,7 @@ public:
   list <Vehicle> vehicles;
   list <Object> objects;
   list <ROSInterfaceInfo> ROSInterfaces;
+  list <ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   PhysicsWater physicsWater;
 
   ConfigFile(const std::string &fName);
