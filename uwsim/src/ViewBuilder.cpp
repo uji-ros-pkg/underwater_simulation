@@ -27,6 +27,10 @@
 #include <osgWidget/WindowManager>
 #include <osgWidget/ViewerEventHandlers>
 
+#include "oculusdevice.h"
+#include "HMDCamera.h"
+
+
 ViewBuilder::ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv) {
 	arguments.reset(new osg::ArgumentParser(argc, argv));
 	init(config, scene_builder);
@@ -56,6 +60,42 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 	if (arguments->read("--freeMotion")) {
 		freeMotion = true;
 	}
+
+        // Open the HMD
+        OculusDevice* oculusDevice = new OculusDevice;
+ 
+        // Set the scaling of the texture, using the recommend 25% from the SDK
+        oculusDevice->setScaleFactor(1.25f);
+
+        osg::GraphicsContext::WindowingSystemInterface* wsi = osg::GraphicsContext::getWindowingSystemInterface();
+
+        if (!wsi) {
+          osg::notify(osg::NOTICE)<<"Error, no WindowSystemInterface available, cannot create windows."<<std::endl;
+          exit(0);
+        }
+        unsigned int width, height;
+        wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(0), width, height);
+        osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+        traits->windowDecoration = false;
+        traits->x = 0;
+        traits->y = 0;
+        traits->width = oculusDevice->hScreenResolution();
+        traits->height = oculusDevice->vScreenResolution();
+        traits->doubleBuffer = true;
+        traits->sharedContext = 0;
+        traits->sampleBuffers = true;
+        traits->samples = 4;
+        traits->vsync = true;
+
+        osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits);
+
+        if (gc.valid()) {
+          gc->setClearColor(osg::Vec4(0.2f, 0.2f, 0.4f, 1.0f));
+          gc->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+
+
+
 
 	//Initialize viewer
 	viewer=new osgViewer::Viewer();
@@ -95,6 +135,9 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 	viewer->addEventHandler( new osgViewer::HelpHandler );
 	viewer->getCamera()->setName("MainCamera");
 
+        viewer->getCamera()->setGraphicsContext(gc);
+        viewer->getCamera()->setViewport(0, 0, traits->width, traits->height);
+
 	//Main camera projection parameters: view angle (fov), aspect ratio, fustrum near and far
 	if (config.camNear!=-1 && config.camFar!=-1) {
 		OSG_INFO << "Setting custom near/far planes to " << config.camNear << " " << config.camFar << std::endl;
@@ -105,8 +148,11 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 		viewer->getCamera()->setProjectionMatrixAsPerspective(config.camFov, config.camAspectRatio, 1, 10);
 	}
 
+        osg::ref_ptr<HMDCamera> hmd_camera = new HMDCamera(viewer, oculusDevice);
+        hmd_camera->addChild(scene_builder->getRoot() );
+
 	OSG_INFO << "Setting main viewer" << std::endl;
-	viewer->setSceneData( scene_builder->getRoot() );
+	viewer->setSceneData( hmd_camera );
 
 	OSG_INFO << "Starting window manager..." << std::endl;
 	wm = new osgWidget::WindowManager(

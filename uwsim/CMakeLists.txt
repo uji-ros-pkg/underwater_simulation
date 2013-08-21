@@ -16,6 +16,7 @@ find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
+find_package(OculusSDK REQUIRED)
 
 catkin_package(
   LIBRARIES
@@ -55,7 +56,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/SimulatorConfig.h.cmake
 find_package(PkgConfig)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
-INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OculusSDK_INCLUDE_DIRS})
 
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
@@ -91,15 +92,17 @@ src/BulletHfFluid/btHfFluidRigidCollisionAlgorithm.cpp
 src/BulletHfFluid/btHfFluidRigidCollisionConfiguration.cpp
 src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
 src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
+src/oculusdevice.cpp
+src/HMDCamera.cpp
 )
 
 message("OPENSCENEGRAPH_LIBRARIES= ${OPENSCENEGRAPH_LIBRARIES}")
 
-target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
+target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} /opt/ros/hydro/lib/libovr.so -lGLU)
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
 add_executable(uwsim_binary  src/main.cpp)
-target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU )
+target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} /opt/ros/hydro/lib/libovr.so -lGLU )
 
 add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 target_link_libraries(makeVehicleSurvey uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
