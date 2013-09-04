@@ -56,7 +56,7 @@ protected:
 
 VirtualCamera::VirtualCamera(){}
 
-void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far,int bw) {
+void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far,int bw, int widget) {
 	this->uwsim_root=uwsim_root;
 	this->name=name;
 
@@ -87,11 +87,16 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 	  this->paramsOn=0;
 	this->range=range;
 	this->bw=bw;
+	this->widget=widget;
         
-	renderTexture=new osg::Image();
-	renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
-	depthTexture=new osg::Image();
-	depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
+	if(!range){
+	  renderTexture=new osg::Image();
+	  renderTexture->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
+	}
+	else{
+	  depthTexture=new osg::Image();
+	  depthTexture->allocateImage(width, height, 1, GL_DEPTH_COMPONENT, GL_FLOAT);
+	}
 
 	createCamera();
 }
@@ -99,28 +104,28 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2,0);  //Aspect Ratio correction should be improved!
+  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2,0,0);  //Aspect Ratio correction should be improved!
 
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov, double aspectRatio) {  //Used in structured light projector as shadow camera
-	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20,0);
+	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20,0,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
-	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,50,1.33,0.18,20,0);
+	init(uwsim_root, name, trackNode,width,height,baseline, frameId, NULL,0,50,1.33,0.18,20,0,1);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,int bw) {
-	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,50,1.33,0.18,20,bw);
+	init(uwsim_root, name, trackNode,width,height,baseline,frameId,params,range,50,1.33,0.18,20,bw,1);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,50,1.33,0.18,20,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"",params,0,50,1.33,0.18,20,0,1);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height) {
-	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,50,1.33,0.18,20,0);
+	init(uwsim_root, name, trackNode,width,height,0.0,"", NULL,0,50,1.33,0.18,20,0,1);
 }
 
 void VirtualCamera::createCamera()
@@ -137,8 +142,10 @@ void VirtualCamera::createCamera()
 	textureCamera->setRenderOrder(osg::Camera::PRE_RENDER);
 
 	// The camera will render into the texture that we created earlier
-	textureCamera->attach(osg::Camera::COLOR_BUFFER, renderTexture.get());
-	textureCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture.get());
+	if(!range)
+	  textureCamera->attach(osg::Camera::COLOR_BUFFER, renderTexture.get());
+	else
+	  textureCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture.get());
 
 	textureCamera->setName("CamViewCamera");
 	textureCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
