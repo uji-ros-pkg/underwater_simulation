@@ -104,7 +104,7 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, trackNode,width,1,0.0, "", NULL,1,fov,1+0.004464*fov,0.8,range*1.2,0,0);  //Aspect Ratio correction should be improved!
+  init(uwsim_root, name, trackNode,1,width,0.0, "", NULL,1,fov,1.0/width,0.8,range*1.2,0,0);  //Aspect Ratio correction should be improved!
 
 }
 

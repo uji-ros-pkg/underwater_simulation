@@ -79,7 +79,7 @@
       <joint>0.3 </joint>
     </jointValues>
     <position>
-      <x> 0.1</x>
+      <x> -0.2</x>
       <y> 0 </y>
       <z> 2.0 </z>
     </position>
@@ -241,7 +241,7 @@
       <orientation>
         <r>0</r>
         <p>0</p>
-        <y>1.57 </y>
+        <y>3.14 </y>
       </orientation>
       <initAngle>-60</initAngle>
       <finalAngle>60</finalAngle>
