@@ -17,6 +17,57 @@
 #include <osg/Material>
 #include <math.h>
 
+
+//ContactTest structure: http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers
+struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback {
+ 
+	  //! Constructor, pass whatever context you want to have available when processing contacts
+	  /*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
+	   *  (supplied by the superclass) for needsCollision() */
+	  ContactSensorCallback(btRigidBody& tgtBody)
+		: btCollisionWorld::ContactResultCallback(), body(tgtBody) {collided=0; }
+ 
+	  btRigidBody& body; //!< The body the sensor is monitoring
+	  int collided;
+ 
+	  //! If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision:
+	  /*! However, if you use a btCollisionObject for #body instead of a btRigidBody,
+	   *  then this is unnecessary—checkCollideWithOverride isn't available */
+	  virtual bool needsCollision(btBroadphaseProxy* proxy) const {
+		if(proxy->m_collisionFilterGroup == 0x00000010 ){  //Check if it's a vehicle!
+			return false;
+		}
+		return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
+	} 
+ 
+	//! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
+	virtual btScalar addSingleResult(btManifoldPoint& cp,
+		const btCollisionObject * colObj0,int partId0,int index0,
+		const btCollisionObject * colObj1,int partId1,int index1)
+	{
+		//std::cout<<"Checking"<<std::endl;
+   		//CollisionDataType * nombre=(CollisionDataType *)colObj0->getUserPointer();
+    		//CollisionDataType * nombre2=(CollisionDataType *)colObj1->getUserPointer();
+		//Check if object colliding is Static or Kinematic (in that case no object reaction will be produced by bullet, so we stop the arm movement!)
+		if( ((colObj0->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0 || (colObj0->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0) && 
+		    ((colObj1->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0 || (colObj1->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)){
+		  collided=1;
+
+		}
+
+		/*std::cout<<((colObj0->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0)<<" &&&& "<<((colObj1->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)<<std::endl;
+		std::cout<<colObj1->getCollisionFlags()<<" "<<btCollisionObject::CF_STATIC_OBJECT<<std::endl;
+		//std::cout<<cp.getDistance()<<" "<<cp.getLifeTime()<<std::endl;
+    std::cout<<"Collision ";
+    if(nombre)
+	std::cout<<nombre->name<<" "<<" ";
+    if(nombre2)
+	std::cout<<nombre2->name;
+    std::cout<<" "<<std::endl;*/
+		return 0; // not actually sure if return value is used for anything...?
+	}
+};
+
 URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicChain(vehicle.nlinks, vehicle.njoints) {
    ScopedTimer buildSceneTimer("Loading URDF robot... \n", osg::notify(osg::ALWAYS));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/robot"));
@@ -25,6 +76,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 
    link.resize(vehicle.nlinks);
 
+   //Create links from geometry nodes
    for(int i=0; i<vehicle.nlinks;i++) {
 	ScopedTimer buildSceneTimer("  · "+vehicle.links[i].geom->file+": ", osg::notify(osg::ALWAYS));
 
@@ -54,6 +106,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    //Create a frame that can be switched on and off 
    osg::ref_ptr<osg::Node> axis=UWSimGeometry::createSwitchableFrame();
 
+   //Create tree hierarchy linkBT->link->linkPT and link links
    if(success) {
 	ScopedTimer buildSceneTimer("  · Linking links...", osg::notify(osg::ALWAYS));
         osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
@@ -154,24 +207,75 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    }	
 }
 
-void URDFRobot::updateJoints(std::vector<double> &q) {
-	osg::Matrix m;
+void URDFRobot::addToKinematicChain(osg::Node * newLink,btRigidBody* body) {
+  link.push_back(newLink);
 
-	for (int i=0; i<getNumberOfJoints(); i++) {
-	  if(jointType[i]==1){
-	    if(mimic[i].sliderCrank==0)
-	      m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,joint_axis[i]);   
-	    else
-	      m.makeRotate((q[mimic[i].joint]+asin(mimic[i].offset*sin(q[mimic[i].joint])))*-1,joint_axis[i]);
-	  }
-	  else if(jointType[i]==2)
-	    m.makeTranslate( joint_axis[i] *= (q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset) );
-	  else
-	    m.makeIdentity();
-	  osg::Matrix nm=zerojoints[i]->getMatrix();
-	  nm.preMult(m);
-	  joints[i]->setMatrix(nm);
-	}
+  //Reset vehicle properties as vehicle
+  if(body){
+    physics->dynamicsWorld->btCollisionWorld::removeCollisionObject(body);
+    physics->dynamicsWorld->addCollisionObject(body,short( COL_VEHICLE),short(COL_OBJECTS));
+  }
+
+}
+
+void URDFRobot::moveJoints(std::vector<double> &q) {
+   osg::Matrix m;
+
+  for (int i=0; i<getNumberOfJoints(); i++) {
+    if(jointType[i]==1){
+      if(mimic[i].sliderCrank==0)
+        m.makeRotate(q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset,joint_axis[i]);   
+      else
+        m.makeRotate((q[mimic[i].joint]+asin(mimic[i].offset*sin(q[mimic[i].joint])))*-1,joint_axis[i]);
+    }
+    else if(jointType[i]==2){
+      m.makeTranslate( joint_axis[i] * (q[mimic[i].joint]*1+mimic[i].offset) );
+    }
+    else
+      m.makeIdentity();
+    osg::Matrix nm=zerojoints[i]->getMatrix();
+    nm.preMult(m);
+    joints[i]->setMatrix(nm);
+  }
+
+}
+
+
+void URDFRobot::updateJoints(std::vector<double> &q) {
+
+  moveJoints(q);
+
+  //Check if vehicle is colliding in new position;
+  int collision=0;
+  for(int i=1; i<link.size() && !collision; i++){ //Do not check base_link as it's position does not depend on Kinematic chain (should be checked on vehicle moves)
+    osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*> (link[i]->getUserData());
+    btRigidBody* tgtBody=data->rigidBody;
+    if(tgtBody){
+      tgtBody->setWorldTransform(osgbCollision::asBtTransform(*getWorldCoords(link[i])));
+      ContactSensorCallback callback(*tgtBody);
+      physics->dynamicsWorld->contactTest(tgtBody,callback);
+      collision=callback.collided;
+    }
+  }
+
+
+  //If not colliding save position as safe
+  if(!collision){
+    //std::cout<<"No collision, saving position as 'safe'"<<std::endl;
+    for (int i=0; i<getNumberOfJoints(); i++) 
+      qLastSafe[i]=q[i];
+  }
+
+  //If collision move back to lastSafe position
+  //TODO Check if it is posible to move only some joints instead of stopping the whole movement
+  else{
+    //std::cout<<"Collision detected, turning back to last safe position"<<std::endl;
+    for (int i=0; i<getNumberOfJoints(); i++){
+      this->q[i]= qLastSafe[i];
+    }
+    moveJoints(qLastSafe);
+  }
+
 }
 
 

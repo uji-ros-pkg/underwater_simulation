@@ -135,15 +135,16 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		scene->addObject(iauvFile[i]->baseTransform);
 
 		siauv->setVehiclePosition(vehicle.position[0],vehicle.position[1],vehicle.position[2],vehicle.orientation[0],vehicle.orientation[1],vehicle.orientation[2]);
-
-		if(vehicle.jointValues.size() && siauv->urdf!=NULL){
-			siauv->urdf->setJointPosition(vehicle.jointValues);
-		}
   
 		for(int j=0; j<vehicle.nlinks;j++) {
 			NodeDataType * data= new NodeDataType(0);
 			siauv->urdf->link[j]->setUserData(data);
 	        }
+
+		if(vehicle.jointValues.size() && siauv->urdf!=NULL){
+			siauv->urdf->setJointPosition(vehicle.jointValues);
+		}
+		
 	}
 
 	//Add objects added in config file.

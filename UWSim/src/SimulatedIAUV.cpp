@@ -248,7 +248,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) : urdf(
 		vMr->asPositionAttitudeTransform()->setAttitude(osg::Quat(rs.orientation[0],osg::Vec3d(1,0,0),rs.orientation[1],osg::Vec3d(0,1,0), rs.orientation[2],osg::Vec3d(0,0,1) ));
 		vMr->setName("ObjectPickerNode");
 		urdf->link[rs.link]->asGroup()->addChild(vMr);
-		object_pickers.push_back(ObjectPicker(rs.name, oscene->scene->localizedWorld, vMr, rs.range, true));
+		object_pickers.push_back(ObjectPicker(rs.name, oscene->scene->localizedWorld, vMr, rs.range, true,urdf));
 		OSG_INFO << "Done adding an object picker..." << std::endl;
 	}
 

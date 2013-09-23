@@ -194,8 +194,8 @@ struct PhysicProperties{
   double minAngularLimit[3];
   double maxAngularLimit[3];
   int isKinematic;
-  std::string csType;
-  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";linearDamping=0;angularDamping=0;minLinearLimit[0]=1;minLinearLimit[1]=1;minLinearLimit[2]=1;maxLinearLimit[0]=0;maxLinearLimit[1]=0;maxLinearLimit[2]=0;isKinematic=0;minAngularLimit[0]=1;minAngularLimit[1]=1;minAngularLimit[2]=1;maxAngularLimit[0]=0;maxAngularLimit[1]=0;maxAngularLimit[2]=0;};
+  std::string csType,cs;
+  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";cs="";linearDamping=0;angularDamping=0;minLinearLimit[0]=1;minLinearLimit[1]=1;minLinearLimit[2]=1;maxLinearLimit[0]=0;maxLinearLimit[1]=0;maxLinearLimit[2]=0;isKinematic=0;minAngularLimit[0]=1;minAngularLimit[1]=1;minAngularLimit[2]=1;maxAngularLimit[0]=0;maxAngularLimit[1]=0;maxAngularLimit[2]=0;};
 };
 
 struct Object{

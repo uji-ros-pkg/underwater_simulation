@@ -150,10 +150,11 @@
 <!ELEMENT info (#PCDATA)>
 
 <!-- elementos physics -->
-<!ELEMENT physics (mass?,inertia?,collisionShapeType?,linearDamping?,angularDamping?,isKinematic? , minLinearLimit?, maxLinearLimit?,minAngularLimit?,maxAngularLimit?)>
+<!ELEMENT physics (mass?,inertia?,collisionShapeType?,collisionShape?,linearDamping?,angularDamping?,isKinematic? , minLinearLimit?, maxLinearLimit?,minAngularLimit?,maxAngularLimit?)>
 <!ELEMENT mass (#PCDATA)>
 <!ELEMENT inertia (x,y,z)>
 <!ELEMENT collisionShapeType (#PCDATA)>
+<!ELEMENT collisionShape (#PCDATA)>
 <!ELEMENT linearDamping (#PCDATA)>
 <!ELEMENT angularDamping (#PCDATA)>
 <!ELEMENT minLinearLimit (x,y,z)>

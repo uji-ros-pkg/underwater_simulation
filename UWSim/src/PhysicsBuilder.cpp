@@ -26,6 +26,7 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder,ConfigFile config)
     for(unsigned int j=0; j<scene_builder->iauvFile[i]->urdf->link.size();j++){
       osg::Node * link =scene_builder->iauvFile[i]->urdf->link[j];
       osg::Node * cs= NULL;
+      btRigidBody* rigidBody;
       //Look for vehicle, and collision shapes on config.
       for(std::list<Vehicle>::iterator cfgVehicle=config.vehicles.begin();cfgVehicle!=config.vehicles.end();cfgVehicle++)
         if(cfgVehicle->name==scene_builder->iauvFile[i]->name)
@@ -38,11 +39,18 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder,ConfigFile config)
 	    }
       
       CollisionDataType * colData=new CollisionDataType(link->getName(),scene_builder->iauvFile[i]->name,1);
-      physics->addObject(NULL,link,colData,boost::shared_ptr<PhysicProperties>(),cs);
+      rigidBody = physics->addObject(NULL,link,colData,boost::shared_ptr<PhysicProperties>(),cs);
+
+      //Update visual node data with physics properties
+      osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*> ( link->getUserData() );
+      data->rigidBody = rigidBody;
+      link->setUserData(data);
+
       //TODO: Add node data type correctly(hand actuator).
       //NodeDataType * data= new NodeDataType(floorbody,0);
       //link->setUserData(data);
     }
+    scene_builder->iauvFile[i]->urdf->physics=physics;
   }
 
 
@@ -72,14 +80,26 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder,ConfigFile config)
 
     }
 
+    //Check if object has a collisionShape defined
+    osg::Node * cs= NULL;
+    if(pp && pp->cs!="")
+	cs=UWSimGeometry::retrieveResource(pp->cs);
+
+    btRigidBody* rigidBody;
+
     //Objects  objects with simple shapes will be added with water physics and rest with physics.
     if(config.physicsWater.enable && (pp->csType=="box" || pp->csType=="sphere")){
-       physics->addFloatingObject(mt,scene_builder->objects[i],colData,pp);
+       rigidBody = physics->addFloatingObject(mt,scene_builder->objects[i],colData,pp,cs);
     }
     else{
-       physics->addObject(mt,scene_builder->objects[i],colData,pp);
+       rigidBody = physics->addObject(mt,scene_builder->objects[i],colData,pp,cs);
     }
     //wMb->setUserData(data); 
+
+    //store physiscs in object's data
+    osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*> ( scene_builder->objects[i]->getUserData() );
+    data->rigidBody = rigidBody;
+    scene_builder->objects[i]->setUserData(data);
   }
 
   //Add ROSPhysInterfaces

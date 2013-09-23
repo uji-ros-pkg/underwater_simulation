@@ -167,6 +167,8 @@ btCollisionShape* BulletPhysics::GetCSFromOSG(osg::Node * node, collisionShapeTy
 	cs= osgbCollision::btCompoundShapeFromOSGGeodes(node,CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE);
     else if (ctype==SHAPE_COMPOUND_BOX)
 	cs= osgbCollision::btCompoundShapeFromOSGGeodes(node,BOX_SHAPE_PROXYTYPE);
+    else if (ctype==SHAPE_COMPOUND_CYLINDER)
+	cs= osgbCollision::btCompoundShapeFromOSGGeodes(node,CYLINDER_SHAPE_PROXYTYPE);
     else if (ctype==SHAPE_TRIMESH)
 	cs= osgbCollision::btTriMeshCollisionShapeFromOSG(node);
 
@@ -192,12 +194,14 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
      ctype=BulletPhysics::SHAPE_SPHERE;
    else if(pp->csType=="compound box")
      ctype=BulletPhysics::SHAPE_COMPOUND_BOX;
+   else if(pp->csType=="compound cylinder")
+     ctype=BulletPhysics::SHAPE_COMPOUND_CYLINDER;
    else if(pp->csType=="trimesh")
      ctype=BulletPhysics::SHAPE_TRIMESH;
    else if(pp->csType=="compound trimesh")
      ctype=BulletPhysics::SHAPE_COMPOUND_TRIMESH;
    else
-     OSG_WARN << data->name<<" has an unknown collision shape type: "<<pp->csType<<". Using default box shape(dynamic) trimesh(kinematic). Check xml file, allowed collision shapes are 'box' 'compound box' 'trimesh' 'compound trimesh'." << std::endl;
+     OSG_WARN << data->name<<" has an unknown collision shape type: "<<pp->csType<<". Using default box shape(dynamic) trimesh(kinematic). Check xml file, allowed collision shapes are 'box' 'compound box' 'trimesh' 'compound trimesh' 'compound cylinder." << std::endl;
 
    btCollisionShape* cs;
    if(colShape==NULL)

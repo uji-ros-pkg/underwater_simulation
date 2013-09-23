@@ -15,6 +15,7 @@
 
 #include "VirtualRangeSensor.h"
 #include "UWSimUtils.h"
+#include "URDFRobot.h"
 
 //Node tracker that updates the ray coordinates from the tracked node position, computes intersections and 'picks' nodes
 class ObjectPickerUpdateCallback : public IntersectorUpdateCallback {
@@ -46,6 +47,12 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback {
 	      if(data!=NULL && data->catchable){
 
 	        std::cerr << "Picking object up." << std::endl;
+ 		//physics: set static object flag
+		if(data->rigidBody)
+                  data->rigidBody->setCollisionFlags(data->rigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		
+		//add link to kinematic chain
+		urdf->addToKinematicChain(i[0],data->rigidBody);
 
 		osg::Node * objectTransf=i[0]->getParent(0)->getParent(0);  //Object->linkBaseTransform->transform
 	  
@@ -71,17 +78,18 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback {
   public:
 	osg::NodePath impact;
 	osg::Node *trackNode;
+	boost::shared_ptr<URDFRobot> urdf;
 	bool picked;
 
-	ObjectPickerUpdateCallback(osg::Node *trackNode, double range, bool visible, osg::Node *root) : IntersectorUpdateCallback (range, visible, root) { this->trackNode=trackNode; picked=false;}
+	ObjectPickerUpdateCallback(osg::Node *trackNode, double range, bool visible, osg::Node *root, boost::shared_ptr<URDFRobot> urdf) : IntersectorUpdateCallback (range, visible, root) { this->trackNode=trackNode; picked=false; this->urdf=urdf;}
 };
 
 class ObjectPicker : public VirtualRangeSensor{
   public:
-    ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible);
+    ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,boost::shared_ptr<URDFRobot> urdf);
     ObjectPicker();
 
-    void init(std::string name,  osg::Node *root, osg::Node *trackNode, double range, bool visible);
+    void init(std::string name,  osg::Node *root, osg::Node *trackNode, double range, bool visible,boost::shared_ptr<URDFRobot> urdf);
 };
 
 #endif

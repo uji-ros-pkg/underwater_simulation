@@ -68,7 +68,7 @@ class CollisionDataType : public osg::Referenced{
 class BulletPhysics: public osg::Referenced {
 
 public:
-	typedef enum {SHAPE_BOX, SHAPE_SPHERE, SHAPE_TRIMESH,SHAPE_COMPOUND_TRIMESH,SHAPE_COMPOUND_BOX} collisionShapeType_t;
+	typedef enum {SHAPE_BOX, SHAPE_SPHERE, SHAPE_TRIMESH,SHAPE_COMPOUND_TRIMESH,SHAPE_COMPOUND_BOX,SHAPE_COMPOUND_CYLINDER} collisionShapeType_t;
 
 	btHfFluidRigidDynamicsWorld * dynamicsWorld;
 	//osgbCollision::GLDebugDrawer debugDrawer;

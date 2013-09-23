@@ -934,6 +934,8 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 			extractPositionOrColor(child,pp.inertia);
 		else if(child->get_name()=="collisionShapeType")
 			extractStringChar(child,pp.csType);
+		else if(child->get_name()=="collisionShape")
+			extractStringChar(child,pp.cs);
 		else if(child->get_name()=="linearDamping"){
 			extractFloatChar(child,pp.linearDamping);		
 			if(pp.linearDamping>1.0)
