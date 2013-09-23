@@ -229,7 +229,7 @@ void URDFRobot::moveJoints(std::vector<double> &q) {
         m.makeRotate((q[mimic[i].joint]+asin(mimic[i].offset*sin(q[mimic[i].joint])))*-1,joint_axis[i]);
     }
     else if(jointType[i]==2){
-      m.makeTranslate( joint_axis[i] * (q[mimic[i].joint]*1+mimic[i].offset) );
+      m.makeTranslate( joint_axis[i] * (q[mimic[i].joint]*mimic[i].multiplier+mimic[i].offset) );
     }
     else
       m.makeIdentity();
