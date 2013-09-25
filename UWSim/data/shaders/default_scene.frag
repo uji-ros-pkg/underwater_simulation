@@ -85,7 +85,7 @@ void main()
 	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
 	
 	// Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z -= 0.0005;
+	shadowCoordinateWdivide.z -= 0.005;
 
 	float distanceFromLight = texture2D(SLStex,shadowCoordinateWdivide.st).z;
 	

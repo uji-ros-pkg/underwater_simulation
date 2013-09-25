@@ -104,12 +104,12 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, osg::Node *tr
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width,double fov, double range){//Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, trackNode,1,width,0.0, "", NULL,1,fov,1.0/width,0.8,range*1.2,0,0);  //Aspect Ratio correction should be improved!
+  init(uwsim_root, name, trackNode,1,width,0.0, "", NULL,1,fov,1.0/width,0.8,range*1.2,0,0);
 
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov, double aspectRatio) {  //Used in structured light projector as shadow camera
-	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.3,20,0,0);
+	init(uwsim_root, name, trackNode,width,height,0.0, "", NULL,1,fov,aspectRatio,0.1,20,0,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId) {
@@ -178,7 +178,7 @@ void VirtualCamera::createCamera()
 	Ty = 0.0;	
 
 	node_tracker = new MyNodeTrackerCallback(uwsim_root, depthTexture, textureCamera);
-	trackNode->setUpdateCallback(node_tracker);
+	trackNode->setEventCallback(node_tracker);
 
 
 	//Uniforms for independence from main camera (underwater effects on shaders)
