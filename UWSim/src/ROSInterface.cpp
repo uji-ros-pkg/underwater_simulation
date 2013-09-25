@@ -22,6 +22,7 @@
 #include <underwater_sensor_msgs/Pressure.h>
 #include <underwater_sensor_msgs/DVL.h>
 #include <std_msgs/Bool.h>
+#include <osg/LineStipple>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -51,7 +52,7 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
   started=0; //Used in time
   trajectory_initialized=false;
   this->max_waypoint_distance=max_waypoint_distance;
-  enable_visualization=(visualization==1);
+  enable_visualization=(visualization>=1);
 
   if (enable_visualization) {
 	  trajectory_points=new osg::Vec3Array;
@@ -71,6 +72,19 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
 	  geode->addDrawable(trajectory);
 	  osg::LineWidth* linewidth = new osg::LineWidth();
 	  linewidth->setWidth(4.0f); 
+
+	  //stipple for dashed lines:
+	  if(visualization>1){
+	    osg::LineStipple* linestipple = new osg::LineStipple;
+	    linestipple->setFactor(1);
+	    if(visualization==2)
+	      linestipple->setPattern(0xf0f0);
+	    if(visualization==3)
+	      linestipple->setPattern(0xfff000fff000);
+	    if(visualization==4)
+	      linestipple->setPattern(0xf000f000);
+	    geode->getOrCreateStateSet()->setAttributeAndModes(linestipple,osg::StateAttribute::ON);
+	  }
 
 	  //Attach the trajectory to the localizedWorld node
 	  findNodeVisitor finder("localizedWorld");
