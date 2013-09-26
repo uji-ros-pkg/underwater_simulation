@@ -96,14 +96,14 @@ void main()
 
 	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
 	//check binary texture threshold, backprojection, shadow, out of texture bounds.
-	if( (texcolor.x+texcolor.y+texcolor.z)<2.0 && ShadowCoord.w > 0 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0)){
+	if( (texcolor.x+texcolor.y+texcolor.z)<2.0 && ShadowCoord.w > 0.0 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0)){
 	    textureColor = vec4( 0.0,1.0,0.0,1.0);
 	}
 	else{
 	  if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
 	    textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
 	  else
-            textureColor =color;
+            textureColor = color;
 
 	}
 

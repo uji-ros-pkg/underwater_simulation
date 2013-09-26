@@ -151,6 +151,19 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length) {
   Xcylinder->setStateSet(Xstateset);
   XBaseTransform->addChild(Xcylinder);
 
+  //Properties on X cylinder
+  static const char model_vertex[]   = "default_scene.vert";
+  static const char model_fragment[] = "default_scene.frag";
+
+  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+  osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, "", "");
+  program->addBindAttribLocation("aTangent", 6);
+
+  Xstateset->setAttributeAndModes(program,osg::StateAttribute::ON);
+  Xstateset->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
+  Xstateset->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
+
+
   //create YBase to rotate
   osg::Matrix YBase;
   YBase.makeIdentity();
@@ -168,6 +181,11 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length) {
   Ycylinder->setStateSet(Ystateset);
   YBaseTransform->addChild(Ycylinder);
 
+  //Properties on Ycylinder
+  Ystateset->setAttributeAndModes(program,osg::StateAttribute::ON);
+  Ystateset->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
+  Ystateset->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
+
   //create ZBase to rotate
   osg::Matrix ZBase;
   ZBase.makeIdentity();
@@ -184,6 +202,11 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length) {
   Zstateset->setAttribute(Zmaterial);
   Zcylinder->setStateSet(Zstateset);
   ZBaseTransform->addChild(Zcylinder);
+
+  //Properties on Zcylinder
+  Zstateset->setAttributeAndModes(program,osg::StateAttribute::ON);
+  Zstateset->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
+  Zstateset->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
 
   return linkBaseTransform;
 }

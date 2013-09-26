@@ -50,6 +50,6 @@ void main(void)
 
 	computeScattering( osgOcean_Eye, worldVertex.xyz, vExtinction, vInScattering);
 
-	color=gl_Color;
+	color=gl_FrontMaterial.diffuse;
 	vWorldHeight = worldVertex.z;
 }
