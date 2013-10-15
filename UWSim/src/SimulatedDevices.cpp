@@ -14,20 +14,27 @@
 #include "ros/ros.h"
 #include <osg/Notify>
 
-#include "SimDev_Echo.h"
+#include <pluginlib/class_loader.h>
+using namespace uwsim;
 
 //a list of "factories" to initialize and apply a device or rosinterface
 //an instance of "config" class is used as both a "factory" and as an XML structure
 std::vector<SimulatedDeviceFactory::Ptr> factories;
 
+pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("UWSim", "uwsim::SimulatedDeviceFactory");
+
 //setting up a list of available devices/rosinterfaces
 static void initFactories(){
 	if (factories.size()>0) return;
-	//ADD NEW DEVICE/ROSINTERFACE BEGIN
 	
-	factories.push_back(SimulatedDeviceFactory::Ptr(new SimDev_Echo_Factory()));
+	vector<string> available_plugins = simdev_loader.getDeclaredClasses();
+	for (size_t i = 0; i< available_plugins.size();++i){
+	  OSG_ALWAYS<<"Loading SimulatedDevices plugin: '"<<available_plugins.at(i)<<"'"<<std::endl;
+	  factories.push_back(SimulatedDeviceFactory::Ptr(
+	    simdev_loader.createInstance(available_plugins.at(i))
+	  ));
+	}
 	
-	//ADD NEW DEVICE/ROSINTERFACE END
 	for (size_t i = 0; i< factories.size();++i)
 		for (size_t j = 0; j< i;++j)
 			if (factories[i]->getType() == factories[j]->getType())

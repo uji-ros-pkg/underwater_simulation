@@ -1,0 +1,8 @@
+<library path="lib/libuwsim_plugins_simdev">
+  <class type="SimDev_Echo_Factory" 
+    base_class_type="uwsim::SimulatedDeviceFactory">
+  <description>
+  Example plugin
+  </description>
+  </class>
+</library>

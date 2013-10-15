@@ -4,6 +4,7 @@
 #ifndef SIMULATEDDEVICE_ECHO_H_
 #define SIMULATEDDEVICE_ECHO_H_
 #include "SimulatedDevices.h"
+using namespace uwsim;
 
 /*
  * Example header of driver/rosinterface configuration/factory

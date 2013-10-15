@@ -1,6 +1,6 @@
 //"Echo" example, SimulatedDevice_Echo.cpp
 
-
+#include <pluginlib/class_list_macros.h>
 #include "SimDev_Echo.h"
 
 SimDev_Echo::SimDev_Echo(SimDev_Echo_Config * cfg): SimulatedDevice(cfg) {
@@ -67,3 +67,4 @@ SimDev_Echo_ROSPublisher::publish() {
 	pub_.publish(msg);
 }
 
+PLUGINLIB_EXPORT_CLASS(SimDev_Echo_Factory, uwsim::SimulatedDeviceFactory)

@@ -19,6 +19,7 @@
   <depend package="osgBullet"/>
   <depend package="osgWorks"/>
   <depend package="resource_retriever"/>
+  <depend package="pluginlib"/>
   <rosdep name="libxml++-2.6" />
   <rosdep name="boost" />
   <rosdep name="libopenscenegraph" />
@@ -27,6 +28,7 @@
   <url>http://www.irs.uji.es/uwsim/</url>
   <export>
     <cpp cflags="-I${prefix}/src" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -luwsim -lGLU"/>
+    <UWSim plugin="${prefix}/simdev_plugins.xml" />
   </export>
 
 

@@ -915,7 +915,7 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			processMultibeamSensor(child,aux);
 			vehicle.multibeam_sensors.push_back(aux);
 		} else if (child->get_name()=="simulatedDevices"){
-			std::vector< SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
+			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
 			for (size_t i=0; i< auxs.size(); ++i)
 				if (auxs[i])
 					vehicle.simulated_devices.push_back(auxs[i]);
