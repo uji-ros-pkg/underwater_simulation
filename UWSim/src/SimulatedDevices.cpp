@@ -17,11 +17,11 @@
 #include <pluginlib/class_loader.h>
 using namespace uwsim;
 
+pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("UWSim", "uwsim::SimulatedDeviceFactory");
+
 //a list of "factories" to initialize and apply a device or rosinterface
 //an instance of "config" class is used as both a "factory" and as an XML structure
 std::vector<SimulatedDeviceFactory::Ptr> factories;
-
-pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("UWSim", "uwsim::SimulatedDeviceFactory");
 
 //setting up a list of available devices/rosinterfaces
 static void initFactories(){
@@ -30,9 +30,7 @@ static void initFactories(){
 	vector<string> available_plugins = simdev_loader.getDeclaredClasses();
 	for (size_t i = 0; i< available_plugins.size();++i){
 	  OSG_ALWAYS<<"Loading SimulatedDevices plugin: '"<<available_plugins.at(i)<<"'"<<std::endl;
-	  factories.push_back(SimulatedDeviceFactory::Ptr(
-	    simdev_loader.createInstance(available_plugins.at(i))
-	  ));
+	  factories.push_back(simdev_loader.createInstance(available_plugins.at(i)));
 	}
 	
 	for (size_t i = 0; i< factories.size();++i)
