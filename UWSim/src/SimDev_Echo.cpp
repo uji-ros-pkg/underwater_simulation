@@ -19,8 +19,9 @@ SimDev_Echo_Factory::processConfig(const xmlpp::Node* node, ConfigFile * config)
 	return SimulatedDeviceConfig::Ptr(cfg);
 }
 
-void 
-SimDev_Echo_Factory::applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *sceneBuilder){
+bool 
+SimDev_Echo_Factory::applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *sceneBuilder, size_t iteration){
+	if (iteration>0) return true;
 	for (size_t i=0; i< vehicleChars.simulated_devices.size(); ++i)
 		if (vehicleChars.simulated_devices[i]->getType() == this->getType()){
 			SimDev_Echo_Config * cfg = dynamic_cast<SimDev_Echo_Config *>(vehicleChars.simulated_devices[i].get());
@@ -30,6 +31,7 @@ SimDev_Echo_Factory::applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, Sc
 			else
 				OSG_FATAL<<"SimDev_Echo device '"<<vehicleChars.simulated_devices[i]->name<<"' inside robot '"<<vehicleChars.name<<"' has empty info, discarding..."<<std::endl;
 		}
+	return true;
 }
 
 std::vector< boost::shared_ptr<ROSInterface> >
@@ -67,4 +69,10 @@ SimDev_Echo_ROSPublisher::publish() {
 	pub_.publish(msg);
 }
 
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+// new pluginlib API in Groovy and Hydro
 PLUGINLIB_EXPORT_CLASS(SimDev_Echo_Factory, uwsim::SimulatedDeviceFactory)
+#else
+PLUGINLIB_REGISTER_CLASS(SimDev_Echo_Factory, SimDev_Echo_Factory, uwsim::SimulatedDeviceFactory)
+#endif
+

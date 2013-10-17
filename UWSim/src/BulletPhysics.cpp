@@ -183,6 +183,7 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
      if(data->isVehicle){
 	pp->isKinematic=1;
 	pp->csType="compound box";
+        pp->mass = 0; //there is no need to set mass (and inertia) to kinematic objects
      }
    }
 
@@ -212,6 +213,7 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
     btVector3 inertia=btVector3(pp->inertia[0],pp->inertia[1],pp->inertia[2]);
 
     MyMotionState* motion = new MyMotionState(node,root);
+   if (inertia.length()==0) //asking bullet to calculate inertia only if it is unset
     cs->calculateLocalInertia( pp->mass, inertia  );
     btRigidBody::btRigidBodyConstructionInfo rb( pp->mass, motion, cs,inertia);
     btRigidBody* body = new btRigidBody( rb );

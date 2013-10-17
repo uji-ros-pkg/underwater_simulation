@@ -24,6 +24,7 @@ struct ROSInterface;
 struct ConfigFile;
 struct Vehicle;
 struct SceneBuilder;
+struct BulletPhysics;
 
 namespace uwsim {
   struct SimulatedDevice;
@@ -54,7 +55,9 @@ namespace uwsim {
     //DRIVER: parses XML and returns "XML config", executed first
     virtual SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node* node, ConfigFile * config) = 0;
     //DRIVER: checks parsed XML configurations and sets SimulatedAUV's data, executed second
-    virtual void applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *oscene) = 0;
+    //Executed multiple times (to allow dependent devices work independent from order of ), until all factories return true
+    //normally, configuration should occur only on iteration 0
+    virtual bool applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *oscene, size_t iteration) = 0;
     //ROSINTERFACE: returns configured ROSInterfaces, executed third
     virtual std::vector<boost::shared_ptr<ROSInterface> > getInterface(ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile) = 0;
   
@@ -69,6 +72,7 @@ namespace uwsim {
     std::string getType(){return type;}
     typedef boost::shared_ptr<SimulatedDevice> Ptr;
     SimulatedDevice(SimulatedDeviceConfig * cfg);
+    virtual void applyPhysics( BulletPhysics * bulletPhysics) = 0;
     virtual ~SimulatedDevice(){}
   };
 };

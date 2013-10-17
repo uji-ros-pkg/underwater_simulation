@@ -66,9 +66,15 @@ SimulatedDevices::getInterfaces(ROSInterfaceInfo & rosInterface, std::vector<boo
 
 void SimulatedDevices::applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *oscene)
 {
-	for (size_t i = 0; i< factories.size();++i){
-		factories[i]->applyConfig(auv, vehicleChars, oscene);
-	}
+  for (size_t iteration = 0; iteration< 10;++iteration)//executed max 10 times
+  {
+    bool configured = true;
+    for (size_t i = 0; i< factories.size();++i){
+      if(!factories[i]->applyConfig(auv, vehicleChars, oscene, iteration))
+	configured = false;
+    }
+    if (configured) break;
+  }
 }
 
 static void processConfigNode(const xmlpp::Node* node, ConfigFile * config, SimulatedDeviceConfig::Ptr cfg)
