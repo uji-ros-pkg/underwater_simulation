@@ -92,6 +92,7 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
 	  std::vector<osg::Node*> node_list=finder.getNodeList();
 
 	  geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+          const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
           osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
   	  static const char model_vertex[]   = "default_scene.vert";
 	  static const char model_fragment[] = "default_scene.frag";

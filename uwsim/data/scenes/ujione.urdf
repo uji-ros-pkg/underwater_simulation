@@ -6,7 +6,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://UWSim/data/robot/UJIOne/ujione_base.osg"/>
+        <mesh filename="robot/UJIOne/ujione_base.osg"/>
       </geometry>
     </visual>
   </link>
@@ -16,7 +16,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://UWSim/data/robot/UJIOne/ujione_jaw_inner.osg"/>
+        <mesh filename="robot/UJIOne/ujione_jaw_inner.osg"/>
       </geometry>
     </visual>
   </link>
@@ -33,7 +33,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://UWSim/data/robot/UJIOne/ujione_jaw_outer.osg"/>
+        <mesh filename="robot/UJIOne/ujione_jaw_outer.osg"/>
       </geometry>
     </visual>
   </link>

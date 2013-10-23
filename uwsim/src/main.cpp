@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include <stdlib.h>
 
 #include "ConfigXMLParser.h"
 #include "SceneBuilder.h"
@@ -76,16 +77,19 @@ int main(int argc, char *argv[])
 	//Add current folder to path
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));	
 	//Add UWSim folders to path
-	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+"/scenes");	
+        const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));	
-	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_ROOT_PATH));	
+
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH));	
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data");	
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data/scenes");	
 
 	//Add dataPath folder to path
 	if (dataPath!=std::string("")) {
 		osgDB::Registry::instance()->getDataFilePathList().push_back(dataPath);	
 	}
 
-	string configfile=std::string(SIMULATOR_DATA_PATH)+"/scenes/cirs.xml";
+	string configfile=std::string(UWSIM_ROOT_PATH)+"/scenes/cirs.xml";
 	while( arguments->read("--configfile",configfile));
 	ConfigFile config(configfile);
 

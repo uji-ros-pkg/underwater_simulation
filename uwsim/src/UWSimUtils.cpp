@@ -261,6 +261,8 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
 }
 
 void UWSimGeometry::applyStateSets(osg::Node *node) {
+          const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+ 
 	  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
           static const char model_vertex[]   = "default_scene.vert";
           static const char model_fragment[] = "default_scene.frag";
@@ -283,7 +285,6 @@ osg::Node * UWSimGeometry::retrieveResource(std::string name){
     resource = r.get(name); 
   }
   catch (resource_retriever::Exception& e){
-    ROS_ERROR("Failed to retrieve file: %s", e.what());
     return NULL;
   }
 
@@ -320,10 +321,24 @@ osg::Node * UWSimGeometry::retrieveResource(std::string name){
 }
 
 osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
-  if(geom->type==0){
+  if(geom->type==0)
+  {
     osg::Node * node = retrieveResource(geom->file);
-    if(node == NULL){
-      std::cerr<<"Error reading file " << geom->file <<" Check URDF file." <<std::endl;
+    if(node == NULL) {
+      //retrieve resource didn't succeed, let's search in the DATA PATH
+      const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+
+      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
+      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/objects"));
+      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/terrain"));
+      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+      node  = osgDB::readNodeFile(geom->file);
+
+      if (node == NULL)
+      {
+        std::cerr<<"Error retrieving file " << geom->file <<" Check URDF file or set your data path with the --dataPath option." <<std::endl;
+        exit(0);
+      }
     }
     //If node isn't a group create a group with it.
     if(node->asGroup()==NULL){

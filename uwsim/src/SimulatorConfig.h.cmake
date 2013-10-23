@@ -39,11 +39,8 @@
 //Build Bullet physics
 #cmakedefine BUILD_BULLET_PHYSICS ${BUILD_BULLET_PHYSICS}
 
-//Path to the simulator root folder
-#cmakedefine SIMULATOR_ROOT_PATH "${SIMULATOR_ROOT_PATH}"
-
-//Path to the data folder
-#cmakedefine SIMULATOR_DATA_PATH "${SIMULATOR_DATA_PATH}"
+//UWSim root folder
+#cmakedefine UWSIM_ROOT_PATH "${UWSIM_ROOT_PATH}"
 
 //Operating system
 #cmakedefine WIN32 ${WIN32}

@@ -370,6 +370,8 @@ osg::ref_ptr<osg::TextureCubeMap> osgOceanScene::loadCubeMapTextures( const std:
     enum {POS_X, NEG_X, POS_Y, NEG_Y, POS_Z, NEG_Z};
 
     std::string filenames[6];
+  
+    const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
 
     filenames[POS_X] = std::string(SIMULATOR_DATA_PATH)+"/textures/" + dir +"/east.png";
     filenames[NEG_X] = std::string(SIMULATOR_DATA_PATH)+"/textures/" + dir + "/west.png";
@@ -408,7 +410,8 @@ osg::Geode* osgOceanScene::sunDebug( const osg::Vec3f& position )
 }
 
 osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filename, Object *o)
-    {
+{
+        const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
         osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/objects"));
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/terrain"));
