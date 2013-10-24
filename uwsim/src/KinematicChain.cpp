@@ -20,6 +20,7 @@ KinematicChain::KinematicChain(int nlinks, int njoints) {
 	limits.resize(njoints);
 	names.resize(njoints);
 	q.resize(njoints);
+	qLastSafe.resize(njoints);
 	memset(&(q.front()),0,njoints*sizeof(double));
 	started=0;
 }

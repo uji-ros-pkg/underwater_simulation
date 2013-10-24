@@ -26,6 +26,7 @@
 #include <osgDB/FileNameUtils>
 #include <osg/Version>
 
+#include <btBulletDynamicsCommon.h>
 
 //Node data used to check if an object is catchable or not.
 class NodeDataType : public osg::Referenced{
@@ -42,9 +43,11 @@ class NodeDataType : public osg::Referenced{
 	   originalRotation[1]=origR[1];
 	   originalRotation[2]=origR[2];
 	}
+	rigidBody=NULL; //initiated if physics is ON
        }; 
        int catchable;
        double originalPosition[3],originalRotation[3];
+       btRigidBody * rigidBody;
        
 };
 

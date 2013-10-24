@@ -18,6 +18,7 @@
 #include "VirtualCamera.h"
 #include "ConfigXMLParser.h"
 #include "VirtualRangeSensor.h"
+#include "VirtualSLSProjector.h"
 #include "ObjectPicker.h"
 #include "InertialMeasurementUnit.h"
 #include "PressureSensor.h"
@@ -34,12 +35,14 @@ public:
 	std::vector<VirtualCamera> camview;
 	std::vector<VirtualCamera> camrange;
 	std::vector<VirtualRangeSensor> range_sensors;
+    	std::vector<VirtualSLSProjector> sls_projectors;
 	std::vector<ObjectPicker> object_pickers;
 	std::vector<InertialMeasurementUnit> imus;
 	std::vector<PressureSensor> pressure_sensors;
 	std::vector<GPSSensor> gps_sensors;
 	std::vector<DVLSensor> dvl_sensors;
 	std::vector<MultibeamSensor> multibeam_sensors;
+	boost::shared_ptr<SimulatedDevices> devices;
 
 	typedef enum {ARM5,PA10} arm_t;
 

@@ -17,6 +17,7 @@
 #ifndef CONFIGXMLPARSER_H_
 #define CONFIGXMLPARSER_H_
 
+#include "SimulatedDevices.h"
 #include <libxml++/libxml++.h>
 #include <urdf/model.h>
 
@@ -26,7 +27,9 @@ using namespace std;
 #include <list>
 
 struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan} type_t;
+  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan,SimulatedDevice, contactSensorToROS} type_t;
+  string subtype; //type of a SimulatedDevice
+  std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
   string topic, infoTopic, targetName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
@@ -45,12 +48,23 @@ struct Vcam{
   string name;
   string linkName, roscam, roscaminfo;
   std::string frameId; ///Frame Id for stereo camera images
-  int resw,resh,link,range;
+  int resw,resh,link,range,bw;
   double showpath;
   double position[3],orientation[3];
   double baseLine; ///baseline for stereo cameras
   boost::shared_ptr<Parameters> parameters;
-  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();range=0;}
+  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();range=0;bw=0;}
+};
+
+struct slProjector {
+  string name;
+  string linkName;
+  string image_name;
+  double position[3],orientation[3];
+  double fov;
+  int visible;
+  int link;
+  void init(){name="";linkName="";image_name="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;fov=0;visible=0;}
 };
 
 struct rangeSensor {
@@ -160,12 +174,14 @@ struct Vehicle{
   std::vector<Material> materials;
   std::list<Vcam> Vcams;
   std::list<Vcam> VRangecams;
+  std::list<slProjector> sls_projectors;
   std::list<rangeSensor> range_sensors, object_pickers;
   std::list<Imu> imus;
   std::list<XMLPressureSensor> pressure_sensors;
   std::list<XMLGPSSensor> gps_sensors;
   std::list<XMLDVLSensor> dvl_sensors;
   std::list<XMLMultibeamSensor> multibeam_sensors;
+  std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
 };
 
 struct PhysicProperties{
@@ -173,11 +189,13 @@ struct PhysicProperties{
   double inertia[3];
   double linearDamping;
   double angularDamping;
-  double linearFactor[3];
-  double angularFactor[3];
+  double minLinearLimit[3];
+  double maxLinearLimit[3];
+  double minAngularLimit[3];
+  double maxAngularLimit[3];
   int isKinematic;
-  std::string csType;
-  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";linearDamping=0;angularDamping=0;linearFactor[0]=1;linearFactor[1]=1;linearFactor[2]=1;angularFactor[0]=1;angularFactor[1]=1;angularFactor[2]=1;isKinematic=0;};
+  std::string csType,cs;
+  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";cs="";linearDamping=0;angularDamping=0;minLinearLimit[0]=1;minLinearLimit[1]=1;minLinearLimit[2]=1;maxLinearLimit[0]=0;maxLinearLimit[1]=0;maxLinearLimit[2]=0;isKinematic=0;minAngularLimit[0]=1;minAngularLimit[1]=1;minAngularLimit[2]=1;maxAngularLimit[0]=0;maxAngularLimit[1]=0;maxAngularLimit[2]=0;};
 };
 
 struct Object{
@@ -198,7 +216,7 @@ struct PhysicsWater{
 };
 
 class ConfigFile{
-private:
+public://made process and extract methods public to be used in Simulated Devices implementations
 
   void esPi(string in,double &param);
 
@@ -216,6 +234,7 @@ private:
   void processSize(const xmlpp::Node* node);
   void processParameters(const xmlpp::Node*, Parameters *params);
   void processVcam(const xmlpp::Node* node, Vcam &vcam);
+  void processSLProjector(const xmlpp::Node* node, slProjector &slp);
   void processRangeSensor(const xmlpp::Node* node, rangeSensor &rs);
   void processImu(const xmlpp::Node* node, Imu &rs);
   void processPressureSensor(const xmlpp::Node* node, XMLPressureSensor &ps);
@@ -249,6 +268,7 @@ public:
   list <Vehicle> vehicles;
   list <Object> objects;
   list <ROSInterfaceInfo> ROSInterfaces;
+  list <ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   PhysicsWater physicsWater;
 
   ConfigFile(const std::string &fName);
