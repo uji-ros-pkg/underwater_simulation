@@ -147,6 +147,7 @@ install(
   TARGETS
     uwsim
     uwsim_binary
+    uwsim_plugins_simdev
     makeVehicleSurvey
     setJointPosition
     setJointVelocity
@@ -168,7 +169,7 @@ install(DIRECTORY src/
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
-install(DIRECTORY data/scenes
+install(DIRECTORY data/scenes data/shaders
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data
 )
 
@@ -179,3 +180,5 @@ install(DIRECTORY src/
                GROUP_READ GROUP_EXECUTE
                WORLD_READ WORLD_EXECUTE
 )
+
+install(FILES package.xml simdev_plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
