@@ -14,7 +14,10 @@
 #include "ros/ros.h"
 #include <osg/Notify>
 
-#include "SimDev_Echo.h"
+#include <pluginlib/class_loader.h>
+using namespace uwsim;
+
+pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("UWSim", "uwsim::SimulatedDeviceFactory");
 
 //a list of "factories" to initialize and apply a device or rosinterface
 //an instance of "config" class is used as both a "factory" and as an XML structure
@@ -23,11 +26,13 @@ std::vector<SimulatedDeviceFactory::Ptr> factories;
 //setting up a list of available devices/rosinterfaces
 static void initFactories(){
 	if (factories.size()>0) return;
-	//ADD NEW DEVICE/ROSINTERFACE BEGIN
 	
-	factories.push_back(SimulatedDeviceFactory::Ptr(new SimDev_Echo_Factory()));
+	vector<string> available_plugins = simdev_loader.getDeclaredClasses();
+	for (size_t i = 0; i< available_plugins.size();++i){
+	  OSG_ALWAYS<<"Loading SimulatedDevices plugin: '"<<available_plugins.at(i)<<"'"<<std::endl;
+	  factories.push_back(simdev_loader.createInstance(available_plugins.at(i)));
+	}
 	
-	//ADD NEW DEVICE/ROSINTERFACE END
 	for (size_t i = 0; i< factories.size();++i)
 		for (size_t j = 0; j< i;++j)
 			if (factories[i]->getType() == factories[j]->getType())
@@ -59,9 +64,15 @@ SimulatedDevices::getInterfaces(ROSInterfaceInfo & rosInterface, std::vector<boo
 
 void SimulatedDevices::applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *oscene)
 {
-	for (size_t i = 0; i< factories.size();++i){
-		factories[i]->applyConfig(auv, vehicleChars, oscene);
-	}
+  for (size_t iteration = 0; iteration< 10;++iteration)//executed max 10 times
+  {
+    bool configured = true;
+    for (size_t i = 0; i< factories.size();++i){
+      if(!factories[i]->applyConfig(auv, vehicleChars, oscene, iteration))
+	configured = false;
+    }
+    if (configured) break;
+  }
 }
 
 static void processConfigNode(const xmlpp::Node* node, ConfigFile * config, SimulatedDeviceConfig::Ptr cfg)

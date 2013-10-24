@@ -181,7 +181,7 @@ struct Vehicle{
   std::list<XMLGPSSensor> gps_sensors;
   std::list<XMLDVLSensor> dvl_sensors;
   std::list<XMLMultibeamSensor> multibeam_sensors;
-  std::vector<SimulatedDeviceConfig::Ptr> simulated_devices;
+  std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
 };
 
 struct PhysicProperties{

@@ -3,7 +3,8 @@
 //"Echo" example, SimulatedDevice_Echo.h
 #ifndef SIMULATEDDEVICE_ECHO_H_
 #define SIMULATEDDEVICE_ECHO_H_
-#include "SimulatedDevices.h"
+#include "SimulatedDevice.h"
+using namespace uwsim;
 
 /*
  * Example header of driver/rosinterface configuration/factory
@@ -27,7 +28,7 @@ public:
 	SimDev_Echo_Factory(std::string type_= "echo"):SimulatedDeviceFactory(type_){};
 	
 	SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node* node, ConfigFile * config);
-	void applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *sceneBuilder);
+	bool applyConfig( SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *sceneBuilder, size_t iteration);
 	std::vector<boost::shared_ptr<ROSInterface> > getInterface(ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile);
 };
 
@@ -40,6 +41,7 @@ public:
 
 //Driver class
 class SimDev_Echo: public SimulatedDevice {
+  void applyPhysics(BulletPhysics * bulletPhysics){}
 public:
 	std::string info;	//Device's property
 	

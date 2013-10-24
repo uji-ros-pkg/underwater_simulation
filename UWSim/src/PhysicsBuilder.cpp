@@ -51,6 +51,11 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder,ConfigFile config)
       //link->setUserData(data);
     }
     scene_builder->iauvFile[i]->urdf->physics=physics;
+    
+    assert(scene_builder->iauvFile[i]->devices.get()!=NULL);
+    //apply physics to devices
+    for(unsigned int j=0; j<scene_builder->iauvFile[i]->devices->all.size();j++)
+      scene_builder->iauvFile[i]->devices->all[j]->applyPhysics(physics);
   }
 
 

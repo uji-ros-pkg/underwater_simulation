@@ -96,6 +96,9 @@ src/BulletHfFluid/btHfFluidRigidCollisionConfiguration.cpp
 src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
 src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
 src/SimulatedDevices.cpp
+)
+
+rosbuild_add_library(uwsim_plugins_simdev 
 src/SimDev_Echo.cpp
 )
 
