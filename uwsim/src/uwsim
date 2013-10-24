@@ -11,7 +11,7 @@ then
   if [[ -z $answer || $answer == "Y" || $answer == "y" ]]
   then
     mkdir -p ~/.uwsim/data
-    wget http://www.irs.uji.es/uwsim/files/$(DATAFILE) -O ~/.uwsim/UWSim-data.tgz && tar -zxvf ~/.uwsim/UWSim-data.tgz -C ~/.uwsim
+    wget http://www.irs.uji.es/uwsim/files/$DATAFILE -O ~/.uwsim/UWSim-data.tgz && tar -zxvf ~/.uwsim/UWSim-data.tgz -C ~/.uwsim
   else
     echo "Cannot run UWSim."
     exit
