@@ -17,7 +17,7 @@
 #include <pluginlib/class_loader.h>
 using namespace uwsim;
 
-pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("UWSim", "uwsim::SimulatedDeviceFactory");
+pluginlib::ClassLoader<SimulatedDeviceFactory> simdev_loader("uwsim", "uwsim::SimulatedDeviceFactory");
 
 //a list of "factories" to initialize and apply a device or rosinterface
 //an instance of "config" class is used as both a "factory" and as an XML structure

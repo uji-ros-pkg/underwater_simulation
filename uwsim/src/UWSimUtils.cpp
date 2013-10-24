@@ -155,7 +155,7 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length) {
   static const char model_vertex[]   = "default_scene.vert";
   static const char model_fragment[] = "default_scene.frag";
 
-  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
   osg::ref_ptr<osg::Program> program = osgOcean::ShaderManager::instance().createProgram("robot_shader", model_vertex, model_fragment, "", "");
   program->addBindAttribLocation("aTangent", 6);
 
@@ -263,7 +263,7 @@ osg::Node * UWSimGeometry::createOSGSphere( double radius )
 void UWSimGeometry::applyStateSets(osg::Node *node) {
           const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
  
-	  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+	  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
           static const char model_vertex[]   = "default_scene.vert";
           static const char model_fragment[] = "default_scene.frag";
 
@@ -331,7 +331,7 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom){
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/objects"));
       osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/terrain"));
-      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
       node  = osgDB::readNodeFile(geom->file);
 
       if (node == NULL)

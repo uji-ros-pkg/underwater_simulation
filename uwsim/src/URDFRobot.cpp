@@ -73,7 +73,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
 
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/robot"));
-   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/textures"));
 
    link.resize(vehicle.nlinks);
@@ -111,7 +111,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
    //Create tree hierarchy linkBT->link->linkPT and link links
    if(success) {
 	ScopedTimer buildSceneTimer("  · Linking links...", osg::notify(osg::ALWAYS));
-        osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
 	static const char model_vertex[]   = "default_scene.vert";
 	static const char model_fragment[] = "default_scene.frag";
 	std::vector<osg::ref_ptr<osg::MatrixTransform> > linkBaseTransforms(vehicle.nlinks);
