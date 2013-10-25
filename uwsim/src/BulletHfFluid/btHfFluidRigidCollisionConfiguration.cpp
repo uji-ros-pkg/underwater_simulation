@@ -15,11 +15,11 @@ subject to the following restrictions:
 Experimental Buoyancy fluid demo written by John McCutchan
 */
 
-#include "btHfFluidRigidCollisionConfiguration.h"
-#include "btHfFluidRigidCollisionAlgorithm.h"
-#include "btHfFluidBuoyantShapeCollisionAlgorithm.h"
-#include "BuoyantShapeConvexCollisionAlgorithm.h"
-#include "LinearMath/btPoolAllocator.h"
+#include <uwsim/BulletHfFluid/btHfFluidRigidCollisionConfiguration.h>
+#include <uwsim/BulletHfFluid/btHfFluidRigidCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantShapeCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.h>
+#include <LinearMath/btPoolAllocator.h>
 
 #include <iostream>
 

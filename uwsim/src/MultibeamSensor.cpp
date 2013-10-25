@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "MultibeamSensor.h"
+#include <uwsim/MultibeamSensor.h>
 
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode,  double initAngle,double finalAngle,double alpha,double range):

@@ -10,18 +10,18 @@
  *     Javier Perez
  */ 
 
-#include "SceneBuilder.h"
+#include <uwsim/SceneBuilder.h>
 
 #include <osg/Notify>
 
 #include <string>
 #include <vector>
 
-#include "osgOceanScene.h"
-#include "HUDCamera.h"
-#include "VirtualRangeSensor.h"
-#include "ROSInterface.h"
-#include "UWSimUtils.h"
+#include <uwsim/osgOceanScene.h>
+#include <uwsim/HUDCamera.h>
+#include <uwsim/VirtualRangeSensor.h>
+#include <uwsim/ROSInterface.h>
+#include <uwsim/UWSimUtils.h>
 
 
 using namespace std;

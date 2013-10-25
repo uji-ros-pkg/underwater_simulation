@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "VirtualRangeSensor.h"
-#include "UWSimUtils.h"
+#include <uwsim/VirtualRangeSensor.h>
+#include <uwsim/UWSimUtils.h>
 #include <iostream>
 
 VirtualRangeSensor::VirtualRangeSensor(){}

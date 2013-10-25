@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "PhysicsBuilder.h"
+#include <uwsim/PhysicsBuilder.h>
 
 PhysicsBuilder::PhysicsBuilder(SceneBuilder * scene_builder,ConfigFile config){
   loadPhysics(scene_builder,config);

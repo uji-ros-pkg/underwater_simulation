@@ -17,16 +17,16 @@
 * Adapted to UWSim by Mario Prats
 */
 
-#include "SimulatorConfig.h"
-#include "osgOceanScene.h"
-#include "UWSimUtils.h"
+#include <uwsim/SimulatorConfig.h>
+#include <uwsim/osgOceanScene.h>
+#include <uwsim/UWSimUtils.h>
 
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include <osg/Program>
 #include <osg/LightSource>
-#include "ConfigXMLParser.h"
+#include <uwsim/ConfigXMLParser.h>
 
 #include <osgOcean/ShaderManager>
 

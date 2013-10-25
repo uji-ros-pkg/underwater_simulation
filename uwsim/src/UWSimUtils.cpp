@@ -11,8 +11,8 @@
  */ 
 
 #include <ros/ros.h>
-#include "SimulatorConfig.h"
-#include "UWSimUtils.h"
+#include <uwsim/SimulatorConfig.h>
+#include <uwsim/UWSimUtils.h>
 #include <osg/Material>
 #include <osg/ShapeDrawable>
 #include <osg/Shape>

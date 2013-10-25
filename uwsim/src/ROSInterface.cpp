@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "ROSInterface.h"
-#include "UWSimUtils.h"
+#include <uwsim/ROSInterface.h>
+#include <uwsim/UWSimUtils.h>
 #include <osg/LineWidth>
 #include <osg/Material>
 #include <osgOcean/ShaderManager>

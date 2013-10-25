@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "UWSimUtils.h"
-#include "InertialMeasurementUnit.h"
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/InertialMeasurementUnit.h>
 
 osg::Quat InertialMeasurementUnit::getMeasurement() {
 	//Should get world coords and then transform to the localizedWorld

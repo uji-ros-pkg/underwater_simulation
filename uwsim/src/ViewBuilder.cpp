@@ -10,10 +10,10 @@
  *     Javier Perez
  */ 
 
-#include "ViewBuilder.h"
-#include "UWSimUtils.h"
-#include "TextHUD.h"
-#include "EventHandler.h"
+#include <uwsim/ViewBuilder.h>
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/TextHUD.h>
+#include <uwsim/EventHandler.h>
 
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>

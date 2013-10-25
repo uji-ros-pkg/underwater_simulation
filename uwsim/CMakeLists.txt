@@ -19,6 +19,7 @@ find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
 
 catkin_package(
+  INCLUDE_DIRS include
   LIBRARIES
     uwsim
   CATKIN_DEPENDS
@@ -50,14 +51,14 @@ FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTer
 
 SET(UWSIM_ROOT_PATH "${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}")
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/SimulatorConfig.h.cmake
-  ${PROJECT_SOURCE_DIR}/src/SimulatorConfig.h
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h.cmake
+  ${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h
 )
 
 find_package(PkgConfig)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
-INCLUDE_DIRECTORIES(${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
@@ -164,10 +165,8 @@ install(
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY src/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-)
+install(DIRECTORY include/${PROJECT_NAME}
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 install(DIRECTORY data/scenes data/shaders
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data

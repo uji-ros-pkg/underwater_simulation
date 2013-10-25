@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "URDFRobot.h"
-#include "UWSimUtils.h"
+#include <uwsim/URDFRobot.h>
+#include <uwsim/UWSimUtils.h>
 #include <osgOcean/ShaderManager>
 #include <osg/ShapeDrawable>
 #include <osg/Material>

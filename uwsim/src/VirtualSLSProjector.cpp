@@ -7,7 +7,7 @@
  *
  */
 
-#include "VirtualSLSProjector.h"
+#include <uwsim/VirtualSLSProjector.h>
 
 
 class UpdateLMVPM : public osg::Uniform::Callback

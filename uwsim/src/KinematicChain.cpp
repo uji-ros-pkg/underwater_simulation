@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "KinematicChain.h"
+#include <uwsim/KinematicChain.h>
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>
 
