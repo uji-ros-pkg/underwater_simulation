@@ -1,7 +1,7 @@
 //"Echo" example, SimulatedDevice_Echo.cpp
 
 #include <pluginlib/class_list_macros.h>
-#include "SimDev_Echo.h"
+#include <uwsim/SimDev_Echo.h>
 
 SimDev_Echo::SimDev_Echo(SimDev_Echo_Config * cfg): SimulatedDevice(cfg) {
 	this->info = cfg->info;

@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "ConfigXMLParser.h"
-#include "SimulatorConfig.h"
+#include <uwsim/ConfigXMLParser.h>
+#include <uwsim/SimulatorConfig.h>
 #include <osgDB/FileUtils>
 
 void ConfigFile::esPi(string in, double &param){

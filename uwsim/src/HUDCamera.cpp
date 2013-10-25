@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "HUDCamera.h"
+#include <uwsim/HUDCamera.h>
 #include <string.h>
 #include <iostream>
 

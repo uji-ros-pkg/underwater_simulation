@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "BulletPhysics.h"
+#include <uwsim/BulletPhysics.h>
 
 
 // Define filter masks

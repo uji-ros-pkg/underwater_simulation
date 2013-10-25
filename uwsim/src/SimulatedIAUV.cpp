@@ -10,11 +10,11 @@
  *     Javier Perez
  */ 
 
-#include "SceneBuilder.h"
-#include "osgOceanScene.h"
-#include "SimulatorConfig.h"
-#include "SimulatedIAUV.h"
-#include "URDFRobot.h"
+#include <uwsim/SceneBuilder.h>
+#include <uwsim/osgOceanScene.h>
+#include <uwsim/SimulatorConfig.h>
+#include <uwsim/SimulatedIAUV.h>
+#include <uwsim/URDFRobot.h>
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>
 

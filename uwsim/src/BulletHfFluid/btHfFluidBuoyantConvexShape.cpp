@@ -16,15 +16,15 @@ Experimental Buoyancy fluid demo written by John McCutchan
 */
 #include <stdio.h>
 
-#include "LinearMath/btAabbUtil2.h"
-#include "BulletCollision/CollisionShapes/btConvexShape.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
-#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
+#include <LinearMath/btAabbUtil2.h>
+#include <BulletCollision/CollisionShapes/btConvexShape.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h>
+#include <BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h>
+#include <BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.h>
+#include <BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h>
 
-#include "btHfFluidBuoyantConvexShape.h"
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
 
 btHfFluidBuoyantConvexShape::btHfFluidBuoyantConvexShape (btConvexShape* convexShape)
 {

@@ -9,9 +9,9 @@
  *     Yuri Gavshin
  */
 
-#include "SimulatedDevices.h"
-#include "ConfigXMLParser.h"
-#include "ros/ros.h"
+#include <uwsim/SimulatedDevices.h>
+#include <uwsim/ConfigXMLParser.h>
+#include <ros/ros.h>
 #include <osg/Notify>
 
 #include <pluginlib/class_loader.h>

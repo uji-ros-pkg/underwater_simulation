@@ -16,12 +16,12 @@
 #include <vector>
 #include <stdlib.h>
 
-#include "ConfigXMLParser.h"
-#include "SceneBuilder.h"
-#include "ViewBuilder.h"
-#include "PhysicsBuilder.h"
+#include <uwsim/ConfigXMLParser.h>
+#include <uwsim/SceneBuilder.h>
+#include <uwsim/ViewBuilder.h>
+#include <uwsim/PhysicsBuilder.h>
 
-#include "UWSimUtils.h"
+#include <uwsim/UWSimUtils.h>
 
 using namespace std;
 

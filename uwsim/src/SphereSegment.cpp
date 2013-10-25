@@ -15,7 +15,7 @@
 * http://www.gnu.org/copyleft/lesser.txt.
 */
 
-#include "SphereSegment.h"
+#include <uwsim/SphereSegment.h>
 
 SphereSegment::SphereSegment(void)
 {}

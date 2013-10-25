@@ -18,14 +18,14 @@ Experimental Buoyancy fluid demo written by John McCutchan
 #include <stdio.h>
 #include <iostream>
 
-#include "btHfFluidRigidCollisionAlgorithm.h"
-#include "btHfFluidBuoyantConvexShape.h"
-#include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
-#include "btHfFluid.h"
+#include <uwsim/BulletHfFluid/btHfFluidRigidCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
+#include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <BulletCollision/CollisionDispatch/btCollisionObject.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <uwsim/BulletHfFluid/btHfFluid.h>
 
 btHfFluidRigidCollisionAlgorithm::~btHfFluidRigidCollisionAlgorithm()
 {

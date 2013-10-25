@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "ObjectPicker.h"
-#include "UWSimUtils.h"
+#include <uwsim/ObjectPicker.h>
+#include <uwsim/UWSimUtils.h>
 
 ObjectPicker::ObjectPicker(): VirtualRangeSensor() {}
 

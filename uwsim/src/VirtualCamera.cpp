@@ -10,10 +10,10 @@
  *     Javier Perez
  */ 
 
-#include "VirtualCamera.h"
-#include "UWSimUtils.h"
+#include <uwsim/VirtualCamera.h>
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/SceneBuilder.h>
 #include <iostream>
-#include "SceneBuilder.h"
 
 class UpdateUnderWater : public osg::Uniform::Callback{
 public:
