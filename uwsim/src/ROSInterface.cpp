@@ -80,9 +80,9 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
 	    if(visualization==2)
 	      linestipple->setPattern(0xf0f0);
 	    if(visualization==3)
-	      linestipple->setPattern(0xfff000fff000);
+	      linestipple->setPattern(0xff00);
 	    if(visualization==4)
-	      linestipple->setPattern(0xf000f000);
+	      linestipple->setPattern(0xf000);
 	    geode->getOrCreateStateSet()->setAttributeAndModes(linestipple,osg::StateAttribute::ON);
 	  }
 
