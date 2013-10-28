@@ -17,16 +17,16 @@
 * Adapted to UWSim by Mario Prats
 */
 
-#include "SimulatorConfig.h"
-#include "osgOceanScene.h"
-#include "UWSimUtils.h"
+#include <uwsim/SimulatorConfig.h>
+#include <uwsim/osgOceanScene.h>
+#include <uwsim/UWSimUtils.h>
 
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osg/PositionAttitudeTransform>
 #include <osg/Program>
 #include <osg/LightSource>
-#include "ConfigXMLParser.h"
+#include <uwsim/ConfigXMLParser.h>
 
 #include <osgOcean/ShaderManager>
 
@@ -415,7 +415,7 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
         osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/objects"));
 	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/terrain"));
-	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+	osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
         osg::ref_ptr<osg::Node> object = osgDB::readNodeFile(filename);
 
         if(!object.valid()){
@@ -432,6 +432,8 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
 			object->getOrCreateStateSet()->setAttributeAndModes(program,osg::StateAttribute::ON);
 			object->getStateSet()->addUniform( new osg::Uniform( "uOverlayMap", 1 ) );
 			object->getStateSet()->addUniform( new osg::Uniform( "uNormalMap",  2 ) );
+			object->getStateSet()->addUniform( new osg::Uniform( "SLStex", 3) );
+			object->getStateSet()->addUniform( new osg::Uniform( "SLStex2", 4) );
 			object->setNodeMask( _oceanScene->getNormalSceneMask() | _oceanScene->getReflectedSceneMask() | _oceanScene->getRefractedSceneMask() );
 
 			osg::Matrix linkBase;

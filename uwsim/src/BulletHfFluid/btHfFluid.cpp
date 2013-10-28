@@ -17,15 +17,15 @@ Experimental Buoyancy fluid demo written by John McCutchan
 
 #include <stdio.h>
 #include <iostream>
-#include "btHfFluid.h"
-#include "btHfFluidCollisionShape.h"
-#include "btHfFluidBuoyantConvexShape.h"
-#include "BulletCollision/NarrowPhaseCollision/btPersistentManifold.h"
-#include "BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h"
-#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
-#include "BulletCollision/CollisionDispatch/btManifoldResult.h"
-#include "BulletCollision/CollisionShapes/btTriangleShape.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
+#include <uwsim/BulletHfFluid/btHfFluid.h>
+#include <uwsim/BulletHfFluid/btHfFluidCollisionShape.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
+#include <BulletCollision/NarrowPhaseCollision/btPersistentManifold.h>
+#include <BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h>
+#include <BulletCollision/CollisionDispatch/btCollisionWorld.h>
+#include <BulletCollision/CollisionDispatch/btManifoldResult.h>
+#include <BulletCollision/CollisionShapes/btTriangleShape.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
 //#include "../../OpenGL/GLDebugDrawer.h"
 								
 btHfFluid::btHfFluid (btScalar gridCellWidth, int numNodesWidth, int numNodesLength)

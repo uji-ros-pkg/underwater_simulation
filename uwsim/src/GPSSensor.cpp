@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "UWSimUtils.h"
-#include "GPSSensor.h"
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/GPSSensor.h>
 #include <osg/io_utils>
 
 osg::Vec3d GPSSensor::getMeasurement() {

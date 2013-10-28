@@ -10,7 +10,7 @@
  *     Javier Perez
  */ 
 
-#include "MultibeamSensor.h"
+#include <uwsim/MultibeamSensor.h>
 
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode,  double initAngle,double finalAngle,double alpha,double range):
@@ -31,7 +31,7 @@ void MultibeamSensor::preCalcTable(){
   MVPW->invert(*MVPW);
 
   //Get real fov from camera
-  osg::Vec3d first=osg::Vec3d(0,0,1)*(*MVPW), last=osg::Vec3d(numpixels-1,0,1)*(*MVPW), center=osg::Vec3d(numpixels/2,0,1)*(*MVPW);
+  osg::Vec3d first=osg::Vec3d(0,0,1)*(*MVPW), last=osg::Vec3d(0,numpixels-1,1)*(*MVPW), center=osg::Vec3d(0,numpixels/2,1)*(*MVPW);
   double realfov=acos((first*last)/(last.length()*first.length()));
   double thetacenter=acos((first*center)/(center.length()*first.length()));
   double alpha=realfov/(numpixels);
@@ -43,7 +43,7 @@ void MultibeamSensor::preCalcTable(){
   int current=0;
   double lastTheta=0;
   for(int i=0;i<numpixels;i++){
-    osg::Vec3d point=osg::Vec3d(i,0,1)*(*MVPW);
+    osg::Vec3d point=osg::Vec3d(0,i,1)*(*MVPW);
 
     double theta=acos((first*point) / (first.length()*point.length()));
     while(theta>=alpha*current && current<numpixels){
@@ -61,7 +61,8 @@ void MultibeamSensor::preCalcTable(){
 	remapVector[current].weight2=dist/(dist+prevdist);
 	//std::cout<<remapVector[current].weight1<<" "<<remapVector[current].weight2<<" "<<remapVector[current].weight1+remapVector[current].weight2<<std::endl;
       }
-      remapVector[current].distort=1+fabs(theta-thetacenter)*fabs(theta-thetacenter)*fabs(theta-thetacenter)/1.3;
+      remapVector[current].distort=1/cos(fabs(theta-thetacenter));
+      //std::cout<<"remap: "<<remapVector[current].distort<<std::endl;
       current++;
       //std::cout<<theta<<":"<<tan(theta)<<" asd:"<<fx<<std::endl;
       //std::cout<<current<<" "<<i<<std::endl;

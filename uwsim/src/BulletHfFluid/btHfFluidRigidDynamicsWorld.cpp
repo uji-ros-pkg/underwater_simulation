@@ -16,14 +16,14 @@ Experimental Buoyancy fluid demo written by John McCutchan
 */
 
 #include <stdio.h>
-#include "LinearMath/btQuickprof.h"
-#include "LinearMath/btIDebugDraw.h"
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include <LinearMath/btQuickprof.h>
+#include <LinearMath/btIDebugDraw.h>
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 
 // height field fluid
-#include "btHfFluid.h"
-#include "btHfFluidBuoyantConvexShape.h"
-#include "btHfFluidRigidDynamicsWorld.h"
+#include <uwsim/BulletHfFluid/btHfFluid.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
+#include <uwsim/BulletHfFluid/btHfFluidRigidDynamicsWorld.h>
 
 
 

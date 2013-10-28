@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "ConfigXMLParser.h"
-#include "SimulatorConfig.h"
+#include <uwsim/ConfigXMLParser.h>
+#include <uwsim/SimulatorConfig.h>
 #include <osgDB/FileUtils>
 
 void ConfigFile::esPi(string in, double &param){
@@ -285,8 +285,36 @@ void ConfigFile::processVcam(const xmlpp::Node* node,Vcam &vcam){
 			processParameters(child,vcam.parameters.get());
 		} else if(child->get_name()=="showpath")
 			extractFloatChar(child,vcam.showpath);
+		else if(child->get_name()=="grayscale"){
+			extractIntChar(child,vcam.bw);
+			if(vcam.bw != 0 && vcam.bw!=1){
+				OSG_WARN << "ConfigFile::processVcam: grayscale is not a binary value ( 0 1), using default value (0)" << std::endl;
+				vcam.bw=0;
+			}
+		}
 	}
 
+}
+
+void ConfigFile::processSLProjector(const xmlpp::Node* node, slProjector &slp){
+  xmlpp::Node::NodeList list = node->get_children();
+  for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+    xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+    if(child->get_name()=="position")
+      extractPositionOrColor(child,slp.position);
+    else if(child->get_name()=="relativeTo")
+      extractStringChar(child,slp.linkName);
+    else if(child->get_name()=="orientation")
+      extractOrientation(child,slp.orientation);
+    else if(child->get_name()=="name")
+      extractStringChar(child,slp.name);
+    else if(child->get_name()=="fov")
+      extractFloatChar(child,slp.fov);
+    else if(child->get_name()=="visible")
+      extractIntChar(child,slp.visible);
+    else if(child->get_name()=="image_name")
+      extractStringChar(child,slp.image_name);
+  }
 }
 
 void ConfigFile::processRangeSensor(const xmlpp::Node* node, rangeSensor &rs){
@@ -661,6 +689,29 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle){
 			vehicle.VRangecams.push_back(aux2);
 	}
 
+    //get Structured Light Projector joint
+    slProjector slp;
+    for(unsigned int i = 0; i < vehicle.sls_projectors.size(); i++)
+    {
+      found = 0;
+      slp = vehicle.sls_projectors.front();
+      vehicle.sls_projectors.pop_front();
+      for(int j = 0; j < vehicle.nlinks && !found; j++)
+      {
+        if(vehicle.links[j].name == slp.linkName)
+        {
+          slp.link = j;
+          found = 1;
+        }
+      }
+      if(found == 0)
+      {
+        OSG_WARN << "ConfigFile::postProcessVehicle: Structured Light Projector attached to unknown link: " << slp.linkName << ". Will be ignored"<< std::endl;
+      } else {
+        vehicle.sls_projectors.push_back(slp);
+      }
+    }
+
 	//get Range sensor joint
 	rangeSensor rs;
 	for(unsigned int i=0;i<vehicle.range_sensors.size();i++){
@@ -823,6 +874,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.range=1;
 			processVcam(child,aux);
 			vehicle.VRangecams.push_back(aux);
+		} else if (child->get_name()=="structuredLightProjector"){
+		    slProjector aux;
+		    aux.init();
+		    processSLProjector(child,aux);
+		    vehicle.sls_projectors.push_back(aux);
 		} else if (child->get_name()=="rangeSensor"){
 			rangeSensor aux;
 			aux.init();
@@ -858,6 +914,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processMultibeamSensor(child,aux);
 			vehicle.multibeam_sensors.push_back(aux);
+		} else if (child->get_name()=="simulatedDevices"){
+			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
+			for (size_t i=0; i< auxs.size(); ++i)
+				if (auxs[i])
+					vehicle.simulated_devices.push_back(auxs[i]);
 		}
 	}
 }
@@ -873,6 +934,8 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 			extractPositionOrColor(child,pp.inertia);
 		else if(child->get_name()=="collisionShapeType")
 			extractStringChar(child,pp.csType);
+		else if(child->get_name()=="collisionShape")
+			extractStringChar(child,pp.cs);
 		else if(child->get_name()=="linearDamping"){
 			extractFloatChar(child,pp.linearDamping);		
 			if(pp.linearDamping>1.0)
@@ -883,10 +946,10 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 			if(pp.linearDamping>1.0)
 			  OSG_WARN << "ConfigFile::PhysicProperties: angularDamping is higher than 1.0."<< std::endl;
 		}
-		else if(child->get_name()=="linearFactor")
-			extractPositionOrColor(child,pp.linearFactor);
-		else if(child->get_name()=="angularFactor")
-			extractPositionOrColor(child,pp.angularFactor);
+		else if(child->get_name()=="minLinearLimit")
+			extractPositionOrColor(child,pp.minLinearLimit);
+		else if(child->get_name()=="maxLinearLimit")
+			extractPositionOrColor(child,pp.maxLinearLimit);
 		else if(child->get_name()=="isKinematic"){
 			extractIntChar(child,pp.isKinematic);
 			if (pp.isKinematic!=0 && pp.isKinematic!=1) {
@@ -894,6 +957,10 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
 				freeMotion=0;
 			}
 		}
+		else if(child->get_name()=="minAngularLimit")
+			extractPositionOrColor(child,pp.minAngularLimit);
+		else if(child->get_name()=="maxAngularLimit")
+			extractPositionOrColor(child,pp.maxAngularLimit);
 		
 	}
 }
@@ -929,7 +996,12 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node,ROSInterfaceInfo &r
 	xmlpp::Node::NodeList list = node->get_children();
 	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
 		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
-
+		if(child->get_name()!="text"){//adding all nodes as text for further processing by a SimulatedDevice
+			std::string text;
+			extractStringChar(child,text);
+			rosInterface.values[child->get_name()] = text;
+		}
+		
 		if(child->get_name()=="topic" || child->get_name()=="imageTopic" )
 			extractStringChar(child,rosInterface.topic);
 		else if(child->get_name()=="vehicleName" || child->get_name()=="cameraName" || child->get_name()=="name")
@@ -974,6 +1046,7 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 	xmlpp::Node::NodeList list = node->get_children();
 	for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
 		xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+		xmlpp::Node* subchild=NULL;
 
 		ROSInterfaceInfo rosInterface;
 		rosInterface.rate=10; //Default rate
@@ -1013,12 +1086,30 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 			rosInterface.type=ROSInterfaceInfo::DVLSensorToROS;
 		} else if(child->get_name()=="multibeamSensorToLaserScan"){
 			rosInterface.type=ROSInterfaceInfo::multibeamSensorToLaserScan;
+		} else if(child->get_name()=="contactSensorToROS"){
+			rosInterface.type=ROSInterfaceInfo::contactSensorToROS;
+		} else if(child->get_name()=="SimulatedDeviceROS"){
+			xmlpp::Node::NodeList sublist = child->get_children();
+				for(xmlpp::Node::NodeList::iterator subiter = sublist.begin(); subiter != sublist.end(); ++subiter){
+					xmlpp::Node* tempchild=dynamic_cast<const xmlpp::Node*>(*subiter);
+					if (tempchild!=NULL && tempchild->get_name()!="text"){
+						std::string subtype = tempchild->get_name();
+						//std::cout<< "subtype="<<subtype<<std::endl;
+						if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
+							rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
+							rosInterface.subtype = subtype.substr(0, subtype.length()-3);
+							subchild = tempchild;
+						}
+					}
+				}
 		}
 
-
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
-			processROSInterface(child,rosInterface);
-			ROSInterfaces.push_back(rosInterface);
+			processROSInterface(subchild!=NULL ? subchild : child, rosInterface);
+			if(rosInterface.type!=ROSInterfaceInfo::contactSensorToROS)
+  			  ROSInterfaces.push_back(rosInterface);
+			else
+ 			  ROSPhysInterfaces.push_back(rosInterface);
 		}
 	}
 }

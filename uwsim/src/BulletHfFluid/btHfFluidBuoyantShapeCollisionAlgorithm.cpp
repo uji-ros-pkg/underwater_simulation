@@ -16,15 +16,15 @@ Experimental Buoyancy fluid demo written by John McCutchan
 */
 #include <stdio.h>
 
-#include "btHfFluidBuoyantShapeCollisionAlgorithm.h"
-#include "btHfFluidBuoyantConvexShape.h"
-#include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantShapeCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
+#include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
-#include "btHfFluid.h"
+#include <BulletCollision/CollisionDispatch/btCollisionObject.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <uwsim/BulletHfFluid/btHfFluid.h>
 
 btHfFluidBuoyantShapeCollisionAlgorithm::btHfFluidBuoyantShapeCollisionAlgorithm(const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* col0,btCollisionObject* col1,btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver)
 : btCollisionAlgorithm(ci), m_convexConvexAlgorithm(NULL, ci, col0, col1, simplexSolver, pdSolver,0,0) 

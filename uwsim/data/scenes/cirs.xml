@@ -79,7 +79,7 @@
       <joint>0.3 </joint>
     </jointValues>
     <position>
-      <x> 0</x>
+      <x> -0.2</x>
       <y> 0 </y>
       <z> 2.0 </z>
     </position>
@@ -241,7 +241,7 @@
       <orientation>
         <r>0</r>
         <p>0</p>
-        <y>1.57 </y>
+        <y>3.14 </y>
       </orientation>
       <initAngle>-60</initAngle>
       <finalAngle>60</finalAngle>
@@ -249,6 +249,16 @@
       <range>10</range>
     </multibeamSensor>
 
+    <simulatedDevices>
+      <echo>
+        <name>g500_echo1</name>
+        <info>Echo example 1</info>
+      </echo>
+      <echo>
+        <name>g500_echo2</name>
+        <info>Echo example 2</info>
+      </echo>
+    </simulatedDevices>
   </vehicle>
 
   <object>
@@ -366,6 +376,25 @@
       <name>multibeam</name>
       <topic>g500/multibeam</topic>
     </multibeamSensorToLaserScan>
+    <SimulatedDeviceROS>
+      <echoROS>
+        <name>g500_echo1</name>
+        <topic>g500/echo1</topic>
+        <rate>1</rate>
+      </echoROS>
+    </SimulatedDeviceROS>
+    <SimulatedDeviceROS>
+      <echoROS>
+        <name>g500_echo2</name>
+        <topic>g500/echo2</topic>
+        <rate>1</rate>
+      </echoROS>
+    </SimulatedDeviceROS>
+    <contactSensorToROS>
+      <name>girona500</name>
+      <topic>g500/contactSensor</topic>
+      <rate> 100 </rate>
+    </contactSensorToROS>
   </rosInterfaces>
 </UWSimScene>
 

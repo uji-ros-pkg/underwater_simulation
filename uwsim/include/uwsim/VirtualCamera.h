@@ -158,23 +158,26 @@ public:
 
 	int width, height, range;
 	double fx,fy,cx,cy;	///< intrinsic parameters
-	double fov,far,near,k;
+	double aspectRatio, fov,far,near,k;
 	double baseline; //Only for stereo. Default=0
 	double Tx, Ty; //Only for stereo.
 	std::string frameId; //Default=""
 	int paramsOn;
+	int bw;  //BlackWhite camera
+	int widget; //Widget available or not
 	
 	osg::ref_ptr<osg::Image> renderTexture;  //RGB image
 	osg::ref_ptr<osg::Image> depthTexture;	//Range image
 
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, double fov, double range);
+	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov, double aspectRatio);
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height);
 	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, Parameters *params);
     	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId);
-    	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params, int range);
+    	VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params, int range,int bw);
     	VirtualCamera();
     	
-	void init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov);
+	void init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline, std::string frameId, Parameters *params,int range,double fov,double aspectRatio, double near, double far,int bw,int widget);
 
     	void createCamera();
 
