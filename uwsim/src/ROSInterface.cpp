@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "ROSInterface.h"
-#include "UWSimUtils.h"
+#include <uwsim/ROSInterface.h>
+#include <uwsim/UWSimUtils.h>
 #include <osg/LineWidth>
 #include <osg/Material>
 #include <osgOcean/ShaderManager>
@@ -21,6 +21,8 @@
 #include <sensor_msgs/LaserScan.h>
 #include <underwater_sensor_msgs/Pressure.h>
 #include <underwater_sensor_msgs/DVL.h>
+#include <std_msgs/Bool.h>
+#include <osg/LineStipple>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -50,7 +52,7 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
   started=0; //Used in time
   trajectory_initialized=false;
   this->max_waypoint_distance=max_waypoint_distance;
-  enable_visualization=(visualization==1);
+  enable_visualization=(visualization>=1);
 
   if (enable_visualization) {
 	  trajectory_points=new osg::Vec3Array;
@@ -71,6 +73,19 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
 	  osg::LineWidth* linewidth = new osg::LineWidth();
 	  linewidth->setWidth(4.0f); 
 
+	  //stipple for dashed lines:
+	  if(visualization>1){
+	    osg::LineStipple* linestipple = new osg::LineStipple;
+	    linestipple->setFactor(1);
+	    if(visualization==2)
+	      linestipple->setPattern(0xf0f0);
+	    if(visualization==3)
+	      linestipple->setPattern(0xff00);
+	    if(visualization==4)
+	      linestipple->setPattern(0xf000);
+	    geode->getOrCreateStateSet()->setAttributeAndModes(linestipple,osg::StateAttribute::ON);
+	  }
+
 	  //Attach the trajectory to the localizedWorld node
 	  findNodeVisitor finder("localizedWorld");
 	  rootNode->accept(finder);
@@ -78,7 +93,7 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
 
 	  geode->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
           const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
-          osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH)+std::string("/shaders"));
+          osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH)+std::string("/data/shaders"));
   	  static const char model_vertex[]   = "default_scene.vert";
 	  static const char model_fragment[] = "default_scene.frag";
 
@@ -567,6 +582,7 @@ ArmToROSJointState::~ArmToROSJointState() {}
 VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate, int depth): ROSPublisherInterface(info_topic,rate), cam(camera), image_topic(topic) {
   it.reset(new image_transport::ImageTransport(nh_));
   this->depth=depth;
+  this->bw=camera->bw;
 }
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh) {
@@ -599,6 +615,8 @@ void VirtualCameraToROSImage::publish() {
       img_info.header.stamp=img.header.stamp=getROSTime();
       img_info.header.frame_id=img.header.frame_id=cam->frameId;
       if(depth)
+        img.encoding=std::string("mono16");
+      else if(bw)
         img.encoding=std::string("mono8");
       else
         img.encoding=std::string("rgb8");   
@@ -650,8 +668,18 @@ void VirtualCameraToROSImage::publish() {
       //looking towards bottom-right. Therefore it must be manually arranged.
       if (virtualdata!=NULL) 
       	for (int i=0; i<h; i++) {
-	  for (unsigned int j=0; j<img.step; j++) {
- 	         img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
+	  for (unsigned int j=0; (!bw && !depth && j<img.step) || (bw && j*3<img.step)  || (depth && j*2<img.step); j++) {
+		if(bw){
+		  img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j*3]*0.2989;
+		  img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*3+1]*0.5870;
+		  img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*3+2]*0.1140;
+		}
+	 	else if(depth){
+		  img.data[(h-i-1)*img.step+j]=j%2? virtualdata[i*img.step+j*2] : virtualdata[i*img.step+j*2+1];
+		  //img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*2+1];
+		}
+		else  
+ 	          img.data[(h-i-1)*img.step+j]=virtualdata[i*img.step+j];
     	  }
         }
       else
@@ -745,3 +773,46 @@ void  MultibeamSensorToROS::publish() {
 }
 	
  MultibeamSensorToROS::~MultibeamSensorToROS() {}
+
+contactSensorToROS::contactSensorToROS(osg::Group *rootNode,BulletPhysics * physics,std::string target, std::string topic, int rate): ROSPublisherInterface(topic,rate) {
+this->rootNode=rootNode;
+this->physics=physics;
+this->target=target;
+}
+
+void   contactSensorToROS::createPublisher(ros::NodeHandle &nh) {
+  ROS_INFO("contactSensorToROS publisher on topic %s",topic.c_str());
+  pub_ = nh.advertise<std_msgs::Bool>(topic, 1);
+}
+
+void   contactSensorToROS::publish() {
+  int colliding=0;
+
+  for(int i=0;i<physics->getNumCollisions();i++){
+    btPersistentManifold * col = physics->getCollision(i);
+
+    //Get objects colliding
+    btRigidBody* obA = static_cast<btRigidBody*>(col->getBody0());
+    btRigidBody* obB = static_cast<btRigidBody*>(col->getBody1());  
+
+    //Check if target is involved in collision
+    CollisionDataType * data=(CollisionDataType *)obA->getUserPointer();  
+    CollisionDataType * data2=(CollisionDataType *)obB->getUserPointer();
+
+    int numContacts= col->getNumContacts();
+
+    if(data2->getObjectName()==target  || data->getObjectName()==target){
+      for (int j=0;j<numContacts ;j++){
+ 	btManifoldPoint pt = col->getContactPoint(j);
+	if(pt.getDistance()<0.f)
+          colliding=1;
+      }
+    }
+    
+  }
+  std_msgs::Bool msg;
+  msg.data=colliding;
+  pub_.publish(msg);
+}
+	
+  contactSensorToROS::~ contactSensorToROS() {}

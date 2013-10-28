@@ -3,16 +3,16 @@ BuoyantShape vs ConvexSHape collision algorithm added to Experimental Buoyancy f
 */
 #include <stdio.h>
 
-#include "btHfFluidBuoyantShapeCollisionAlgorithm.h"
-#include "BuoyantShapeConvexCollisionAlgorithm.h"
-#include "btHfFluidBuoyantConvexShape.h"
-#include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantShapeCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.h>
+#include <uwsim/BulletHfFluid/btHfFluidBuoyantConvexShape.h>
+#include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
-#include "btHfFluid.h"
+#include <BulletCollision/CollisionDispatch/btCollisionObject.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <uwsim/BulletHfFluid/btHfFluid.h>
 
 #include <iostream>
 

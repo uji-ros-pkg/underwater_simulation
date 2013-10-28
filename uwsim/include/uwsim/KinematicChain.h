@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <string.h>
+#include "BulletPhysics.h"
 
 
 struct MimicArm{
@@ -44,6 +45,9 @@ public:
 
 	//osg::MatrixTransform *tool_transform;	///< Transform between the end-effector and the tool base frame
 	//osg::ref_ptr<osg::Node> tool;		///< Pointer to the tool osg node
+
+	std::vector<double> qLastSafe;		///< Last joint values not colliding
+	BulletPhysics * physics;		/// Bullet physics pointer to query
 	
 	ros::WallTime last;
     int started;

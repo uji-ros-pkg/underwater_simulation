@@ -14,5 +14,5 @@ subject to the following restrictions:
 
 Experimental Buoyancy fluid demo written by John McCutchan
 */
-#include "btHfFluidCollisionShape.h"
+#include <uwsim/BulletHfFluid/btHfFluidCollisionShape.h>
 

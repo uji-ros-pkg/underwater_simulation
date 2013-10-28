@@ -10,18 +10,18 @@
  *     Javier Perez
  */ 
 
-#include "SceneBuilder.h"
+#include <uwsim/SceneBuilder.h>
 
 #include <osg/Notify>
 
 #include <string>
 #include <vector>
 
-#include "osgOceanScene.h"
-#include "HUDCamera.h"
-#include "VirtualRangeSensor.h"
-#include "ROSInterface.h"
-#include "UWSimUtils.h"
+#include <uwsim/osgOceanScene.h>
+#include <uwsim/HUDCamera.h>
+#include <uwsim/VirtualRangeSensor.h>
+#include <uwsim/ROSInterface.h>
+#include <uwsim/UWSimUtils.h>
 
 
 using namespace std;
@@ -135,15 +135,16 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		scene->addObject(iauvFile[i]->baseTransform);
 
 		siauv->setVehiclePosition(vehicle.position[0],vehicle.position[1],vehicle.position[2],vehicle.orientation[0],vehicle.orientation[1],vehicle.orientation[2]);
-
-		if(vehicle.jointValues.size() && siauv->urdf!=NULL){
-			siauv->urdf->setJointPosition(vehicle.jointValues);
-		}
   
 		for(int j=0; j<vehicle.nlinks;j++) {
 			NodeDataType * data= new NodeDataType(0);
 			siauv->urdf->link[j]->setUserData(data);
 	        }
+
+		if(vehicle.jointValues.size() && siauv->urdf!=NULL){
+			siauv->urdf->setJointPosition(vehicle.jointValues);
+		}
+		
 	}
 
 	//Add objects added in config file.
@@ -294,7 +295,14 @@ bool SceneBuilder::loadScene(ConfigFile config)
 		if(rosInterface.type==ROSInterfaceInfo::ROSPoseToPAT)
 			iface=boost::shared_ptr<ROSPoseToPAT>(new ROSPoseToPAT(root,rosInterface.topic,rosInterface.targetName));
 
-		ROSInterfaces.push_back(iface);
+		if(rosInterface.type==ROSInterfaceInfo::SimulatedDevice){
+			std::vector<boost::shared_ptr<ROSInterface> > ifaces = SimulatedDevices::getInterfaces(rosInterface,iauvFile);
+			for(size_t i=0; i<ifaces.size();++i)
+				ROSInterfaces.push_back(ifaces[i]);
+		}
+		
+		if (iface)
+			ROSInterfaces.push_back(iface);
 		config.ROSInterfaces.pop_front();
 	}
 	//root->addChild(physics.debugDrawer.getSceneGraph());

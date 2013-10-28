@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "UWSimUtils.h"
-#include "PressureSensor.h"
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/PressureSensor.h>
 
 double PressureSensor::getMeasurement() {
 	//Should get world coords and then transform to the localizedWorld

@@ -31,6 +31,7 @@ public:
 
 
 	URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle);
+	void addToKinematicChain(osg::Node * link,btRigidBody* body);
 
 	~URDFRobot();
 
@@ -38,6 +39,9 @@ protected:
 	
 	void updateJoints(std::vector<double> &q);
 	void updateJoints(std::vector<double> &q, int startJoint, int numJoints);
+
+private:
+	void moveJoints(std::vector<double> &q);
 
 };
 

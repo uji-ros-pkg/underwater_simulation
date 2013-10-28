@@ -10,16 +10,16 @@
  *     Javier Perez
  */ 
 
-#include "ObjectPicker.h"
-#include "UWSimUtils.h"
+#include <uwsim/ObjectPicker.h>
+#include <uwsim/UWSimUtils.h>
 
 ObjectPicker::ObjectPicker(): VirtualRangeSensor() {}
 
-ObjectPicker::ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
-	init(name, root, trackNode, range, visible);
+ObjectPicker::ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,boost::shared_ptr<URDFRobot> urdf) {
+	init(name, root, trackNode, range, visible, urdf);
 }
 
-void ObjectPicker::init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible) {
+void ObjectPicker::init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible, boost::shared_ptr<URDFRobot> urdf) {
 	this->name=name;
 	this->root=root;
 	
@@ -32,7 +32,7 @@ void ObjectPicker::init(std::string name, osg::Node *root, osg::Node *trackNode,
 	this->visible=visible;
 
 	//make this virtual ray track the node
-	node_tracker = new ObjectPickerUpdateCallback(trackNode, range,visible,root);
+	node_tracker = new ObjectPickerUpdateCallback(trackNode, range,visible,root,urdf);
 	trackNode->setUpdateCallback((ObjectPickerUpdateCallback*)(node_tracker.get()));
 	trackNode->asGroup()->addChild(node_tracker->geode);
 }

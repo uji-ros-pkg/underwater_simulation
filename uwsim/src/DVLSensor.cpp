@@ -10,8 +10,8 @@
  *     Javier Perez
  */ 
 
-#include "UWSimUtils.h"
-#include "DVLSensor.h"
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/DVLSensor.h>
 #include <osg/io_utils>
 
 osg::Vec3d DVLSensor::getMeasurement() {

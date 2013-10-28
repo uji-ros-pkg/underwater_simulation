@@ -121,7 +121,7 @@
     <child link="part4_jaw2"/>
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="0.07 0 -0.04"/>
-    <mimic joint="part4_to_part4_jaw1" multiplier="1" offset="0"/>
+    <mimic joint="JawOpening" multiplier="1" offset="0"/>
   </joint>
 
 </robot>

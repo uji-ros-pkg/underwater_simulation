@@ -26,6 +26,7 @@
 #include "HUDCamera.h"
 #include "MultibeamSensor.h"
 #include "UWSimUtils.h"
+#include "BulletPhysics.h"
 
 //OSG
 #include <OpenThreads/Thread>
@@ -329,6 +330,7 @@ class VirtualCameraToROSImage : public ROSPublisherInterface {
 	image_transport::Publisher img_pub_;
 	std::string image_topic;
 	int depth;
+	int bw;
 public:
 	VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate,int depth);
 
@@ -361,6 +363,20 @@ public:
 	void publish();
 	
 	~MultibeamSensorToROS();
+};
+
+class contactSensorToROS : public ROSPublisherInterface {
+  	BulletPhysics * physics;
+	std::string target;
+	osg::Group *rootNode;
+public:
+	contactSensorToROS(osg::Group *rootNode,BulletPhysics * physics,std::string target, std::string topic, int rate);
+
+	void createPublisher(ros::NodeHandle &nh);
+
+	void publish();
+	
+	~contactSensorToROS();
 };	
 #endif
 		

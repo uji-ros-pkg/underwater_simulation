@@ -15,7 +15,7 @@
 * http://www.gnu.org/copyleft/lesser.txt.
 */
 
-#include "SkyDome.h"
+#include <uwsim/SkyDome.h>
 #include <osgOcean/ShaderManager>
 
 SkyDome::SkyDome( void )
