@@ -6,8 +6,8 @@
      UWSim is an UnderWater SIMulator for marine robotics research and development. UWSim visualizes an underwater virtual scenario that can be configured using standard modeling software. Controllable underwater vehicles, surface vessels and robotic manipulators, as well as simulated sensors, can be added to the scene and accessed externally through ROS interfaces. This allows to easily integrate the visualization tool with existing control architectures.
   </description>
 
-  <author email="mprats@willowgarage.com">Mario Prats</author>
-  <maintainer email="mprats@willowgarage.com">Mario Prats</maintainer>
+  <author email="marioprats@gmail.com">Mario Prats</author>
+  <maintainer email="marioprats@gmail.com">Mario Prats</maintainer>
 
   <license>GPL</license>
   <url>http://www.irs.uji.es/uwsim/</url>
