@@ -25,6 +25,7 @@ struct ConfigFile;
 struct Vehicle;
 struct SceneBuilder;
 struct BulletPhysics;
+struct ViewBuilder;
 
 namespace uwsim {
   struct SimulatedDevice;
@@ -72,7 +73,9 @@ namespace uwsim {
     std::string getType(){return type;}
     typedef boost::shared_ptr<SimulatedDevice> Ptr;
     SimulatedDevice(SimulatedDeviceConfig * cfg);
-    virtual void applyPhysics( BulletPhysics * bulletPhysics) = 0;
+    virtual void applyPhysics( BulletPhysics * bulletPhysics){}
+    virtual void setViewBuilder( ViewBuilder * viewBuilder){}
+    
     virtual ~SimulatedDevice(){}
   };
 };

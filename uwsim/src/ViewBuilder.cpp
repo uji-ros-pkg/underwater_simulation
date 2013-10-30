@@ -179,6 +179,9 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder) {
 
 	viewer->setSceneData(appgroup);
 
+	for (unsigned int j=0; j<scene_builder->iauvFile.size(); j++)
+		for (unsigned int i=0; i<scene_builder->iauvFile[j]->devices->all.size(); i++)
+			scene_builder->iauvFile[j]->devices->all.at(i)->setViewBuilder(this);
 	return true;
 }
 void ViewBuilder::init(){
