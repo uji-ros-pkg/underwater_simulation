@@ -496,7 +496,7 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
 	geom->radius=sphere->radius;
      }
   }
-  int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, int nmat, std::vector<Material> &materials){
+  int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, int &nmat, std::vector<Material> &materials){
      processGeometry(visual->geometry.get(),link.geom.get());
      processPose(visual->origin,link.position,link.rpy,link.quat);
 
@@ -568,7 +568,7 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
     }
   }
 
-  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int nmat, std::vector<Material> &materials){
+  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int &nmat, std::vector<Material> &materials){
     vehicle.links[nlink].name=link->name;
     vehicle.links[nlink].geom.reset( new Geometry);
     if(link->visual)
@@ -615,7 +615,8 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle){
 	vehicle.nmaterials = model.materials_.size();
 	vehicle.materials.resize(vehicle.nmaterials);
 	boost::shared_ptr<const urdf::Link> root = model.getRoot();
-	processLink(root,vehicle,0,0,0,vehicle.materials);
+	int nmat = 0;
+	processLink(root,vehicle,0,0,nmat,vehicle.materials);
 	return 0;
 }
 

@@ -252,9 +252,9 @@ public://made process and extract methods public to be used in Simulated Devices
 
   void processGeometry(urdf::Geometry * geometry, Geometry * geom);
   void processPose(urdf::Pose pose,double position[3], double rpy[3],double quat[4]);
-  int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int nmat, std::vector<Material> &materials); //returns current material
+  int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int &nmat, std::vector<Material> &materials); //returns current material
   void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink);
-  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, int nmat, std::vector<Material> &materials); //returns current link number
+  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, int &nmat, std::vector<Material> &materials); //returns current link number
   int processURDFFile(string file, Vehicle &vehicle);
 
   void postprocessVehicle(Vehicle &vehicle);

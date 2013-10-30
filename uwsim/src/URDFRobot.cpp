@@ -92,6 +92,10 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	  osg::ref_ptr<osg::Material> material = new osg::Material();
           material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(vehicle.materials[vehicle.links[i].material].r, vehicle.materials[vehicle.links[i].material].g, vehicle.materials[vehicle.links[i].material].b, vehicle.materials[vehicle.links[i].material].a));
 	  stateset->setAttribute(material);
+	  if (vehicle.materials[vehicle.links[i].material].a<1){
+	    stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	    stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
+	  }
 	  link[i]->setStateSet(stateset);
 	}
    }

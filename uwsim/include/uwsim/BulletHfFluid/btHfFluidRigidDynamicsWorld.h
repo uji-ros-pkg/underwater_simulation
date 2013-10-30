@@ -57,7 +57,7 @@ protected:
 	void drawHfFluidBuoyantConvexShape (btIDebugDraw* debugDrawer, btCollisionObject* object, btHfFluidBuoyantConvexShape* buoyantShape, int voxelDraw);
 	void drawHfFluidNormal (btIDebugDraw* debugDraw, btHfFluid* fluid);
 public:
-	
+	void	debugDraw(){debugDrawWorld();}
 	btHfFluidRigidDynamicsWorld(btDispatcher* dispatcher,btBroadphaseInterface* pairCache,btConstraintSolver* constraintSolver,btCollisionConfiguration* collisionConfiguration);
 
 	virtual ~btHfFluidRigidDynamicsWorld();
