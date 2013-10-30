@@ -87,7 +87,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle): KinematicCha
 	  exit(0);
 	link[i]->setName(vehicle.links[i].name);
 
-	if(vehicle.links[i].material!=-1){ //Add material if exists
+	if(! vehicle.links[i].material.empty()){ //Add material if exists
 	  osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet();
 	  osg::ref_ptr<osg::Material> material = new osg::Material();
           material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(vehicle.materials[vehicle.links[i].material].r, vehicle.materials[vehicle.links[i].material].g, vehicle.materials[vehicle.links[i].material].b, vehicle.materials[vehicle.links[i].material].a));

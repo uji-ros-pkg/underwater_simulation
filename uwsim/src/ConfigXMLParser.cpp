@@ -497,36 +497,23 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
      }
   }
 
-void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, std::vector<Material> &materials){
-     processGeometry(visual->geometry.get(),link.geom.get());
-     processPose(visual->origin,link.position,link.rpy,link.quat);
+void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, std::map<std::string, Material> &materials){
+  processGeometry(visual->geometry.get(),link.geom.get());
+  processPose(visual->origin,link.position,link.rpy,link.quat);
 
-
-     //Material
-     //Search if it's a new materia
-     int found=0;
-     if(visual->material!=NULL){
-       for(int i=0;i<materials.size() && !found;i++){
-	 if(visual->material_name==materials[i].name){
-	   link.material=i;
-	   found=1;
-	 }
-       }
-
-       if(!found){
-         Material m;
-	 m.name=visual->material_name;
-	 m.r=visual->material->color.r;
-	 m.g=visual->material->color.g;
-	 m.b=visual->material->color.b;
-	 m.a=visual->material->color.a;
-         materials.push_back(m);
-	 link.material = materials.size() - 1;
-       }
-     }
-     else
-	link.material=-1;
+  //Create the material if it doesn't exist already
+  link.material = visual->material_name;
+  if (visual->material && materials.find(visual->material_name) == materials.end())
+  {
+    Material m;
+    m.name=visual->material_name;
+    m.r=visual->material->color.r;
+    m.g=visual->material->color.g;
+    m.b=visual->material->color.b;
+    m.a=visual->material->color.a;
+    materials[m.name] = m;
   }
+}
 
   void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink){
     jointVehicle.name=joint->name;
@@ -569,14 +556,14 @@ void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link
     }
   }
 
-  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint, std::vector<Material> &materials){
+  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint, std::map<std::string, Material> &materials){
     vehicle.links[nlink].name=link->name;
     vehicle.links[nlink].geom.reset( new Geometry);
     if(link->visual)
       processVisual(link->visual,vehicle.links[nlink], materials);
     else{
       vehicle.links[nlink].geom->type=4;
-      vehicle.links[nlink].material=-1;
+      vehicle.links[nlink].material=std::string();
       memset(vehicle.links[nlink].position,0,3*sizeof(double));
       memset(vehicle.links[nlink].rpy,0,3*sizeof(double));
       memset(vehicle.links[nlink].quat,0,4*sizeof(double));
@@ -613,7 +600,6 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle){
 	vehicle.links.resize(vehicle.nlinks);
 	vehicle.njoints=model.joints_.size();
 	vehicle.joints.resize(vehicle.njoints);
-	vehicle.nmaterials = model.materials_.size();
 	boost::shared_ptr<const urdf::Link> root = model.getRoot();
 	processLink(root,vehicle,0,0,vehicle.materials);
 	return 0;
