@@ -139,7 +139,7 @@ struct Link{
   double position[3];
   double rpy[3];
   double quat[4];
-  int material;
+  std::string material;
   boost::shared_ptr<Geometry> cs, geom;
 };
 
@@ -167,11 +167,10 @@ struct Vehicle{
   int nlinks;
   int njoints;
   int ninitJoints;
-  int nmaterials;
   double position[3];
   double orientation[3];
   std::vector<double> jointValues;
-  std::vector<Material> materials;
+  std::map<std::string, Material> materials;
   std::list<Vcam> Vcams;
   std::list<Vcam> VRangecams;
   std::list<slProjector> sls_projectors;
@@ -252,9 +251,9 @@ public://made process and extract methods public to be used in Simulated Devices
 
   void processGeometry(urdf::Geometry * geometry, Geometry * geom);
   void processPose(urdf::Pose pose,double position[3], double rpy[3],double quat[4]);
-  int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int &nmat, std::vector<Material> &materials); //returns current material
+  void processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, std::map<std::string, Material> &materials);
   void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink);
-  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, int &nmat, std::vector<Material> &materials); //returns current link number
+  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, std::map<std::string, Material> &materials); //returns current link number
   int processURDFFile(string file, Vehicle &vehicle);
 
   void postprocessVehicle(Vehicle &vehicle);
