@@ -254,11 +254,11 @@
         <name>g500_echo1</name>
         <info>Echo example 1</info>
       </echo>
-      <echo>
-        <name>g500_echo2</name>
-        <info>Echo example 2</info>
-      </echo>
     </simulatedDevices>
+    <echo>
+      <name>g500_echo2</name>
+      <info>Echo example 2</info>
+    </echo>
   </vehicle>
 
   <object>
@@ -383,18 +383,16 @@
         <rate>1</rate>
       </echoROS>
     </SimulatedDeviceROS>
-    <SimulatedDeviceROS>
-      <echoROS>
-        <name>g500_echo2</name>
-        <topic>g500/echo2</topic>
-        <rate>1</rate>
-      </echoROS>
-    </SimulatedDeviceROS>
     <contactSensorToROS>
       <name>girona500</name>
       <topic>g500/contactSensor</topic>
       <rate> 100 </rate>
     </contactSensorToROS>
+    <echoROS>
+      <name>g500_echo2</name>
+      <topic>g500/echo2</topic>
+      <rate>1</rate>
+    </echoROS>
   </rosInterfaces>
 </UWSimScene>
 

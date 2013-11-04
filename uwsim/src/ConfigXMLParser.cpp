@@ -199,7 +199,10 @@ void ConfigFile::processSimParams(const xmlpp::Node* node){
 			physicsWater.enable=1;
 			processPhysicsWater(child);
 		}
-
+                else if(child->get_name()=="physicsFrequency")
+                        extractFloatChar(child,physicsFrequency);
+                else if(child->get_name()=="physicsSubSteps")
+                        extractIntChar(child,physicsSubSteps);
 	}
 }
 
@@ -900,12 +903,12 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processMultibeamSensor(child,aux);
 			vehicle.multibeam_sensors.push_back(aux);
-		} else if (child->get_name()=="simulatedDevices"){
-			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
+		} else {
+			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this, child->get_name()!="simulatedDevices");
 			for (size_t i=0; i< auxs.size(); ++i)
 				if (auxs[i])
 					vehicle.simulated_devices.push_back(auxs[i]);
-		}
+                }
 	}
 }
 
@@ -1080,7 +1083,6 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 					xmlpp::Node* tempchild=dynamic_cast<const xmlpp::Node*>(*subiter);
 					if (tempchild!=NULL && tempchild->get_name()!="text"){
 						std::string subtype = tempchild->get_name();
-						//std::cout<< "subtype="<<subtype<<std::endl;
 						if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
 							rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
 							rosInterface.subtype = subtype.substr(0, subtype.length()-3);
@@ -1088,7 +1090,13 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 						}
 					}
 				}
-		}
+		} else {
+                        std::string subtype = child->get_name();
+                        if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
+                                rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
+                                rosInterface.subtype = subtype.substr(0, subtype.length()-3);
+                        }
+                }
 
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
 			processROSInterface(subchild!=NULL ? subchild : child, rosInterface);
@@ -1142,6 +1150,8 @@ ConfigFile::ConfigFile(const std::string &fName){
    	memset(gravity,0,3*sizeof(double));
 	camNear=camFar=-1;
         enablePhysics=0;
+        physicsFrequency = 60;
+        physicsSubSteps = 0;
 	try
 	{
 		xmlpp::DomParser parser;

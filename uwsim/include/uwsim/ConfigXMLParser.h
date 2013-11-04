@@ -269,6 +269,8 @@ public:
   list <ROSInterfaceInfo> ROSInterfaces;
   list <ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   PhysicsWater physicsWater;
+  double physicsFrequency;
+  int physicsSubSteps;
 
   ConfigFile(const std::string &fName);
 };
