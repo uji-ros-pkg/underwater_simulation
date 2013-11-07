@@ -20,7 +20,7 @@
 #include <uwsim/SceneBuilder.h>
 #include <uwsim/ViewBuilder.h>
 #include <uwsim/PhysicsBuilder.h>
-
+#include "osgbCollision/GLDebugDrawer.h"
 #include <uwsim/UWSimUtils.h>
 
 using namespace std;
@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	arguments->getApplicationUsage()->addCommandLineOption("--v","Be verbose. (OSG notify level NOTICE)");
 	arguments->getApplicationUsage()->addCommandLineOption("--vv","Be much verbose. (OSG notify level DEBUG)");
 	arguments->getApplicationUsage()->addCommandLineOption("--dataPath <path>","Search for models in this path, besides the default ones");
+        arguments->getApplicationUsage()->addCommandLineOption("--debugPhysics [<flag>]","Enable physics visualisation. 1 for wireframe, 2 for physics only. For other flag options refer to btIDebugDraw.h");
 
 	unsigned int helpType = 0;
 	if ((helpType = arguments->readHelpType()))
@@ -103,6 +104,17 @@ int main(int argc, char *argv[])
         if(config.enablePhysics)
 	  physicsBuilder.loadPhysics(&builder,config);
 
+	int drawPhysics = 0;
+	if (!arguments->read("--debugPhysics", osg::ArgumentParser::Parameter(drawPhysics)) && arguments->read("--debugPhysics"))
+		drawPhysics = 2;
+	boost::shared_ptr<osgbCollision::GLDebugDrawer> debugDrawer;
+	if (config.enablePhysics && drawPhysics>0){
+		debugDrawer.reset(new osgbCollision::GLDebugDrawer());
+		debugDrawer->setDebugMode(drawPhysics);
+		physicsBuilder.physics->dynamicsWorld->setDebugDrawer(debugDrawer.get());
+		builder.getRoot()->addChild(debugDrawer->getSceneGraph());
+	}
+
 	ViewBuilder view(config, &builder, arguments);
 	
 	view.init();
@@ -124,8 +136,15 @@ int main(int argc, char *argv[])
                   double elapsed( currSimTime - prevSimTime );
                   if( view.getViewer()->getFrameStamp()->getFrameNumber() < 3 ) 
                     elapsed = 1./60.;
-                  physicsBuilder.physics->stepSimulation(elapsed, 4, elapsed/4. );
+                  int subSteps = fmax(0,config.physicsSubSteps);
+                  if (subSteps==0) subSteps = ceil(elapsed*config.physicsFrequency);//auto substep
+                  physicsBuilder.physics->stepSimulation(elapsed, subSteps, 1/config.physicsFrequency);
                   prevSimTime = currSimTime;
+                  if (debugDrawer) {
+                    debugDrawer->BeginDraw();
+                    physicsBuilder.physics->dynamicsWorld->debugDraw();
+                    debugDrawer->EndDraw();
+                  }
 		}                
 
 		view.getViewer()->frame();

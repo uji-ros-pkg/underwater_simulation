@@ -199,7 +199,10 @@ void ConfigFile::processSimParams(const xmlpp::Node* node){
 			physicsWater.enable=1;
 			processPhysicsWater(child);
 		}
-
+                else if(child->get_name()=="physicsFrequency")
+                        extractFloatChar(child,physicsFrequency);
+                else if(child->get_name()=="physicsSubSteps")
+                        extractIntChar(child,physicsSubSteps);
 	}
 }
 
@@ -496,36 +499,24 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
 	geom->radius=sphere->radius;
      }
   }
-  int ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, int nmat, std::vector<Material> &materials){
-     processGeometry(visual->geometry.get(),link.geom.get());
-     processPose(visual->origin,link.position,link.rpy,link.quat);
 
+void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual,Link &link, std::map<std::string, Material> &materials){
+  processGeometry(visual->geometry.get(),link.geom.get());
+  processPose(visual->origin,link.position,link.rpy,link.quat);
 
-     //Material
-     //Search if it's a new materia
-     int found=0;
-     if(visual->material!=NULL){
-       for(int i=0;i<nmat && !found;i++){
-	 if(visual->material_name==materials[i].name){
-	   link.material=i;
-	   found=1;
-	 }
-       }
-
-       if(!found){
-	 materials[nmat].name=visual->material_name;
-	 materials[nmat].r=visual->material->color.r;
-	 materials[nmat].g=visual->material->color.g;
-	 materials[nmat].b=visual->material->color.b;
-	 materials[nmat].a=visual->material->color.a;
-	 link.material=nmat;
-	 nmat++;
-       }
-     }
-     else
-	link.material=-1;
-     return nmat;
+  //Create the material if it doesn't exist already
+  link.material = visual->material_name;
+  if (visual->material && materials.find(visual->material_name) == materials.end())
+  {
+    Material m;
+    m.name=visual->material_name;
+    m.r=visual->material->color.r;
+    m.g=visual->material->color.g;
+    m.b=visual->material->color.b;
+    m.a=visual->material->color.a;
+    materials[m.name] = m;
   }
+}
 
   void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink){
     jointVehicle.name=joint->name;
@@ -568,14 +559,14 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
     }
   }
 
-  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint,int nmat, std::vector<Material> &materials){
+  int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link,Vehicle &vehicle,int nlink,int njoint, std::map<std::string, Material> &materials){
     vehicle.links[nlink].name=link->name;
     vehicle.links[nlink].geom.reset( new Geometry);
     if(link->visual)
-      nmat= processVisual(link->visual,vehicle.links[nlink],nmat, materials);
+      processVisual(link->visual,vehicle.links[nlink], materials);
     else{
       vehicle.links[nlink].geom->type=4;
-      vehicle.links[nlink].material=-1;
+      vehicle.links[nlink].material=std::string();
       memset(vehicle.links[nlink].position,0,3*sizeof(double));
       memset(vehicle.links[nlink].rpy,0,3*sizeof(double));
       memset(vehicle.links[nlink].quat,0,4*sizeof(double));
@@ -592,7 +583,7 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom){
     int linkNumber=nlink;
     for(uint i=0;i<link->child_joints.size();i++){
        processJoint(link->child_joints[i],vehicle.joints[linkNumber],nlink,linkNumber+1);
-       linkNumber=processLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1,nmat,materials);
+       linkNumber=processLink(link->child_links[i],vehicle,linkNumber+1,linkNumber+1, materials);
     }
     return linkNumber;
   }
@@ -612,10 +603,8 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle){
 	vehicle.links.resize(vehicle.nlinks);
 	vehicle.njoints=model.joints_.size();
 	vehicle.joints.resize(vehicle.njoints);
-	vehicle.nmaterials = model.materials_.size();
-	vehicle.materials.resize(vehicle.nmaterials);
 	boost::shared_ptr<const urdf::Link> root = model.getRoot();
-	processLink(root,vehicle,0,0,0,vehicle.materials);
+	processLink(root,vehicle,0,0,vehicle.materials);
 	return 0;
 }
 
@@ -914,12 +903,12 @@ void ConfigFile::processVehicle(const xmlpp::Node* node,Vehicle &vehicle){
 			aux.init();
 			processMultibeamSensor(child,aux);
 			vehicle.multibeam_sensors.push_back(aux);
-		} else if (child->get_name()=="simulatedDevices"){
-			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this);
+		} else {
+			std::vector< uwsim::SimulatedDeviceConfig::Ptr > auxs = SimulatedDevices::processConfig(child, this, child->get_name()!="simulatedDevices");
 			for (size_t i=0; i< auxs.size(); ++i)
 				if (auxs[i])
 					vehicle.simulated_devices.push_back(auxs[i]);
-		}
+                }
 	}
 }
 
@@ -1094,7 +1083,6 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 					xmlpp::Node* tempchild=dynamic_cast<const xmlpp::Node*>(*subiter);
 					if (tempchild!=NULL && tempchild->get_name()!="text"){
 						std::string subtype = tempchild->get_name();
-						//std::cout<< "subtype="<<subtype<<std::endl;
 						if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
 							rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
 							rosInterface.subtype = subtype.substr(0, subtype.length()-3);
@@ -1102,7 +1090,13 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node){
 						}
 					}
 				}
-		}
+		} else {
+                        std::string subtype = child->get_name();
+                        if (subtype.length()>3 && subtype.substr(subtype.length()-3,3)=="ROS"){
+                                rosInterface.type=ROSInterfaceInfo::SimulatedDevice;
+                                rosInterface.subtype = subtype.substr(0, subtype.length()-3);
+                        }
+                }
 
 		if (rosInterface.type!=ROSInterfaceInfo::Unknown) {
 			processROSInterface(subchild!=NULL ? subchild : child, rosInterface);
@@ -1156,6 +1150,8 @@ ConfigFile::ConfigFile(const std::string &fName){
    	memset(gravity,0,3*sizeof(double));
 	camNear=camFar=-1;
         enablePhysics=0;
+        physicsFrequency = 60;
+        physicsSubSteps = 0;
 	try
 	{
 		xmlpp::DomParser parser;
