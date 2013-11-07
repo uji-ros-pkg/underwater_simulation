@@ -97,24 +97,30 @@ static void processConfigNode(const xmlpp::Node* node, ConfigFile * config, Simu
 }
 
 std::vector< SimulatedDeviceConfig::Ptr >
-SimulatedDevices::processConfig(const xmlpp::Node* node, ConfigFile * config){
+SimulatedDevices::processConfig(const xmlpp::Node* node, ConfigFile * config, bool isDevice){
   std::vector< SimulatedDeviceConfig::Ptr > devs;
-  xmlpp::Node::NodeList list = node->get_children();
-  for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
-    xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
-    
-    if (child->get_name()!="text" && child->get_name()!="comment"){
-      bool isFactoryFound = false;
-      for (size_t i = 0; i< loader->factories.size();++i)
-        if (loader->factories[i]->getType()==child->get_name()){
-          isFactoryFound = true;
-          SimulatedDeviceConfig::Ptr dev = loader->factories[i]->processConfig(child, config);
-          if (dev)
-            processConfigNode(child, config, dev);
-          devs.push_back(dev);
-        }
-      if (!isFactoryFound)
-        OSG_FATAL<<"Unknown SimulatedDevice '"<<child->get_name()<<"', skipping..."<<std::endl;
+  if (node->get_name()=="text" || node->get_name()=="comment")
+    return devs;
+  if (isDevice){
+    bool isFactoryFound = false;
+    for (size_t i = 0; i< loader->factories.size();++i)
+      if (loader->factories[i]->getType()==node->get_name()){
+        isFactoryFound = true;
+        SimulatedDeviceConfig::Ptr dev = loader->factories[i]->processConfig(node, config);
+        if (dev)
+          processConfigNode(node, config, dev);
+        devs.push_back(dev);
+      }
+    if (!isFactoryFound)
+      OSG_FATAL<<"Unknown SimulatedDevice '"<<node->get_name()<<"', skipping..."<<std::endl;
+  }
+  else{
+    xmlpp::Node::NodeList list = node->get_children();
+    for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter){
+      xmlpp::Node* child=dynamic_cast<const xmlpp::Node*>(*iter);
+      std::vector< SimulatedDeviceConfig::Ptr > devs_ = processConfig(child, config, true);
+      for (size_t i = 0; i< devs_.size();++i)
+        devs.push_back(devs_.at(i));
     }
   }
   return devs;

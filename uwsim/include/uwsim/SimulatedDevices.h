@@ -31,6 +31,6 @@ public:
   static std::vector<boost::shared_ptr<ROSInterface> > getInterfaces(ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile);
   
   //Parses driver's XML configuration
-  static std::vector<uwsim::SimulatedDeviceConfig::Ptr > processConfig(const xmlpp::Node* node, ConfigFile * config);
+  static std::vector<uwsim::SimulatedDeviceConfig::Ptr > processConfig(const xmlpp::Node* node, ConfigFile * config, bool isDevice = false);
 };
 #endif /* SIMULATEDDEVICES_H_ */

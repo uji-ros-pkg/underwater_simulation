@@ -136,7 +136,9 @@ int main(int argc, char *argv[])
                   double elapsed( currSimTime - prevSimTime );
                   if( view.getViewer()->getFrameStamp()->getFrameNumber() < 3 ) 
                     elapsed = 1./60.;
-                  physicsBuilder.physics->stepSimulation(elapsed, 4, elapsed/4. );
+                  int subSteps = fmax(0,config.physicsSubSteps);
+                  if (subSteps==0) subSteps = ceil(elapsed*config.physicsFrequency);//auto substep
+                  physicsBuilder.physics->stepSimulation(elapsed, subSteps, 1/config.physicsFrequency);
                   prevSimTime = currSimTime;
                   if (debugDrawer) {
                     debugDrawer->BeginDraw();
