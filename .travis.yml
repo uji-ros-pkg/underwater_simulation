@@ -18,7 +18,6 @@ before_install:
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros
-  - sudo apt-get install ros-hydro-uwsim-bullet ros-hydro-uwsim-osgbullet ros-hydro-uwsim-osgocean ros-hydro-uwsim-osgworks
   - sudo rosdep init
   - rosdep update
 install:
@@ -26,7 +25,7 @@ install:
   - mkdir -p ~/ros/ws_uwsim/src
   - cd ~/ros/ws_uwsim/src
   - wstool init .
-  - git clone -b hydro-devel https://github.com/uji-ros-pkg/underwater_simulation.git
+  - git clone -b $ROS_DISTRO-devel https://github.com/uji-ros-pkg/underwater_simulation.git
   - rm -rf $REPOSITORY_NAME
   - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace
   - cd ../
