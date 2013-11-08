@@ -23,25 +23,25 @@
 #include <iostream>
 #include <string.h>
 
-class URDFRobot: public KinematicChain {
+class URDFRobot : public KinematicChain
+{
 
 public:
 
-	std::vector<osg::Vec3d> joint_axis;
+  std::vector<osg::Vec3d> joint_axis;
 
+  URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle);
+  void addToKinematicChain(osg::Node * link, btRigidBody* body);
 
-	URDFRobot(osgOcean::OceanScene *oscene,Vehicle vehicle);
-	void addToKinematicChain(osg::Node * link,btRigidBody* body);
-
-	~URDFRobot();
+  ~URDFRobot();
 
 protected:
-	
-	void updateJoints(std::vector<double> &q);
-	void updateJoints(std::vector<double> &q, int startJoint, int numJoints);
+
+  void updateJoints(std::vector<double> &q);
+  void updateJoints(std::vector<double> &q, int startJoint, int numJoints);
 
 private:
-	void moveJoints(std::vector<double> &q);
+  void moveJoints(std::vector<double> &q);
 
 };
 

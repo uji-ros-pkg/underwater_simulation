@@ -19,13 +19,18 @@
 #include <osgWidget/WindowManager>
 #include <osgWidget/Box>
 
-class CustomWidget {
-  public:
-    CustomWidget() {}
+class CustomWidget
+{
+public:
+  CustomWidget()
+  {
+  }
 
-    virtual osg::ref_ptr<osgWidget::Window> getWidgetWindow()=0;
+  virtual osg::ref_ptr<osgWidget::Window> getWidgetWindow()=0;
 
-    ~CustomWidget() {}
+  ~CustomWidget()
+  {
+  }
 };
 
 #endif
