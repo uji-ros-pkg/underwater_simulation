@@ -391,7 +391,7 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom)
 getWorldCoordOfNodeVisitor::getWorldCoordOfNodeVisitor() :
     osg::NodeVisitor(NodeVisitor::TRAVERSE_PARENTS), done(false)
 {
-  wcMatrix = new osg::Matrixd();
+  wcMatrix.reset(new osg::Matrixd());
 }
 
 void getWorldCoordOfNodeVisitor::apply(osg::Node &node)
@@ -407,14 +407,14 @@ void getWorldCoordOfNodeVisitor::apply(osg::Node &node)
   }
 }
 
-osg::Matrixd* getWorldCoordOfNodeVisitor::giveUpDaMat()
+boost::shared_ptr<osg::Matrix> getWorldCoordOfNodeVisitor::giveUpDaMat()
 {
   return wcMatrix;
 }
 
-osg::Matrixd* getWorldCoords(osg::Node* node)
+boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
 {
-  getWorldCoordOfNodeVisitor* ncv = new getWorldCoordOfNodeVisitor();
+  osg::ref_ptr<getWorldCoordOfNodeVisitor> ncv = new getWorldCoordOfNodeVisitor();
   if (node && ncv)
   {
     node->accept(*ncv);
@@ -422,7 +422,7 @@ osg::Matrixd* getWorldCoords(osg::Node* node)
   }
   else
   {
-    return NULL;
+    return boost::shared_ptr<osg::Matrix>();
   }
 }
 

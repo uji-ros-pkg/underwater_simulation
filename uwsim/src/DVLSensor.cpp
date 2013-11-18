@@ -17,7 +17,7 @@
 osg::Vec3d DVLSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
-  osg::Matrixd *rMs = getWorldCoords(node_);
+  boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   osg::Matrixd lMs = *rMs * osg::Matrixd::inverse(rMl_);
   osg::Vec3d x = lMs.getTrans();
 

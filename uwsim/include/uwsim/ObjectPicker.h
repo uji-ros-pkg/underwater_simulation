@@ -62,8 +62,8 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback
           osg::Node * objectTransf = i[0]->getParent(0)->getParent(0); //Object->linkBaseTransform->transform
 
           //Get coordinates to change them when changing position in graph
-          osg::Matrixd *originalpos = getWorldCoords(objectTransf);
-          osg::Matrixd *hand = getWorldCoords(trackNode);
+          boost::shared_ptr<osg::Matrix> originalpos = getWorldCoords(objectTransf);
+          boost::shared_ptr<osg::Matrix> hand = getWorldCoords(trackNode);
           hand->invert(*hand);
 
           //ADD node in hand, remove object from original position.

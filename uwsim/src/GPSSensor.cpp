@@ -17,7 +17,7 @@
 osg::Vec3d GPSSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
-  osg::Matrixd *rMs = getWorldCoords(node_);
+  boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   osg::Matrixd lMs = *rMs * osg::Matrixd::inverse(rMl_);
 
   //Now add some gaussian noise
@@ -29,6 +29,6 @@ osg::Vec3d GPSSensor::getMeasurement()
 
 double GPSSensor::depthBelowWater()
 {
-  osg::Matrixd *rMs = getWorldCoords(node_);
+  boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   return -(rMs->getTrans().z() - oscene_->getOceanScene()->getOceanSurfaceHeight());
 }

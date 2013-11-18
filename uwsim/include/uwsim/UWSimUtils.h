@@ -162,10 +162,10 @@ class getWorldCoordOfNodeVisitor : public osg::NodeVisitor
 public:
   getWorldCoordOfNodeVisitor();
   virtual void apply(osg::Node &node);
-  osg::Matrixd* giveUpDaMat();
+  boost::shared_ptr<osg::Matrix> giveUpDaMat();
 private:
   bool done;
-  osg::Matrix* wcMatrix;
+  boost::shared_ptr<osg::Matrix> wcMatrix;
 };
 
 // Given a valid node placed in a scene under a transform, return the
@@ -173,7 +173,7 @@ private:
 // Creates a visitor that will update a matrix representing world coordinates
 // of the node, return this matrix.
 // (This could be a class member for something derived from node also.
-osg::Matrixd* getWorldCoords(osg::Node* node);
+boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node);
 
 //Class to get all the catchable objects
 
