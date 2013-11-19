@@ -72,14 +72,14 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder)
     fullScreenNum = 0;
   }
   //is screen number is higher than any available screen, set it to the last one
-  if (fullScreenNum+1>=osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens())
-        fullScreenNum = osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens()-1;
-  if (fullScreenNum>=0)
+  if (fullScreenNum + 1 >= osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens())
+    fullScreenNum = osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens() - 1;
+  if (fullScreenNum >= 0)
   {
     osg::GraphicsContext::ScreenSettings settings;
     osg::GraphicsContext::ScreenIdentifier screen_id(fullScreenNum);
     osg::GraphicsContext::getWindowingSystemInterface()->getScreenSettings(screen_id, settings);
-    if (settings.width>0 && settings.height>0)
+    if (settings.width > 0 && settings.height > 0)
     {
       reswidth = settings.width;
       resheight = settings.height;
