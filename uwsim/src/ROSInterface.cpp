@@ -676,11 +676,10 @@ void ArmToROSJointState::publish()
     sensor_msgs::JointState js;
     js.header.stamp = getROSTime();
     std::vector<double> q = arm->getJointPosition();
+    std::vector<std::string> names=arm->getJointName();
     for (size_t i = 0; i < q.size(); i++)
     {
-      char name[4];
-      sprintf(name, "q%d", (int)i + 1);
-      js.name.push_back(std::string(name));
+      js.name.push_back(names[i]);
       js.position.push_back(q[i]);
       js.effort.push_back(0);
     }

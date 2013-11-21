@@ -60,6 +60,7 @@ public:
   void setJointPosition(std::vector<double> &q, std::vector<std::string> names = std::vector<std::string>());
   void setJointVelocity(std::vector<double> &qdot, std::vector<std::string> names = std::vector<std::string>());
   std::vector<double> getJointPosition();
+  std::vector<std::string> getJointName();
 
   /** Get the number of links */
   int getNumberOfLinks()

@@ -164,6 +164,17 @@ std::vector<double> KinematicChain::getJointPosition()
   return validq;
 }
 
+std::vector<std::string> KinematicChain::getJointName()
+{
+  std::vector<std::string> validq;
+  for(int i=0;i<getNumberOfJoints();i++)
+  {
+    if(jointType[i]!=0 && mimic[i].joint==i) 
+      validq.push_back(names[i]);
+    }
+  return validq;
+}
+
 KinematicChain::~KinematicChain()
 {
 }
