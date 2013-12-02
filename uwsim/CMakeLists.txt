@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   urdf
   tf
-  robot_state_publisher
   underwater_sensor_msgs
   resource_retriever
   roscpp
@@ -32,7 +31,6 @@ catkin_package(
     pluginlib
     urdf
     tf
-    robot_state_publisher
     underwater_sensor_msgs
     resource_retriever
     roscpp
