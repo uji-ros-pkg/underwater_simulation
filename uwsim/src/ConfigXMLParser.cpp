@@ -685,7 +685,7 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle)
     std::cerr << "Failed to parse urdf file " << file << std::endl;
     exit(0);
   }
-
+  vehicle.URDFFile=file_fullpath;
   OSG_INFO << "Successfully parsed urdf file " << file << std::endl;
 
   vehicle.nlinks = model.links_.size();
@@ -1189,6 +1189,10 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &
       extractStringChar(child, rosInterface.targetName);
     else if (child->get_name() == "rate")
       extractIntChar(child, rosInterface.rate);
+    else if (child->get_name() == "rootName")
+      extractStringChar(child, rosInterface.rootName);
+    else if (child->get_name() == "enableObjects")
+      extractUIntChar(child, rosInterface.enableObjects);
     else if (child->get_name() == "infoTopic")
       extractStringChar(child, rosInterface.infoTopic);
     else if (child->get_name() == "width")
@@ -1257,6 +1261,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
     else if (child->get_name() == "PATToROSOdom")
     {
       rosInterface.type = ROSInterfaceInfo::PATToROSOdom;
+    }
+    else if (child->get_name() == "WorldToROSTF")
+    {
+      rosInterface.type = ROSInterfaceInfo::WorldToROSTF;
     }
     else if (child->get_name() == "ArmToROSJointState")
     {

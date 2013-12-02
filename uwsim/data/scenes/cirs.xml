@@ -321,6 +321,11 @@
       <vehicleName> girona500 </vehicleName>
       <visualize> 1 </visualize>
     </ROSOdomToPAT>
+    <WorldToROSTF>
+      <rootName> world </rootName>
+      <enableObjects> 0 </enableObjects>
+      <rate>10</rate>
+    </WorldToROSTF>
     <ArmToROSJointState> 
 	<topic>/uwsim/joint_state</topic>
 	<vehicleName> girona500 </vehicleName>

@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   pluginlib
   urdf
+  tf
+  robot_state_publisher
   underwater_sensor_msgs
   resource_retriever
   roscpp
@@ -29,6 +31,8 @@ catkin_package(
     image_transport
     pluginlib
     urdf
+    tf
+    robot_state_publisher
     underwater_sensor_msgs
     resource_retriever
     roscpp

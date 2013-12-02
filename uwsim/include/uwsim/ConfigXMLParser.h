@@ -32,15 +32,15 @@ struct ROSInterfaceInfo
   {
     Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage,
     RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS,
-    DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS
+    DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS, WorldToROSTF
   } type_t;
   string subtype; //type of a SimulatedDevice
   std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
-  string topic, infoTopic, targetName;
+  string topic, infoTopic, targetName, rootName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
   unsigned int w, h; //width and height if necessary
-  unsigned int posx, posy, depth, blackWhite; ///< default (x,y) position of the widget if necessary, blackWhite camera
+  unsigned int posx, posy, depth, blackWhite, enableObjects; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
   int visualize; ///< If 1, enable visualization of the data. 0 by default
   double color[3]; // visualization color in rosodomtopat waypoints
@@ -301,6 +301,7 @@ struct Vehicle
   std::list<XMLDVLSensor> dvl_sensors;
   std::list<XMLMultibeamSensor> multibeam_sensors;
   std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
+  std::string URDFFile;
 };
 
 struct PhysicProperties

@@ -16,7 +16,7 @@
 <!ELEMENT multibeamSensor (name,relativeTo,position?,orientation?, initAngle,finalAngle, angleIncr,range)>
 <!ELEMENT camera (freeMotion?,objectToTrack?,fov?,aspectRatio?,near?,far?,position?,lookAt?) >
 <!ELEMENT object (name,file,position,orientation,offsetp?,offsetr?,physics?)>
-<!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?, (RangeImageSensorToROSImage*)?,(multibeamSensorToLaserScan*)?, (SimulatedDeviceROS*)?,(contactSensorToROS*)?,(echoROS*)?)>
+<!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (WorldToROSTF*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?, (RangeImageSensorToROSImage*)?,(multibeamSensorToLaserScan*)?, (SimulatedDeviceROS*)?,(contactSensorToROS*)?,(echoROS*)?)>
 
 <!-- elementos comunes -->
 <!ELEMENT position (x,y,z)>
@@ -116,6 +116,7 @@
 <!-- elementos rosinterfaces -->
 <!ELEMENT ROSOdomToPAT (topic,vehicleName, visualize?)>
 <!ELEMENT PATToROSOdom  (topic, vehicleName, rate?)>
+<!ELEMENT WorldToROSTF  (rootName, enableObjects?, rate?)>
 <!ELEMENT ArmToROSJointState  (topic, vehicleName, rate?)>
 <!ELEMENT ROSJointStateToArm  (topic,vehicleName)>
 <!ELEMENT VirtualCameraToROSImage (cameraName,imageTopic,infoTopic,rate?,depth?)>
@@ -144,6 +145,8 @@
 <!ELEMENT imageTopic (#PCDATA)>
 <!ELEMENT infoTopic (#PCDATA)>
 <!ELEMENT visualize (#PCDATA)>
+<!ELEMENT rootName (#PCDATA)>
+<!ELEMENT enableObjects (#PCDATA)>
 
 <!-- elementos vcamtoROSImage -->
 <!ELEMENT cam (#PCDATA)>

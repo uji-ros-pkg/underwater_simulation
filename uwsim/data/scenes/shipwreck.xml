@@ -139,6 +139,11 @@
       <topic> /uwsim/girona500_odom_TRIDENT </topic>
       <vehicleName> girona500_TRIDENT </vehicleName>
     </PATToROSOdom>
+    <WorldToROSTF>
+      <rootName> world </rootName>
+      <enableObjects> 0 </enableObjects>
+      <rate>10</rate>
+    </WorldToROSTF>
   </rosInterfaces>
 
 </UWSimScene>
