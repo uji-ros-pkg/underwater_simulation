@@ -29,7 +29,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-//robot_state_publisher
+//robot_state_publisher depndencies
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 #include <tf/tf.h>

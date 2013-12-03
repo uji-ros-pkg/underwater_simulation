@@ -971,11 +971,11 @@ contactSensorToROS::~contactSensorToROS()
 }
 
 
-WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate ) :
+WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate ) :
     ROSPublisherInterface(worldRootName, rate)
 {
-   iauvFile_=iauvFile;
-   for( int i=0; i<iauvFile_.size();i++){
+   iauvFile_ = iauvFile;
+   for(int i = 0; i < iauvFile_.size(); i++){
       KDL::Tree tree;
       if (!kdl_parser::treeFromFile(iauvFile[i].get()->urdf->URDFFile, tree)){
          ROS_ERROR("Failed to construct kdl tree");
@@ -1001,20 +1001,20 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector<boost::shared_ptr<
       {
          transform = dynamic_cast<osg::MatrixTransform*>(first);
       }
-      transforms_.push_back( transform );
+      transforms_.push_back(transform);
    }
    worldRootName_ = worldRootName;
-   enableObjects_ = enableObjects;//TODO Implementar frames de objetos al árbol TF.
+   enableObjects_ = enableObjects;//TODO: If enableObjects, then add object frames to the TF tree.
 }
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
 {   
-   odompub_ = new tf::TransformBroadcaster();
+   odompub_ = boost::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
 }
 
 void WorldToROSTF::publish()
 {
-   for( int i=0; i<iauvFile_.size();i++){
+   for( int i = 0; i < iauvFile_.size(); i++ ){
 
       std::vector<double> q = iauvFile_[i].get()->urdf->getJointPosition();
       std::vector<std::string> names= iauvFile_[i].get()->urdf->getJointName();
@@ -1034,13 +1034,13 @@ void WorldToROSTF::publish()
          osg::Vec3d pos = mat.getTrans();
          osg::Quat rot = mat.getRotate();
 
-         tf::Vector3 p( pos.x(), pos.y(), pos.z() );
-         tf::Quaternion q( rot.x(), rot.y(), rot.z(), rot.w() );
+         tf::Vector3 p(pos.x(), pos.y(), pos.z());
+         tf::Quaternion q(rot.x(), rot.y(), rot.z(), rot.w());
          tf::Pose pose(q,p);
          tf::StampedTransform t(pose, getROSTime(), "/" + worldRootName_, "/"+iauvFile_[i].get()->name);
       
-         tf::Vector3 p2( 0, 0, 0 );
-         tf::Quaternion q2( 0, 0, 0, 1 );
+         tf::Vector3 p2(0, 0, 0);
+         tf::Quaternion q2(0, 0, 0, 1);
          tf::Pose pose2(q2,p2);
          tf::StampedTransform t2(pose2, getROSTime(), "/"+iauvFile_[i].get()->name, "/"+iauvFile_[i].get()->name + "/base_link");
 

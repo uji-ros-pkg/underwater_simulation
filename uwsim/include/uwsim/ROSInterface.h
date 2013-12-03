@@ -45,7 +45,6 @@
 //ROS
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
-#include <tf/transform_datatypes.h>//Puede sobrar
 #include <tf/transform_listener.h>
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
@@ -278,9 +277,10 @@ class WorldToROSTF : public ROSPublisherInterface
 {
   std::vector< osg::ref_ptr<osg::MatrixTransform> > transforms_;
   std::vector< robot_state_publisher::RobotStatePublisher * > robot_pubs_;
-  tf::TransformBroadcaster * odompub_;
-  std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile_;
-  std::string worldRootName_; unsigned int enableObjects_;
+  boost::shared_ptr< tf::TransformBroadcaster > odompub_;
+  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile_;
+  std::string worldRootName_; 
+  unsigned int enableObjects_;
 public:
   WorldToROSTF(osg::Group *rootNode, std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate);
 
