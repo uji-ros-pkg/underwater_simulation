@@ -984,11 +984,9 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
          ROS_INFO("Loaded tree, %d segments, %d joints", tree.getNrOfSegments(), tree.getNrOfJoints());
       }
       
-      osg::ref_ptr<osg::MatrixTransform> transform;
-      robot_state_publisher::RobotStatePublisher * rpub;
-
-      rpub = new robot_state_publisher::RobotStatePublisher(tree, "/" + iauvFile[i].get()->name);
-      robot_pubs_.push_back(rpub);
+      osg::ref_ptr<osg::MatrixTransform> transform;    
+      robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
+       new robot_state_publisher::RobotStatePublisher(tree, "/" + iauvFile[i].get()->name)));
   
       findNodeVisitor findNode(iauvFile[i].get()->name);
       rootNode->accept(findNode);
