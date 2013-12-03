@@ -20,6 +20,7 @@
   <build_depend>uwsim_osgocean</build_depend>
   <build_depend>urdf</build_depend>  
   <build_depend>tf</build_depend>
+  <build_depend>tf_conversions</build_depend>
   <build_depend>underwater_sensor_msgs</build_depend> 
   <build_depend>uwsim_bullet</build_depend>
   <build_depend>uwsim_osgbullet</build_depend>
@@ -31,6 +32,8 @@
   <build_depend>libopenscenegraph</build_depend>
   <build_depend>opengl</build_depend>
   <build_depend>pluginlib</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>kdl_parser</build_depend>  
 
   <run_depend>geometry_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
@@ -39,6 +42,7 @@
   <run_depend>uwsim_osgocean</run_depend>
   <run_depend>urdf</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>tf_conversions</run_depend> 
   <run_depend>underwater_sensor_msgs</run_depend> 
   <run_depend>uwsim_bullet</run_depend>
   <run_depend>uwsim_osgbullet</run_depend>
@@ -50,6 +54,8 @@
   <run_depend>libopenscenegraph</run_depend>
   <run_depend>opengl</run_depend>
   <run_depend>pluginlib</run_depend>
+  <run_depend>eigen</run_depend>
+  <run_depend>kdl_parser</run_depend> 
 
   <export>
     <uwsim plugin="${prefix}/simdev_plugins.xml" />

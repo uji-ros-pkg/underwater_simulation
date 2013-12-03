@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   urdf
   tf
+  tf_conversions 
+  kdl_parser
   underwater_sensor_msgs
   resource_retriever
   roscpp
@@ -18,6 +20,7 @@ find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
+find_package(Eigen REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -31,6 +34,8 @@ catkin_package(
     pluginlib
     urdf
     tf
+    tf_conversions 
+    kdl_parser
     underwater_sensor_msgs
     resource_retriever
     roscpp
