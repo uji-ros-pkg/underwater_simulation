@@ -57,6 +57,7 @@
 #include <geometry_msgs/Pose.h>
 #include <kdl_parser/kdl_parser.hpp>
 //#include <cola2_common/NavigationData.h>
+#include <robot_state_publisher/robot_state_publisher.h>
 
 //Max time (in seconds) between two consecutive control references
 #define MAX_ELAPSED	1

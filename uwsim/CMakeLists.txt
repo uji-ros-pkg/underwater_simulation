@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf_conversions 
   kdl_parser
+  robot_state_publisher
   underwater_sensor_msgs
   resource_retriever
   roscpp
@@ -36,6 +37,7 @@ catkin_package(
     tf
     tf_conversions 
     kdl_parser
+    robot_state_publisher
     underwater_sensor_msgs
     resource_retriever
     roscpp

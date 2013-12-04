@@ -23,6 +23,7 @@
 #include <underwater_sensor_msgs/DVL.h>
 #include <std_msgs/Bool.h>
 #include <osg/LineStipple>
+#include <robot_state_publisher/robot_state_publisher.h>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -987,9 +988,10 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
          ROS_INFO("Loaded tree, %d segments, %d joints", tree.getNrOfSegments(), tree.getNrOfJoints());
       }
       
-      osg::ref_ptr<osg::MatrixTransform> transform;    
+      osg::ref_ptr<osg::MatrixTransform> transform;
+      ros::param::set("/tf_prefix", "/" + iauvFile[i].get()->name);    
       robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
-       new robot_state_publisher::RobotStatePublisher(tree, "/" + iauvFile[i].get()->name)));
+       new robot_state_publisher::RobotStatePublisher(tree)));
   
       findNodeVisitor findNode(iauvFile[i].get()->name);
       rootNode->accept(findNode);
