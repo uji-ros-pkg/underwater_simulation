@@ -975,12 +975,15 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
     ROSPublisherInterface(worldRootName, rate)
 {
    iauvFile_ = iauvFile;
-   for(int i = 0; i < iauvFile_.size(); i++){
+   for(int i = 0; i < iauvFile_.size(); i++)
+   {
       KDL::Tree tree;
-      if (!kdl_parser::treeFromFile(iauvFile[i].get()->urdf->URDFFile, tree)){
+      if (!kdl_parser::treeFromFile(iauvFile[i].get()->urdf->URDFFile, tree))
+      {
          ROS_ERROR("Failed to construct kdl tree");
       }
-      else{
+      else
+      {
          ROS_INFO("Loaded tree, %d segments, %d joints", tree.getNrOfSegments(), tree.getNrOfJoints());
       }
       
@@ -1012,8 +1015,8 @@ void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
 
 void WorldToROSTF::publish()
 {
-   for( int i = 0; i < iauvFile_.size(); i++ ){
-
+   for( int i = 0; i < iauvFile_.size(); i++ )
+   {
       std::vector<double> q = iauvFile_[i].get()->urdf->getJointPosition();
       std::vector<std::string> names= iauvFile_[i].get()->urdf->getJointName();
       std::map<std::string, double> js;
