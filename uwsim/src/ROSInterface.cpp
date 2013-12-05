@@ -1025,11 +1025,11 @@ void WorldToROSTF::publish()
       for (size_t j = 0; j < names.size(); ++j)
          js[names[j]] = q[j];
   
-     // Publish moving joints
-     robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime(), iauvFile_[i].get()->name);
-     // Publish fixed joints
-     robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
-     //Publish odometry
+      // Publish moving joints
+      robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime(), iauvFile_[i].get()->name);
+      // Publish fixed joints
+      robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
+      //Publish odometry
       if (transforms_[i] != NULL)
       {
          osg::Matrixd mat = transforms_[i]->getMatrix();

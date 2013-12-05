@@ -8,7 +8,6 @@
  * Contributors:
  *     Mario Prats
  *     Javier Perez
- *     David Fornas
  */
 
 #include <ros/ros.h>
@@ -28,9 +27,6 @@
 
 //#include <osgOcean/OceanScene>
 #include <osgOcean/ShaderManager>
-
-#include <kdl/frames_io.hpp>
-#include <tf_conversions/tf_kdl.h>
 
 // Default constructor - initialize searchForName to "" and 
 // set the traversal mode to TRAVERSE_ALL_CHILDREN
@@ -446,7 +442,5 @@ void GetCatchableObjects::apply(osg::Node &searchNode)
   }
   traverse(searchNode);
 }
-
-
 
 

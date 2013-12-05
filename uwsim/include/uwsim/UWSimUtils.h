@@ -8,7 +8,6 @@
  * Contributors:
  *     Mario Prats
  *     Javier Perez
- *     David Fornas
  */
 
 #ifndef UWSIMUTILS_H
@@ -190,10 +189,6 @@ public:
 private:
   nodeListType foundNodeList;
 };
-
-
-
-
 
 #endif
 
