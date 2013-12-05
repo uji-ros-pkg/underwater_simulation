@@ -55,7 +55,6 @@
 #include <image_transport/image_transport.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Pose.h>
-#include <kdl_parser/kdl_parser.hpp>
 //#include <cola2_common/NavigationData.h>
 #include <robot_state_publisher/robot_state_publisher.h>
 

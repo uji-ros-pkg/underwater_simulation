@@ -443,4 +443,3 @@ void GetCatchableObjects::apply(osg::Node &searchNode)
   traverse(searchNode);
 }
 
-
