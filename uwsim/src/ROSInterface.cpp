@@ -1006,7 +1006,7 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
       transforms_.push_back(transform);
    }
    worldRootName_ = worldRootName;
-   enableObjects_ = enableObjects;
+   enableObjects_ = enableObjects;//TODO Implement enableObjects feature
 }
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
