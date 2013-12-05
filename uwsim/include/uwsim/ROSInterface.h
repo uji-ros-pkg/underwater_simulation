@@ -277,7 +277,7 @@ public:
 class WorldToROSTF : public ROSPublisherInterface
 {
   std::vector< osg::ref_ptr<osg::MatrixTransform> > transforms_;
-  std::vector< boost::shared_ptr<robot_state_publisher::RobotStatePublisher> > robot_pubs_;
+   std::vector< boost::shared_ptr<robot_state_publisher::RobotStatePublisher> > robot_pubs_;
   boost::shared_ptr<tf::TransformBroadcaster> odompub_;
   std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile_;
   std::string worldRootName_; 

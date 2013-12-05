@@ -989,7 +989,6 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
       }
       
       osg::ref_ptr<osg::MatrixTransform> transform;
-      ros::param::set("/tf_prefix", "/" + iauvFile[i].get()->name);    
       robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
        new robot_state_publisher::RobotStatePublisher(tree)));
   
@@ -1007,7 +1006,7 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
       transforms_.push_back(transform);
    }
    worldRootName_ = worldRootName;
-   enableObjects_ = enableObjects;//TODO: If enableObjects, then add object frames to the TF tree.
+   enableObjects_ = enableObjects;
 }
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
@@ -1027,9 +1026,9 @@ void WorldToROSTF::publish()
          js[names[j]] = q[j];
   
      // Publish moving joints
-     robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime());
+     robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime(), iauvFile_[i].get()->name);
      // Publish fixed joints
-     robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms();
+     robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
      //Publish odometry
       if (transforms_[i] != NULL)
       {

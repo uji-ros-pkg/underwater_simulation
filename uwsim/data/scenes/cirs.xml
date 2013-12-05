@@ -323,7 +323,7 @@
     </ROSOdomToPAT>
     <WorldToROSTF>
       <rootName> world </rootName>
-      <enableObjects> 0 </enableObjects>
+      <enableObjects> 1 </enableObjects>
       <rate>10</rate>
     </WorldToROSTF>
     <ArmToROSJointState> 
