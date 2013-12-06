@@ -26,6 +26,7 @@ install:
   - cd ~/ros/ws_uwsim/src
   - wstool init .
   - git clone -b $ROS_DISTRO-devel https://github.com/uji-ros-pkg/underwater_simulation.git
+  - git clone -b $ROS_DISTRO-devel https://github.com/ros/robot_state_publisher.git
   - rm -rf $REPOSITORY_NAME
   - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace
   - cd ../
