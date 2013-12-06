@@ -3,16 +3,17 @@ project(uwsim)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  sensor_msgs
-  nav_msgs
   image_transport
+  kdl_parser
+  nav_msgs
   pluginlib
-  urdf
-  tf
-  robot_state_publisher
-  underwater_sensor_msgs
   resource_retriever
+  robot_state_publisher
   roscpp
+  sensor_msgs
+  tf
+  underwater_sensor_msgs
+  urdf
 )
 
 find_package(uwsim_osgocean REQUIRED)
@@ -26,25 +27,25 @@ catkin_package(
     uwsim
   CATKIN_DEPENDS
     geometry_msgs
-    sensor_msgs
-    nav_msgs
     image_transport
+    kdl_parser
+    nav_msgs
     pluginlib
-    urdf
-    tf
-    robot_state_publisher
-    underwater_sensor_msgs
     resource_retriever
+    robot_state_publisher
     roscpp
+    sensor_msgs
+    tf
+    underwater_sensor_msgs
+    urdf
   DEPENDS
-    libxml++-2.6
     boost
-    opengl
     libopenscenegraph
+    libxml++-2.6
+    opengl
+    uwsim_bullet
     uwsim_osgocean
     uwsim_osgworks
-    uwsim_osgocean
-    uwsim_bullet
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
