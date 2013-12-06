@@ -23,6 +23,7 @@
 #include <underwater_sensor_msgs/DVL.h>
 #include <std_msgs/Bool.h>
 #include <osg/LineStipple>
+#include <robot_state_publisher/robot_state_publisher.h>
 
 // static member
 ros::Time ROSInterface::current_time_;
@@ -967,5 +968,90 @@ void contactSensorToROS::publish()
 }
 
 contactSensorToROS::~contactSensorToROS()
+{
+}
+
+
+WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate ) :
+    ROSPublisherInterface(worldRootName, rate)
+{
+   iauvFile_ = iauvFile;
+   for(int i = 0; i < iauvFile_.size(); i++)
+   {
+      KDL::Tree tree;
+      if (!kdl_parser::treeFromFile(iauvFile[i].get()->urdf->URDFFile, tree))
+      {
+         ROS_ERROR("Failed to construct kdl tree");
+      }
+      else
+      {
+         ROS_INFO("Loaded tree, %d segments, %d joints", tree.getNrOfSegments(), tree.getNrOfJoints());
+      }
+      
+      osg::ref_ptr<osg::MatrixTransform> transform;
+      robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
+       new robot_state_publisher::RobotStatePublisher(tree)));
+  
+      findNodeVisitor findNode(iauvFile[i].get()->name);
+      rootNode->accept(findNode);
+      osg::Node *first = findNode.getFirst();
+      if (first == NULL)
+      {
+         transform = NULL;
+      }
+      else
+      {
+         transform = dynamic_cast<osg::MatrixTransform*>(first);
+      }
+      transforms_.push_back(transform);
+   }
+   worldRootName_ = worldRootName;
+   enableObjects_ = enableObjects;//TODO Implement enableObjects feature
+}
+
+void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
+{   
+   odompub_ = boost::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
+}
+
+void WorldToROSTF::publish()
+{
+   for( int i = 0; i < iauvFile_.size(); i++ )
+   {
+      std::vector<double> q = iauvFile_[i].get()->urdf->getJointPosition();
+      std::vector<std::string> names= iauvFile_[i].get()->urdf->getJointName();
+      std::map<std::string, double> js;
+      assert(names.size() == q.size());
+      for (size_t j = 0; j < names.size(); ++j)
+         js[names[j]] = q[j];
+  
+      // Publish moving joints
+      robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime(), iauvFile_[i].get()->name);
+      // Publish fixed joints
+      robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
+      //Publish odometry
+      if (transforms_[i] != NULL)
+      {
+         osg::Matrixd mat = transforms_[i]->getMatrix();
+         osg::Vec3d pos = mat.getTrans();
+         osg::Quat rot = mat.getRotate();
+
+         tf::Vector3 p(pos.x(), pos.y(), pos.z());
+         tf::Quaternion q(rot.x(), rot.y(), rot.z(), rot.w());
+         tf::Pose pose(q,p);
+         tf::StampedTransform t(pose, getROSTime(), "/" + worldRootName_, "/"+iauvFile_[i].get()->name);
+      
+         tf::Vector3 p2(0, 0, 0);
+         tf::Quaternion q2(0, 0, 0, 1);
+         tf::Pose pose2(q2,p2);
+         tf::StampedTransform t2(pose2, getROSTime(), "/"+iauvFile_[i].get()->name, "/"+iauvFile_[i].get()->name + "/base_link");
+
+         odompub_->sendTransform(t2);
+         odompub_->sendTransform(t);  
+      }
+   }
+}
+
+WorldToROSTF::~WorldToROSTF()
 {
 }

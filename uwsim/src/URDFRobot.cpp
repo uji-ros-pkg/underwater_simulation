@@ -88,6 +88,8 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
   osgDB::Registry::instance()->getDataFilePathList().push_back(
       std::string(SIMULATOR_DATA_PATH) + std::string("/textures"));
 
+  URDFFile=vehicle.URDFFile;
+
   link.resize(vehicle.nlinks);
 
   //Create links from geometry nodes

@@ -44,6 +44,8 @@
 
 //ROS
 #include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Image.h>
@@ -54,6 +56,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Pose.h>
 //#include <cola2_common/NavigationData.h>
+#include <robot_state_publisher/robot_state_publisher.h>
 
 //Max time (in seconds) between two consecutive control references
 #define MAX_ELAPSED	1
@@ -268,6 +271,24 @@ public:
   void publish();
 
   ~PATToROSOdom();
+};
+
+class WorldToROSTF : public ROSPublisherInterface
+{
+  std::vector< osg::ref_ptr<osg::MatrixTransform> > transforms_;
+  std::vector< boost::shared_ptr<robot_state_publisher::RobotStatePublisher> > robot_pubs_;
+  boost::shared_ptr<tf::TransformBroadcaster> odompub_;
+  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile_;
+  std::string worldRootName_; 
+  unsigned int enableObjects_;
+public:
+  WorldToROSTF(osg::Group *rootNode, std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate);
+
+  void createPublisher(ros::NodeHandle &nh);
+
+  void publish();
+
+  ~WorldToROSTF();
 };
 
 class ImuToROSImu : public ROSPublisherInterface

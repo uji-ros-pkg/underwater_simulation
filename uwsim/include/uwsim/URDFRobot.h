@@ -29,6 +29,7 @@ class URDFRobot : public KinematicChain
 public:
 
   std::vector<osg::Vec3d> joint_axis;
+  std::string URDFFile;
 
   URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle);
   void addToKinematicChain(osg::Node * link, btRigidBody* body);
