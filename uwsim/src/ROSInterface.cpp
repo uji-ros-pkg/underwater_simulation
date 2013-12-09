@@ -24,6 +24,7 @@
 #include <std_msgs/Bool.h>
 #include <osg/LineStipple>
 #include <robot_state_publisher/robot_state_publisher.h>
+#include <kdl_parser/kdl_parser.hpp>
 
 // static member
 ros::Time ROSInterface::current_time_;
