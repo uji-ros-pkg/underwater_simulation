@@ -94,19 +94,27 @@ void main()
  		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
 	// ------------------------END CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
 
-	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
+	if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
+		textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
+	else
+		textureColor = color;
+		
 	vec4 lightColor = vec4(0.0,0.0,0.0,0.0);
-	//check binary texture threshold, backprojection, shadow, out of texture bounds.
-	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0)){
-	    //inverting sls texture
-	    lightColor = vec4( 1.0,1.0,1.0,1.0) - texcolor;
-	    //light power is inversely proportional to distance 
-	    lightColor = vec4(lightColor.x/(distanceFromLight*distanceFromLight), lightColor.y/(distanceFromLight*distanceFromLight), lightColor.z/(distanceFromLight*distanceFromLight), 1.0);
+	
+	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
+	//check SLS texture, backprojection, shadow, out of texture bounds
+	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0))
+	{
+		if (texcolor.w>0.1) //treating less-transparent pixels as laser projection (not dependent on the distance, substitutes original color)
+		{ 
+			textureColor = texcolor;
+		}	
+		else //treating almost-transparent pixels as light projection (dependent on the distance, added to original color)
+		{
+			lightColor.w = 1;
+			lightColor.xyz = texcolor.xyz/(distanceFromLight*distanceFromLight);			
+		}
 	}
-	  if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
-	    textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
-	  else
-            textureColor = color;
 
 	vec4 final_color;
 	float alpha;
