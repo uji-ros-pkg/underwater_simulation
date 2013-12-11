@@ -94,19 +94,27 @@ void main()
  		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
 	// ------------------------END CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
 
+	if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
+		textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
+	else
+		textureColor = color;
+		
+	vec4 lightColor = vec4(0.0,0.0,0.0,0.0);
+	
 	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
-	//check binary texture threshold, backprojection, shadow, out of texture bounds.
-	if( (texcolor.x+texcolor.y+texcolor.z)<2.0 && ShadowCoord.w > 0.0 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor!=vec4(1.0,0.0,0.0,0.0)){
-	    textureColor = vec4( 0.0,1.0,0.0,1.0);
+	//check SLS texture, backprojection, shadow, out of texture bounds
+	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor.w>0)
+	{
+		if (texcolor.w>0.5)//treating opaque pixels as laser projection (not dependent on the distance, substitutes original color) 
+		{
+			textureColor = vec4(floor(texcolor.x+0.99),floor(texcolor.y+0.99),floor(texcolor.z+0.99),1.0);
+		}	
+		else if (texcolor.w<=0.01)//treating almost-transparent pixels as light projection (dependent on the distance, added to original color)
+		{
+			lightColor.w = 1;
+			lightColor.xyz = texcolor.xyz/(distanceFromLight*distanceFromLight);
+		}
 	}
-	else{
-	  if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
-	    textureColor=texture2D( uTextureMap, gl_TexCoord[0].st );
-	  else
-            textureColor = color;
-
-	}
-
 
 	vec4 final_color;
 	float alpha;
@@ -116,8 +124,8 @@ void main()
 	// and surface fog becomes visible.
 	if(osgOcean_EyeUnderwater && vWorldHeight < osgOcean_WaterHeight+2.0 )
 	{
-		final_color = lighting( textureColor );
-
+		final_color = lighting( textureColor)+lightColor;
+		
         // mix in underwater light
 		final_color.rgb = final_color.rgb * vExtinction + vInScattering;
 
@@ -133,7 +141,7 @@ void main()
     // Above water
 	else
 	{
-        final_color = lighting( textureColor );
+        final_color = lighting( textureColor)+lightColor;
 
 		float fogFactor = computeFogFactor( osgOcean_AboveWaterFogDensity, gl_FogFragCoord );
 		final_color = mix( osgOcean_AboveWaterFogColor, final_color, fogFactor );

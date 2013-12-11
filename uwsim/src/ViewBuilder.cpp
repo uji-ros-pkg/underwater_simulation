@@ -26,6 +26,7 @@
 #include <osgWidget/Util>
 #include <osgWidget/WindowManager>
 #include <osgWidget/ViewerEventHandlers>
+#include <osg/GraphicsContext>
 
 ViewBuilder::ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv)
 {
@@ -63,6 +64,26 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder)
   if (arguments->read("--freeMotion"))
   {
     freeMotion = true;
+  }
+
+  fullScreenNum = -1;
+  if (!arguments->read("--fullScreen", fullScreenNum) && arguments->read("--fullScreen"))
+  {
+    fullScreenNum = 0;
+  }
+  //is screen number is higher than any available screen, set it to the last one
+  if (fullScreenNum + 1 >= osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens())
+    fullScreenNum = osg::GraphicsContext::getWindowingSystemInterface()->getNumScreens() - 1;
+  if (fullScreenNum >= 0)
+  {
+    osg::GraphicsContext::ScreenSettings settings;
+    osg::GraphicsContext::ScreenIdentifier screen_id(fullScreenNum);
+    osg::GraphicsContext::getWindowingSystemInterface()->getScreenSettings(screen_id, settings);
+    if (settings.width > 0 && settings.height > 0)
+    {
+      reswidth = settings.width;
+      resheight = settings.height;
+    }
   }
 
   //Initialize viewer
@@ -213,5 +234,8 @@ void ViewBuilder::init()
 {
   OSG_INFO << "Creating application..." << std::endl;
 
-  viewer->setUpViewInWindow(50, 50, static_cast<int>(wm->getWidth()), static_cast<int>(wm->getHeight()));
+  if (fullScreenNum>=0)
+    viewer->setUpViewOnSingleScreen(fullScreenNum);
+  else
+    viewer->setUpViewInWindow(50, 50, static_cast<int>(wm->getWidth()), static_cast<int>(wm->getHeight()));
 }

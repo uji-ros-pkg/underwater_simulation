@@ -16,7 +16,7 @@
 osg::Quat InertialMeasurementUnit::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
-  osg::Matrixd *rMi = getWorldCoords(imu_node_);
+  boost::shared_ptr<osg::Matrix> rMi = getWorldCoords(imu_node_);
   osg::Matrixd lMi = *rMi * osg::Matrixd::inverse(rMl_);
 
   //Now add some gaussian noise

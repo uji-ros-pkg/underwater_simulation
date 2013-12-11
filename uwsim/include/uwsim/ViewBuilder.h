@@ -28,6 +28,7 @@ class ViewBuilder
 public:
   osg::ref_ptr<osgViewer::Viewer> viewer;
   boost::shared_ptr<osg::ArgumentParser> arguments;
+  int fullScreenNum;
 
 public:
   osg::ref_ptr<osgWidget::WindowManager> wm;

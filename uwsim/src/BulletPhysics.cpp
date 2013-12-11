@@ -39,7 +39,7 @@ public:
   virtual void setWorldTransform(const btTransform &worldTrans)
   {
     //Object initial position
-    osg::Matrixd * mat = getWorldCoords(transf->getParent(0));
+    boost::shared_ptr<osg::Matrix> mat = getWorldCoords(transf->getParent(0));
 
     //Get object position in matrixd
     osg::Matrixd worldMatrix;
