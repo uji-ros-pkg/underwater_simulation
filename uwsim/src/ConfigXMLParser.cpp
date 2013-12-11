@@ -364,8 +364,8 @@ void ConfigFile::processSLProjector(const xmlpp::Node* node, slProjector &slp)
       extractStringChar(child, slp.name);
     else if (child->get_name() == "fov")
       extractFloatChar(child, slp.fov);
-    else if (child->get_name() == "visible")
-      extractIntChar(child, slp.visible);
+    else if (child->get_name() == "laser")
+      extractIntChar(child, slp.laser);
     else if (child->get_name() == "image_name")
       extractStringChar(child, slp.image_name);
   }

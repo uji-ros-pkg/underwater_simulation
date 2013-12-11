@@ -22,19 +22,18 @@ public:
   std::string image_name;
   osg::ref_ptr<osg::Node> node;
   osg::ref_ptr<osg::Node> root;
-  double range; ///< Max projection range //TODO
+  double range; ///< Max projection range
   double fov; ///< Field of view
-  bool visible; ///< Whether to make the beam visible or not
   unsigned int textureUnit;
   osg::Texture2D* dbgDepthTexture;
   VirtualCamera camera;
 
   VirtualSLSProjector(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double fov,
-                      bool visible);
+                      bool laser);
   VirtualSLSProjector();
 
   virtual void init(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double range,
-                    double fov, bool visible);
+                    double fov, bool laser);
 };
 
 #endif

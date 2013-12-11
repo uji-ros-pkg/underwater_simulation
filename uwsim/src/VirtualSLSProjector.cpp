@@ -34,28 +34,26 @@ VirtualSLSProjector::VirtualSLSProjector()
   osg::ref_ptr < osg::Node > root = new osg::Node;
   std::string name = "SLSprojector";
   std::string image_name = "laser_texture.png";
-  double range = 0; //TODO: Not implemented
+  double range = 0; 
   double fov = 60.0;
-  bool visible = 1; //TODO: Not implemented
-  init(name, root, node, image_name, range, fov, visible);
+  init(name, root, node, image_name, range, fov, 0);
 }
 
 VirtualSLSProjector::VirtualSLSProjector(std::string name, osg::Node *root, osg::Node *node, std::string image_name,
-                                         double fov, bool visible)
+                                         double fov, bool laser)
 {
   double range = 0;
-  init(name, root, node, image_name, range, fov, visible);
+  init(name, root, node, image_name, range, fov, laser);
 }
 
 void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double range,
-                               double fov, bool visible)
+                               double fov, bool laser)
 {
   this->name = name;
   this->fov = fov;
   this->range = range;
   this->node = node;
   this->image_name = image_name;
-  this->visible = visible;
   this->textureUnit = 3; // It shouldn't be fixed
 
   //Create projected texture
@@ -88,6 +86,10 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
   osg::Uniform* u = new osg::Uniform("LightModelViewProjectionMatrix", lmvpm);
   u->setUpdateCallback(new UpdateLMVPM(camera.textureCamera));
   root->getOrCreateStateSet()->addUniform(u);
+
+  // add Laser uniform to change from laser to light behaviours
+  osg::Uniform* laserUniform = new osg::Uniform("isLaser", laser);
+  root->getOrCreateStateSet()->addUniform(laserUniform);
 
 }
 

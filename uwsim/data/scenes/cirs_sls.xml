@@ -178,8 +178,8 @@
       <name>laser_projector</name>
       <relativeTo>sls</relativeTo>
       <fov>64</fov>
-      <image_name>data/textures/laser_stripe_bin.png</image_name>
-      <visible>0</visible>
+      <image_name>data/textures/laser_stripe.png</image_name>
+      <laser>1</laser>
       <position>
         <x>0</x>
         <y>0</y>

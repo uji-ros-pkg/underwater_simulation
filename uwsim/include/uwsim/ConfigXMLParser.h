@@ -91,7 +91,7 @@ struct slProjector
   string image_name;
   double position[3], orientation[3];
   double fov;
-  int visible;
+  int laser;
   int link;
   void init()
   {
@@ -105,7 +105,7 @@ struct slProjector
     orientation[1] = 0;
     orientation[2] = 0;
     fov = 0;
-    visible = 0;
+    laser = 1;
   }
 };
 
