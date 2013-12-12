@@ -61,8 +61,8 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
   osg::Image* texture_to_project = osgDB::readImageFile(this->image_name);
   assert(texture_to_project);
   texture->setImage(texture_to_project);
-  texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER); // fa que la textura no es repeteixi continuament
-  texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER); // veure: http://lucera-project.blogspot.com.es/2010/06/opengl-wrap.html
+  texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER); // It makes texture not to repeat 
+  texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER); // F.M.I: http://lucera-project.blogspot.com.es/2010/06/opengl-wrap.html
   texture->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER);
   texture->setBorderColor(osg::Vec4d(0.0, 0.0, 0.0, 0.0));
   root->getOrCreateStateSet()->setTextureAttributeAndModes(4, texture, osg::StateAttribute::ON);

@@ -14,7 +14,7 @@
 
 #include "VirtualCamera.h"
 
-/**  Virtual range sensor that ... */
+/**  Virtual Structured Light sensor that Projects a light (laser or not) in the scene */
 class VirtualSLSProjector
 {
 public:
