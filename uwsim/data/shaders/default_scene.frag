@@ -108,10 +108,8 @@ void main()
 	{
 	  if(isLaser)//treating as laser projection (not dependent on the distance, substitutes original color)
 	  { 
-		if (texcolor.w>0.5) //Make binary alpha channel to allow transparency
-		{
-			textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
-		}
+		if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0)
+		  textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
 	  }
 	  else //treating as light projection (dependent on the distance, added to original color)
 		{
