@@ -1019,15 +1019,8 @@ void WorldToROSTF::publish()
 {
    for( int i = 0; i < iauvFile_.size(); i++ )
    {
-      std::vector<double> q = iauvFile_[i].get()->urdf->getJointPosition();
-      std::vector<std::string> names= iauvFile_[i].get()->urdf->getJointName();
-      std::map<std::string, double> js;
-      assert(names.size() == q.size());
-      for (size_t j = 0; j < names.size(); ++j)
-         js[names[j]] = q[j];
-  
       // Publish moving joints
-      robot_pubs_[i]->RobotStatePublisher::publishTransforms(js, getROSTime(), iauvFile_[i].get()->name);
+      robot_pubs_[i]->RobotStatePublisher::publishTransforms(iauvFile_[i].get()->urdf->getFullJointMap(), getROSTime(), iauvFile_[i].get()->name);
       // Publish fixed joints
       robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
       //Publish odometry

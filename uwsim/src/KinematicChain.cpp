@@ -171,8 +171,21 @@ std::vector<std::string> KinematicChain::getJointName()
   {
     if(jointType[i]!=0 && mimic[i].joint==i) 
       validq.push_back(names[i]);
-    }
+  }
   return validq;
+}
+
+std::map<std::string, double> KinematicChain::getFullJointMap()
+{
+  std::map<std::string, double> map;
+  for(int i=0;i<getNumberOfJoints();i++)
+  {
+    if (jointType[i] != 0)
+      map[names[i]]=q[mimic[i].joint];
+
+  }
+
+  return map;
 }
 
 KinematicChain::~KinematicChain()

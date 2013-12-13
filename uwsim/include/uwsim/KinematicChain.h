@@ -61,6 +61,7 @@ public:
   void setJointVelocity(std::vector<double> &qdot, std::vector<std::string> names = std::vector<std::string>());
   std::vector<double> getJointPosition();
   std::vector<std::string> getJointName();
+  std::map<std::string, double> getFullJointMap();  //Builds a map: name -> jointValue with all non-fixed joints (even mimic joints)
 
   /** Get the number of links */
   int getNumberOfLinks()
