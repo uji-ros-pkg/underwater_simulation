@@ -973,10 +973,12 @@ contactSensorToROS::~contactSensorToROS()
 }
 
 
-WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile, std::string worldRootName, unsigned int enableObjects, int rate ) :
+WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile,   std::vector<osg::ref_ptr<osg::Node> > objects, std::string worldRootName, unsigned int enableObjects, int rate ) :
     ROSPublisherInterface(worldRootName, rate)
 {
    iauvFile_ = iauvFile;
+   objects_ = objects;
+   rootNode_ = rootNode;
    for(int i = 0; i < iauvFile_.size(); i++)
    {
       KDL::Tree tree;
@@ -1012,11 +1014,13 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
 {   
-   odompub_ = boost::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
+   tfpub_ = boost::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
 }
 
 void WorldToROSTF::publish()
 {
+
+   //Publish vehicle frames
    for( int i = 0; i < iauvFile_.size(); i++ )
    {
       // Publish moving joints
@@ -1040,10 +1044,36 @@ void WorldToROSTF::publish()
          tf::Pose pose2(q2,p2);
          tf::StampedTransform t2(pose2, getROSTime(), "/"+iauvFile_[i].get()->name, "/"+iauvFile_[i].get()->name + "/base_link");
 
-         odompub_->sendTransform(t2);
-         odompub_->sendTransform(t);  
+         tfpub_->sendTransform(t2);
+         tfpub_->sendTransform(t);  
       }
    }
+
+   //Publish object frames
+   if(enableObjects_)
+   {
+
+     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(findRN("localizedWorld",rootNode_));
+     LWMat->invert(*LWMat);
+
+     for(unsigned int i=0;i<objects_.size();i++)
+     {
+       boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(objects_[i]);
+
+       osg::Matrixd  res=*objectMat * *LWMat;
+
+       tf::Vector3 p2(res.getTrans().x(), res.getTrans().y(), res.getTrans().z());
+       tf::Quaternion q2(res.getRotate().x(), res.getRotate().y(), res.getRotate().z(), res.getRotate().w());
+       tf::Pose pose2(q2,p2);
+       tf::StampedTransform t(pose2, getROSTime(),  "/" + worldRootName_, objects_[i]->getName());
+
+       tfpub_->sendTransform(t);
+     }
+
+   }
+
+
+
 }
 
 WorldToROSTF::~WorldToROSTF()

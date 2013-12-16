@@ -249,7 +249,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
     if (rosInterface.type == ROSInterfaceInfo::WorldToROSTF)
     {
       iface = boost::shared_ptr < WorldToROSTF
-          > (new WorldToROSTF(root, iauvFile, rosInterface.rootName, rosInterface.enableObjects, rosInterface.rate));
+          > (new WorldToROSTF(root, iauvFile, objects, rosInterface.rootName, rosInterface.enableObjects, rosInterface.rate));
 
     }
     if (rosInterface.type == ROSInterfaceInfo::ROSJointStateToArm
