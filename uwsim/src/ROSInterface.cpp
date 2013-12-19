@@ -741,7 +741,7 @@ void VirtualCameraToROSImage::publish()
       img_info.header.stamp = img.header.stamp = getROSTime();
       img_info.header.frame_id = img.header.frame_id = cam->frameId;
       if (depth)
-        img.encoding = std::string("mono16");
+        img.encoding = std::string("32FC1");
       else if (bw)
         img.encoding = std::string("mono8");
       else
@@ -750,6 +750,8 @@ void VirtualCameraToROSImage::publish()
       img.is_bigendian = 0;
       img.height = h;
       img.width = w;
+      if (bw)
+        d /=3;
       img.step = d / h;
       img.data.resize(d);
       img_info.width = w;
@@ -784,6 +786,11 @@ void VirtualCameraToROSImage::publish()
       img_info.binning_x = 0;
       img_info.binning_y = 0;
 
+      double fov, aspect, near, far;
+      cam->textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+      double a = far / (far - near);
+      double b = (far * near) / (near - far);
+
       //img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
 
       unsigned char *virtualdata = (unsigned char*)osgimage->data();
@@ -794,23 +801,30 @@ void VirtualCameraToROSImage::publish()
       if (virtualdata != NULL)
         for (int i = 0; i < h; i++)
         {
+          unsigned char *srcRow = virtualdata + i * img.step*(bw?3:1);
+          unsigned char *dstRow = img.data.data() + (h - i - 1) * img.step;
           for (unsigned int j = 0;
-              (!bw && !depth && j < img.step) || (bw && j * 3 < img.step) || (depth && j * 2 < img.step); j++)
+              (!depth && j < img.step) || (depth && j < w); j++)
           {
             if (bw)
             {
-              img.data[(h - i - 1) * img.step + j] = virtualdata[i * img.step + j * 3] * 0.2989;
-              img.data[(h - i - 1) * img.step + j] += virtualdata[i * img.step + j * 3 + 1] * 0.5870;
-              img.data[(h - i - 1) * img.step + j] += virtualdata[i * img.step + j * 3 + 2] * 0.1140;
+              dstRow[j] = srcRow[j * 3] * 0.2989;
+              dstRow[j] += srcRow[j * 3 + 1] * 0.5870;
+              dstRow[j] += srcRow[j * 3 + 2] * 0.1140;
             }
             else if (depth)
             {
-              img.data[(h - i - 1) * img.step + j] =
-                  j % 2 ? virtualdata[i * img.step + j * 2] : virtualdata[i * img.step + j * 2 + 1];
-              //img.data[(h-i-1)*img.step+j]+=virtualdata[i*img.step+j*2+1];
+              float D = b / (((float*)srcRow)[j] - a);
+              if (D == far)
+                D = INFINITY;
+              else if (D == near)
+                D = -INFINITY;
+              else if (!isfinite(D) || D < near || D > far)
+                D = NAN;
+              ((float*)dstRow)[j] = D;
             }
             else
-              img.data[(h - i - 1) * img.step + j] = virtualdata[i * img.step + j];
+              dstRow[j] = srcRow[j];
           }
         }
       else
@@ -820,7 +834,7 @@ void VirtualCameraToROSImage::publish()
       pub_.publish(img_info);
     }
   }
-  //OSG_DEBUG << "OSGImageToROSImage::publish exit" << std::endl;		
+  //OSG_DEBUG << "OSGImageToROSImage::publish exit" << std::endl;
 }
 
 VirtualCameraToROSImage::~VirtualCameraToROSImage()
