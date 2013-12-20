@@ -3,14 +3,17 @@ project(uwsim)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  sensor_msgs
-  nav_msgs
   image_transport
+  kdl_parser
+  nav_msgs
   pluginlib
-  urdf
-  underwater_sensor_msgs
   resource_retriever
+  robot_state_publisher
   roscpp
+  sensor_msgs
+  tf
+  underwater_sensor_msgs
+  urdf
 )
 
 find_package(uwsim_osgocean REQUIRED)
@@ -24,23 +27,25 @@ catkin_package(
     uwsim
   CATKIN_DEPENDS
     geometry_msgs
-    sensor_msgs
-    nav_msgs
     image_transport
+    kdl_parser
+    nav_msgs
     pluginlib
-    urdf
-    underwater_sensor_msgs
     resource_retriever
+    robot_state_publisher
     roscpp
+    sensor_msgs
+    tf
+    underwater_sensor_msgs
+    urdf
   DEPENDS
-    libxml++-2.6
     boost
-    opengl
     libopenscenegraph
+    libxml++-2.6
+    opengl
+    uwsim_bullet
     uwsim_osgocean
     uwsim_osgworks
-    uwsim_osgocean
-    uwsim_bullet
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
@@ -59,6 +64,8 @@ find_package(PkgConfig)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
 INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+
+link_directories(${orocos_kdl_LIBRARY_DIRS})
 
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")

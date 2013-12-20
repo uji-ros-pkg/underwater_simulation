@@ -26,128 +26,246 @@ using namespace std;
 #include <cstdlib>
 #include <list>
 
-struct ROSInterfaceInfo{
-  typedef enum {Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage, RangeSensorToROSRange,ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS, DVLSensorToROS, RangeImageSensorToROSImage,multibeamSensorToLaserScan,SimulatedDevice, contactSensorToROS} type_t;
+struct ROSInterfaceInfo
+{
+  typedef enum
+  {
+    Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage,
+    RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS,
+    DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS, WorldToROSTF
+  } type_t;
   string subtype; //type of a SimulatedDevice
   std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
-  string topic, infoTopic, targetName;
+  string topic, infoTopic, targetName, rootName;
   type_t type; //Type of ROSInterface
   int rate; //if it's necessary
   unsigned int w, h; //width and height if necessary
-  unsigned int posx, posy, depth, blackWhite; ///< default (x,y) position of the widget if necessary, blackWhite camera
+  unsigned int posx, posy, depth, blackWhite, enableObjects; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
   int visualize; ///< If 1, enable visualization of the data. 0 by default
   double color[3]; // visualization color in rosodomtopat waypoints
 };
 
-struct Parameters{
-  double fx,fy,x0,y0,f,n,k;
+struct Parameters
+{
+  double fx, fy, x0, y0, f, n, k;
 };
 
-struct Vcam{
+struct Vcam
+{
   string name;
   string linkName, roscam, roscaminfo;
   std::string frameId; ///Frame Id for stereo camera images
-  int resw,resh,link,range,bw;
+  int resw, resh, link, range, bw;
   double showpath;
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   double baseLine; ///baseline for stereo cameras
   boost::shared_ptr<Parameters> parameters;
-  void init(){name="";linkName="";roscam="";roscaminfo="";resw=160;resh=120;position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0; baseLine=0.0; frameId=""; showpath=0; parameters.reset();range=0;bw=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    roscam = "";
+    roscaminfo = "";
+    resw = 160;
+    resh = 120;
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+    baseLine = 0.0;
+    frameId = "";
+    showpath = 0;
+    parameters.reset();
+    range = 0;
+    bw = 0;
+  }
 };
 
-struct slProjector {
+struct slProjector
+{
   string name;
   string linkName;
   string image_name;
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   double fov;
-  int visible;
+  int laser;
   int link;
-  void init(){name="";linkName="";image_name="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;fov=0;visible=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    image_name = "";
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+    fov = 0;
+    laser = 1;
+  }
 };
 
-struct rangeSensor {
+struct rangeSensor
+{
   string name;
   string linkName;
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   double range;
   int visible;
   int link;
-  void init(){name="";linkName="";position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;range=0;visible=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+    range = 0;
+    visible = 0;
+  }
 };
 
-struct Imu {
+struct Imu
+{
   string name;
   string linkName;
   double std; //standard deviation
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   int link;
-  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    std = 0.0;
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
 };
 
-struct XMLPressureSensor {
+struct XMLPressureSensor
+{
   string name;
   string linkName;
   double std; //standard deviation
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   int link;
-  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    std = 0.0;
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
 };
 
-struct XMLGPSSensor {
+struct XMLGPSSensor
+{
   string name;
   string linkName;
   double std; //standard deviation
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   int link;
-  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    std = 0.0;
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
 };
 
-struct XMLDVLSensor {
+struct XMLDVLSensor
+{
   string name;
   string linkName;
   double std; //standard deviation
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   int link;
-  void init(){name="";linkName=""; std=0.0; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+  void init()
+  {
+    name = "";
+    linkName = "";
+    std = 0.0;
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
 };
 
-struct XMLMultibeamSensor {
+struct XMLMultibeamSensor
+{
   string name;
   string linkName;
-  double position[3],orientation[3];
+  double position[3], orientation[3];
   int link;
-  double initAngle,finalAngle,angleIncr,range;
-  void init(){name="";linkName=""; position[0]=0;position[1]=0;position[2]=0;orientation[0]=0;orientation[1]=0;orientation[2]=0;}
+  double initAngle, finalAngle, angleIncr, range;
+  void init()
+  {
+    name = "";
+    linkName = "";
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
 };
 
-struct Mimic{
+struct Mimic
+{
   string jointName;
-  double offset,multiplier;
+  double offset, multiplier;
 };
 
-struct Geometry{
+struct Geometry
+{
   int type; //Related to geometry, 0: mesh from file, 1:box, 2:cylinder, 3:sphere, 4:NoVisual
   double boxSize[3]; //only used in box type
   double length, radius; //only used in cylinder and sphere types
   string file; // only used in mesh type
 };
 
-struct Link{
+struct Link
+{
   string name;
   double position[3];
   double rpy[3];
   double quat[4];
-  int material;
+  std::string material;
   boost::shared_ptr<Geometry> cs, geom;
 };
 
-struct Joint{
+struct Joint
+{
   string name;
   int parent, child; //references to Link
-  int mimicp,type; //0 fixed, 1 rotation, 2 prismatic.
-  float lowLimit,upLimit;
+  int mimicp, type; //0 fixed, 1 rotation, 2 prismatic.
+  float lowLimit, upLimit;
   boost::shared_ptr<Mimic> mimic;
   double position[3];
   double rpy[3];
@@ -155,23 +273,24 @@ struct Joint{
   double quat[4];
 };
 
-struct Material{
+struct Material
+{
   string name;
-  double r,g,b,a;
+  double r, g, b, a;
 };
 
-struct Vehicle{
+struct Vehicle
+{
   string name;
   std::vector<Link> links;
   std::vector<Joint> joints;
   int nlinks;
   int njoints;
   int ninitJoints;
-  int nmaterials;
   double position[3];
   double orientation[3];
   std::vector<double> jointValues;
-  std::vector<Material> materials;
+  std::map<std::string, Material> materials;
   std::list<Vcam> Vcams;
   std::list<Vcam> VRangecams;
   std::list<slProjector> sls_projectors;
@@ -182,9 +301,11 @@ struct Vehicle{
   std::list<XMLDVLSensor> dvl_sensors;
   std::list<XMLMultibeamSensor> multibeam_sensors;
   std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
+  std::string URDFFile;
 };
 
-struct PhysicProperties{
+struct PhysicProperties
+{
   double mass;
   double inertia[3];
   double linearDamping;
@@ -194,12 +315,37 @@ struct PhysicProperties{
   double minAngularLimit[3];
   double maxAngularLimit[3];
   int isKinematic;
-  std::string csType,cs;
-  void init(){mass=1;inertia[0]=0;inertia[1]=0;inertia[2]=0;csType="box";cs="";linearDamping=0;angularDamping=0;minLinearLimit[0]=1;minLinearLimit[1]=1;minLinearLimit[2]=1;maxLinearLimit[0]=0;maxLinearLimit[1]=0;maxLinearLimit[2]=0;isKinematic=0;minAngularLimit[0]=1;minAngularLimit[1]=1;minAngularLimit[2]=1;maxAngularLimit[0]=0;maxAngularLimit[1]=0;maxAngularLimit[2]=0;};
+  std::string csType, cs;
+  void init()
+  {
+    mass = 1;
+    inertia[0] = 0;
+    inertia[1] = 0;
+    inertia[2] = 0;
+    csType = "box";
+    cs = "";
+    linearDamping = 0;
+    angularDamping = 0;
+    minLinearLimit[0] = 1;
+    minLinearLimit[1] = 1;
+    minLinearLimit[2] = 1;
+    maxLinearLimit[0] = 0;
+    maxLinearLimit[1] = 0;
+    maxLinearLimit[2] = 0;
+    isKinematic = 0;
+    minAngularLimit[0] = 1;
+    minAngularLimit[1] = 1;
+    minAngularLimit[2] = 1;
+    maxAngularLimit[0] = 0;
+    maxAngularLimit[1] = 0;
+    maxAngularLimit[2] = 0;
+  }
+  ;
 };
 
-struct Object{
-  string name,file;
+struct Object
+{
+  string name, file;
   double position[3];
   double orientation[3];
   double offsetp[3];
@@ -207,25 +353,36 @@ struct Object{
   boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
-struct PhysicsWater{
+struct PhysicsWater
+{
   int enable;
   double position[3];
   double resolution;
   double size[6];
-  void init(){enable=0;resolution=0.25;position[0]=position[1]=position[2]=0;size[0]=size[2]=size[4]=-10;size[1]=size[3]=size[5]=10;};
+  void init()
+  {
+    enable = 0;
+    resolution = 0.25;
+    position[0] = position[1] = position[2] = 0;
+    size[0] = size[2] = size[4] = -10;
+    size[1] = size[3] = size[5] = 10;
+  }
+  ;
 };
 
-class ConfigFile{
-public://made process and extract methods public to be used in Simulated Devices implementations
+class ConfigFile
+{
+public:
+  //made process and extract methods public to be used in Simulated Devices implementations
 
-  void esPi(string in,double &param);
+  void esPi(string in, double &param);
 
-  void extractFloatChar(const xmlpp::Node* node,double &param);
-  void extractIntChar(const xmlpp::Node* node,int &param);
+  void extractFloatChar(const xmlpp::Node* node, double &param);
+  void extractIntChar(const xmlpp::Node* node, int &param);
   void extractUIntChar(const xmlpp::Node* node, unsigned int &param);
-  void extractStringChar(const xmlpp::Node* node,string &param);
-  void extractPositionOrColor(const xmlpp::Node* node,double param[3]);
-  void extractOrientation(const xmlpp::Node* node,double param[3]);
+  void extractStringChar(const xmlpp::Node* node, string &param);
+  void extractPositionOrColor(const xmlpp::Node* node, double param[3]);
+  void extractOrientation(const xmlpp::Node* node, double param[3]);
 
   void processFog(const xmlpp::Node* node);
   void processOceanState(const xmlpp::Node* node);
@@ -251,25 +408,30 @@ public://made process and extract methods public to be used in Simulated Devices
   void processXML(const xmlpp::Node* node);
 
   void processGeometry(urdf::Geometry * geometry, Geometry * geom);
-  void processPose(urdf::Pose pose,double position[3], double rpy[3],double quat[4]);
-  int processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link, int nmat, std::vector<Material> &materials); //returns current material
-  void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle,int parentLink,int childLink);
-  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint, int nmat, std::vector<Material> &materials); //returns current link number
+  void processPose(urdf::Pose pose, double position[3], double rpy[3], double quat[4]);
+  void processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link,
+                     std::map<std::string, Material> &materials);
+  void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle, int parentLink, int childLink);
+  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint,
+                  std::map<std::string, Material> &materials); //returns current link number
   int processURDFFile(string file, Vehicle &vehicle);
 
   void postprocessVehicle(Vehicle &vehicle);
 
 public:
-  double windx, windy,windSpeed,depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight, oceanSurfaceHeight,fogDensity;
-  int isNotChoppy, disableShaders, eye_in_hand,freeMotion,resw,resh,enablePhysics ;
+  double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
+         oceanSurfaceHeight, fogDensity;
+  int isNotChoppy, disableShaders, eye_in_hand, freeMotion, resw, resh, enablePhysics;
   string arm, vehicleToTrack;
-  double camPosition[3],camLookAt[3],fogColor[3],color[3],attenuation[3], offsetr[3], offsetp[3],gravity[3];
+  double camPosition[3], camLookAt[3], fogColor[3], color[3], attenuation[3], offsetr[3], offsetp[3], gravity[3];
   double camFov, camAspectRatio, camNear, camFar;
-  list <Vehicle> vehicles;
-  list <Object> objects;
-  list <ROSInterfaceInfo> ROSInterfaces;
-  list <ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
+  list<Vehicle> vehicles;
+  list<Object> objects;
+  list<ROSInterfaceInfo> ROSInterfaces;
+  list<ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   PhysicsWater physicsWater;
+  double physicsFrequency;
+  int physicsSubSteps;
 
   ConfigFile(const std::string &fName);
 };

@@ -23,32 +23,36 @@
 #include "ConfigXMLParser.h"
 #include "SceneBuilder.h"
 
-class ViewBuilder 
+class ViewBuilder
 {
 public:
-	osg::ref_ptr<osgViewer::Viewer> viewer;
-	boost::shared_ptr<osg::ArgumentParser> arguments;
+  osg::ref_ptr<osgViewer::Viewer> viewer;
+  boost::shared_ptr<osg::ArgumentParser> arguments;
+  int fullScreenNum;
 
 public:
-	osg::ref_ptr<osgWidget::WindowManager> wm;
-	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder);
-	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv);
-	ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, boost::shared_ptr<osg::ArgumentParser> args);
+  osg::ref_ptr<osgWidget::WindowManager> wm;
+  ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder);
+  ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv);
+  ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, boost::shared_ptr<osg::ArgumentParser> args);
 
-	osgViewer::View* getView() {return viewer.get();}
-	osgViewer::Viewer* getViewer() {return viewer.get();}
-	void init();
+  osgViewer::View* getView()
+  {
+    return viewer.get();
+  }
+  osgViewer::Viewer* getViewer()
+  {
+    return viewer.get();
+  }
+  void init();
 
-	~ViewBuilder() {}
+  ~ViewBuilder()
+  {
+  }
 
 protected:
-	bool init(ConfigFile &config, SceneBuilder *scene_builder);
+  bool init(ConfigFile &config, SceneBuilder *scene_builder);
 };
 
-
-
 #endif
-
-
-
 

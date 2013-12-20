@@ -8,7 +8,7 @@
  * Contributors:
  *     Mario Prats
  *     Javier Perez
- */ 
+ */
 
 #include "osgPCDLoader.h"
 

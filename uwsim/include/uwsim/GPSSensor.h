@@ -21,40 +21,47 @@
 #include <boost/random.hpp>
 #include "osgOceanScene.h"
 
-class GPSSensor {
+class GPSSensor
+{
 
 public:
-    std::string name;
+  std::string name;
 
-    /** Constructor
-     * @param name the name of the pressure sensor
-     * @param parent the node of the scene graph that holds the sensor
-     * @param rMl the sensor measures are given with respect to the root (r). Use rMl to transform them to another frame ('l' is the new frame, typically the localized world)
-     * @param std the standard deviation on the sensor measures
-     */
-    GPSSensor(osgOceanScene *oscene, std::string sensor_name, osg::Node *parent, osg::Matrixd rMl, double std=0): name(sensor_name), oscene_(oscene), parent_(parent), rMl_(rMl), std_(std) {
-    	node_=new osg::Node();
-    	parent->asGroup()->addChild(node_);
-    }
+  /** Constructor
+   * @param name the name of the pressure sensor
+   * @param parent the node of the scene graph that holds the sensor
+   * @param rMl the sensor measures are given with respect to the root (r). Use rMl to transform them to another frame ('l' is the new frame, typically the localized world)
+   * @param std the standard deviation on the sensor measures
+   */
+  GPSSensor(osgOceanScene *oscene, std::string sensor_name, osg::Node *parent, osg::Matrixd rMl, double std = 0) :
+      name(sensor_name), oscene_(oscene), parent_(parent), rMl_(rMl), std_(std)
+  {
+    node_ = new osg::Node();
+    parent->asGroup()->addChild(node_);
+  }
 
-    osg::Vec3d getMeasurement();
+  osg::Vec3d getMeasurement();
 
-    double getStandardDeviation() {return std_;}
+  double getStandardDeviation()
+  {
+    return std_;
+  }
 
-    /** Returns the depth of the sensor (in meters) under the water*/
-    double depthBelowWater();
+  /** Returns the depth of the sensor (in meters) under the water*/
+  double depthBelowWater();
 
-    virtual ~GPSSensor() {}
+  virtual ~GPSSensor()
+  {
+  }
 
 private:
-    osg::ref_ptr<osgOceanScene> oscene_;
-    osg::ref_ptr<osg::Node> parent_;
-    osg::Matrixd rMl_;
-    double std_;
-    osg::ref_ptr<osg::Node> node_;
+  osg::ref_ptr<osgOceanScene> oscene_;
+  osg::ref_ptr<osg::Node> parent_;
+  osg::Matrixd rMl_;
+  double std_;
+  osg::ref_ptr<osg::Node> node_;
 
-    boost::mt19937 rng_; ///< Boost random number generator
+  boost::mt19937 rng_; ///< Boost random number generator
 };
-
 
 #endif /* GPSSENSOR_H_ */
