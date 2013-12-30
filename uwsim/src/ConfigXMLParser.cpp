@@ -235,6 +235,13 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
       extractFloatChar(child, physicsFrequency);
     else if (child->get_name() == "physicsSubSteps")
       extractIntChar(child, physicsSubSteps);
+    else if (child->get_name() == "showTrajectory")
+    {
+      ShowTrajectory aux;
+      aux.init();
+      processShowTrajectory(child, aux);
+      trajectories.push_back(aux);
+    }
   }
 }
 
@@ -272,6 +279,21 @@ void ConfigFile::processSize(const xmlpp::Node* node)
     else if (child->get_name() == "maxZ")
       extractFloatChar(child, physicsWater.size[5]);
 
+  }
+}
+
+void ConfigFile::processShowTrajectory(const xmlpp::Node* node, ShowTrajectory & trajectory)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "target")
+      extractStringChar(child, trajectory.target);
+    else if (child->get_name() == "color")
+      extractPositionOrColor(child, trajectory.color);
+    else if (child->get_name() == "lineStyle")
+      extractIntChar(child, trajectory.lineStyle);
   }
 }
 
@@ -1226,10 +1248,6 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &
     }
     else if (child->get_name() == "scale")
       extractFloatChar(child, rosInterface.scale);
-    else if (child->get_name() == "visualize")
-      extractIntChar(child, rosInterface.visualize);
-    else if (child->get_name() == "color")
-      extractPositionOrColor(child, rosInterface.color);
     else if (child->get_name() == "text")
     {
     } //we ignore this as whitespace is treated as a whole child element}
@@ -1250,13 +1268,11 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
     rosInterface.rate = 10; //Default rate
     rosInterface.posx = rosInterface.posy = 0;
     rosInterface.scale = 1;
-    rosInterface.visualize = 0;
     rosInterface.type = ROSInterfaceInfo::Unknown;
     rosInterface.depth = 0;
     if (child->get_name() == "ROSOdomToPAT")
     {
       rosInterface.type = ROSInterfaceInfo::ROSOdomToPAT;
-      rosInterface.color[0] = rosInterface.color[1] = rosInterface.color[2] = 1;
     }
     else if (child->get_name() == "PATToROSOdom")
     {

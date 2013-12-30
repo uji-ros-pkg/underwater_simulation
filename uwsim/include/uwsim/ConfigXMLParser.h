@@ -42,8 +42,6 @@ struct ROSInterfaceInfo
   unsigned int w, h; //width and height if necessary
   unsigned int posx, posy, depth, blackWhite, enableObjects; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
-  int visualize; ///< If 1, enable visualization of the data. 0 by default
-  double color[3]; // visualization color in rosodomtopat waypoints
 };
 
 struct Parameters
@@ -370,6 +368,19 @@ struct PhysicsWater
   ;
 };
 
+struct ShowTrajectory
+{
+  std::string target;
+  double color[3];
+  int lineStyle;
+  void init()
+  {
+    target="";
+    color[0]= 1; color[1]= 0; color[2] = 0;
+    lineStyle=1;
+  }
+};
+
 class ConfigFile
 {
 public:
@@ -389,6 +400,7 @@ public:
   void processSimParams(const xmlpp::Node* node);
   void processPhysicsWater(const xmlpp::Node* node);
   void processSize(const xmlpp::Node* node);
+  void processShowTrajectory(const xmlpp::Node* node, ShowTrajectory & trajectory);
   void processParameters(const xmlpp::Node*, Parameters *params);
   void processVcam(const xmlpp::Node* node, Vcam &vcam);
   void processSLProjector(const xmlpp::Node* node, slProjector &slp);
@@ -429,6 +441,7 @@ public:
   list<Object> objects;
   list<ROSInterfaceInfo> ROSInterfaces;
   list<ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
+  list<ShowTrajectory> trajectories;
   PhysicsWater physicsWater;
   double physicsFrequency;
   int physicsSubSteps;
