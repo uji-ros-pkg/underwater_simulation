@@ -1006,6 +1006,7 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
       }
       
       osg::ref_ptr<osg::MatrixTransform> transform;
+      nh_.setParam("tf_prefix", iauvFile_[i].get()->name);
       robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
        new robot_state_publisher::RobotStatePublisher(tree)));
   
@@ -1037,6 +1038,7 @@ void WorldToROSTF::publish()
    //Publish vehicle frames
    for( int i = 0; i < iauvFile_.size(); i++ )
    {
+      nh_.setParam("tf_prefix", iauvFile_[i].get()->name);
       // Publish moving joints
       robot_pubs_[i]->publishTransforms(iauvFile_[i].get()->urdf->getFullJointMap(), getROSTime());
       // Publish fixed joints
