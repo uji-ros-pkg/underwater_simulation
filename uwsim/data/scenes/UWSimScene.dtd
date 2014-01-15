@@ -2,7 +2,7 @@
 
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
-<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsWater?)>
+<!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsWater?,showTrajectory*)>
 <!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?, parameters?, showpath?,grayscale?)>
 <!ELEMENT virtualRangeImage (name,relativeTo,resw?,resh?,position?,orientation?,parameters?)>
@@ -57,6 +57,9 @@
 <!ELEMENT eye_in_hand (#PCDATA)>
 <!ELEMENT resw (#PCDATA)>
 <!ELEMENT resh (#PCDATA)>
+<!ELEMENT showTrajectory (target,color?,lineStyle?)>
+<!ELEMENT lineStyle (#PCDATA)>
+<!ELEMENT target (#PCDATA)>
 <!ELEMENT enablePhysics (#PCDATA)>
 <!ELEMENT gravity (x,y,z)>
 <!ELEMENT physicsWater (size,position,resolution)>
@@ -115,7 +118,7 @@
 <!ELEMENT joint (#PCDATA)>
 
 <!-- elementos rosinterfaces -->
-<!ELEMENT ROSOdomToPAT (topic,vehicleName, visualize?)>
+<!ELEMENT ROSOdomToPAT (topic,vehicleName)>
 <!ELEMENT PATToROSOdom  (topic, vehicleName, rate?)>
 <!ELEMENT WorldToROSTF  (rootName, enableObjects?, rate?)>
 <!ELEMENT ArmToROSJointState  (topic, vehicleName, rate?)>
@@ -145,7 +148,6 @@
 <!ELEMENT cameraName (#PCDATA)>
 <!ELEMENT imageTopic (#PCDATA)>
 <!ELEMENT infoTopic (#PCDATA)>
-<!ELEMENT visualize (#PCDATA)>
 <!ELEMENT rootName (#PCDATA)>
 <!ELEMENT enableObjects (#PCDATA)>
 

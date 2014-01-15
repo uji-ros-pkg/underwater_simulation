@@ -103,6 +103,17 @@ public:
             (draw_frames_) ? node_list[i]->asSwitch()->setAllChildrenOn() :
                 node_list[i]->asSwitch()->setAllChildrenOff();
         }
+        else if (ea.getKey() == 't')
+        {
+          //Search for 'switch_trajectory' nodes and toggle their values
+          findNodeVisitor finder("switch_trajectory");
+          _scene->localizedWorld->accept(finder);
+          std::vector<osg::Node*> node_list = finder.getNodeList();
+          (draw_frames_) ? draw_frames_ = false : draw_frames_ = true;
+          for (unsigned int i = 0; i < node_list.size(); i++)
+            (draw_frames_) ? node_list[i]->asSwitch()->setAllChildrenOn() :
+                node_list[i]->asSwitch()->setAllChildrenOff();
+        }
         else if (ea.getKey() == 'r')
         {
           //search catchable objects and get them back to their original positions
@@ -134,13 +145,7 @@ public:
             callback->picked = false;
           }
 
-          //Search for ROSOdomToPAT to restart waypoints
-          for (unsigned int i = 0; i < _ROSInterfaces.size(); i++)
-          {
-            ROSOdomToPAT * iface = dynamic_cast<ROSOdomToPAT *>(_ROSInterfaces[i].get());
-            if (iface)
-              iface->clearWaypoints();
-          }
+          //Search for trajectory updaters and clearwaypoints?
         }
 
       }

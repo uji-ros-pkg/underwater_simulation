@@ -119,19 +119,8 @@ class ROSOdomToPAT : public ROSSubscriberInterface
   ros::WallTime last;
   int started;
 
-  bool trajectory_initialized;
-  bool enable_visualization;
-  double max_waypoint_distance;
-  osg::PrimitiveSet *prset;
-  osg::Vec3Array *trajectory_points;
-  osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
-  osg::ref_ptr<osg::Geometry> trajectory;
-
 public:
-  ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, double color[3], int visualization = 0,
-               double max_waypoint_distance = 0.1);
-
-  void clearWaypoints(void);
+  ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName);
 
   virtual void createSubscriber(ros::NodeHandle &nh);
 
