@@ -47,8 +47,7 @@ ROSSubscriberInterface::~ROSSubscriberInterface()
   join();
 }
 
-ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName, double col[3],
-                           int visualization, double max_waypoint_distance) :
+ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string vehicleName) :
     ROSSubscriberInterface(topic)
 {
   findNodeVisitor findNode(vehicleName);
@@ -63,66 +62,6 @@ ROSOdomToPAT::ROSOdomToPAT(osg::Group *rootNode, std::string topic, std::string 
     transform = dynamic_cast<osg::MatrixTransform*>(first);
   }
   started = 0; //Used in time
-  trajectory_initialized = false;
-  this->max_waypoint_distance = max_waypoint_distance;
-  enable_visualization = (visualization >= 1);
-
-  if (enable_visualization)
-  {
-    trajectory_points = new osg::Vec3Array;
-    trajectory_points->push_back(osg::Vec3(0, 0, 0));
-    trajectory = osg::ref_ptr < osg::Geometry > (new osg::Geometry());
-    trajectory->setVertexArray(trajectory_points);
-
-    osg::Vec4Array* colors = new osg::Vec4Array;
-    colors->push_back(osg::Vec4f(col[0], col[1], col[2], 1.0f));
-    trajectory->setColorArray(colors);
-    trajectory->setColorBinding(osg::Geometry::BIND_OVERALL);
-    prset = new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP);
-    trajectory->addPrimitiveSet(prset);
-    trajectory->setUseDisplayList(false);
-
-    geode = osg::ref_ptr < osg::Geode > (new osg::Geode());
-    geode->addDrawable(trajectory);
-    osg::LineWidth* linewidth = new osg::LineWidth();
-    linewidth->setWidth(4.0f);
-
-    //stipple for dashed lines:
-    if (visualization > 1)
-    {
-      osg::LineStipple* linestipple = new osg::LineStipple;
-      linestipple->setFactor(1);
-      if (visualization == 2)
-        linestipple->setPattern(0xf0f0);
-      if (visualization == 3)
-        linestipple->setPattern(0xff00);
-      if (visualization == 4)
-        linestipple->setPattern(0xf000);
-      geode->getOrCreateStateSet()->setAttributeAndModes(linestipple, osg::StateAttribute::ON);
-    }
-
-    //Attach the trajectory to the localizedWorld node
-    findNodeVisitor finder("localizedWorld");
-    rootNode->accept(finder);
-    std::vector<osg::Node*> node_list = finder.getNodeList();
-
-    geode->getOrCreateStateSet()->setAttributeAndModes(linewidth, osg::StateAttribute::ON);
-    const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
-    osgDB::Registry::instance()->getDataFilePathList().push_back(
-        std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
-    static const char model_vertex[] = "default_scene.vert";
-    static const char model_fragment[] = "default_scene.frag";
-
-    osg::ref_ptr < osg::Program > program = osgOcean::ShaderManager::instance().createProgram("robot_shader",
-                                                                                              model_vertex,
-                                                                                              model_fragment, "", "");
-    program->addBindAttribLocation("aTangent", 6);
-
-    geode->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
-    geode->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
-    geode->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
-    node_list[0]->asGroup()->addChild(geode);
-  }
 }
 
 void ROSOdomToPAT::createSubscriber(ros::NodeHandle &nh)
@@ -150,30 +89,6 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom)
       sMsv_osg.setRotate(
           osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z,
                     odom->pose.pose.orientation.w));
-
-      //Store trajectory
-      if (enable_visualization)
-      {
-        if (trajectory_initialized)
-        {
-          if ((trajectory_points->back() - sMsv_osg.getTrans()).length() > max_waypoint_distance)
-          {
-            trajectory_points->push_back(
-                osg::Vec3(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z));
-            trajectory->setVertexArray(trajectory_points);
-            ((osg::DrawArrays*)prset)->setFirst(0);
-            ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
-            std::cerr << "Trajectory_points size: " << trajectory_points->size() << std::endl;
-          }
-        }
-        else
-        {
-          trajectory_points->clear();
-          trajectory_points->push_back(
-              osg::Vec3(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z));
-          trajectory_initialized = true;
-        }
-      }
     }
     else
     {
@@ -207,14 +122,6 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom)
     }
     transform->setMatrix(sMsv_osg);
   }
-}
-
-void ROSOdomToPAT::clearWaypoints()
-{
-  trajectory_points->clear();
-  ((osg::DrawArrays*)prset)->setFirst(0);
-  ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
-  trajectory_initialized = false;
 }
 
 ROSOdomToPAT::~ROSOdomToPAT()

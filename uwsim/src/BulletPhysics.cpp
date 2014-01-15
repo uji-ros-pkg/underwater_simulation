@@ -16,6 +16,62 @@
 unsigned int vehicleCollidesWith(COL_OBJECTS);
 unsigned int objectsCollidesWith(COL_EVERYTHING);
 
+//This motion state just keeps track of another btObject (used for force sensors)
+class MirrorMotionState : public btMotionState
+{
+public:
+  MirrorMotionState(btRigidBody * copied)
+  {
+    copy=copied;
+  }
+
+  virtual void getWorldTransform(btTransform &worldTrans) const
+  {
+     copy->getMotionState()->getWorldTransform(worldTrans);
+  }
+
+  virtual void setWorldTransform(const btTransform &worldTrans)
+  {
+    //There is no need to do nothing as there is no real object
+  }
+
+protected:
+  btRigidBody * copy;
+
+};
+
+//Copies a bullet body with it's physical properties. (used for force sensors)
+btRigidBody* BulletPhysics::copyObject(btRigidBody * copied)
+{
+
+  btVector3 inertia;
+  copied->getCollisionShape()->calculateLocalInertia(1.0/copied->getInvMass(), inertia);
+
+  MirrorMotionState* motion = new MirrorMotionState(copied);
+  btRigidBody::btRigidBodyConstructionInfo rb(1.0/copied->getInvMass(), motion,copied->getCollisionShape(),inertia);  //inertia should be copied too
+  btRigidBody* body = new btRigidBody(rb);
+
+  CollisionDataType * colData = new CollisionDataType("copied", "copied", 1);
+  body->setUserPointer(colData);
+
+  //Restrictions are not being copied
+
+  body->setDamping(copied->getLinearDamping(), copied->getAngularDamping());
+
+  //addRigidBody adds its own collision masks, changing after object creation do not update masks so objects are removed and readded in order to update masks to improve collisions performance.
+  dynamicsWorld->addRigidBody(body);
+
+  //We suppose it's a vehicle
+  dynamicsWorld->btCollisionWorld::removeCollisionObject(body);
+  dynamicsWorld->addCollisionObject(body, short(COL_VEHICLE), short(vehicleCollidesWith));
+
+  body->setActivationState(DISABLE_DEACTIVATION);
+
+
+  return (body);
+}
+
+
 class MyMotionState : public btMotionState
 {
 public:
@@ -71,7 +127,9 @@ void BulletPhysics::stepSimulation(btScalar timeStep, int maxSubSteps = 1,
   //cleanManifolds();
   if (fluid)
     updateOceanSurface();
+  physicsStep=1; //Keeps track of ongoing physics processing.
   ((btDynamicsWorld*)dynamicsWorld)->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
+  physicsStep=0;
 }
 
 void BulletPhysics::printManifolds()

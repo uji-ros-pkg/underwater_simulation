@@ -1,8 +1,8 @@
 # Dynamics model parameters for G500
 
 g500/num_actuators: 5
-g500/dynamics/period: 0.01
-g500/dynamics/uwsim_period: 0.05
+g500/dynamics/period: 0.001
+g500/dynamics/uwsim_period: 0.001
 g500/dynamics/mass: 98.0
 g500/dynamics/gravity_center: [0.0, 0.0, 0.05]
 g500/dynamics/g: 9.81

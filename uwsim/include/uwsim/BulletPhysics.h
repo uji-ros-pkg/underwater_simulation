@@ -99,6 +99,9 @@ public:
 
   int getNumCollisions();
 
+  btRigidBody* copyObject(btRigidBody * copied);
+  int physicsStep;
+
   btPersistentManifold * getCollision(int i);
 
   ~BulletPhysics()
