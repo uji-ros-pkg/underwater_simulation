@@ -48,6 +48,9 @@
       <z> -1.57 </z>
     </offsetr>
     <enablePhysics> 1 </enablePhysics>
+    <showTrajectory>
+      <target>girona500</target>
+    </showTrajectory>
   </simParams>
   <camera>
     <freeMotion> 1 </freeMotion>
@@ -334,7 +337,6 @@
     <ROSOdomToPAT>
       <topic> /dataNavigator </topic>
       <vehicleName> girona500 </vehicleName>
-      <visualize> 1 </visualize>
     </ROSOdomToPAT>
     <WorldToROSTF>
       <rootName> world </rootName>

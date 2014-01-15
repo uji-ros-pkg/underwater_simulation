@@ -22,6 +22,7 @@
 #include <uwsim/VirtualRangeSensor.h>
 #include <uwsim/ROSInterface.h>
 #include <uwsim/UWSimUtils.h>
+#include <uwsim/TrajectoryVisualization.h>
 
 using namespace std;
 
@@ -235,8 +236,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
     boost::shared_ptr < ROSInterface > iface;
     if (rosInterface.type == ROSInterfaceInfo::ROSOdomToPAT)
       iface = boost::shared_ptr < ROSOdomToPAT
-          > (new ROSOdomToPAT(root, rosInterface.topic, rosInterface.targetName, rosInterface.color,
-                              rosInterface.visualize));
+          > (new ROSOdomToPAT(root, rosInterface.topic, rosInterface.targetName));
 
     if (rosInterface.type == ROSInterfaceInfo::ROSTwistToPAT)
       iface = boost::shared_ptr < ROSTwistToPAT
@@ -377,6 +377,20 @@ bool SceneBuilder::loadScene(ConfigFile config)
     config.ROSInterfaces.pop_front();
   }
   //root->addChild(physics.debugDrawer.getSceneGraph());
+
+  while (config.trajectories.size() > 0)
+  {
+    ShowTrajectory trajectory = config.trajectories.front();
+
+    osg::ref_ptr<TrajectoryUpdateCallback> node_tracker = new TrajectoryUpdateCallback(trajectory.color, 0.02,trajectory.lineStyle, root);
+    osg::Node * trackNode=findRN(trajectory.target,root);
+    if(trackNode)
+      trackNode->setUpdateCallback(node_tracker);
+    else
+      OSG_FATAL << "Scene Builder: "<<trajectory.target<<" trajectory target not found, please check your XML."<<std::endl;
+
+    config.trajectories.pop_front();
+  }
 
   return true;
 }
