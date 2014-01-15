@@ -666,6 +666,11 @@ int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &v
   else
     vehicle.links[nlink].cs.reset();
 
+  if(link->inertial)
+    vehicle.links[nlink].mass=link->inertial->mass;
+  else
+    vehicle.links[nlink].mass=-1; //Not set
+
   int linkNumber = nlink;
   for (uint i = 0; i < link->child_joints.size(); i++)
   {

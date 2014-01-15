@@ -31,21 +31,32 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
       osg::Node * link = scene_builder->iauvFile[i]->urdf->link[j];
       osg::Node * cs = NULL;
       btRigidBody* rigidBody;
-      //Look for vehicle, and collision shapes on config.
+      boost::shared_ptr<PhysicProperties> pp;
+      pp.reset(new PhysicProperties);
+      pp->init();
+      pp->isKinematic = 1;
+      pp->csType = "compound box";
+      pp->mass=0;
+      //Look for config vehicle, to search for physic properties.
       for (std::list<Vehicle>::iterator cfgVehicle = config.vehicles.begin(); cfgVehicle != config.vehicles.end();
           cfgVehicle++)
         if (cfgVehicle->name == scene_builder->iauvFile[i]->name)
           for (unsigned int part = 0; part < cfgVehicle->links.size(); part++)
-            if (cfgVehicle->links[part].name == link->getName() && cfgVehicle->links[part].cs)
+            if (cfgVehicle->links[part].name == link->getName()) //Config vehicle found!
             {
-              //std::cout<<link->getName()<<" has cs"<<std::endl;
-              cs = UWSimGeometry::loadGeometry(cfgVehicle->links[part].cs);
-              if (!cs)
-                std::cerr << "Collision shape couldn't load, using visual to create physics" << std::endl;
+              if(cfgVehicle->links[part].cs) //Add collisionShape if available
+              {
+                cs = UWSimGeometry::loadGeometry(cfgVehicle->links[part].cs);
+                if (!cs)
+                  std::cerr << "Collision shape couldn't load, using visual to create physics" << std::endl;
+              }
+
+              if(cfgVehicle->links[part].mass > 0)  //If mass is set in config add it.
+                pp->mass=cfgVehicle->links[part].mass;
             }
 
       CollisionDataType * colData = new CollisionDataType(link->getName(), scene_builder->iauvFile[i]->name, 1);
-      rigidBody = physics->addObject(NULL, link, colData, boost::shared_ptr<PhysicProperties>(), cs);
+      rigidBody = physics->addObject(NULL, link, colData, pp, cs);
 
       //Update visual node data with physics properties
       osg::ref_ptr < NodeDataType > data = dynamic_cast<NodeDataType*>(link->getUserData());

@@ -258,6 +258,7 @@ struct Link
   double quat[4];
   std::string material;
   boost::shared_ptr<Geometry> cs, geom;
+  double mass;
 };
 
 struct Joint

@@ -259,6 +259,21 @@
       <name>g500_echo2</name>
       <info>Echo example 2</info>
     </echo>
+
+    <ForceSensor>
+      <name>ForceG500</name>
+      <target>base_link</target>
+      <offsetp>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </offsetp>
+      <offsetr>
+        <x>-1.57</x>
+        <y>0</y>
+        <z>3.14</z>
+      </offsetr>
+    </ForceSensor>
   </vehicle>
 
   <object>
@@ -398,6 +413,11 @@
       <topic>g500/echo2</topic>
       <rate>1</rate>
     </echoROS>
+    <ForceSensorROS>
+      <name>ForceG500</name>
+      <topic>g500/ForceSensor</topic>
+      <rate>100</rate>
+    </ForceSensorROS>
   </rosInterfaces>
 </UWSimScene>
 

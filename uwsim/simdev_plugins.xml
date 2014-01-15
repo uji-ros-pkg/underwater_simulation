@@ -5,4 +5,10 @@
   Example plugin
   </description>
   </class>
+  <class name="ForceSensor_Factory" type="ForceSensor_Factory" 
+    base_class_type="uwsim::SimulatedDeviceFactory">
+  <description>
+  Force Sensor
+  </description>
+  </class>
 </library>
