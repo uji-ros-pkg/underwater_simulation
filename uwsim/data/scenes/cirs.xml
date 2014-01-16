@@ -82,7 +82,7 @@
       <joint>0.3 </joint>
     </jointValues>
     <position>
-      <x> -0.2</x>
+      <x> 0.2</x>
       <y> 0 </y>
       <z> 2.0 </z>
     </position>
@@ -267,8 +267,8 @@
       <name>ForceG500</name>
       <target>base_link</target>
       <offsetp>
-        <x>0</x>
-        <y>0</y>
+        <x>-0.2</x>
+        <y>0.75</y>
         <z>0</z>
       </offsetp>
       <offsetr>

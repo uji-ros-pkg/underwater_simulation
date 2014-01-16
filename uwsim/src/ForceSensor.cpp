@@ -38,9 +38,9 @@ void ForceSensor::applyPhysics(BulletPhysics * bulletPhysics)
   osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*>(target->getUserData());
   copy=physics->copyObject(data->rigidBody);
   copy->setGravity(btVector3(0,0,0));
-  copy->setCenterOfMassTransform(btTransform(btQuaternion(0,0,0,1),btVector3(-0.2,0,0.75)));
+  copy->setCenterOfMassTransform(btTransform(btQuaternion(0,0,0,1),btVector3(offsetp[0],offsetp[1],offsetp[2])));
   btTarget = data->rigidBody;
-  btTarget->setCenterOfMassTransform(btTransform(btQuaternion(0,0,0,1),btVector3(-0.2,0,0.75)));
+  btTarget->setCenterOfMassTransform(btTransform(btQuaternion(0,0,0,1),btVector3(offsetp[0],offsetp[1],offsetp[2])));
 
   physics->dynamicsWorld->setInternalTickCallback(forceSensorPreTickCallback, static_cast<void *>(this),true);
   physics->dynamicsWorld->setInternalTickCallback(forceSensorPostTickCallback, static_cast<void *>(this));

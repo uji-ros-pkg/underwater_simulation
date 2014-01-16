@@ -160,6 +160,7 @@ class Dynamics :
         c_v = dot((c-d), self.v)
         v_dot = dot(self.IM, (t-c_v-g+self.collisionForce)) #t-c_v-g+collisionForce
         v_dot = squeeze(asarray(v_dot)) #Transforms a matrix into an array
+        self.collisionForce=[0,0,0,0,0,0]
         return v_dot
         
 #
