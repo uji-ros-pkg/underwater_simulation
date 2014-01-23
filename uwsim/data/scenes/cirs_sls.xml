@@ -83,7 +83,7 @@
     </jointValues>
     <position>
       <x> 0.2</x>
-      <y> 0 </y>
+      <y> 0.2 </y>
       <z> 2.0 </z>
     </position>
     <orientation>
@@ -93,18 +93,18 @@
     </orientation>
     <virtualCamera>
       <name>stereo_down_left</name>
-      <relativeTo>part0</relativeTo>
+      <relativeTo>stereo_down_optical</relativeTo>
       <resw>1024</resw>
       <resh>768</resh>
       <position>
-        <x>-0.5</x>
-        <y>-0.06</y>
-        <z> 0 </z>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
       </position>  
       <orientation>
         <r>0</r>
         <p>0</p>
-        <y>1.57 </y>
+        <y>0</y>
       </orientation>
       <baseline> 0.0 </baseline>
       <frameId> stereo_down </frameId>
@@ -120,18 +120,18 @@
     </virtualCamera>
     <virtualCamera>
       <name>stereo_down_right</name>
-      <relativeTo>part0</relativeTo>
+      <relativeTo>stereo_down_optical</relativeTo>
       <resw>1024</resw>
       <resh>768</resh>
       <position>
-        <x>-0.5</x>
-        <y>0.06</y>
-        <z> 0 </z>
+        <x>0</x>
+        <y>0.12</y>
+        <z>0</z>
       </position>  
       <orientation>
         <r>0</r>
         <p>0</p>
-        <y>1.57 </y>
+        <y>0</y>
       </orientation>
       <baseline> 0.12 </baseline>
       <frameId> stereo_down </frameId>
