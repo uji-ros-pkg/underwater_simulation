@@ -12,6 +12,7 @@ then
   then
     mkdir -p ~/.uwsim/data
     wget http://www.irs.uji.es/uwsim/files/$DATAFILE -O ~/.uwsim/UWSim-data.tgz && tar -zxvf ~/.uwsim/UWSim-data.tgz -C ~/.uwsim
+    rm ~/.uwsim/UWSim-data.tgz
   else
     echo "Cannot run UWSim."
     exit
