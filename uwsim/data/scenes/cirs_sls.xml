@@ -62,7 +62,7 @@
     <position>
       <x>-5</x>
       <y>-5 </y>
-      <z>8 </z>
+      <z> 9 </z> <!-- -5 -5 8 -->
     </position> 
     <lookAt>
       <x>0</x>
@@ -103,8 +103,8 @@
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
-        <y>0</y>
+        <p>3.14</p>
+        <y>3.14</y>
       </orientation>
       <baseline> 0.0 </baseline>
       <frameId> stereo_down </frameId>
@@ -124,14 +124,14 @@
       <resw>1024</resw>
       <resh>768</resh>
       <position>
-        <x>0</x>
-        <y>0.12</y>
+        <x>0.12</x>
+        <y>0</y>
         <z>0</z>
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
-        <y>0</y>
+        <p>3.14</p>
+        <y>3.14</y>
       </orientation>
       <baseline> 0.12 </baseline>
       <frameId> stereo_down </frameId>
