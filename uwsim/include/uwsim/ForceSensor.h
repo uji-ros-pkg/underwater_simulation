@@ -86,12 +86,10 @@ class ForceSensor_ROSPublisher : public ROSPublisherInterface
   //this is just an example, use a pointer to SimulatedIAUV, if only ROSInterface is implemented
   //pointer to a device
   ForceSensor * dev;
-  ros::WallTime last;
 public:
   ForceSensor_ROSPublisher(ForceSensor *dev, std::string topic, int rate) :
       ROSPublisherInterface(topic, rate), dev(dev)
   {
-    last = ros::WallTime::now();
   }
 
   void createPublisher(ros::NodeHandle &nh);

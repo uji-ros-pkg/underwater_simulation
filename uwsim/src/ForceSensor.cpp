@@ -174,8 +174,7 @@ void ForceSensor_ROSPublisher::publish()
 
   dev->getForceTorque(force,torque);
 
-  ros::WallDuration t_diff = ros::WallTime::now() - last;
-  elapsed = t_diff.toSec();
+  elapsed = 1.0/publish_rate;
 
   geometry_msgs::WrenchStamped msg;
   msg.header.stamp = getROSTime();
@@ -185,13 +184,11 @@ void ForceSensor_ROSPublisher::publish()
   msg.wrench.force.y=force[1]/elapsed*(1/dev->btTarget->getInvMass());
   msg.wrench.force.z=force[2]/elapsed*(1/dev->btTarget->getInvMass());
 
-
   msg.wrench.torque.x=torque[0]/elapsed*(1/dev->btTarget->getInvMass());
   msg.wrench.torque.y=torque[1]/elapsed*(1/dev->btTarget->getInvMass());
   msg.wrench.torque.z=torque[2]/elapsed*(1/dev->btTarget->getInvMass());
-  pub_.publish(msg);
 
-  last = ros::WallTime::now();
+  pub_.publish(msg);
 }
 
 #if ROS_VERSION_MINIMUM(1, 9, 0)
