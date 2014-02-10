@@ -126,11 +126,11 @@ bool ForceSensor_Factory::applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars
     {
       ForceSensor_Config * cfg = dynamic_cast<ForceSensor_Config *>(vehicleChars.simulated_devices[i].get());
       osg::ref_ptr<osg::Node> target;
-      for(i=0;i<auv->urdf->link.size();i++)
+      for(int j=0;j<auv->urdf->link.size();j++)
       {
-        if(auv->urdf->link[i]->getName()==cfg->target)
+        if(auv->urdf->link[j]->getName()==cfg->target)
         {
-          target=auv->urdf->link[i];
+          target=auv->urdf->link[j];
         }
       }
       auv->devices->all.push_back(ForceSensor::Ptr(new ForceSensor(cfg,target)));
