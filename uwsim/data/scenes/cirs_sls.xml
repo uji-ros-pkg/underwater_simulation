@@ -15,11 +15,11 @@
     <crestFoamHeight> 2.2 </crestFoamHeight>
     <oceanSurfaceHeight> 0 </oceanSurfaceHeight>
     <fog>
-      <density> 0.1 </density>
+      <density> 0.1</density>
       <color>
-	<r>0</r>
-	<g>0.05</g>
-	<b>0.3</b>
+  <r>0</r>
+  <g>0.05</g>
+  <b>0.3</b>
       </color>
     </fog>
     <color>
@@ -47,6 +47,10 @@
       <y> 0</y>
       <z> -1.57 </z>
     </offsetr>
+    <enablePhysics> 1 </enablePhysics>
+    <showTrajectory>
+      <target>girona500</target>
+    </showTrajectory>
   </simParams>
   <camera>
     <freeMotion> 1 </freeMotion>
@@ -58,7 +62,7 @@
     <position>
       <x>-5</x>
       <y>-5 </y>
-      <z>8 </z>
+      <z> 9 </z> <!-- -5 -5 8 -->
     </position> 
     <lookAt>
       <x>0</x>
@@ -73,14 +77,14 @@
     <jointValues>
       <joint> 0 </joint>
       <joint> 0</joint>
-      <joint> 0.4 </joint>
+      <joint> 2.2 </joint>
       <joint> 0 </joint>
-      <joint>-0.3 </joint>
+      <joint>0.3 </joint>
     </jointValues>
     <position>
-      <x> 1.35</x>
-      <y> 0 </y>
-      <z> 2.8 </z>
+      <x> 0.2</x>
+      <y> 0.2 </y>
+      <z> 2.0 </z>
     </position>
     <orientation>
       <r>0</r>
@@ -88,51 +92,19 @@
       <y>0</y>
     </orientation>
     <virtualCamera>
-      <name>bowtech1</name>
-      <relativeTo>part0</relativeTo>
-      <resw> 320 </resw>
-      <resh> 240 </resh>
-      <position>
-        <x>-0.2</x>
-        <y> -0.1 </y>
-        <z> 0 </z>
-      </position>
-      <orientation>
-        <r>0</r>
-        <p>0</p>
-        <y>1.57 </y>
-      </orientation>
-    </virtualCamera>
-    <virtualCamera>
-      <name>bowtech2</name>
-      <relativeTo>part0</relativeTo>
-      <resw> 320</resw>
-      <resh> 240 </resh>
-      <position>
-        <x>-0.2</x>
-        <y> 0.1 </y>
-        <z> 0 </z>
-      </position>  
-      <orientation>
-        <r>0</r>
-        <p>0</p>
-        <y>1.57 </y>
-      </orientation>
-    </virtualCamera>
-    <virtualCamera>
       <name>stereo_down_left</name>
-      <relativeTo>part0</relativeTo>
+      <relativeTo>stereo_down_optical</relativeTo>
       <resw>1024</resw>
       <resh>768</resh>
       <position>
-        <x>-0.5</x>
-        <y>-0.06</y>
-        <z> 0 </z>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
-        <y>1.57 </y>
+        <p>3.14</p>
+        <y>3.14</y>
       </orientation>
       <baseline> 0.0 </baseline>
       <frameId> stereo_down </frameId>
@@ -148,18 +120,18 @@
     </virtualCamera>
     <virtualCamera>
       <name>stereo_down_right</name>
-      <relativeTo>part0</relativeTo>
+      <relativeTo>stereo_down_optical</relativeTo>
       <resw>1024</resw>
       <resh>768</resh>
       <position>
-        <x>-0.5</x>
-        <y>0.06</y>
-        <z> 0 </z>
+        <x>0.12</x>
+        <y>0</y>
+        <z>0</z>
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
-        <y>1.57 </y>
+        <p>3.14</p>
+        <y>3.14</y>
       </orientation>
       <baseline> 0.12 </baseline>
       <frameId> stereo_down </frameId>
@@ -177,8 +149,8 @@
     <structuredLightProjector>
       <name>laser_projector</name>
       <relativeTo>sls</relativeTo>
-      <fov>64</fov>
-      <image_name>data/textures/laser_stripe.png</image_name>
+      <fov>21</fov>
+      <image_name>data/textures/laser_lines_green.png</image_name>
       <laser>1</laser>
       <position>
         <x>0</x>
@@ -188,10 +160,9 @@
       <orientation>
         <r>0</r>
         <p>3.14</p>
-        <y>0</y>
+        <y>1.57</y> 
       </orientation>
     </structuredLightProjector>
-
     <rangeSensor>
       <name>sonar</name>
       <relativeTo>part0</relativeTo>
@@ -208,6 +179,142 @@
         <y>0</y>
       </orientation>
     </rangeSensor>
+
+    <imu>
+      <name>imu</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>3.1415</y>
+      </orientation>
+      <std>0.00000001</std>
+    </imu>
+
+    <pressureSensor>
+      <name>pressureSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0.2</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>0</y>
+      </orientation>
+      <std>0.02</std>
+    </pressureSensor>
+    
+    <gpsSensor>
+      <name>GPSSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>0</y>
+      </orientation>
+      <std>0.00005</std>
+    </gpsSensor>
+
+    <dvlSensor>
+      <name>DVLSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>-0.75</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>3.9269908169872414</y>
+      </orientation>
+      <std>0.0015</std>
+    </dvlSensor>
+
+    <virtualRangeImage>
+      <name>rangeImage</name>
+      <relativeTo>part0</relativeTo>
+      <resw> 320</resw>
+      <resh> 240 </resh>
+      <position>
+        <x>-0.2</x>
+        <y> 0.1 </y>
+        <z> 0 </z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>1.57 </y>
+      </orientation>
+      <parameters>
+        <fx>257.986</fx>
+        <fy>257.341</fy>
+        <x0>120</x0>
+        <y0>160</y0>
+        <f>10</f>
+        <n>0.8</n>
+        <k>0</k>
+      </parameters>
+
+    </virtualRangeImage>
+
+    <multibeamSensor>
+      <name>multibeam</name>
+      <relativeTo>part0</relativeTo>
+      <position>
+        <x>-0.2</x>
+        <y> 0.1 </y>
+        <z> 0 </z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>3.14 </y>
+      </orientation>
+      <initAngle>-60</initAngle>
+      <finalAngle>60</finalAngle>
+      <angleIncr>0.1</angleIncr>
+      <range>10</range>
+    </multibeamSensor>
+
+    <simulatedDevices>
+      <echo>
+        <name>g500_echo1</name>
+        <info>Echo example 1</info>
+      </echo>
+    </simulatedDevices>
+    <echo>
+      <name>g500_echo2</name>
+      <info>Echo example 2</info>
+    </echo>
+
+    <ForceSensor>
+      <name>ForceG500</name>
+      <target>base_link</target>
+      <offsetp>
+        <x>-0.2</x>
+        <y>0.75</y>
+        <z>0</z>
+      </offsetp>
+      <offsetr>
+        <x>-1.57</x>
+        <y>0</y>
+        <z>3.14</z>
+      </offsetr>
+    </ForceSensor>
   </vehicle>
 
   <object>
@@ -233,6 +340,10 @@
       <y> 0</y>
       <z> -1.57 </z>
     </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
   </object>
 
 
@@ -249,31 +360,35 @@
       <p>3.1415</p>
       <y>0</y>
     </orientation>
+    <physics>
+      <mass> 15 </mass>
+      <inertia> 
+        <x> 0</x>
+        <y> 0 </y>
+        <z> 0 </z>
+      </inertia>
+      <collisionShapeType> box </collisionShapeType>
+    </physics>
   </object>
 
   <rosInterfaces>
     <ROSOdomToPAT>
       <topic> /dataNavigator </topic>
       <vehicleName> girona500 </vehicleName>
-      <visualize> 1 </visualize>
     </ROSOdomToPAT>
-    <PATToROSOdom>
-      <topic> /uwsim/girona500_odom </topic>
-      <vehicleName> girona500 </vehicleName>
-    </PATToROSOdom>
+    <WorldToROSTF>
+      <rootName> world </rootName>
+      <enableObjects> 1 </enableObjects>
+      <rate>10</rate>
+    </WorldToROSTF>
     <ArmToROSJointState> 
-	<topic>/uwsim/joint_state</topic>
-	<vehicleName> girona500 </vehicleName>
+  <topic>/uwsim/joint_state</topic>
+  <vehicleName> girona500 </vehicleName>
     </ArmToROSJointState>
     <ROSJointStateToArm> 
-	<topic>/uwsim/joint_state_command</topic>
-	<vehicleName> girona500 </vehicleName>
+  <topic>/uwsim/joint_state_command</topic>
+  <vehicleName> girona500 </vehicleName>
     </ROSJointStateToArm>
-    <VirtualCameraToROSImage> 
-      <cameraName>bowtech1</cameraName>
-      <imageTopic> /uwsim/camera1 </imageTopic>
-      <infoTopic> /uwsim/camera1_info </infoTopic>
-    </VirtualCameraToROSImage>
     <VirtualCameraToROSImage> 
       <cameraName>stereo_down_left</cameraName>
       <imageTopic> /stereo_down/left/image_raw</imageTopic>
@@ -284,15 +399,70 @@
       <imageTopic> /stereo_down/right/image_raw</imageTopic>
       <infoTopic>  /stereo_down/right/camera_info </infoTopic>
     </VirtualCameraToROSImage>
+    <ROSTwistToPAT>
+      <topic> /g500/twist</topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSTwistToPAT>
     <RangeSensorToROSRange>
       <name>sonar</name>
       <topic> /uwsim/g500/range </topic>
       <rate>10</rate>
     </RangeSensorToROSRange>
     <ROSPoseToPAT>
-      <topic> /dataPoseNavigator </topic>
+      <topic> /g500/pose</topic>
       <vehicleName> girona500 </vehicleName>
     </ROSPoseToPAT>
+    <ImuToROSImu>
+      <name>imu</name>
+      <topic>g500/imu</topic>
+      <rate>20</rate>
+    </ImuToROSImu>
+    <PressureSensorToROS>
+      <name>pressureSensor</name>
+      <topic>g500/pressure</topic>
+      <rate>5</rate>
+    </PressureSensorToROS>
+    <GPSSensorToROS>
+      <name>GPSSensor</name>
+      <topic>g500/gps</topic>
+      <rate>1</rate>
+    </GPSSensorToROS>
+    <DVLSensorToROS>
+      <name>DVLSensor</name>
+      <topic>g500/dvl</topic>
+      <rate>5</rate>
+    </DVLSensorToROS>
+    <RangeImageSensorToROSImage> 
+      <cameraName>rangeImage</cameraName>
+      <imageTopic> /uwsim/rangecamera </imageTopic>
+      <infoTopic> /uwsim/rangecamera_info </infoTopic>
+    </RangeImageSensorToROSImage>
+    <multibeamSensorToLaserScan>
+      <name>multibeam</name>
+      <topic>g500/multibeam</topic>
+    </multibeamSensorToLaserScan>
+    <SimulatedDeviceROS>
+      <echoROS>
+        <name>g500_echo1</name>
+        <topic>g500/echo1</topic>
+        <rate>1</rate>
+      </echoROS>
+    </SimulatedDeviceROS>
+    <contactSensorToROS>
+      <name>girona500</name>
+      <topic>g500/contactSensor</topic>
+      <rate> 100 </rate>
+    </contactSensorToROS>
+    <echoROS>
+      <name>g500_echo2</name>
+      <topic>g500/echo2</topic>
+      <rate>1</rate>
+    </echoROS>
+    <ForceSensorROS>
+      <name>ForceG500</name>
+      <topic>g500/ForceSensor</topic>
+      <rate>100</rate>
+    </ForceSensorROS>
   </rosInterfaces>
 </UWSimScene>
 
