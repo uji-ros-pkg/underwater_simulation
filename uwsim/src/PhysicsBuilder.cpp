@@ -62,10 +62,6 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
       osg::ref_ptr < NodeDataType > data = dynamic_cast<NodeDataType*>(link->getUserData());
       data->rigidBody = rigidBody;
       link->setUserData(data);
-
-      //TODO: Add node data type correctly(hand actuator).
-      //NodeDataType * data= new NodeDataType(floorbody,0);
-      //link->setUserData(data);
     }
     scene_builder->iauvFile[i]->urdf->physics = physics;
 

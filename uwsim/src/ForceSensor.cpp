@@ -32,8 +32,9 @@ void ForceSensor::applyPhysics(BulletPhysics * bulletPhysics)
   btTarget = data->rigidBody;
   btTarget->setCenterOfMassTransform(btTransform(btQuaternion(0,0,0,1),btVector3(offsetp[0],offsetp[1],offsetp[2])));
 
-  if(btTarget->getInvMass()==0){
-    ROS_FATAL("ForceSensor %s used in a null mass object ...", name.c_str());
+  if(btTarget->getInvMass()==0)
+  {
+    ROS_FATAL("ForceSensor %s used in a null mass object.", name.c_str());
     exit(0);
   } 
 
@@ -42,6 +43,12 @@ void ForceSensor::applyPhysics(BulletPhysics * bulletPhysics)
 
 void ForceSensor::getForceTorque(double force[3], double torque[3])
 {
+
+  if(!physics)
+  {
+    ROS_FATAL("ForceSensor %s can't retrieve physics information. Missing enable physics?", name.c_str());
+    exit(0);
+  }
   if(physics->physicsStep ==0) //Check if physics is looping (data is not reliable)
   {
 
