@@ -71,6 +71,12 @@ public:
 
 };
 
+//Adds tick callback manager which will do all stuff needed in pretick callback
+void preTickCallback(btDynamicsWorld *world, btScalar timeStep);
+
+//Adds tick callback manager which will do all stuff needed in posttick callback
+void postTickCallback(btDynamicsWorld *world, btScalar timeStep);
+
 class BulletPhysics : public osg::Referenced
 {
 
@@ -109,6 +115,35 @@ public:
   }
   ;
 
+  //This class stores information related to different sources that need to be called in internal tick callbacks.
+  //To know force sensors.
+  class TickCallbackManager
+  {
+    private:
+      //Force sensor structures;
+      struct ForceSensorcbInfo
+      {
+	btRigidBody * copy, * target;
+        btVector3 linInitial, angInitial,linFinal, angFinal;
+      };
+      std::vector<ForceSensorcbInfo> forceSensors;
+    
+      void preTickForceSensors();
+      void postTickForceSensors();
+    public:
+
+      int substep; //Tracks number of substep;
+
+      TickCallbackManager(){};
+      int addForceSensor(btRigidBody * copy, btRigidBody * target);
+      void getForceSensorSpeed(int forceSensor, double linSpeed[3],double angSpeed[3]);
+      void physicsInternalPreProcessCallback(btScalar timeStep);
+      void physicsInternalPostProcessCallback(btScalar timeStep);
+  };
+
+
+  TickCallbackManager * callbackManager;
+
 private:
   btHfFluidRigidCollisionConfiguration * collisionConfiguration;
   btCollisionDispatcher * dispatcher;
@@ -123,8 +158,8 @@ private:
   btConvexShape* GetConvexCSFromOSG(osg::Node * node, collisionShapeType_t ctype);
 
   void updateOceanSurface();
-
 };
 
-#endif
+
+#endif	
 

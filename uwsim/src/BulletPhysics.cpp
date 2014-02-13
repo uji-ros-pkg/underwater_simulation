@@ -128,6 +128,7 @@ void BulletPhysics::stepSimulation(btScalar timeStep, int maxSubSteps = 1,
   if (fluid)
     updateOceanSurface();
   physicsStep=1; //Keeps track of ongoing physics processing.
+  callbackManager->substep=0;
   ((btDynamicsWorld*)dynamicsWorld)->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
   physicsStep=0;
 }
@@ -155,6 +156,20 @@ void BulletPhysics::printManifolds()
       std::cout << " " << min << std::endl;
     }
   }
+}
+
+//Adds tick callback manager which will do all stuff needed in pretick callback
+void preTickCallback(btDynamicsWorld *world, btScalar timeStep)
+{
+    BulletPhysics::TickCallbackManager *w = static_cast<BulletPhysics::TickCallbackManager *>(world->getWorldUserInfo());
+    w->physicsInternalPreProcessCallback(timeStep);
+}
+
+//Adds tick callback manager which will do all stuff needed in posttick callback
+void postTickCallback(btDynamicsWorld *world, btScalar timeStep)
+{
+    BulletPhysics::TickCallbackManager *w = static_cast<BulletPhysics::TickCallbackManager *>(world->getWorldUserInfo());
+    w->physicsInternalPostProcessCallback(timeStep);
 }
 
 BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf, PhysicsWater physicsWater)
@@ -207,6 +222,73 @@ BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* 
    dynamicsWorld->setDebugDrawer(&debugDrawer);
    debugDrawer.BeginDraw();
    debugDrawer.setEnabled(true);*/
+
+   //Create pre-tick and post-tick callbacks
+   callbackManager= new TickCallbackManager();
+   dynamicsWorld->setInternalTickCallback(preTickCallback, static_cast<void *>(callbackManager),true);
+   dynamicsWorld->setInternalTickCallback(postTickCallback, static_cast<void *>(callbackManager));
+}
+
+//Adds a force sensor to tickCallbackManager
+int BulletPhysics::TickCallbackManager::addForceSensor(btRigidBody * copy, btRigidBody * target)
+{
+  ForceSensorcbInfo fs;
+  fs.target=target;
+  fs.copy=copy;
+  forceSensors.push_back(fs);
+
+  return forceSensors.size()-1;
+}
+
+//Gets Speed difference from tickcallbackmanager using reference returned on addition
+void BulletPhysics::TickCallbackManager::getForceSensorSpeed(int forceSensor, double linSpeed[3],double angSpeed[3])
+{
+  linSpeed[0]=forceSensors[forceSensor].linFinal.x()-forceSensors[forceSensor].linInitial.x();
+  linSpeed[1]=forceSensors[forceSensor].linFinal.y()-forceSensors[forceSensor].linInitial.y();
+  linSpeed[2]=forceSensors[forceSensor].linFinal.z()-forceSensors[forceSensor].linInitial.z();
+
+  angSpeed[0]=forceSensors[forceSensor].angFinal.x()-forceSensors[forceSensor].angInitial.x();
+  angSpeed[1]=forceSensors[forceSensor].angFinal.y()-forceSensors[forceSensor].angInitial.y();
+  angSpeed[2]=forceSensors[forceSensor].angFinal.z()-forceSensors[forceSensor].angInitial.z();
+}
+
+//forceSensor pre-tick callback
+void BulletPhysics::TickCallbackManager::preTickForceSensors()
+{
+  for(int i=0;i<forceSensors.size();i++)
+  {
+    forceSensors[i].copy->setCenterOfMassTransform(forceSensors[i].target->getCenterOfMassTransform());
+    forceSensors[i].copy->clearForces();
+    forceSensors[i].copy->setLinearVelocity(forceSensors[i].target->getLinearVelocity());
+    forceSensors[i].copy->setAngularVelocity(forceSensors[i].target->getAngularVelocity());
+    forceSensors[i].linInitial=forceSensors[i].copy->getLinearVelocity();
+    forceSensors[i].angInitial=forceSensors[i].copy->getAngularVelocity();
+  }
+}
+
+//forceSensor post-tick callback
+void BulletPhysics::TickCallbackManager::postTickForceSensors()
+{
+  for(int i=0;i<forceSensors.size();i++)
+  {
+    forceSensors[i].linFinal=forceSensors[i].copy->getLinearVelocity();
+    forceSensors[i].angFinal=forceSensors[i].copy->getAngularVelocity();
+  }
+}
+
+//This function will be called just before physics step (or substep) start
+void BulletPhysics::TickCallbackManager::physicsInternalPreProcessCallback(btScalar timeStep)
+{
+  if (substep==0){
+    preTickForceSensors();
+  }
+}
+
+//This function will be called just after physics step (or substep) finishes
+void BulletPhysics::TickCallbackManager::physicsInternalPostProcessCallback(btScalar timeStep)
+{
+  postTickForceSensors();
+  substep++;
 }
 
 void BulletPhysics::updateOceanSurface()

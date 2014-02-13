@@ -55,16 +55,12 @@ public:
 #include "BulletPhysics.h"
 
 //Driver class
-static void forceSensorPreTickCallback(btDynamicsWorld *world, btScalar timeStep);
-static void forceSensorPostTickCallback(btDynamicsWorld *world, btScalar timeStep);
-
 
 class ForceSensor : public SimulatedDevice
 {
   void applyPhysics(BulletPhysics * bulletPhysics);
-  btVector3 linInitial, linFinal;
-  btVector3 angInitial, angFinal;
   double lastTimeStep;
+  int CBreference;
 public:
   BulletPhysics * physics;
   btRigidBody * copy, * btTarget;  //Rigid object copy with physical reaction
@@ -73,8 +69,6 @@ public:
   osg::Matrixd offset; //We only need rotation as traslation goes to bullet directly
 
   ForceSensor(ForceSensor_Config * cfg, osg::ref_ptr<osg::Node> target);
-  void physicsInternalPreProcessCallback(btScalar timeStep);
-  void physicsInternalPostProcessCallback(btScalar timeStep);
   void getForceTorque(double force[3], double torque[3]);
 };
 
