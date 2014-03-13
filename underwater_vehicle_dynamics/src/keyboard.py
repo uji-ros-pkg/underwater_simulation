@@ -4,6 +4,9 @@ from std_msgs.msg import Float64MultiArray
 import termios, fcntl, sys, os
 import rospy
 
+#import services
+from std_srvs.srv import Empty
+
 if len(sys.argv) != 4: 
 	sys.exit("Usage: "+sys.argv[0]+" <thrusters_topic>")
  
@@ -21,6 +24,8 @@ fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
 
 pub = rospy.Publisher(thrusters_topic, Float64MultiArray)
 rospy.init_node('keyboard')
+rospy.wait_for_service('/dynamics/reset')
+reset=rospy.ServiceProxy('/dynamics/reset', Empty)
 try:
     while not rospy.is_shutdown():
         thrusters=[0,0,0,0,0]
@@ -36,6 +41,8 @@ try:
 		thrusters[4]=0.4
 	    elif c=='d':
 		thrusters[4]=-0.4
+	    elif c==' ':
+		reset()
 	    elif c=='\x1b':
 		c2= sys.stdin.read(1)
 		c2= sys.stdin.read(1)

@@ -13,6 +13,9 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import WrenchStamped
 
+#import services
+from std_srvs.srv import Empty
+
 # More imports
 from numpy import *
 import tf
@@ -241,6 +244,11 @@ class Dynamics :
         v = PyKDL.Vector(tf[0], tf[1], tf[2])
         frame = PyKDL.Frame(r, v)
         return frame
+
+    def reset(self,req):
+        self.v = self.v_0
+        self.p = self.p_0
+	return []
     
     def __init__(self):
         """ Simulates the dynamics of an AUV """
@@ -309,6 +317,9 @@ class Dynamics :
 	#TODO: set the topic names as parameters
         rospy.Subscriber(self.input_topic, Float64MultiArray, self.updateThrusters)
         rospy.Subscriber("/g500/ForceSensor", WrenchStamped, self.updateCollision)
+
+
+	s = rospy.Service('/dynamics/reset',Empty, self.reset)
 	
     def iterate(self):
         t1 = rospy.Time.now()
