@@ -61,6 +61,7 @@ g500/dynamics/initial_pose: [0.0, 0.0, 0.0, 0, 0, 1.57] #[3.0, 1.1, 2.8, 0, 0, 3
 g500/dynamics/initial_velocity: [0, 0, 0, 0, 0, 0]
 
 g500/dynamics/topic_name: "/dataNavigator"
+g500/dynamics/external_force_topic: "/g500/external_force"
 g500/dynamics/frame_id: "g500_base_link"
 
 

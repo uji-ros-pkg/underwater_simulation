@@ -51,6 +51,7 @@ class Dynamics :
         self.p_0 = array(rospy.get_param(self.vehicle_name + "/dynamics" + "/initial_pose"))
         self.v_0 = array(rospy.get_param(self.vehicle_name + "/dynamics" + "/initial_velocity"))
         self.frame_id = rospy.get_param(self.vehicle_name + "/dynamics" + "/frame_id")
+        self.external_force_topic = rospy.get_param(self.vehicle_name + "/dynamics" + "/external_force_topic")
     
 #       Currents data
         self.current_mean = array( rospy.get_param("dynamics/current_mean") )
@@ -316,7 +317,7 @@ class Dynamics :
     #   Create Subscribers for thrusters and collisions
 	#TODO: set the topic names as parameters
         rospy.Subscriber(self.input_topic, Float64MultiArray, self.updateThrusters)
-        rospy.Subscriber("/g500/ForceSensor", WrenchStamped, self.updateCollision)
+        rospy.Subscriber(self.external_force_topic, WrenchStamped, self.updateCollision)
 
 
 	s = rospy.Service('/dynamics/reset',Empty, self.reset)
