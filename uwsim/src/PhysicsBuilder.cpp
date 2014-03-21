@@ -50,6 +50,11 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
                 if (!cs)
                   std::cerr << "Collision shape couldn't load, using visual to create physics" << std::endl;
               }
+	      //When creating the collision shape from geometry it uses child nodes, so we need to load the  
+	      // geometry on a clean node to avoid multiple collision shapes
+	      //TODO: avoid to reload the same geometry reusing visual geometry
+	      if(!cs)
+		cs = UWSimGeometry::loadGeometry(cfgVehicle->links[part].geom);
 
               if(cfgVehicle->links[part].mass > 0)  //If mass is set in config add it.
                 pp->mass=cfgVehicle->links[part].mass;
