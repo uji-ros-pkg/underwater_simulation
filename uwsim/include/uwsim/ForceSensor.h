@@ -67,6 +67,7 @@ public:
   osg::ref_ptr<osg::Node> target;
   double offsetp[3];
   osg::Matrixd offset; //We only need rotation as traslation goes to bullet directly
+  int physicsApplied;
 
   ForceSensor(ForceSensor_Config * cfg, osg::ref_ptr<osg::Node> target);
   void getForceTorque(double force[3], double torque[3]);

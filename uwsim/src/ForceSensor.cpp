@@ -20,6 +20,7 @@ ForceSensor::ForceSensor(ForceSensor_Config * cfg, osg::ref_ptr<osg::Node> targe
   this->offsetp[0]=cfg->offsetp[0];  this->offsetp[1]=cfg->offsetp[1];  this->offsetp[2]=cfg->offsetp[2];
   offset.makeRotate(osg::Quat(cfg->offsetr[0], osg::Vec3d(1, 0, 0), cfg->offsetr[1], osg::Vec3d(0, 1, 0), cfg->offsetr[2],osg::Vec3d(0, 0, 1)));
   physics=NULL;
+  physicsApplied=0;
 }
 
 void ForceSensor::applyPhysics(BulletPhysics * bulletPhysics)
@@ -39,6 +40,7 @@ void ForceSensor::applyPhysics(BulletPhysics * bulletPhysics)
   } 
 
   CBreference=physics->callbackManager->addForceSensor(copy,btTarget);
+  physicsApplied=1;
 }
 
 void ForceSensor::getForceTorque(double force[3], double torque[3])
@@ -149,6 +151,11 @@ void ForceSensor_ROSPublisher::createPublisher(ros::NodeHandle &nh)
 {
   ROS_INFO("ForceSensor_ROSPublisher on topic %s", topic.c_str());
   pub_ = nh.advertise < geometry_msgs::WrenchStamped > (topic, 1);
+  while (!dev->physicsApplied)
+  {
+    ROS_INFO("ForceSensor_ROSPublisher Waiting for physics to be initialized...");
+    sleep(1.0);
+  }
 }
 
 void ForceSensor_ROSPublisher::publish()
