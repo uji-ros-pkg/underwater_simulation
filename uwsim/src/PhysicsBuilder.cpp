@@ -20,7 +20,7 @@ PhysicsBuilder::PhysicsBuilder(SceneBuilder * scene_builder, ConfigFile config)
 void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config)
 {
 
-  physics = new BulletPhysics(config.gravity, scene_builder->scene->getOceanSurface(), config.physicsWater);
+  physics = new BulletPhysics(config.gravity, scene_builder->scene->getOceanSurface());
   OSG_INFO << "Loading Physics" << std::endl;
 
   //Add physics to vehicles
@@ -109,15 +109,8 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
 
     btRigidBody* rigidBody;
 
-    //Objects  objects with simple shapes will be added with water physics and rest with physics.
-    if (config.physicsWater.enable && (pp->csType == "box" || pp->csType == "sphere"))
-    {
-      rigidBody = physics->addFloatingObject(mt, scene_builder->objects[i], colData, pp, cs);
-    }
-    else
-    {
-      rigidBody = physics->addObject(mt, scene_builder->objects[i], colData, pp, cs);
-    }
+    rigidBody = physics->addObject(mt, scene_builder->objects[i], colData, pp, cs);
+    
     //wMb->setUserData(data); 
 
     //store physiscs in object's data

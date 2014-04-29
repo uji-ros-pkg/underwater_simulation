@@ -95,14 +95,6 @@ src/MultibeamSensor.cpp
 src/VirtualSLSProjector.cpp
 src/BulletPhysics.cpp
 src/PhysicsBuilder.cpp
-src/BulletHfFluid/btHfFluid.cpp
-src/BulletHfFluid/btHfFluidBuoyantConvexShape.cpp
-src/BulletHfFluid/btHfFluidBuoyantShapeCollisionAlgorithm.cpp
-src/BulletHfFluid/btHfFluidCollisionShape.cpp
-src/BulletHfFluid/btHfFluidRigidCollisionAlgorithm.cpp
-src/BulletHfFluid/btHfFluidRigidCollisionConfiguration.cpp
-src/BulletHfFluid/btHfFluidRigidDynamicsWorld.cpp
-src/BulletHfFluid/BuoyantShapeConvexCollisionAlgorithm.cpp
 )
 
 add_library(uwsim_plugins_simdev 

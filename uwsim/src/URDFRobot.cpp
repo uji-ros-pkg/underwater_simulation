@@ -46,17 +46,17 @@ struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback
   }
 
   //! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
-  virtual btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObject * colObj0, int partId0, int index0,
-                                   const btCollisionObject * colObj1, int partId1, int index1)
+  virtual btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObjectWrapper * colObj0, int partId0, int index0,
+                                   const btCollisionObjectWrapper * colObj1, int partId1, int index1)
   {
     //std::cout<<"Checking"<<std::endl;
     //CollisionDataType * nombre=(CollisionDataType *)colObj0->getUserPointer();
     //CollisionDataType * nombre2=(CollisionDataType *)colObj1->getUserPointer();
     //Check if object colliding is Static or Kinematic (in that case no object reaction will be produced by bullet, so we stop the arm movement!)
-    if (((colObj0->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
-        || (colObj0->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)
-        && ((colObj1->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
-            || (colObj1->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0))
+    if (((colObj0->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
+        || (colObj0->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)
+        && ((colObj1->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
+            || (colObj1->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0))
     {
       collided = 1;
 

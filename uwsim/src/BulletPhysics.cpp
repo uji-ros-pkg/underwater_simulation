@@ -125,8 +125,6 @@ void BulletPhysics::stepSimulation(btScalar timeStep, int maxSubSteps = 1,
   //dynamicsWorld->debugDrawWorld();
   //printManifolds();
   //cleanManifolds();
-  if (fluid)
-    updateOceanSurface();
   physicsStep=1; //Keeps track of ongoing physics processing.
   callbackManager->substep=0;
   ((btDynamicsWorld*)dynamicsWorld)->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
@@ -172,9 +170,10 @@ void postTickCallback(btDynamicsWorld *world, btScalar timeStep)
     w->physicsInternalPostProcessCallback(timeStep);
 }
 
-BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf, PhysicsWater physicsWater)
+//oceanSurf is not used right now, but should be to add water physics
+BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf) 
 {
-  collisionConfiguration = new btHfFluidRigidCollisionConfiguration();
+  collisionConfiguration = new btDefaultCollisionConfiguration();
   dispatcher = new btCollisionDispatcher(collisionConfiguration);
   solver = new btSequentialImpulseConstraintSolver();
 
@@ -182,7 +181,7 @@ BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* 
   btVector3 worldAabbMax(10000, 10000, 10000);
   inter = new btAxisSweep3(worldAabbMin, worldAabbMax, 1000);
 
-  dynamicsWorld = new btHfFluidRigidDynamicsWorld(dispatcher, inter, solver, collisionConfiguration);
+  dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, inter, solver, collisionConfiguration);
   dynamicsWorld->getDispatchInfo().m_enableSPU = true;
 
   btVector3 gravity(configGravity[0], configGravity[1], configGravity[2]);
@@ -194,30 +193,6 @@ BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* 
   dynamicsWorld->setGravity(gravity);
   oceanSurface = oceanSurf;
 
-  if (physicsWater.enable)
-  {
-
-    fluid = new btHfFluid(physicsWater.resolution, physicsWater.size[0], physicsWater.size[1], physicsWater.size[2],
-                          physicsWater.size[3], physicsWater.size[4], physicsWater.size[5]);
-    //fluid = new btHfFluid (btScalar(0.25), 100,100);
-    btTransform xform;
-    xform.setIdentity();
-    xform.getOrigin() = btVector3(physicsWater.position[0], physicsWater.position[1], physicsWater.position[2]);
-    //xform.setRotation(btQuaternion(0,1.57,0));
-    fluid->setWorldTransform(xform);
-    fluid->setHorizontalVelocityScale(btScalar(0.0f));
-    fluid->setVolumeDisplacementScale(btScalar(0.0f));
-    dynamicsWorld->addHfFluid(fluid);
-
-    for (int i = 0; i < fluid->getNumNodesLength() * fluid->getNumNodesWidth(); i++)
-    {
-      fluid->setFluidHeight(i, btScalar(0.0f));
-    }
-
-    fluid->prep();
-  }
-  else
-    fluid = NULL;
   /*debugDrawer.setDebugMode(btIDebugDraw::DBG_DrawContactPoints|| btIDebugDraw::DBG_DrawWireframe || btIDebugDraw::DBG_DrawText);
    dynamicsWorld->setDebugDrawer(&debugDrawer);
    debugDrawer.BeginDraw();
@@ -276,7 +251,8 @@ void BulletPhysics::TickCallbackManager::postTickForceSensors()
   }
 }
 
-//This function will be called just before physics step (or substep) start
+//This function will be called just before physics step (or substep) start,
+//It may be used to add buoyancy and drag forces to dynamic objects
 void BulletPhysics::TickCallbackManager::physicsInternalPreProcessCallback(btScalar timeStep)
 {
   if (substep==0){
@@ -289,29 +265,6 @@ void BulletPhysics::TickCallbackManager::physicsInternalPostProcessCallback(btSc
 {
   postTickForceSensors();
   substep++;
-}
-
-void BulletPhysics::updateOceanSurface()
-{
-
-  int nodeswidth = fluid->getNumNodesWidth();
-
-  int nodeslength = fluid->getNumNodesLength();
-  double cellwidth = fluid->getGridCellWidth();
-  double halfnodeswidth = nodeswidth / 2 * cellwidth;
-  double halfnodeslength = nodeslength / 2 * cellwidth;
-
-  for (int i = 0; i < nodeswidth; i++)
-  {
-    for (int j = 0; j < nodeslength; j++)
-    {
-      fluid->setFluidHeight(
-          i,
-          j,
-          oceanSurface->getSurfaceHeightAt(i * cellwidth - halfnodeswidth + cellwidth / 2,
-                                           j * cellwidth - halfnodeslength + cellwidth / 2) * -1);
-    }
-  }
 }
 
 btCollisionShape* BulletPhysics::GetCSFromOSG(osg::Node * node, collisionShapeType_t ctype)
@@ -448,73 +401,6 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
     body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
   }
 
-  return (body);
-}
-
-//Buoyant Shapes only admits simple convex  shapes
-btConvexShape* BulletPhysics::GetConvexCSFromOSG(osg::Node * node, collisionShapeType_t ctype)
-{
-  btConvexShape* cs = NULL;
-
-  if (ctype == SHAPE_BOX)
-    cs = osgbCollision::btBoxCollisionShapeFromOSG(node);
-  else if (ctype == SHAPE_SPHERE)
-    cs = osgbCollision::btSphereCollisionShapeFromOSG(node);
-
-  return cs;
-}
-
-btRigidBody* BulletPhysics::addFloatingObject(osg::MatrixTransform *root, osg::Node *node, CollisionDataType * data,
-                                              boost::shared_ptr<PhysicProperties> pp, osg::Node * colShape)
-{
-  if (!pp)
-  {
-    pp.reset(new PhysicProperties);
-    pp->init();
-  }
-
-  collisionShapeType_t ctype = SHAPE_BOX;
-
-  if (pp->csType == "box")
-    ctype = BulletPhysics::SHAPE_BOX;
-  else if (pp->csType == "sphere")
-    ctype = BulletPhysics::SHAPE_SPHERE;
-  else
-    OSG_WARN << data->name << " has an unknown collision shape type: " << pp->csType
-        << ". Using default box shape(dynamic) trimesh(kinematic). Check xml file, allowed collision shapes are 'box' 'compound box' 'trimesh' 'compound trimesh'."
-        << std::endl;
-
-  btConvexShape* cs;
-  if (colShape == NULL)
-    cs = GetConvexCSFromOSG(node, ctype);
-  else
-    cs = GetConvexCSFromOSG(colShape, ctype);
-
-  btVector3 inertia = btVector3(pp->inertia[0], pp->inertia[1], pp->inertia[2]);
-
-  MyMotionState* motion = new MyMotionState(node, root);
-  cs->calculateLocalInertia(pp->mass, inertia);
-
-  btHfFluidBuoyantConvexShape* buoyantShape = new btHfFluidBuoyantConvexShape(cs);
-  buoyantShape->generateShape(btScalar(0.05f), btScalar(0.01f));
-  buoyantShape->setFloatyness(btScalar(1.0f));
-
-  btRigidBody::btRigidBodyConstructionInfo rb(pp->mass, motion, buoyantShape, inertia);
-  btRigidBody* body = new btRigidBody(rb);
-
-  body->setUserPointer(data);
-
-  //body->setLinearFactor(btVector3(pp->linearFactor[0],pp->linearFactor[1],pp->linearFactor[2]));
-  //body->setAngularFactor(btVector3(pp->angularFactor[0],pp->angularFactor[1],pp->angularFactor[2]));
-
-  body->setDamping(pp->linearDamping, pp->angularDamping);
-
-  //addRigidBody adds its own collision masks, changing after object creation do not update masks so objects are removed and readded in order to update masks to improve collisions performance.
-  dynamicsWorld->addRigidBody(body);
-  dynamicsWorld->btCollisionWorld::removeCollisionObject(body);
-  dynamicsWorld->addCollisionObject(body, short(COL_OBJECTS), short(objectsCollidesWith));
-
-  body->setActivationState(DISABLE_DEACTIVATION);
   return (body);
 }
 

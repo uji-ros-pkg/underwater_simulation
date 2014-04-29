@@ -25,11 +25,6 @@
 
 #include <osgOcean/OceanScene>
 
-#include "BulletHfFluid/btHfFluidRigidDynamicsWorld.h"
-#include "BulletHfFluid/btHfFluidRigidCollisionConfiguration.h"
-#include "BulletHfFluid/btHfFluid.h"
-#include "BulletHfFluid/btHfFluidBuoyantConvexShape.h"
-
 //#include <osgbCollision/GLDebugDrawer.h>
 
 #define UWSIM_DEFAULT_GRAVITY	btVector3(0,0,-1)
@@ -86,10 +81,10 @@ public:
     SHAPE_BOX, SHAPE_SPHERE, SHAPE_TRIMESH, SHAPE_COMPOUND_TRIMESH, SHAPE_COMPOUND_BOX, SHAPE_COMPOUND_CYLINDER
   } collisionShapeType_t;
 
-  btHfFluidRigidDynamicsWorld * dynamicsWorld;
+  btDiscreteDynamicsWorld * dynamicsWorld;
   //osgbCollision::GLDebugDrawer debugDrawer;
 
-  BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf, PhysicsWater physicsWater);
+  BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf);
 
   void setGravity(btVector3 g)
   {
@@ -97,8 +92,6 @@ public:
   }
   btRigidBody* addObject(osg::MatrixTransform *root, osg::Node *node, CollisionDataType * data,
                          boost::shared_ptr<PhysicProperties> pp, osg::Node * colShape = NULL);
-  btRigidBody* addFloatingObject(osg::MatrixTransform *root, osg::Node *node, CollisionDataType * data,
-                                 boost::shared_ptr<PhysicProperties> pp, osg::Node * colShape = NULL);
 
   void stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep);
   void printManifolds();
@@ -145,19 +138,16 @@ public:
   TickCallbackManager * callbackManager;
 
 private:
-  btHfFluidRigidCollisionConfiguration * collisionConfiguration;
+  btDefaultCollisionConfiguration * collisionConfiguration;
   btCollisionDispatcher * dispatcher;
   btConstraintSolver * solver;
   btBroadphaseInterface * inter;
-  btHfFluid* fluid;
 
   osgOcean::OceanTechnique* oceanSurface;
 
   void cleanManifolds();
   btCollisionShape* GetCSFromOSG(osg::Node * node, collisionShapeType_t ctype);
-  btConvexShape* GetConvexCSFromOSG(osg::Node * node, collisionShapeType_t ctype);
 
-  void updateOceanSurface();
 };
 
 

@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
       if (debugDrawer)
       {
         debugDrawer->BeginDraw();
-        physicsBuilder.physics->dynamicsWorld->debugDraw();
+        physicsBuilder.physics->dynamicsWorld->debugDrawWorld();
         debugDrawer->EndDraw();
       }
     }

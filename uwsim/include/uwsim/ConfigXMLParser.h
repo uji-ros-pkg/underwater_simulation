@@ -352,23 +352,6 @@ struct Object
   boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
-struct PhysicsWater
-{
-  int enable;
-  double position[3];
-  double resolution;
-  double size[6];
-  void init()
-  {
-    enable = 0;
-    resolution = 0.25;
-    position[0] = position[1] = position[2] = 0;
-    size[0] = size[2] = size[4] = -10;
-    size[1] = size[3] = size[5] = 10;
-  }
-  ;
-};
-
 struct ShowTrajectory
 {
   std::string target;
@@ -399,8 +382,6 @@ public:
   void processFog(const xmlpp::Node* node);
   void processOceanState(const xmlpp::Node* node);
   void processSimParams(const xmlpp::Node* node);
-  void processPhysicsWater(const xmlpp::Node* node);
-  void processSize(const xmlpp::Node* node);
   void processShowTrajectory(const xmlpp::Node* node, ShowTrajectory & trajectory);
   void processParameters(const xmlpp::Node*, Parameters *params);
   void processVcam(const xmlpp::Node* node, Vcam &vcam);
@@ -443,7 +424,6 @@ public:
   list<ROSInterfaceInfo> ROSInterfaces;
   list<ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   list<ShowTrajectory> trajectories;
-  PhysicsWater physicsWater;
   double physicsFrequency;
   int physicsSubSteps;
 
