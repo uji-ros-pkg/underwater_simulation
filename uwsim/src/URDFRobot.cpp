@@ -45,32 +45,31 @@ struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback
     return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
   }
 
+  #if BT_BULLET_VERSION <= 279
   //! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
+  virtual btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObject * colObj0, int partId0, int index0,
+                                   const btCollisionObject * colObj1, int partId1, int index1)
+  #else
   virtual btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObjectWrapper * colObj0, int partId0, int index0,
                                    const btCollisionObjectWrapper * colObj1, int partId1, int index1)
+  #endif
   {
-    //std::cout<<"Checking"<<std::endl;
-    //CollisionDataType * nombre=(CollisionDataType *)colObj0->getUserPointer();
-    //CollisionDataType * nombre2=(CollisionDataType *)colObj1->getUserPointer();
     //Check if object colliding is Static or Kinematic (in that case no object reaction will be produced by bullet, so we stop the arm movement!)
+  #if BT_BULLET_VERSION <= 279
+    if (((colObj0->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
+        || (colObj0->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)
+        && ((colObj1->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
+            || (colObj1->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0))
+  #else
     if (((colObj0->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
         || (colObj0->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)
         && ((colObj1->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0
             || (colObj1->getCollisionObject()->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0))
+  #endif
     {
       collided = 1;
 
     }
-
-    /*std::cout<<((colObj0->getCollisionFlags() & btCollisionObject::CF_STATIC_OBJECT) > 0)<<" &&&& "<<((colObj1->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) > 0)<<std::endl;
-     std::cout<<colObj1->getCollisionFlags()<<" "<<btCollisionObject::CF_STATIC_OBJECT<<std::endl;
-     //std::cout<<cp.getDistance()<<" "<<cp.getLifeTime()<<std::endl;
-     std::cout<<"Collision ";
-     if(nombre)
-     std::cout<<nombre->name<<" "<<" ";
-     if(nombre2)
-     std::cout<<nombre2->name;
-     std::cout<<" "<<std::endl;*/
     return 0; // not actually sure if return value is used for anything...?
   }
 };
