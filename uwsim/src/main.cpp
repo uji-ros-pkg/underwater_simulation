@@ -154,10 +154,10 @@ int main(int argc, char *argv[])
       double elapsed(currSimTime - prevSimTime);
       if (view.getViewer()->getFrameStamp()->getFrameNumber() < 3)
         elapsed = 1. / 60.;
-      int subSteps = fmax(0, config.physicsSubSteps);
+      int subSteps = fmax(0, config.physicsConfig.subSteps);
       if (subSteps == 0)
-        subSteps = ceil(elapsed * config.physicsFrequency); //auto substep
-      physicsBuilder.physics->stepSimulation(elapsed, subSteps, 1 / config.physicsFrequency);
+        subSteps = ceil(elapsed * config.physicsConfig.frequency); //auto substep
+      physicsBuilder.physics->stepSimulation(elapsed, subSteps, 1 / config.physicsConfig.frequency);
       prevSimTime = currSimTime;
       if (debugDrawer)
       {

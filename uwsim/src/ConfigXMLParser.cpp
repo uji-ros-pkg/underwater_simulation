@@ -157,7 +157,7 @@ void ConfigFile::processOceanState(const xmlpp::Node* node)
       extractIntChar(child, isNotChoppy);
       if (isNotChoppy != 0 && isNotChoppy != 1)
       {
-        OSG_WARN << "ConfigFile::processOceanState: isNotChoppy is not a binary value ( 0 1), using default value (1)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processOceanState: isNotChoppy is not a binary value ( 0 1), using default value (1)"
             << std::endl;
         isNotChoppy = 1;
       }
@@ -190,7 +190,7 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
       extractIntChar(child, disableShaders);
       if (disableShaders != 0 && disableShaders != 1)
       {
-        OSG_WARN << "ConfigFile::processSimParams: disableShaders is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processSimParams: disableShaders is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         disableShaders = 0;
       }
@@ -200,7 +200,7 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
       extractIntChar(child, eye_in_hand);
       if (eye_in_hand != 0 && eye_in_hand != 1)
       {
-        OSG_WARN << "ConfigFile::processSimParams: eye_in_hand is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processSimParams: eye_in_hand is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         eye_in_hand = 0;
       }
@@ -214,21 +214,37 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
     else if (child->get_name() == "offsetr")
       extractPositionOrColor(child, offsetr);
     else if (child->get_name() == "gravity")
-      extractPositionOrColor(child, gravity);
+      extractPositionOrColor(child, physicsConfig.gravity);
     else if (child->get_name() == "enablePhysics")
     {
       extractIntChar(child, enablePhysics);
       if (enablePhysics != 0 && enablePhysics != 1)
       {
-        OSG_WARN << "ConfigFile::processSimParams: enablePhysics is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processSimParams: enablePhysics is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         enablePhysics = 0;
       }
     }
     else if (child->get_name() == "physicsFrequency")
-      extractFloatChar(child, physicsFrequency);
+      extractFloatChar(child, physicsConfig.frequency);
     else if (child->get_name() == "physicsSubSteps")
-      extractIntChar(child, physicsSubSteps);
+      extractIntChar(child, physicsConfig.subSteps);
+    else if (child->get_name() == "physicsSolver"){
+      std::string aux;
+      extractStringChar(child, aux);
+      if(aux=="Dantzig" || aux=="dantzig")
+	physicsConfig.solver=PhysicsConfig::Dantzig;
+      else if(aux=="SolveProjectedGauss" || aux=="solveProjectedGauss")
+	physicsConfig.solver=PhysicsConfig::SolveProjectedGauss;
+      else if( aux=="SequentialImpulse" || aux=="sequentialImpulse")
+	physicsConfig.solver=PhysicsConfig::SequentialImpulse;
+      else
+      {
+        osg::notify(osg::ALWAYS) << "ConfigFile::processSimParams: unknown physicsSolver, available solvers are Dantzig"<<
+        ", SolveProjectedGauss and SequentialImpulse. Using default Dantzig."<< std::endl;
+	physicsConfig.solver=PhysicsConfig::Dantzig;
+      }
+    }
     else if (child->get_name() == "showTrajectory")
     {
       ShowTrajectory aux;
@@ -318,7 +334,7 @@ void ConfigFile::processVcam(const xmlpp::Node* node, Vcam &vcam)
       extractIntChar(child, vcam.bw);
       if (vcam.bw != 0 && vcam.bw != 1)
       {
-        OSG_WARN << "ConfigFile::processVcam: grayscale is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processVcam: grayscale is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         vcam.bw = 0;
       }
@@ -464,7 +480,7 @@ void ConfigFile::processCamera(const xmlpp::Node* node)
       extractIntChar(child, freeMotion);
       if (freeMotion != 0 && freeMotion != 1)
       {
-        OSG_WARN << "ConfigFile::processCamera: freeMotion is not a binary value ( 0 1), using default value (1)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processCamera: freeMotion is not a binary value ( 0 1), using default value (1)"
             << std::endl;
         freeMotion = 1;
       }
@@ -592,7 +608,7 @@ void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint 
     jointVehicle.type = 2;
   else
   {
-    OSG_WARN << "Unsupported type of joint in " << joint->name << ", fixed joint will be used." << std::endl;
+    osg::notify(osg::ALWAYS) << "Unsupported type of joint in " << joint->name << ", fixed joint will be used." << std::endl;
     jointVehicle.type = 0;
   }
 
@@ -666,7 +682,7 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle)
   std::string file_fullpath = osgDB::findDataFile(file);
   if (file_fullpath == std::string("") || !model.initFile(file_fullpath))
   {
-    std::cerr << "Failed to parse urdf file " << file << std::endl;
+    osg::notify(osg::ALWAYS) << "Failed to parse urdf file " << file << std::endl;
     exit(0);
   }
   vehicle.URDFFile=file_fullpath;
@@ -742,7 +758,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: Camera attached to unknown link: " << aux.linkName
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: Camera attached to unknown link: " << aux.linkName
           << " camera will be ignored" << std::endl;
     }
     else
@@ -766,7 +782,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: Range Camera attached to unknown link: " << aux.linkName
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: Range Camera attached to unknown link: " << aux.linkName
           << " camera will be ignored" << std::endl;
     }
     else
@@ -790,7 +806,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: Structured Light Projector attached to unknown link: "
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: Structured Light Projector attached to unknown link: "
           << slp.linkName << ". Will be ignored" << std::endl;
     }
     else
@@ -816,7 +832,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: RangeSensor attached to unknown link: " << rs.linkName
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: RangeSensor attached to unknown link: " << rs.linkName
           << ". Will be ignored" << std::endl;
     }
     else
@@ -840,7 +856,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: IMU attached to unknown link: " << imu.linkName
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: IMU attached to unknown link: " << imu.linkName
           << ". Will be ignored" << std::endl;
     }
     else
@@ -864,7 +880,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ConfigFile::postProcessVehicle: PressureSensor attached to unknown link: " << ps.linkName
+      osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: PressureSensor attached to unknown link: " << ps.linkName
           << ". Will be ignored" << std::endl;
     }
     else
@@ -889,7 +905,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
       }
       if (found == 0)
       {
-        OSG_WARN << "ConfigFile::postProcessVehicle: GPSSensor attached to unknown link: " << s.linkName
+        osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: GPSSensor attached to unknown link: " << s.linkName
             << ". Will be ignored" << std::endl;
       }
       else
@@ -915,7 +931,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
       }
       if (found == 0)
       {
-        OSG_WARN << "ConfigFile::postProcessVehicle: DVLSensor attached to unknown link: " << s.linkName
+        osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: DVLSensor attached to unknown link: " << s.linkName
             << ". Will be ignored" << std::endl;
       }
       else
@@ -941,7 +957,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
       }
       if (found == 0)
       {
-        OSG_WARN << "ConfigFile::postProcessVehicle: multibeamSensor attached to unknown link: " << MB.linkName
+        osg::notify(osg::ALWAYS) << "ConfigFile::postProcessVehicle: multibeamSensor attached to unknown link: " << MB.linkName
             << ". Will be ignored" << std::endl;
       }
       else
@@ -965,7 +981,7 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
     }
     if (found == 0)
     {
-      OSG_WARN << "ObjectPicker attached to unknown link: " << rs.linkName << ". Will be ignored" << std::endl;
+      osg::notify(osg::ALWAYS) << "ObjectPicker attached to unknown link: " << rs.linkName << ". Will be ignored" << std::endl;
     }
     else
       vehicle.object_pickers.push_back(rs);
@@ -1094,13 +1110,13 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
     {
       extractFloatChar(child, pp.linearDamping);
       if (pp.linearDamping > 1.0)
-        OSG_WARN << "ConfigFile::PhysicProperties: linearDamping is higher than 1.0." << std::endl;
+        osg::notify(osg::ALWAYS) << "ConfigFile::PhysicProperties: linearDamping is higher than 1.0." << std::endl;
     }
     else if (child->get_name() == "angularDamping")
     {
       extractFloatChar(child, pp.angularDamping);
       if (pp.linearDamping > 1.0)
-        OSG_WARN << "ConfigFile::PhysicProperties: angularDamping is higher than 1.0." << std::endl;
+        osg::notify(osg::ALWAYS) << "ConfigFile::PhysicProperties: angularDamping is higher than 1.0." << std::endl;
     }
     else if (child->get_name() == "minLinearLimit")
       extractPositionOrColor(child, pp.minLinearLimit);
@@ -1111,7 +1127,7 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
       extractIntChar(child, pp.isKinematic);
       if (pp.isKinematic != 0 && pp.isKinematic != 1)
       {
-        OSG_WARN << "ConfigFile::PhysicProperties: isKinematic is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::PhysicProperties: isKinematic is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         freeMotion = 0;
       }
@@ -1192,7 +1208,7 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &
       extractUIntChar(child, rosInterface.blackWhite);
       if (rosInterface.blackWhite != 0 && rosInterface.blackWhite != 1)
       {
-        OSG_WARN << "ConfigFile::processROSInterface: blackWhite is not a binary value ( 0 1), using default value (0)"
+        osg::notify(osg::ALWAYS) << "ConfigFile::processROSInterface: blackWhite is not a binary value ( 0 1), using default value (0)"
             << std::endl;
         rosInterface.blackWhite = 0;
       }
@@ -1343,7 +1359,7 @@ void ConfigFile::processXML(const xmlpp::Node* node)
 {
   if (node->get_name() != "UWSimScene")
   {
-    OSG_WARN << "ConfigFile::processXML: XML file is not an UWSimScene file." << std::endl;
+    osg::notify(osg::ALWAYS) << "ConfigFile::processXML: XML file is not an UWSimScene file." << std::endl;
   }
   else
   {
@@ -1384,11 +1400,9 @@ ConfigFile::ConfigFile(const std::string &fName)
 {
   memset(offsetr, 0, 3 * sizeof(double));
   memset(offsetp, 0, 3 * sizeof(double));
-  memset(gravity, 0, 3 * sizeof(double));
   camNear = camFar = -1;
   enablePhysics = 0;
-  physicsFrequency = 60;
-  physicsSubSteps = 0;
+  physicsConfig.init();
   try
   {
     xmlpp::DomParser parser;
@@ -1407,14 +1421,14 @@ ConfigFile::ConfigFile(const std::string &fName)
     }
     else
     {
-      std::cerr << "Cannot locate file " << fName << std::endl;
+      osg::notify(osg::ALWAYS) << "Cannot locate file " << fName << std::endl;
       exit(0);
     }
   }
   catch (const std::exception& ex)
   {
-    std::cerr << "Exception caught: " << ex.what() << std::endl;
-    std::cerr << "Please check your XML file" << std::endl;
+    osg::notify(osg::ALWAYS) << "Exception caught: " << ex.what() << std::endl;
+    osg::notify(osg::ALWAYS) << "Please check your XML file" << std::endl;
     exit(0);
   }
 

@@ -84,7 +84,7 @@ public:
   btDiscreteDynamicsWorld * dynamicsWorld;
   //osgbCollision::GLDebugDrawer debugDrawer;
 
-  BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf);
+  BulletPhysics(PhysicsConfig physicsConfig, osgOcean::OceanTechnique* oceanSurf);
 
   void setGravity(btVector3 g)
   {

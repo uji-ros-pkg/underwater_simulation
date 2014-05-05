@@ -365,6 +365,27 @@ struct ShowTrajectory
   }
 };
 
+struct PhysicsConfig
+{
+ typedef enum
+ {
+    Dantzig,SolveProjectedGauss,SequentialImpulse
+ } solver_type;
+ double gravity[3];
+ double frequency;
+ int subSteps;
+ solver_type solver;
+
+ void init()
+ {
+   memset(gravity, 0, 3 * sizeof(double));
+   frequency = 60;
+   subSteps = 0;
+   solver=Dantzig;
+ }
+ 
+};
+
 class ConfigFile
 {
 public:
@@ -417,15 +438,15 @@ public:
          oceanSurfaceHeight, fogDensity;
   int isNotChoppy, disableShaders, eye_in_hand, freeMotion, resw, resh, enablePhysics;
   string arm, vehicleToTrack;
-  double camPosition[3], camLookAt[3], fogColor[3], color[3], attenuation[3], offsetr[3], offsetp[3], gravity[3];
+  double camPosition[3], camLookAt[3], fogColor[3], color[3], attenuation[3], offsetr[3], offsetp[3];
   double camFov, camAspectRatio, camNear, camFar;
   list<Vehicle> vehicles;
   list<Object> objects;
   list<ROSInterfaceInfo> ROSInterfaces;
   list<ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   list<ShowTrajectory> trajectories;
-  double physicsFrequency;
-  int physicsSubSteps;
+  PhysicsConfig physicsConfig;
+
 
   ConfigFile(const std::string &fName);
 };

@@ -12,6 +12,12 @@
 
 #include <uwsim/BulletPhysics.h>
 
+#if BT_BULLET_VERSION > 279
+#include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
+#include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
+#include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+#endif
+
 // Define filter masks
 unsigned int vehicleCollidesWith(COL_OBJECTS);
 unsigned int objectsCollidesWith(COL_EVERYTHING);
@@ -171,11 +177,29 @@ void postTickCallback(btDynamicsWorld *world, btScalar timeStep)
 }
 
 //oceanSurf is not used right now, but should be to add water physics
-BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* oceanSurf) 
+BulletPhysics::BulletPhysics(PhysicsConfig physicsConfig, osgOcean::OceanTechnique* oceanSurf) 
 {
   collisionConfiguration = new btDefaultCollisionConfiguration();
   dispatcher = new btCollisionDispatcher(collisionConfiguration);
-  solver = new btSequentialImpulseConstraintSolver();
+  
+  #if BT_BULLET_VERSION <= 279
+    solver = new btSequentialImpulseConstraintSolver();
+  #else
+    if(physicsConfig.solver==PhysicsConfig::Dantzig){
+      btDantzigSolver* mlcp = new btDantzigSolver();
+      solver = new btMLCPSolver(mlcp);
+    }
+
+    else if(physicsConfig.solver==PhysicsConfig::SolveProjectedGauss){
+      btSolveProjectedGaussSeidel* mlcp = new btSolveProjectedGaussSeidel;
+      solver = new btMLCPSolver(mlcp);
+    }
+
+    else if(physicsConfig.solver==PhysicsConfig::SequentialImpulse){
+      solver = new btSequentialImpulseConstraintSolver();
+    }
+  #endif
+
 
   btVector3 worldAabbMin(-10000, -10000, -10000);
   btVector3 worldAabbMax(10000, 10000, 10000);
@@ -184,8 +208,8 @@ BulletPhysics::BulletPhysics(double configGravity[3], osgOcean::OceanTechnique* 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, inter, solver, collisionConfiguration);
   dynamicsWorld->getDispatchInfo().m_enableSPU = true;
 
-  btVector3 gravity(configGravity[0], configGravity[1], configGravity[2]);
-  if (configGravity[0] == 0 && configGravity[1] == 0 && configGravity[2] == 0)
+  btVector3 gravity(physicsConfig.gravity[0], physicsConfig.gravity[1], physicsConfig.gravity[2]);
+  if (physicsConfig.gravity[0] == 0 && physicsConfig.gravity[1] == 0 && physicsConfig.gravity[2] == 0)
   {
     gravity = UWSIM_DEFAULT_GRAVITY;
   }

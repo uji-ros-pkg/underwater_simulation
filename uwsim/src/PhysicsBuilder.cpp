@@ -20,7 +20,7 @@ PhysicsBuilder::PhysicsBuilder(SceneBuilder * scene_builder, ConfigFile config)
 void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config)
 {
 
-  physics = new BulletPhysics(config.gravity, scene_builder->scene->getOceanSurface());
+  physics = new BulletPhysics(config.physicsConfig, scene_builder->scene->getOceanSurface());
   OSG_INFO << "Loading Physics" << std::endl;
 
   //Add physics to vehicles
