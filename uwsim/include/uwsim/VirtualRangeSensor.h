@@ -96,7 +96,7 @@ public:
       color->push_back(osg::Vec4(0.0, 1.0, 0.0, 0.6));
       beam->setVertexArray(points.get());
       beam->setColorArray(color.get());
-      beam->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE);
+      beam->setColorBinding(osg::Geometry::BIND_OVERALL);
       beam->addPrimitiveSet(new osg::DrawArrays(GL_LINES, 0, 2));
       geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
       geode->addDrawable(beam.get());
