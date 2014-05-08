@@ -4,8 +4,9 @@
   <version>1.2.0</version>
   <description>Common messages for underwater robotics</description>
 
-  <maintainer email="marioprats@gmail.com">Mario Prats</maintainer>
   <author email="marioprats@gmail.com">Mario Prats</author>
+  <maintainer email="marioprats@gmail.com">Mario Prats</maintainer>
+  <maintainer email="perezsolerj@gmail.com">Javier Perez</maintainer>
 
   <license>BSD</license>
 
