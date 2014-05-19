@@ -601,6 +601,32 @@ ArmToROSJointState::~ArmToROSJointState()
 {
 }
 
+void VirtualCameraToROSImage::CameraBufferCallback::operator () (const osg::Camera& camera) const
+{
+  if(pub)
+  {
+    while(pub->isPublishing()) //If interface is publishing wait to copy.
+    {
+    ;
+    }
+    if (depth)
+    {
+      pub->osgimage = new osg::Image(*cam->depthTexture.get());
+    }
+    else
+    {
+     pub->osgimage = new osg::Image(*cam->renderTexture.get());
+    }
+  }
+}
+
+VirtualCameraToROSImage::CameraBufferCallback::CameraBufferCallback(VirtualCameraToROSImage * publisher,VirtualCamera *camera,int depth)
+{
+  pub = publisher;
+  cam=camera; //We could read data from cameracb, but it is already on virtualCamera.
+  this->depth=depth;
+}
+
 VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic,
                                                  int rate, int depth) :
     ROSPublisherInterface(info_topic, rate), cam(camera), image_topic(topic)
@@ -608,6 +634,9 @@ VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::str
   it.reset(new image_transport::ImageTransport(nh_));
   this->depth = depth;
   this->bw = camera->bw;
+  publishing=0;
+  CameraBufferCallback * buffercb = new  CameraBufferCallback(this,cam,depth); 
+  cam->textureCamera->setPostDrawCallback(buffercb); 
 }
 
 void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh)
@@ -624,15 +653,7 @@ void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh)
 void VirtualCameraToROSImage::publish()
 {
   //OSG_DEBUG << "OSGImageToROSImage::publish entering" << std::endl;
-  osg::ref_ptr < osg::Image > osgimage;
-  if (depth)
-  {
-    osgimage = cam->depthTexture;
-  }
-  else
-  {
-    osgimage = cam->renderTexture;
-  }
+  publishing=1;
   if (osgimage != NULL && osgimage->getTotalSizeInBytes() != 0)
   {
     //OSG_DEBUG << "\t image size: " << cam->renderTexture->s() << " " << cam->renderTexture->t() << " " << cam->renderTexture->getTotalSizeInBytes() << std::endl;
@@ -741,6 +762,7 @@ void VirtualCameraToROSImage::publish()
       pub_.publish(img_info);
     }
   }
+  publishing=0;
   //OSG_DEBUG << "OSGImageToROSImage::publish exit" << std::endl;
 }
 
