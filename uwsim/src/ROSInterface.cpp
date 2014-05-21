@@ -89,6 +89,7 @@ void ROSOdomToPAT::processData(const nav_msgs::Odometry::ConstPtr& odom)
       sMsv_osg.setRotate(
           osg::Quat(odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z,
                     odom->pose.pose.orientation.w));
+      sMsv_osg.preMultScale(transform->getMatrix().getScale());
     }
     else
     {
@@ -222,6 +223,7 @@ void ROSPoseToPAT::processData(const geometry_msgs::Pose::ConstPtr& pose)
 
     sMsv_osg.setTrans(pose->position.x, pose->position.y, pose->position.z);
     sMsv_osg.setRotate(osg::Quat(pose->orientation.x, pose->orientation.y, pose->orientation.z, pose->orientation.w));
+    sMsv_osg.preMultScale(transform->getMatrix().getScale());
 
     transform->setMatrix(sMsv_osg);
 

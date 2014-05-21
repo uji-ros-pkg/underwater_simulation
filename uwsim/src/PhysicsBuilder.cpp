@@ -113,7 +113,7 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
     
     //wMb->setUserData(data); 
 
-    //store physiscs in object's data
+    //store physics in object's data
     osg::ref_ptr < NodeDataType > data = dynamic_cast<NodeDataType*>(scene_builder->objects[i]->getUserData());
     data->rigidBody = rigidBody;
     scene_builder->objects[i]->setUserData(data);
