@@ -242,7 +242,6 @@
     <ROSOdomToPAT>
       <topic> /dataNavigator </topic>
       <vehicleName> girona500 </vehicleName>
-      <visualize> 1 </visualize>
     </ROSOdomToPAT>
     <PATToROSOdom>
       <topic> /uwsim/girona500_odom </topic>
