@@ -607,10 +607,7 @@ void VirtualCameraToROSImage::CameraBufferCallback::operator () (const osg::Came
 {
   if(pub)
   {
-    while(pub->isPublishing()) //If interface is publishing wait to copy.
-    {
-    ;
-    }
+    pub->mutex.lock();
     if (depth)
     {
       pub->osgimage = new osg::Image(*cam->depthTexture.get());
@@ -619,6 +616,7 @@ void VirtualCameraToROSImage::CameraBufferCallback::operator () (const osg::Came
     {
      pub->osgimage = new osg::Image(*cam->renderTexture.get());
     }
+    pub->mutex.unlock();
   }
 }
 
@@ -636,7 +634,6 @@ VirtualCameraToROSImage::VirtualCameraToROSImage(VirtualCamera *camera, std::str
   it.reset(new image_transport::ImageTransport(nh_));
   this->depth = depth;
   this->bw = camera->bw;
-  publishing=0;
   CameraBufferCallback * buffercb = new  CameraBufferCallback(this,cam,depth); 
   cam->textureCamera->setPostDrawCallback(buffercb); 
 }
@@ -655,7 +652,6 @@ void VirtualCameraToROSImage::createPublisher(ros::NodeHandle &nh)
 void VirtualCameraToROSImage::publish()
 {
   //OSG_DEBUG << "OSGImageToROSImage::publish entering" << std::endl;
-  publishing=1;
   if (osgimage != NULL && osgimage->getTotalSizeInBytes() != 0)
   {
     //OSG_DEBUG << "\t image size: " << cam->renderTexture->s() << " " << cam->renderTexture->t() << " " << cam->renderTexture->getTotalSizeInBytes() << std::endl;
@@ -723,6 +719,7 @@ void VirtualCameraToROSImage::publish()
 
       //img_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
 
+      mutex.lock();
       unsigned char *virtualdata = (unsigned char*)osgimage->data();
       //memcpy(&(img.data.front()),virtualdata,d*sizeof(char));
       //Memory cannot be directly copied, since the image frame used in OpenSceneGraph (OpenGL glReadPixels) is on
@@ -759,12 +756,12 @@ void VirtualCameraToROSImage::publish()
         }
       else
         memset(&(img.data.front()), 0, d);
+      mutex.unlock();
 
       img_pub_.publish(img);
       pub_.publish(img_info);
     }
   }
-  publishing=0;
   //OSG_DEBUG << "OSGImageToROSImage::publish exit" << std::endl;
 }
 

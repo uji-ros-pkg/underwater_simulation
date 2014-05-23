@@ -381,13 +381,11 @@ class VirtualCameraToROSImage : public ROSPublisherInterface
   image_transport::Publisher img_pub_;
   std::string image_topic;
   VirtualCamera *cam;
-  int publishing;
   int depth;
   int bw;
 public:
 
   VirtualCameraToROSImage(VirtualCamera *camera, std::string topic, std::string info_topic, int rate, int depth);
-  int isPublishing(){return publishing;};
 
   void createPublisher(ros::NodeHandle &nh);
 
@@ -396,6 +394,7 @@ public:
   ~VirtualCameraToROSImage();
 
   osg::ref_ptr < osg::Image > osgimage;
+  OpenThreads::Mutex mutex; //Mutex to avoid image overwriting
 
 };
 
