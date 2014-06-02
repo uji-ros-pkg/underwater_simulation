@@ -95,7 +95,10 @@ public:
 
   virtual void getWorldTransform(btTransform &worldTrans) const
   {
-    worldTrans = osgbCollision::asBtTransform(*getWorldCoords(object));
+    boost::shared_ptr<osg::Matrix> mat = getWorldCoords(object);
+    //BTTransforms do not use scale, so we turn it back to 1.
+    mat->preMultScale(osg::Vec3d(1.0/mat->getScale().x(),1.0/mat->getScale().y(),1.0/mat->getScale().z())); 
+    worldTrans = osgbCollision::asBtTransform(*mat);
   }
 
   virtual void setWorldTransform(const btTransform &worldTrans)
@@ -107,15 +110,15 @@ public:
     osg::Matrixd worldMatrix;
     btQuaternion rot = worldTrans.getRotation();
     btVector3 pos = worldTrans.getOrigin();
+    worldMatrix.makeRotate(osg::Quat(rot.x(), rot.y(), rot.z(), rot.w()));
     worldMatrix.setTrans(osg::Vec3d(pos.x(), pos.y(), pos.z()));
-    worldMatrix.setRotate(osg::Quat(rot.x(), rot.y(), rot.z(), rot.w()));
+    //BTtransforms do not use scale, as collisionShape is scaled to Node scale we apply osg scale
+    worldMatrix.preMultScale(osg::Vec3d(mat->getScale().x(),mat->getScale().y(),mat->getScale().z()));
 
     //matrix transform from object initial position to final position
     osg::Matrixd rootmat = worldMatrix * (mat->inverse(*mat));
 
     //Apply transform to object matrix
-    rootmat.setTrans(rootmat.getTrans());
-    rootmat.setRotate(rootmat.getRotate());
     transf->setMatrix(rootmat);
   }
 
@@ -351,6 +354,10 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
     cs = GetCSFromOSG(node, ctype);
   else
     cs = GetCSFromOSG(colShape, ctype);
+
+  //As btTransforms do not work with scale, we scale the collision shape
+  boost::shared_ptr<osg::Matrix> mat = getWorldCoords(node);
+  cs->setLocalScaling(btVector3(mat->getScale().x(),mat->getScale().y(),mat->getScale().z()));
 
   btVector3 inertia = btVector3(pp->inertia[0], pp->inertia[1], pp->inertia[2]);
 

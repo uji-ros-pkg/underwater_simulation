@@ -53,6 +53,7 @@ public:
   boost::shared_ptr<URDFRobot> urdf; ///< URDF I-AUV
   //osg::LightSource* lightSource;	///< vehicle lamp
   osg::ref_ptr<osg::MatrixTransform> baseTransform;
+  osg::Vec3d scale;  //Vehicle scale factor
 
   SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicle);
 

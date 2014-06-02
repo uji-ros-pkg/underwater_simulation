@@ -170,13 +170,16 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
       linkBase.preMultRotate(
           osg::Quat(vehicle.links[i].quat[0], vehicle.links[i].quat[1], vehicle.links[i].quat[2],
                     vehicle.links[i].quat[3]));
+      linkBase.preMultScale(osg::Vec3d(vehicle.links[i].geom->scale[0],vehicle.links[i].geom->scale[1],vehicle.links[i].geom->scale[2]));
 
       linkBaseTransforms[i] = new osg::MatrixTransform;
       linkBaseTransforms[i]->setMatrix(linkBase);
       linkBaseTransforms[i]->addChild(link[i]);
 
       //linkBase.invert(linkPost);
-      linkPost.makeRotate(
+      linkPost.makeIdentity();
+      linkPost.preMultScale(osg::Vec3d(1.0/vehicle.links[i].geom->scale[0],1.0/vehicle.links[i].geom->scale[1],1.0/vehicle.links[i].geom->scale[2]));
+      linkPost.preMultRotate(
           osg::Quat(vehicle.links[i].quat[0], vehicle.links[i].quat[1], vehicle.links[i].quat[2],
                     vehicle.links[i].quat[3]).inverse());
       linkPost.preMultTranslate(
@@ -306,7 +309,10 @@ void URDFRobot::updateJoints(std::vector<double> &q)
     btRigidBody* tgtBody = data->rigidBody;
     if (tgtBody)
     {
-      tgtBody->setWorldTransform(osgbCollision::asBtTransform(*getWorldCoords(link[i])));
+      boost::shared_ptr<osg::Matrix> mat = getWorldCoords(link[i]);
+      //BTTransforms do not use scale, so we turn it back to 1.
+      mat->preMultScale(osg::Vec3d(1.0/mat->getScale().x(),1.0/mat->getScale().y(),1.0/mat->getScale().z())); 
+      tgtBody->setWorldTransform(osgbCollision::asBtTransform(*mat));
       ContactSensorCallback callback(*tgtBody);
       physics->dynamicsWorld->contactTest(tgtBody, callback);
       collision = callback.collided;

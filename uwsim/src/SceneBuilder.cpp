@@ -182,8 +182,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
         osg::Quat(auxObject.orientation[0], osg::Vec3d(1, 0, 0), auxObject.orientation[1], osg::Vec3d(0, 1, 0),
                   auxObject.orientation[2], osg::Vec3d(0, 0, 1)));
     wMb_m.setTrans(auxObject.position[0], auxObject.position[1], auxObject.position[2]);
-    //if(auxObject.name!="terrain")
-    //wMb_m.preMultScale(osg::Vec3d(5,2,1));
+    wMb_m.preMultScale(osg::Vec3d(auxObject.scale[0],auxObject.scale[1],auxObject.scale[2]));
 
     osg::ref_ptr < osg::MatrixTransform > wMb = new osg::MatrixTransform(wMb_m);
     osg::Node *object = scene->addObject(wMb, auxObject.file, &auxObject);

@@ -539,12 +539,18 @@ void ConfigFile::processPose(urdf::Pose pose, double position[3], double rpy[3],
 
 void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom)
 {
-
+  //init scale to 1, just in case.
+  geom->scale[0] = 1;
+  geom->scale[1] = 1;    
+  geom->scale[2] = 1;
   if (geometry->type == urdf::Geometry::MESH)
   {
     urdf::Mesh *mesh = dynamic_cast<urdf::Mesh*>(geometry);
     geom->file = mesh->filename;
     geom->type = 0;
+    geom->scale[0] = mesh->scale.x;
+    geom->scale[1] = mesh->scale.y;    
+    geom->scale[2] = mesh->scale.z;
   }
   else if (geometry->type == urdf::Geometry::BOX)
   {
@@ -645,6 +651,9 @@ int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &v
     processVisual(link->visual, vehicle.links[nlink], materials);
   else
   {
+    vehicle.links[nlink].geom->scale[0] = 1;
+    vehicle.links[nlink].geom->scale[1] = 1;    
+    vehicle.links[nlink].geom->scale[2] = 1;
     vehicle.links[nlink].geom->type = 4;
     vehicle.links[nlink].material = std::string();
     memset(vehicle.links[nlink].position, 0, 3 * sizeof(double));
@@ -1007,6 +1016,8 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
       extractPositionOrColor(child, vehicle.position);
     else if (child->get_name() == "orientation")
       extractOrientation(child, vehicle.orientation);
+    else if (child->get_name() == "scaleFactor")
+      extractPositionOrColor(child, vehicle.scale);
     else if (child->get_name() == "jointValues")
       processJointValues(child, vehicle.jointValues, vehicle.ninitJoints);
     else if (child->get_name() == "virtualCamera")
@@ -1155,6 +1166,8 @@ void ConfigFile::processObject(const xmlpp::Node* node, Object &object)
       extractPositionOrColor(child, object.position);
     else if (child->get_name() == "orientation")
       extractOrientation(child, object.orientation);
+    else if (child->get_name() == "scaleFactor")
+      extractPositionOrColor(child, object.scale);
     else if (child->get_name() == "offsetp")
       extractPositionOrColor(child, object.offsetp);
     else if (child->get_name() == "offsetr")
@@ -1376,6 +1389,7 @@ void ConfigFile::processXML(const xmlpp::Node* node)
       else if (child->get_name() == "vehicle")
       {
         Vehicle vehicle;
+	vehicle.scale[0]=1;vehicle.scale[1]=1;vehicle.scale[2]=1;
         processVehicle(child, vehicle);
         postprocessVehicle(vehicle);
         vehicles.push_back(vehicle);
@@ -1383,6 +1397,7 @@ void ConfigFile::processXML(const xmlpp::Node* node)
       else if (child->get_name() == "object")
       {
         Object object;
+	object.scale[0]=1;object.scale[1]=1;object.scale[2]=1;
         memset(object.offsetp, 0, 3 * sizeof(double));
         memset(object.offsetr, 0, 3 * sizeof(double));
         object.physicProperties.reset();

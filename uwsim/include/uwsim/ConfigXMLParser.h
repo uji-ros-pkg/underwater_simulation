@@ -246,6 +246,7 @@ struct Geometry
   double boxSize[3]; //only used in box type
   double length, radius; //only used in cylinder and sphere types
   string file; // only used in mesh type
+  double scale[3]; //used in mesh files
 };
 
 struct Link
@@ -288,6 +289,7 @@ struct Vehicle
   int ninitJoints;
   double position[3];
   double orientation[3];
+  double scale[3];
   std::vector<double> jointValues;
   std::map<std::string, Material> materials;
   std::list<Vcam> Vcams;
@@ -347,6 +349,7 @@ struct Object
   string name, file;
   double position[3];
   double orientation[3];
+  double scale[3];
   double offsetp[3];
   double offsetr[3];
   boost::shared_ptr<PhysicProperties> physicProperties;
