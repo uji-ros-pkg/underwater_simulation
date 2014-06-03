@@ -6,7 +6,7 @@
 	<rosparam param="/g500/dynamics/external_force_topic">g500/ForceSensor</rosparam>
 
 	<arg name="scene" default="cirs.xml" />
-	<node name="uwsim" pkg="uwsim" type="uwsim" args="--configfile=$(arg scene)" output="screen" respawn="false" />
+	<node name="uwsim" pkg="uwsim" type="uwsim" args="--configfile $(arg scene)" output="screen" respawn="false" />
 	<arg name="thrusters_topic" default="/g500/thrusters_input" />
 	<node name="keyboard_command" pkg="underwater_vehicle_dynamics" type="keyboard.py" args="$(arg thrusters_topic)" output="screen" respawn="false"/>
 </launch>
