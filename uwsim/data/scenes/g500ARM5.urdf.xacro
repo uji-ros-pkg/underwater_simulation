@@ -32,7 +32,7 @@
 
   <link name="part0">
     <visual>
-      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+      <origin rpy="${pi} 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="${robot_parts_path}_part0.${ext}"/>
       </geometry>
