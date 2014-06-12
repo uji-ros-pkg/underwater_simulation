@@ -33,7 +33,6 @@ class SimulatedIAUV
 {
 public:
   std::vector<VirtualCamera> camview;
-  std::vector<VirtualCamera> camrange;
   std::vector<VirtualRangeSensor> range_sensors;
   std::vector<VirtualSLSProjector> sls_projectors;
   std::vector<ObjectPicker> object_pickers;

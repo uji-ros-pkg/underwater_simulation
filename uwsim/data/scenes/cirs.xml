@@ -242,7 +242,7 @@
         <z> 0 </z>
       </position>  
       <orientation>
-        <r>0</r>
+        <r>3.14</r>
         <p>0</p>
         <y>3.14 </y>
       </orientation>

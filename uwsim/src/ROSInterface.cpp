@@ -995,6 +995,31 @@ void WorldToROSTF::publish()
          tfpub_->sendTransform(t2);
          tfpub_->sendTransform(t);  
       }
+      boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(findRN("localizedWorld",rootNode_));
+      osg::Matrix IAUVMat= transforms_[i]->getMatrix() * *LWMat ;
+      osg::Matrix iIAUVMat;
+      iIAUVMat.invert(IAUVMat);
+      //publish_cameras (including multibeam and slp)
+      for(int j=0; j< iauvFile_[i].get()->camview.size();j++){
+	boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(iauvFile_[i].get()->camview[j].trackNode);
+
+        osg::Matrix OSGToTFconvention;
+        OSGToTFconvention.makeRotate(M_PI,osg::Vec3d(1,0,0)); //OSG convention is different to tf:
+        //Remember that in opengl/osg, the camera frame is a right-handed system with Z going backwards (opposite to the viewing direction) and Y up.
+        //While in tf convention, the camera frame is a right-handed system with Z going forward (in the viewing direction) and Y down.
+	//check if camera comes from multibeam
+	for(int k=0;k<iauvFile_[i].get()->multibeam_sensors.size();k++)
+	  if(iauvFile_[i].get()->multibeam_sensors[k].name==iauvFile_[i].get()->camview[j].name)
+            OSGToTFconvention.makeRotate(M_PI/2,osg::Vec3d(0,1,0));  //As we are using camera to simulate it, we need to rotate it
+        
+        osg::Matrixd  res=OSGToTFconvention * *objectMat * iIAUVMat;
+        tf::Vector3 p2(res.getTrans().x(), res.getTrans().y(), res.getTrans().z());
+        tf::Quaternion q2(res.getRotate().x(), res.getRotate().y(), res.getRotate().z(), res.getRotate().w());
+        tf::Pose pose2(q2,p2);
+        tf::StampedTransform t(pose2, getROSTime(),   "/"+iauvFile_[i].get()->name, iauvFile_[i].get()->camview[j].name);
+
+        tfpub_->sendTransform(t);
+      }
    }
 
    //Publish object frames
