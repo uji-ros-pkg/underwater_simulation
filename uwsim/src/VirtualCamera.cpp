@@ -135,26 +135,9 @@ VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height,
-                             double baseline, std::string frameId)
-{
-  init(uwsim_root, name, trackNode, width, height, baseline, frameId, NULL, 0, 50, 1.33, 0.18, 20, 0, 1);
-}
-
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height,
-                             double baseline, std::string frameId, Parameters *params, int range, int bw)
-{
-  init(uwsim_root, name, trackNode, width, height, baseline, frameId, params, range, 50, 1.33, 0.18, 20, bw, 1);
-}
-
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height,
-                             Parameters *params)
-{
-  init(uwsim_root, name, trackNode, width, height, 0.0, "", params, 0, 50, 1.33, 0.18, 20, 0, 1);
-}
-
-VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height)
-{
-  init(uwsim_root, name, trackNode, width, height, 0.0, "", NULL, 0, 50, 1.33, 0.18, 20, 0, 1);
+                             double baseline, std::string frameId,double fov, Parameters *params=NULL, int range=0, int bw=0)
+{//Standard camera / depth camera
+  init(uwsim_root, name, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1);
 }
 
 void VirtualCamera::createCamera()

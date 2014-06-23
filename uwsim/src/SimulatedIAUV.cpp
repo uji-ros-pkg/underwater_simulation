@@ -111,7 +111,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     urdf->link[vcam.link]->asGroup()->addChild(vMc);
     camview.push_back(
         VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
-                      vcam.parameters.get(), 0, vcam.bw));
+                      vcam.fov,vcam.parameters.get(), 0, vcam.bw));
     if (vcam.showpath)
       camview[camview.size() - 1].showPath(vcam.showpath);
     OSG_INFO << "Done adding a virtual camera..." << std::endl;
@@ -133,7 +133,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     urdf->link[vcam.link]->asGroup()->addChild(vMc);
     camview.push_back(
         VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
-                      vcam.parameters.get(), 1, 0));
+                      vcam.fov,vcam.parameters.get(), 1, 0));
     if (vcam.showpath)
       camview[camview.size() - 1].showPath(vcam.showpath);
     OSG_INFO << "Done adding a virtual camera..." << std::endl;

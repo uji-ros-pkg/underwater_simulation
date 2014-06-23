@@ -322,6 +322,8 @@ void ConfigFile::processVcam(const xmlpp::Node* node, Vcam &vcam)
     {
       extractStringChar(child, vcam.frameId);
     }
+    else if (child->get_name() == "fovy")
+      extractFloatChar(child, vcam.fov);
     else if (child->get_name() == "parameters")
     {
       vcam.parameters.reset(new Parameters());

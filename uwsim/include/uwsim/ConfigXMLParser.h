@@ -58,6 +58,7 @@ struct Vcam
   double showpath;
   double position[3], orientation[3];
   double baseLine; ///baseline for stereo cameras
+  double fov;
   boost::shared_ptr<Parameters> parameters;
   void init()
   {
@@ -79,6 +80,7 @@ struct Vcam
     parameters.reset();
     range = 0;
     bw = 0;
+    fov=50;
   }
 };
 
