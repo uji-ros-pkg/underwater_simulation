@@ -12,6 +12,7 @@
 
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/InertialMeasurementUnit.h>
+#include <osg/PositionAttitudeTransform>
 
 osg::Quat InertialMeasurementUnit::getMeasurement()
 {
@@ -25,4 +26,17 @@ osg::Quat InertialMeasurementUnit::getMeasurement()
 
   return lMi.getRotate()
       * osg::Quat(var_nor(), osg::Vec3d(1, 0, 0), var_nor(), osg::Vec3d(0, 1, 0), var_nor(), osg::Vec3d(0, 0, 1));
+}
+
+int InertialMeasurementUnit::getTFTransform(tf::Pose & pose, std::string & parent){
+  parent=parentLinkName;
+  pose.setOrigin(tf::Vector3(parent_->asTransform()->asPositionAttitudeTransform()->getPosition().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().z()));
+  pose.setRotation( tf::Quaternion(parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().z(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
+  return 1;
+
 }

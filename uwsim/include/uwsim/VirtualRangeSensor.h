@@ -28,6 +28,8 @@
 #include <osgUtil/IntersectionVisitor>
 #include <osgUtil/LineSegmentIntersector>
 
+#include <tf/transform_datatypes.h>
+
 //Node tracker that updates the ray coordinates from the tracked node position and computes intersections
 class IntersectorUpdateCallback : public osg::NodeTrackerCallback
 {
@@ -108,17 +110,18 @@ public:
 class VirtualRangeSensor
 {
 public:
-  std::string name;
+  std::string name, parentLinkName;
   osg::ref_ptr<osg::Node> trackNode;
   osg::ref_ptr<osg::Node> root;
   double range; ///< Max distance of the beam
   bool visible; ///< Whether to make the beam visible or not
   osg::ref_ptr<IntersectorUpdateCallback> node_tracker;
 
-  VirtualRangeSensor(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible);
+  VirtualRangeSensor(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible);
   VirtualRangeSensor();
+  int getTFTransform(tf::Pose & pose, std::string & parent);
 
-  virtual void init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible);
+  virtual void init(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible);
 
 };
 

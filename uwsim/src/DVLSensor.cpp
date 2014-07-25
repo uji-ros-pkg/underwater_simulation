@@ -14,6 +14,8 @@
 #include <uwsim/DVLSensor.h>
 #include <osg/io_utils>
 
+#include <osg/PositionAttitudeTransform>
+
 osg::Vec3d DVLSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
@@ -43,5 +45,18 @@ osg::Vec3d DVLSensor::getMeasurement()
   vdvl[2] += var_nor();
 
   return osg::Vec3d(vdvl.x(), vdvl.y(), vdvl.z());
+}
+
+int DVLSensor::getTFTransform(tf::Pose & pose, std::string & parent){
+  parent=parentLinkName;
+  pose.setOrigin(tf::Vector3(parent_->asTransform()->asPositionAttitudeTransform()->getPosition().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().z()));
+  pose.setRotation( tf::Quaternion(parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().z(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
+  return 1;
+
 }
 

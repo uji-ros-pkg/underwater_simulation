@@ -14,6 +14,8 @@
 #include <uwsim/GPSSensor.h>
 #include <osg/io_utils>
 
+#include <osg/PositionAttitudeTransform>
+
 osg::Vec3d GPSSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
@@ -31,4 +33,17 @@ double GPSSensor::depthBelowWater()
 {
   boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   return -(rMs->getTrans().z() - oscene_->getOceanScene()->getOceanSurfaceHeight());
+}
+
+int GPSSensor::getTFTransform(tf::Pose & pose, std::string & parent){
+  parent=parentLinkName;
+  pose.setOrigin(tf::Vector3(parent_->asTransform()->asPositionAttitudeTransform()->getPosition().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().z()));
+  pose.setRotation( tf::Quaternion(parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().z(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
+  return 1;
+
 }

@@ -173,7 +173,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
                   osg::Vec3d(0, 0, 1)));
     urdf->link[rs.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMr);
     range_sensors.push_back(
-        VirtualRangeSensor(rs.name, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible) ? true : false));
+        VirtualRangeSensor(rs.name, rs.linkName, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible) ? true : false));
     OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
   }
 
@@ -190,7 +190,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(imu.orientation[0], osg::Vec3d(1, 0, 0), imu.orientation[1], osg::Vec3d(0, 1, 0), imu.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[imu.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMi);
-    imus.push_back(InertialMeasurementUnit(imu.name, vMi, oscene->scene->localizedWorld->getMatrix(), imu.std));
+    imus.push_back(InertialMeasurementUnit(imu.name, imu.linkName, vMi, oscene->scene->localizedWorld->getMatrix(), imu.std));
     OSG_INFO << "Done adding an IMU..." << std::endl;
   }
 
@@ -207,7 +207,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(ps.orientation[0], osg::Vec3d(1, 0, 0), ps.orientation[1], osg::Vec3d(0, 1, 0), ps.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-    pressure_sensors.push_back(PressureSensor(ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
+    pressure_sensors.push_back(PressureSensor(ps.name, ps.linkName, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
     OSG_INFO << "Done adding an Pressure Sensor..." << std::endl;
   }
 
@@ -224,7 +224,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(ps.orientation[0], osg::Vec3d(1, 0, 0), ps.orientation[1], osg::Vec3d(0, 1, 0), ps.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-    gps_sensors.push_back(GPSSensor(oscene->scene, ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
+    gps_sensors.push_back(GPSSensor(oscene->scene, ps.name, ps.linkName , vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
     OSG_INFO << "Done adding an GPS Sensor..." << std::endl;
   }
 
@@ -241,7 +241,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(ps.orientation[0], osg::Vec3d(1, 0, 0), ps.orientation[1], osg::Vec3d(0, 1, 0), ps.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[ps.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-    dvl_sensors.push_back(DVLSensor(ps.name, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
+    dvl_sensors.push_back(DVLSensor(ps.name, ps.linkName, vMs, oscene->scene->localizedWorld->getMatrix(), ps.std));
     OSG_INFO << "Done adding an DVL Sensor..." << std::endl;
   }
 

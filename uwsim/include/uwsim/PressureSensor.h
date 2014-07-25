@@ -19,27 +19,30 @@
 #include <osg/Group>
 
 #include <boost/random.hpp>
+#include <tf/transform_datatypes.h>
 
 class PressureSensor
 {
 
 public:
-  std::string name;
+  std::string name, parentLinkName;
 
   /** Constructor
    * @param name the name of the pressure sensor
+   * @param parentName the name of the link that holds the IMU
    * @param parent the node of the scene graph that holds the sensor
    * @param rMl the sensor measures are given with respect to the root (r). Use rMl to transform them to another frame ('l' is the new frame, typically the localized world)
    * @param std the standard deviation on the sensor measures
    */
-  PressureSensor(std::string sensor_name, osg::Node *parent, osg::Matrixd rMl, double std = 0) :
-      name(sensor_name), parent_(parent), rMl_(rMl), std_(std)
+  PressureSensor(std::string sensor_name, std::string parentName, osg::Node *parent, osg::Matrixd rMl, double std = 0) :
+      name(sensor_name),parentLinkName(parentName) , parent_(parent), rMl_(rMl), std_(std)
   {
     node_ = new osg::Node();
     parent->asGroup()->addChild(node_);
   }
 
   double getMeasurement();
+  int getTFTransform(tf::Pose & pose, std::string & parent);
 
   double getStandardDeviation()
   {

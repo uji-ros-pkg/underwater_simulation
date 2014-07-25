@@ -13,6 +13,8 @@
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/PressureSensor.h>
 
+#include <osg/PositionAttitudeTransform>
+
 double PressureSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
@@ -24,4 +26,17 @@ double PressureSensor::getMeasurement()
   static boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_nor(rng_, normal);
 
   return lMs.getTrans().z() + var_nor();
+}
+
+int PressureSensor::getTFTransform(tf::Pose & pose, std::string & parent){
+  parent=parentLinkName;
+  pose.setOrigin(tf::Vector3(parent_->asTransform()->asPositionAttitudeTransform()->getPosition().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getPosition().z()));
+  pose.setRotation( tf::Quaternion(parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().x(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().y(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().z(),
+                        parent_->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
+  return 1;
+
 }

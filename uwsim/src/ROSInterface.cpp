@@ -995,8 +995,8 @@ void WorldToROSTF::publish()
          tfpub_->sendTransform(t2);
          tfpub_->sendTransform(t);  
       }
-      //publish Cameras
 
+      //publish Cameras
       for(int j=0; j< iauvFile_[i].get()->camview.size();j++)
       {
         tf::Pose pose;
@@ -1016,9 +1016,67 @@ void WorldToROSTF::publish()
           pose=pose*OSGToTFconvention;
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
           tfpub_->sendTransform(t);
+        }  
+      }
 
-        }
-          
+      //publish imus
+      for(int j=0; j< iauvFile_[i].get()->imus.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->imus[i].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->imus[i].name);
+          tfpub_->sendTransform(t);
+        }  
+      }
+
+      //publish RangeSensor
+      for(int j=0; j< iauvFile_[i].get()->range_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->range_sensors[i].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->range_sensors[i].name);
+          tfpub_->sendTransform(t);
+        }  
+      }
+
+      //publish PressureSensor
+      for(int j=0; j< iauvFile_[i].get()->pressure_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->pressure_sensors[i].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->pressure_sensors[i].name);
+          tfpub_->sendTransform(t);
+        }  
+      }
+
+      //publish GPSSensor
+      for(int j=0; j< iauvFile_[i].get()->gps_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->gps_sensors[i].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->gps_sensors[i].name);
+          tfpub_->sendTransform(t);
+        }  
+      }
+
+      //publish DVLSensor
+      for(int j=0; j< iauvFile_[i].get()->dvl_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->dvl_sensors[i].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->dvl_sensors[i].name);
+          tfpub_->sendTransform(t);
+        }  
       }
 
    }

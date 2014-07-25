@@ -19,26 +19,29 @@
 #include <osg/Group>
 
 #include <boost/random.hpp>
+#include <tf/transform_datatypes.h>
 
 class InertialMeasurementUnit
 {
 
 public:
-  std::string name;
+  std::string name,parentLinkName;
 
   /** Constructor
    * @param imu_name the name of the IMU
+   * @param parentName the name of the link that holds the IMU
    * @param imu_parent the node of the scene graph that holds the imu
    * @param rMl the imu measures are given with respect to the root (r). Use rMl to transform them to another frame ('l' is the new frame, typically the localized world)
    * @param imu_std the standard deviation on the imu measures
    */
-  InertialMeasurementUnit(std::string imu_name, osg::Node *imu_parent, osg::Matrixd rMl, double imu_std = 0) :
-      name(imu_name), parent_(imu_parent), rMl_(rMl), std_(imu_std)
+  InertialMeasurementUnit(std::string imu_name, std::string parentName, osg::Node *imu_parent, osg::Matrixd rMl, double imu_std = 0) :
+      name(imu_name),parentLinkName(parentName), parent_(imu_parent), rMl_(rMl), std_(imu_std)
   {
     imu_node_ = new osg::Node();
     imu_parent->asGroup()->addChild(imu_node_);
   }
 
+  int getTFTransform(tf::Pose & pose, std::string & parent);
   osg::Quat getMeasurement();
 
   double getStandardDeviation()
