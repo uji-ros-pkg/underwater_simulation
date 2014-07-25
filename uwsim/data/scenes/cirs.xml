@@ -103,7 +103,7 @@
       </position>
       <orientation>
         <r>0</r>
-        <p>0</p>
+        <p>3.14</p>
         <y>1.57 </y>
       </orientation>
       <!-- draws the FOV of the camera projected on the scene each 2 seconds -->
@@ -121,7 +121,7 @@
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
+        <p>3.14</p>
         <y>1.57 </y>
       </orientation>
     </virtualCamera>
@@ -137,7 +137,7 @@
       </position>  
       <orientation>
         <r>0</r>
-        <p>1.57</p>
+        <p>-1.57</p>
         <y>0</y>
       </orientation>
     </rangeSensor>
@@ -218,7 +218,7 @@
       </position>  
       <orientation>
         <r>0</r>
-        <p>0</p>
+        <p>3.14</p>
         <y>1.57 </y>
       </orientation>
       <parameters>

@@ -28,11 +28,11 @@ public:
   osg::Texture2D* dbgDepthTexture;
   VirtualCamera camera;
 
-  VirtualSLSProjector(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double fov,
+  VirtualSLSProjector(std::string name,std::string parentName, osg::Node *root, osg::Node *node, std::string image_name, double fov,
                       bool laser);
   VirtualSLSProjector();
 
-  virtual void init(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double range,
+  virtual void init(std::string name,std::string parentName, osg::Node *root, osg::Node *node, std::string image_name, double range,
                     double fov, bool laser);
 };
 

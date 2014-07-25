@@ -37,6 +37,8 @@
 
 #include <ros/ros.h>
 
+#include <tf/transform_datatypes.h>
+
 /** A camera associated to a viewer */
 class VirtualCamera : public CustomWidget, public osg::Referenced
 {
@@ -158,7 +160,7 @@ class VirtualCamera : public CustomWidget, public osg::Referenced
   };
 
 public:
-  std::string name;
+  std::string name, parentLinkName;
   osg::ref_ptr<osg::Group> uwsim_root;
   osg::ref_ptr<osg::Camera> textureCamera;
   osg::Node *trackNode;
@@ -177,16 +179,18 @@ public:
   osg::ref_ptr<osg::Image> renderTexture; //RGB image
   osg::ref_ptr<osg::Image> depthTexture; //Range image
 
-  VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, double fov, double range);
-  VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double fov,
+  VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, double fov, double range);
+  VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double fov,
                 double aspectRatio);
-  VirtualCamera(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline,
+  VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double baseline,
                 std::string frameId,double fov, Parameters *params, int range, int bw);
   VirtualCamera();
 
-  void init(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, int width, int height, double baseline,
+  void init(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double baseline,
             std::string frameId, Parameters *params, int range, double fov, double aspectRatio, double near, double far,
             int bw, int widget);
+
+  int getTFTransform(tf::Pose & pose, std::string & parent);
 
   void createCamera();
 

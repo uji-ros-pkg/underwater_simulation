@@ -36,17 +36,17 @@ VirtualSLSProjector::VirtualSLSProjector()
   std::string image_name = "laser_texture.png";
   double range = 0; 
   double fov = 60.0;
-  init(name, root, node, image_name, range, fov, 0);
+  init(name,"base_link", root, node, image_name, range, fov, 0);
 }
 
-VirtualSLSProjector::VirtualSLSProjector(std::string name, osg::Node *root, osg::Node *node, std::string image_name,
+VirtualSLSProjector::VirtualSLSProjector(std::string name,std::string parentName, osg::Node *root, osg::Node *node, std::string image_name,
                                          double fov, bool laser)
 {
   double range = 0;
-  init(name, root, node, image_name, range, fov, laser);
+  init(name, parentName, root, node, image_name, range, fov, laser);
 }
 
-void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *node, std::string image_name, double range,
+void VirtualSLSProjector::init(std::string name,std::string parentName, osg::Node *root, osg::Node *node, std::string image_name, double range,
                                double fov, bool laser)
 {
   this->name = name;
@@ -68,7 +68,7 @@ void VirtualSLSProjector::init(std::string name, osg::Node *root, osg::Node *nod
   root->getOrCreateStateSet()->setTextureAttributeAndModes(4, texture, osg::StateAttribute::ON);
 
   //Shadow camera
-  camera = VirtualCamera(root->asGroup(), "slp_camera", node, texture_to_project->s(), texture_to_project->t(), fov,
+  camera = VirtualCamera(root->asGroup(), name,parentName, node, texture_to_project->s(), texture_to_project->t(), fov,
                          texture_to_project->s() / (float)texture_to_project->t());
 
   //Create depth texture for shadow mapping test

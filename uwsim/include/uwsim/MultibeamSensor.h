@@ -28,7 +28,7 @@ public:
   int numpixels;
   double range, initAngle, finalAngle, angleIncr;
   std::vector<Remap> remapVector;
-  MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, double initAngle, double finalAngle,
+  MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle, double finalAngle,
                   double alpha, double range);
   void preCalcTable();
 };

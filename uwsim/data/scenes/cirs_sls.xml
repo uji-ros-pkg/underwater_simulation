@@ -150,7 +150,7 @@
       <name>laser_projector</name>
       <relativeTo>sls</relativeTo>
       <fov>21</fov>
-      <image_name>data/textures/laser_lines_green.png</image_name>
+      <image_name>data/textures/laser_lines.png</image_name>
       <laser>1</laser>
       <position>
         <x>0</x>

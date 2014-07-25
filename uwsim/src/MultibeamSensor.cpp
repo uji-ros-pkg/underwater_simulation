@@ -12,9 +12,9 @@
 
 #include <uwsim/MultibeamSensor.h>
 
-MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, osg::Node *trackNode, double initAngle,
+MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle,
                                  double finalAngle, double alpha, double range) :
-    VirtualCamera(uwsim_root, name, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
+    VirtualCamera(uwsim_root, name,parentName, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
                   range)
 {
 

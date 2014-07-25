@@ -108,9 +108,9 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     vMc->asPositionAttitudeTransform()->setAttitude(
         osg::Quat(vcam.orientation[0], osg::Vec3d(1, 0, 0), vcam.orientation[1], osg::Vec3d(0, 1, 0),
                   vcam.orientation[2], osg::Vec3d(0, 0, 1)));
-    urdf->link[vcam.link]->asGroup()->addChild(vMc);
+    urdf->link[vcam.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMc);
     camview.push_back(
-        VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
+        VirtualCamera(oscene->root, vcam.name, vcam.linkName, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
                       vcam.fov,vcam.parameters.get(), 0, vcam.bw));
     if (vcam.showpath)
       camview[camview.size() - 1].showPath(vcam.showpath);
@@ -130,9 +130,9 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     vMc->asPositionAttitudeTransform()->setAttitude(
         osg::Quat(vcam.orientation[0], osg::Vec3d(1, 0, 0), vcam.orientation[1], osg::Vec3d(0, 1, 0),
                   vcam.orientation[2], osg::Vec3d(0, 0, 1)));
-    urdf->link[vcam.link]->asGroup()->addChild(vMc);
+    urdf->link[vcam.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMc);
     camview.push_back(
-        VirtualCamera(oscene->root, vcam.name, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
+        VirtualCamera(oscene->root, vcam.name, vcam.linkName, vMc, vcam.resw, vcam.resh, vcam.baseLine, vcam.frameId,
                       vcam.fov,vcam.parameters.get(), 1, 0));
     if (vcam.showpath)
       camview[camview.size() - 1].showPath(vcam.showpath);
@@ -151,9 +151,9 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     vMp->asPositionAttitudeTransform()->setAttitude(
         osg::Quat(slp.orientation[0], osg::Vec3d(1, 0, 0), slp.orientation[1], osg::Vec3d(0, 1, 0), slp.orientation[2],
                   osg::Vec3d(0, 0, 1)));
-    urdf->link[slp.link]->asGroup()->addChild(vMp);
+    urdf->link[slp.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMp);
     //camview.push_back(VirtualCamera(oscene->root, "slp_camera", vMp, 512, 512,slp.fov,102.4));
-    sls_projectors.push_back(VirtualSLSProjector(slp.name, oscene->root, //maybe oscene->scene->localizedWorld ?
+    sls_projectors.push_back(VirtualSLSProjector(slp.name, slp.linkName, oscene->root, //maybe oscene->scene->localizedWorld ?
                                                  vMp, slp.image_name, slp.fov, (slp.laser) ? true : false));
     camview.push_back(sls_projectors.back().camera);
     OSG_INFO << "Done adding a structured light projector..." << std::endl;
@@ -171,7 +171,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     vMr->asPositionAttitudeTransform()->setAttitude(
         osg::Quat(rs.orientation[0], osg::Vec3d(1, 0, 0), rs.orientation[1], osg::Vec3d(0, 1, 0), rs.orientation[2],
                   osg::Vec3d(0, 0, 1)));
-    urdf->link[rs.link]->asGroup()->addChild(vMr);
+    urdf->link[rs.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMr);
     range_sensors.push_back(
         VirtualRangeSensor(rs.name, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible) ? true : false));
     OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
@@ -258,7 +258,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(MB.orientation[0], osg::Vec3d(1, 0, 0), MB.orientation[1], osg::Vec3d(0, 1, 0), MB.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[MB.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
-    MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
+    MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, MB.linkName, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
                                          MB.range);
     multibeam_sensors.push_back(mb);
     camview.push_back(mb);
