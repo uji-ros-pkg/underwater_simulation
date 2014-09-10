@@ -274,6 +274,34 @@ osg::Node * UWSimGeometry::createOSGSphere(double radius)
   return node;
 }
 
+osg::Node * UWSimGeometry::createLabel(std::string textToDraw,double charSize, int bb, osg::Vec4 color )
+{
+  //Create text
+  osg::ref_ptr<osgText::Text> text = new osgText::Text;
+  text->setFont( "fonts/arial.ttf" );
+  text->setText(textToDraw);
+  text->setAxisAlignment( osgText::TextBase::SCREEN );
+  text->setDataVariance( osg::Object::DYNAMIC );
+  text->setColor(color);
+  text->setCharacterSize(charSize);
+  if(bb)
+  {
+    text->setBoundingBoxColor(color);
+    text->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT | osgText::Text::BOUNDINGBOX);
+  }
+  else
+    text->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+
+  //set visual properties
+  osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+  geode->addDrawable( text.get() );
+  geode->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF); //Draw it over geometry
+  geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF );  //Ignore shadows
+
+  geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON); //Unset shader
+  return geode.release();
+}
+
 void UWSimGeometry::applyStateSets(osg::Node *node)
 {
   const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";

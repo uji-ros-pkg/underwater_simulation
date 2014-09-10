@@ -82,6 +82,8 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, std::string p
   this->trackNode = trackNode;
   //Add a switchable frame geometry on the camera frame
   osg::ref_ptr < osg::Node > axis = UWSimGeometry::createSwitchableFrame();
+  //Add label to switchable frame
+  axis->asGroup()->addChild(UWSimGeometry::createLabel(name));
   this->trackNode->asGroup()->addChild(axis);
 
   this->width = width;

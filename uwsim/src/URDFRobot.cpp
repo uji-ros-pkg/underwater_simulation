@@ -131,9 +131,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
     }
   }
 
-  //Create a frame that can be switched on and off
-  osg::ref_ptr < osg::Node > axis = UWSimGeometry::createSwitchableFrame();
-
   //Create tree hierarchy linkBT->link->linkPT and link links
   if (success)
   {
@@ -214,11 +211,23 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
 
     baseTransform = new osg::MatrixTransform();
     baseTransform->addChild(linkBaseTransforms[0]);
-    baseTransform->addChild(axis);
+
+    //Create a frame that can be switched on and off
+    osg::ref_ptr < osg::Node > btaxis = UWSimGeometry::createSwitchableFrame();
+    //Add label to switchable frame
+    btaxis->asGroup()->addChild(UWSimGeometry::createLabel(vehicle.name));
+    baseTransform->addChild(btaxis);
+
     for (int i = 0; i < vehicle.njoints; i++)
     {
       linkPostTransforms[vehicle.joints[i].parent]->asGroup()->addChild(joints[i]);
       joints[i]->addChild(linkBaseTransforms[vehicle.joints[i].child]);
+
+      //Create a frame that can be switched on and off
+      osg::ref_ptr < osg::Node > axis = UWSimGeometry::createSwitchableFrame();
+      //Add label to switchable frame
+      axis->asGroup()->addChild(UWSimGeometry::createLabel(vehicle.joints[i].name));
+
       joints[i]->addChild(axis);
     }
     //Save rotations for joints update, limits, and type of joints

@@ -57,7 +57,7 @@
     <objectToTrack>girona500/base_link</objectToTrack>
     <fov> 60 </fov>
     <aspectRatio> 1.33 </aspectRatio>
-    <near> 1 </near>
+    <near> 0.1 </near>
     <far> 10000 </far>
     <position>
       <x>-5</x>

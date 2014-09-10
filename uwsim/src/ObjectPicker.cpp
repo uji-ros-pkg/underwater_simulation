@@ -33,6 +33,8 @@ void ObjectPicker::init(std::string name, osg::Node *root, osg::Node *trackNode,
   this->trackNode = trackNode;
   //Add a switchable frame geometry on the sensor frame
   osg::ref_ptr < osg::Node > axis = UWSimGeometry::createSwitchableFrame();
+  //Add label to switchable frame
+  axis->asGroup()->addChild(UWSimGeometry::createLabel(name));
   this->trackNode->asGroup()->addChild(axis);
 
   this->range = range;
