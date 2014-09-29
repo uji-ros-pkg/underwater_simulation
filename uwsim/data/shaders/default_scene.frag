@@ -112,18 +112,18 @@ void main()
 	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
 
 	//check SLS texture for backprojection, shadow and out of texture bounds
-	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor.w>0)
+	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor.w>0.0)
 	{
 		if(isLaser)//treating as laser projection (not dependent on the distance, substitutes original color)
 		{ 
-			if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0)
+			if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0.0)
 			{
 				textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
 			}
 		}
 		else //treating as light projection (dependent on the distance, added to original color)
 		{
-			lightColor.w = 1;
+			lightColor.w = 1.0;
 			lightColor.xyz = texcolor.xyz/(distanceFromLight*distanceFromLight);
 		}
 	}
