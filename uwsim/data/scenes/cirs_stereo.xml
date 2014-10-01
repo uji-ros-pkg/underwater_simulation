@@ -120,13 +120,13 @@
       </orientation>
     </virtualCamera>
     <virtualCamera>
-      <name>stereo_down_left</name>
+      <name>stereo_down</name>
       <relativeTo>part0</relativeTo>
       <resw>1024</resw>
       <resh>768</resh>
       <position>
         <x>-0.5</x>
-        <y>-0.06</y>
+        <y>0.06</y>
         <z> 0 </z>
       </position>  
       <orientation>
@@ -153,7 +153,7 @@
       <resh>768</resh>
       <position>
         <x>-0.5</x>
-        <y>0.06</y>
+        <y>-0.06</y>
         <z> 0 </z>
       </position>  
       <orientation>
@@ -247,6 +247,11 @@
       <topic> /uwsim/girona500_odom </topic>
       <vehicleName> girona500 </vehicleName>
     </PATToROSOdom>
+    <WorldToROSTF>
+      <rootName> world </rootName>
+      <enableObjects> 1 </enableObjects>
+      <rate>10</rate>
+    </WorldToROSTF>
     <ArmToROSJointState> 
 	<topic>/uwsim/joint_state</topic>
 	<vehicleName> girona500 </vehicleName>
@@ -261,7 +266,7 @@
       <infoTopic> /uwsim/camera1_info </infoTopic>
     </VirtualCameraToROSImage>
     <VirtualCameraToROSImage> 
-      <cameraName>stereo_down_left</cameraName>
+      <cameraName>stereo_down</cameraName>
       <imageTopic> /stereo_down/left/image_raw</imageTopic>
       <infoTopic> /stereo_down/left/camera_info </infoTopic>
     </VirtualCameraToROSImage>
