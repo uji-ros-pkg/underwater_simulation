@@ -17,4 +17,4 @@ https://groups.google.com/a/uji.es/forum/#!forum/uji-ros-pkg-support
 
 ## Build Status
 
-[![Build Status](https://travis-ci.org/uji-ros-pkg/underwater_simulation.png?branch=hydro-devel)](https://travis-ci.org/uji-ros-pkg/underwater_simulation)
+[![Build Status](https://travis-ci.org/uji-ros-pkg/underwater_simulation.png?branch=indigo-devel)](https://travis-ci.org/uji-ros-pkg/underwater_simulation)
