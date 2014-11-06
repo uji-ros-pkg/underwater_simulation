@@ -15,6 +15,7 @@
 
 #include "SimulatedIAUV.h"
 #include "ConfigXMLParser.h"
+#include "TrajectoryVisualization.h"
 
 class SceneEventHandler : public osgGA::GUIEventHandler
 {
@@ -180,6 +181,15 @@ public:
           }
 
           //Search for trajectory updaters and clearwaypoints?
+        }
+        else if (ea.getKey() == 'y') 
+        { //Clear trajectories
+          for (unsigned int i = 0; i < _sceneBuilder->trajectories.size(); i++)
+          {
+            osg::ref_ptr<TrajectoryUpdateCallback> callback =
+              dynamic_cast<TrajectoryUpdateCallback*>(_sceneBuilder->trajectories[i]->getUpdateCallback()); 
+            callback->reset();
+          }
         }
 
       }

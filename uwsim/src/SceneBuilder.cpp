@@ -476,7 +476,10 @@ bool SceneBuilder::loadScene(ConfigFile config)
     osg::ref_ptr<TrajectoryUpdateCallback> node_tracker = new TrajectoryUpdateCallback(trajectory.color, 0.02,trajectory.lineStyle, root);
     osg::Node * trackNode=findRN(trajectory.target,root);
     if(trackNode)
+    {
       trackNode->setUpdateCallback(node_tracker);
+      trajectories.push_back(trackNode);
+    }
     else
       OSG_FATAL << "Scene Builder: "<<trajectory.target<<" trajectory target not found, please check your XML."<<std::endl;
 
