@@ -14,25 +14,23 @@
 #define SCENE_EVENT_HANDLER
 
 #include "SimulatedIAUV.h"
-#include "ROSInterface.h"
 #include "ConfigXMLParser.h"
 
 class SceneEventHandler : public osgGA::GUIEventHandler
 {
 private:
   osg::ref_ptr<osgOceanScene> _scene;
+  SceneBuilder * _sceneBuilder;
   osg::ref_ptr<TextHUD> _textHUD;
   std::vector<osg::ref_ptr<osgWidget::Window> > _windows;
-  std::vector<boost::shared_ptr<ROSInterface> > _ROSInterfaces;
   ConfigFile *_config;
 
   bool draw_frames_;
 public:
   //vehicle track indicates whether the camera must automatically track the vehicle node
   SceneEventHandler(std::vector<osg::ref_ptr<osgWidget::Window> > &windows, TextHUD* textHUD,
-                    osg::ref_ptr<osgOceanScene> scene, std::vector<boost::shared_ptr<ROSInterface> > &ROSInterfaces,
-                    ConfigFile *config) :
-      _scene(scene), _textHUD(textHUD), _windows(windows), _ROSInterfaces(ROSInterfaces), draw_frames_(false)
+                    SceneBuilder * sceneBuilder, ConfigFile *config) :
+      _scene(sceneBuilder->getScene()), _sceneBuilder(sceneBuilder), _textHUD(textHUD), _windows(windows), draw_frames_(false)
   {
     _textHUD->setSceneText("Clear Blue Sky");
     _config = config;
@@ -117,32 +115,68 @@ public:
         else if (ea.getKey() == 'r')
         {
           //search catchable objects and get them back to their original positions
-          GetCatchableObjects finder;
-          _scene->getScene()->accept(finder);
-          std::vector<osg::Node*> node_list = finder.getNodeList();
-          for (unsigned int i = 0; i < node_list.size(); i++)
+          for (unsigned int i = 0; i < _sceneBuilder->objects.size(); i++)
           {
-            osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*>(node_list[i]->getUserData());
-            osg::Matrixd matrix;
-            matrix.makeRotate(
+
+            osg::ref_ptr<NodeDataType> data = dynamic_cast<NodeDataType*>(_sceneBuilder->objects[i]->getUserData());
+            if(data->catchable)
+            { //No need to restart static objects
+              osg::Matrixd matrix;
+              matrix.makeRotate(
                 osg::Quat(data->originalRotation[0], osg::Vec3d(1, 0, 0), data->originalRotation[1],
                           osg::Vec3d(0, 1, 0), data->originalRotation[2], osg::Vec3d(0, 0, 1)));
-            matrix.setTrans(data->originalPosition[0], data->originalPosition[1], data->originalPosition[2]);
-            node_list[i]->asTransform()->asMatrixTransform()->setMatrix(matrix);
-            _scene->localizedWorld->addChild(node_list[i]);
-            node_list[i]->getParent(0)->removeChild(node_list[i]);
+              matrix.setTrans(data->originalPosition[0], data->originalPosition[1], data->originalPosition[2]);
+
+              if(!data->rigidBody)
+              { //No physics
+                _sceneBuilder->objects[i]->getParent(0)->getParent(0)->asTransform()->asMatrixTransform()->setMatrix(matrix);
+ 
+                //just in case an object picker picked it
+                _scene->localizedWorld->addChild(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+                _sceneBuilder->objects[i]->getParent(0)->getParent(0)->getParent(0)->removeChild(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+              }
+              if(data->rigidBody)
+              {//Physics restart
+                
+                //Reset position for kinematic & static objects
+                _sceneBuilder->objects[i]->getParent(0)->getParent(0)->asTransform()->asMatrixTransform()->setMatrix(matrix);
+                _scene->localizedWorld->addChild(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+                _sceneBuilder->objects[i]->getParent(0)->getParent(0)->getParent(0)->removeChild(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+
+                //Get object position in OSG world to move it to Bullet
+                boost::shared_ptr<osg::Matrix> mat = getWorldCoords(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+
+                //Unset STATIC flag (catched objects)
+                data->rigidBody->setCollisionFlags(
+                    data->rigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT );
+
+                //Reset dynamic properties
+                data->rigidBody->setCenterOfMassTransform(osgbCollision::asBtTransform(*mat));
+                data->rigidBody->clearForces();
+                data->rigidBody->setLinearVelocity(btVector3(0,0,0));
+                data->rigidBody->setAngularVelocity(btVector3(0,0,0));
+              }
+            }
           }
 
-          //Search for object picker to change picked to false
-          findNodeVisitor finder2("ObjectPickerNode");
-          _scene->localizedWorld->accept(finder2);
-          node_list = finder2.getNodeList();
+          //Search for vehicles and set them back to initial pose
 
-          for (unsigned int i = 0; i < node_list.size(); i++)
+          for (unsigned int i = 0; i < _sceneBuilder->iauvFile.size(); i++)
           {
-            osg::ref_ptr<ObjectPickerUpdateCallback> callback =
-                dynamic_cast<ObjectPickerUpdateCallback*>(node_list[i]->getUpdateCallback());
-            callback->picked = false;
+            for (std::list<Vehicle>::iterator cfgVehicle = _config->vehicles.begin(); cfgVehicle != _config->vehicles.end(); cfgVehicle++)
+              if (cfgVehicle->name == _sceneBuilder->iauvFile[i]->name){
+                _sceneBuilder->iauvFile[i]->setVehiclePosition(cfgVehicle->position[0], cfgVehicle->position[1],
+                  cfgVehicle->position[2], cfgVehicle->orientation[0],cfgVehicle->orientation[1], cfgVehicle->orientation[2]);
+
+                _sceneBuilder->iauvFile[i]->urdf->setJointPosition(cfgVehicle->jointValues);
+              }
+
+            //restart object pickers
+            for (unsigned int j = 0; j<_sceneBuilder->iauvFile[i]->object_pickers.size();j++){
+              osg::ref_ptr<ObjectPickerUpdateCallback> callback =
+                dynamic_cast<ObjectPickerUpdateCallback*>(_sceneBuilder->iauvFile[i]->object_pickers[j].trackNode->getUpdateCallback());
+              callback->picked = false;
+            }
           }
 
           //Search for trajectory updaters and clearwaypoints?
