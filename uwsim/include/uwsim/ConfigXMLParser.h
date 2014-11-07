@@ -362,11 +362,13 @@ struct ShowTrajectory
   std::string target;
   double color[3];
   int lineStyle;
+  double timeWindow;
   void init()
   {
     target="";
     color[0]= 1; color[1]= 0; color[2] = 0;
     lineStyle=1;
+    timeWindow=-1;
   }
 };
 
