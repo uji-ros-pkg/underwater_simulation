@@ -28,6 +28,25 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
     osg::Matrixd  res=*objectMat * *LWMat;
     if (trajectory_initialized)
     {
+      time_t now=time(NULL);
+      if(timeWindow > 0)
+      {
+        // remove points older than timeWindow [second]
+        while (points_stamps.size() > 0)
+        {
+          std::vector<time_t>::iterator it=points_stamps.begin();
+          if (difftime(now,(*it)) > timeWindow)
+          {
+            //always removing the oldest one
+            it = points_stamps.erase(it);
+            trajectory_points->erase(trajectory_points->begin());
+          }
+          else
+          {
+            break;
+          }
+        }
+      }
       if ((trajectory_points->back() - res.getTrans()).length() > maxWaypointDistance)
       {
         trajectory_points->push_back(res.getTrans());
@@ -36,26 +55,7 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
         ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
         //std::cerr << "Trajectory_points size: " << trajectory_points->size() << std::endl;
         
-        time_t now=time(NULL);
         points_stamps.push_back(now);
-        if(timeWindow > 0)
-        {
-          // remove points older than timeWindow [second]
-          while (points_stamps.size() > 0)
-          {
-            std::vector<time_t>::iterator it=points_stamps.begin();
-            if (difftime(now,(*it)) > timeWindow)
-            {
-              //always removing the oldest one
-              it = points_stamps.erase(it);
-              trajectory_points->erase(trajectory_points->begin());
-            }
-            else
-            {
-              break;
-            }
-          }
-        }
       }
     }
     else
