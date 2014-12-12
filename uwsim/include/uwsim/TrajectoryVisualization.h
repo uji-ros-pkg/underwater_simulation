@@ -16,6 +16,7 @@
 #include "UWSimUtils.h"
 #include <osg/NodeTrackerCallback>
 #include <osg/LineStipple>
+#include <time.h>
 
 
 //Node tracker that updates vehicle trajectory visualization.
@@ -27,6 +28,25 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
     osg::Matrixd  res=*objectMat * *LWMat;
     if (trajectory_initialized)
     {
+      time_t now=time(NULL);
+      if(timeWindow > 0)
+      {
+        // remove points older than timeWindow [second]
+        while (points_stamps.size() > 0)
+        {
+          std::vector<time_t>::iterator it=points_stamps.begin();
+          if (difftime(now,(*it)) > timeWindow)
+          {
+            //always removing the oldest one
+            it = points_stamps.erase(it);
+            trajectory_points->erase(trajectory_points->begin());
+          }
+          else
+          {
+            break;
+          }
+        }
+      }
       if ((trajectory_points->back() - res.getTrans()).length() > maxWaypointDistance)
       {
         trajectory_points->push_back(res.getTrans());
@@ -34,6 +54,8 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
         ((osg::DrawArrays*)prset)->setFirst(0);
         ((osg::DrawArrays*)prset)->setCount(trajectory_points->size());
         //std::cerr << "Trajectory_points size: " << trajectory_points->size() << std::endl;
+        
+        points_stamps.push_back(now);
       }
     }
     else
@@ -41,6 +63,8 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
       trajectory_points->clear();
       trajectory_points->push_back(res.getTrans());
       trajectory_initialized = true;
+      points_stamps.clear();
+      points_stamps.push_back(std::clock());
     }
     traverse(node, nv);
   }
@@ -48,9 +72,11 @@ public:
   
   bool trajectory_initialized;
   osg::Vec3Array *trajectory_points;
+  std::vector<time_t> points_stamps; // vector to store time stamp of each trajectory point
   osg::ref_ptr<osg::Geometry> trajectory;
   osg::PrimitiveSet *prset;
   double maxWaypointDistance;
+  double timeWindow;
 
   osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
   boost::shared_ptr<osg::Matrix> LWMat; //LocalizedWorld Inverted Matrix ( to know distnace from it)
@@ -61,7 +87,7 @@ public:
   
   }
 
-  TrajectoryUpdateCallback(double color[3], double maxWaypointDistance, int pattern, osg::Group *rootNode, unsigned int mask)
+  TrajectoryUpdateCallback(double color[3], double maxWaypointDistance, int pattern, double timeWindow, osg::Group *rootNode, unsigned int mask)
   {
     this->maxWaypointDistance=maxWaypointDistance;
     trajectory_initialized=false;
@@ -117,6 +143,8 @@ public:
     //Save LocalizedWorld inverted matrix
     LWMat=getWorldCoords(findRN("localizedWorld",rootNode));
     LWMat->invert(*LWMat);
+
+    this->timeWindow=timeWindow;
   }
 };
 
