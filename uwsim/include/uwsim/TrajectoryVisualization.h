@@ -61,7 +61,7 @@ public:
   
   }
 
-  TrajectoryUpdateCallback(double color[3], double maxWaypointDistance, int pattern, osg::Group *rootNode)
+  TrajectoryUpdateCallback(double color[3], double maxWaypointDistance, int pattern, osg::Group *rootNode, unsigned int mask)
   {
     this->maxWaypointDistance=maxWaypointDistance;
     trajectory_initialized=false;
@@ -108,21 +108,10 @@ public:
     swNode->setName("switch_trajectory");
     node_list[0]->asGroup()->addChild(swNode);
 
-
-
-    const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
-    osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
-    static const char model_vertex[] = "default_scene.vert";
-    static const char model_fragment[] = "default_scene.frag";
-
-    osg::ref_ptr < osg::Program > program = osgOcean::ShaderManager::instance().createProgram("robot_shader",
-                                                                                              model_vertex,
-                                                                                              model_fragment, "", "");
-    program->addBindAttribLocation("aTangent", 6);
-
-    geode->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
+    geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON); //Unset shader
     geode->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
     geode->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
+    geode->setNodeMask(mask);
     swNode->addChild(geode);
 
     //Save LocalizedWorld inverted matrix
