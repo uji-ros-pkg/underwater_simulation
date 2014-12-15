@@ -59,8 +59,9 @@
 <!ELEMENT eye_in_hand (#PCDATA)>
 <!ELEMENT resw (#PCDATA)>
 <!ELEMENT resh (#PCDATA)>
-<!ELEMENT showTrajectory (target,color?,lineStyle?)>
+<!ELEMENT showTrajectory (target,color?,lineStyle?,timeWindow?)>
 <!ELEMENT lineStyle (#PCDATA)>
+<!ELEMENT timeWindow (#PCDATA)>
 <!ELEMENT enablePhysics (#PCDATA)>
 <!ELEMENT physicsFrequency (#PCDATA)>
 <!ELEMENT physicsSubSteps (#PCDATA)>

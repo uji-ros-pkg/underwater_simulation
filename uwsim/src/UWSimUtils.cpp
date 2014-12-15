@@ -456,20 +456,3 @@ boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
   }
 }
 
-// GETCATCHABLEOBJECTS
-
-GetCatchableObjects::GetCatchableObjects() :
-    osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
-{
-}
-
-void GetCatchableObjects::apply(osg::Node &searchNode)
-{
-  osg::ref_ptr < NodeDataType > data = dynamic_cast<NodeDataType*>(searchNode.getUserData());
-  if (data != NULL && data->catchable)
-  {
-    foundNodeList.push_back(&searchNode);
-  }
-  traverse(searchNode);
-}
-
