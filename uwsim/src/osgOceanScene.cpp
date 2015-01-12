@@ -406,19 +406,6 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
   }
   else
   {
-
-    static const char model_vertex[] = "default_scene.vert";
-    static const char model_fragment[] = "default_scene.frag";
-
-    osg::Program* program = osgOcean::ShaderManager::instance().createProgram("object_shader", model_vertex,
-                                                                              model_fragment, "", "");
-    program->addBindAttribLocation("aTangent", 6);
-
-    object->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
-    object->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
-    object->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
-    object->getStateSet()->addUniform(new osg::Uniform("SLStex", 3));
-    object->getStateSet()->addUniform(new osg::Uniform("SLStex2", 4));
     object->setNodeMask(
         _oceanScene->getNormalSceneMask() | _oceanScene->getReflectedSceneMask()
             | _oceanScene->getRefractedSceneMask());

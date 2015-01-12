@@ -25,8 +25,6 @@
 #include <osgDB/Options>
 #endif
 
-//#include <osgOcean/OceanScene>
-#include <osgOcean/ShaderManager>
 
 // Default constructor - initialize searchForName to "" and 
 // set the traversal mode to TRAVERSE_ALL_CHILDREN
@@ -164,21 +162,6 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length)
   Xcylinder->setStateSet(Xstateset);
   XBaseTransform->addChild(Xcylinder);
 
-  //Properties on X cylinder
-  static const char model_vertex[] = "default_scene.vert";
-  static const char model_fragment[] = "default_scene.frag";
-
-  osgDB::Registry::instance()->getDataFilePathList().push_back(
-      std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
-  osg::ref_ptr < osg::Program > program = osgOcean::ShaderManager::instance().createProgram("robot_shader",
-                                                                                            model_vertex,
-                                                                                            model_fragment, "", "");
-  program->addBindAttribLocation("aTangent", 6);
-
-  Xstateset->setAttributeAndModes(program, osg::StateAttribute::ON);
-  Xstateset->addUniform(new osg::Uniform("uOverlayMap", 1));
-  Xstateset->addUniform(new osg::Uniform("uNormalMap", 2));
-
   //create YBase to rotate
   osg::Matrix YBase;
   YBase.preMultRotate(osg::Quat(M_PI_2, osg::Vec3d(1, 0, 0)));
@@ -194,11 +177,6 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length)
   Ystateset->setAttribute(Ymaterial);
   Ycylinder->setStateSet(Ystateset);
   YBaseTransform->addChild(Ycylinder);
-
-  //Properties on Ycylinder
-  Ystateset->setAttributeAndModes(program, osg::StateAttribute::ON);
-  Ystateset->addUniform(new osg::Uniform("uOverlayMap", 1));
-  Ystateset->addUniform(new osg::Uniform("uNormalMap", 2));
 
   //create ZBase to rotate
   osg::Matrix ZBase;
@@ -216,11 +194,6 @@ osg::Node* UWSimGeometry::createFrame(double radius, double length)
   Zstateset->setAttribute(Zmaterial);
   Zcylinder->setStateSet(Zstateset);
   ZBaseTransform->addChild(Zcylinder);
-
-  //Properties on Zcylinder
-  Zstateset->setAttributeAndModes(program, osg::StateAttribute::ON);
-  Zstateset->addUniform(new osg::Uniform("uOverlayMap", 1));
-  Zstateset->addUniform(new osg::Uniform("uNormalMap", 2));
 
   return linkBaseTransform;
 }
@@ -300,25 +273,6 @@ osg::Node * UWSimGeometry::createLabel(std::string textToDraw,double charSize, i
 
   geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON); //Unset shader
   return geode.release();
-}
-
-void UWSimGeometry::applyStateSets(osg::Node *node)
-{
-  const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
-
-  osgDB::Registry::instance()->getDataFilePathList().push_back(
-      std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
-  static const char model_vertex[] = "default_scene.vert";
-  static const char model_fragment[] = "default_scene.frag";
-
-  osg::ref_ptr < osg::Program > program = osgOcean::ShaderManager::instance().createProgram("robot_shader",
-                                                                                            model_vertex,
-                                                                                            model_fragment, "", "");
-  program->addBindAttribLocation("aTangent", 6);
-
-  node->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
-  node->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
-  node->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
 }
 
 osg::Node * UWSimGeometry::retrieveResource(std::string name)

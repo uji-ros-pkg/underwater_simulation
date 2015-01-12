@@ -15,36 +15,43 @@ uniform float osgOcean_WaterHeight;
 uniform bool osgOcean_EnableGlare;
 uniform bool osgOcean_EnableDOF;
 uniform bool osgOcean_EyeUnderwater;
+uniform bool osgOcean_EnableUnderwaterScattering;
 // -------------------
 
 uniform sampler2D uTextureMap;
-uniform sampler2D SLStex;
-uniform sampler2D SLStex2;
 
 varying vec3 vExtinction;
 varying vec3 vInScattering;
 varying vec3 vNormal;
 varying vec3 vLightDir;
 varying vec3 vEyeVec;
-varying vec4 color;
-
-varying vec4 ShadowCoord;
-uniform bool isLaser;
-
 
 varying float vWorldHeight;
 
+varying vec4 color;
+
+//Laser variables
+// -----------------
+uniform bool sls_projector;
+
+uniform sampler2D SLStex;
+uniform sampler2D SLStex2;
+varying vec4 ShadowCoord;
+uniform bool isLaser;
+// -----------------
+
+
 float computeDepthBlur(float depth, float focus, float near, float far, float clampval )
 {
-	float f;
-	if (depth < focus){
-		f = (depth - focus)/(focus - near);
-	}
-	else{
-		f = (depth - focus)/(far - focus);
-		f = clamp(f, 0.0, clampval);
-	}
-	return f * 0.5 + 0.5;
+   float f;
+   if (depth < focus){
+      f = (depth - focus)/(focus - near);
+   }
+   else{
+      f = (depth - focus)/(far - focus);
+      f = clamp(f, 0.0, clampval);
+   }
+   return f * 0.5 + 0.5;
 }
 
 vec4 lighting( vec4 colormap )
@@ -76,93 +83,103 @@ float computeFogFactor( float density, float fogCoord )
 	return exp2(density * fogCoord * fogCoord );
 }
 
-void main()
+void main(void)
 {
-	vec4 textureColor;
+    vec4 final_color;
 
-	// CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
-	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
+    vec4 textureColor = texture2D( uTextureMap, gl_TexCoord[0].st ) * color;
+
+    // set default light color (just in case light projection is used)
+    vec4 lightColor = vec4(0.0,0.0,0.0,0.0);
+
+    //Laser computation
+    // -----------------
+
+    if(sls_projector)
+    {
+      // CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
+      vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
 	
-	// Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z -= 0.005;
+      // Used to lower moiré pattern and self-shadowing
+      shadowCoordinateWdivide.z -= 0.005;
 
-	float distanceFromLight = texture2D(SLStex,shadowCoordinateWdivide.st).z;
+      float distanceFromLight = texture2D(SLStex,shadowCoordinateWdivide.st).z;
 	
-	float shadow = 1.0;
-	if (ShadowCoord.w > 0.0 )
-	{
-		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+      float shadow = 1.0;
+      if (ShadowCoord.w > 0.0 )
+      {
+	shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+      }
+      // END CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
+
+      // get SLS texture
+      vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
+
+      //check SLS texture for backprojection, shadow and out of texture bounds
+      if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor.w>0)
+      {
+        if(isLaser)//treating as laser projection (not dependent on the distance, substitutes original color)
+	{ 
+	  if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0)
+	  {
+	    textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
+	  }
 	}
-	// END CHECK Shadowed elements in laser (0.5 shadow, 1.0 clear)
-
-	// Set objects texture color if they have
-	if(texture2D( uTextureMap, gl_TexCoord[0].st )!=vec4(1,1,1,1))
+	else //treating as light projection (dependent on the distance, added to original color)
 	{
-		textureColor = texture2D( uTextureMap, gl_TexCoord[0].st );
+	  lightColor.w = 1;
+	  lightColor.xyz = texcolor.xyz/(distanceFromLight*distanceFromLight);
 	}
-	else
-	{
-		textureColor = color;
-	}
+      }
+    }
 
-	// set default light color
-	vec4 lightColor = vec4(0.0,0.0,0.0,0.0);
+    // -----------------
 
-	// get SLS texture
-	vec4 texcolor=texture2D( SLStex2, shadowCoordinateWdivide.st );
+    // Underwater
+    // +2 tweak here as waves peak above average wave height,
+    // and surface fog becomes visible.
+    //if(osgOcean_EyeUnderwater && vWorldHeight < osgOcean_WaterHeight+2.0 )
+    //JP: this tweak is highly inefficient and has really small benefits -> commented
+    if(osgOcean_EyeUnderwater)
+    {
+        final_color = lighting( textureColor )+lightColor;
 
-	//check SLS texture for backprojection, shadow and out of texture bounds
-	if(distanceFromLight>0.0 && ShadowCoord.w > 0.20 && shadow!=0.5 && texcolor!=vec4(1.0,1.0,1.0,1.0) && texcolor.w>0)
-	{
-		if(isLaser)//treating as laser projection (not dependent on the distance, substitutes original color)
-		{ 
-			if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0)
-			{
-				textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
-			}
-		}
-		else //treating as light projection (dependent on the distance, added to original color)
-		{
-			lightColor.w = 1;
-			lightColor.xyz = texcolor.xyz/(distanceFromLight*distanceFromLight);
-		}
-	}
+        // mix in underwater light
+        if(osgOcean_EnableUnderwaterScattering)
+        {
+            final_color.rgb = final_color.rgb * vExtinction + vInScattering;
+        }
 
-	vec4 final_color;
-	float alpha;
+        float fogFactor = computeFogFactor( osgOcean_UnderwaterFogDensity, gl_FogFragCoord );
 
-	// Underwater
-	// +2 tweak here as waves peak above average wave height,
-	// and surface fog becomes visible.
-	if(osgOcean_EyeUnderwater && vWorldHeight < osgOcean_WaterHeight+2.0 )
-	{
-		final_color = lighting( textureColor)+lightColor;
-		
-		// mix in underwater light
-		final_color.rgb = final_color.rgb * vExtinction + vInScattering;
+        // write to depth buffer (actually a GL_LUMINANCE)
+        if(osgOcean_EnableDOF)
+        {
+            float depth = computeDepthBlur(gl_FogFragCoord, osgOcean_DOF_Focus, osgOcean_DOF_Near, osgOcean_DOF_Far, osgOcean_DOF_Clamp);
+            gl_FragData[1] = vec4(depth);
+        }
 
-		float fogFactor = computeFogFactor( osgOcean_UnderwaterFogDensity, gl_FogFragCoord );
+        // color buffer
+        gl_FragData[0] = mix( osgOcean_UnderwaterFogColor, final_color, fogFactor );
+    }
+    // Above water
+    else
+    {
+        final_color = lighting( textureColor )+lightColor;
 
-		final_color = mix( osgOcean_UnderwaterFogColor, final_color, fogFactor );
+        float fogFactor = computeFogFactor( osgOcean_AboveWaterFogDensity, gl_FogFragCoord );
+        final_color = mix( osgOcean_AboveWaterFogColor, final_color, fogFactor );
 
-		if(osgOcean_EnableDOF)
-		{
-			final_color.a = computeDepthBlur(gl_FogFragCoord, osgOcean_DOF_Focus, osgOcean_DOF_Near, osgOcean_DOF_Far, osgOcean_DOF_Clamp);
-		}
-	}
-	// Above water
-	else
-	{
-		final_color = lighting( textureColor)+lightColor;
+        // write to luminance buffer
+        // might not need the IF here, glsl compiler doesn't complain if 
+        // you try and write to a FragData index that doesn't exist. But since
+        // Mac GLSL support seems so fussy I'll leave it in.
+        if(osgOcean_EnableGlare)
+        {
+            gl_FragData[1] = vec4(0.0);
+        }
 
-		float fogFactor = computeFogFactor( osgOcean_AboveWaterFogDensity, gl_FogFragCoord );
-		final_color = mix( osgOcean_AboveWaterFogColor, final_color, fogFactor );
-
-		if(osgOcean_EnableGlare)
-		{
-			final_color.a = 0.0;
-		}
-	}
-
-	gl_FragColor = final_color;
+        // write to color buffer
+        gl_FragData[0] = final_color;
+    }
 }

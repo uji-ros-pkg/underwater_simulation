@@ -12,7 +12,6 @@
 
 #include <uwsim/URDFRobot.h>
 #include <uwsim/UWSimUtils.h>
-#include <osgOcean/ShaderManager>
 #include <osg/ShapeDrawable>
 #include <osg/Material>
 #include <math.h>
@@ -146,15 +145,6 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
     osg::Matrix linkPost;
     for (int i = 0; i < vehicle.nlinks; i++)
     {
-      osg::ref_ptr < osg::Program > program = osgOcean::ShaderManager::instance().createProgram("robot_shader",
-                                                                                                model_vertex,
-                                                                                                model_fragment, "", "");
-      program->addBindAttribLocation("aTangent", 6);
-
-      link[i]->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
-      link[i]->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
-      link[i]->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
-
       link[i]->setNodeMask(
           oscene->getNormalSceneMask() | oscene->getReflectedSceneMask() | oscene->getRefractedSceneMask());
       linkBase.makeIdentity();

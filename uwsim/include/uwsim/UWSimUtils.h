@@ -144,10 +144,6 @@ public:
 
   static osg::Node * retrieveResource(std::string name);
   static osg::Node * loadGeometry(boost::shared_ptr<Geometry> geom);
-
-  /** Apply osgOcean-based state sets to a node */
-  static void applyStateSets(osg::Node*);
-
 private:
 
 };
