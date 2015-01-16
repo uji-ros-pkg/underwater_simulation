@@ -275,6 +275,12 @@ bool SceneBuilder::loadScene(ConfigFile config)
           > (new WorldToROSTF(root, iauvFile, objects, rosInterface.rootName, rosInterface.enableObjects, rosInterface.rate));
 
     }
+    if (rosInterface.type == ROSInterfaceInfo::ROSPointCloudLoader)
+    {
+      iface = boost::shared_ptr < ROSPointCloudLoader
+          > (new ROSPointCloudLoader(rosInterface.topic,root));
+
+    }
     if (rosInterface.type == ROSInterfaceInfo::ROSJointStateToArm
         || rosInterface.type == ROSInterfaceInfo::ArmToROSJointState)
     {

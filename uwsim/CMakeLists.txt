@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   underwater_sensor_msgs
   urdf
+  pcl_ros
 )
 
 find_package(uwsim_osgocean REQUIRED)
@@ -38,6 +39,7 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
+    pcl_ros
   DEPENDS
     boost
     libopenscenegraph

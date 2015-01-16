@@ -1334,6 +1334,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
     {
       rosInterface.type = ROSInterfaceInfo::contactSensorToROS;
     }
+    else if (child->get_name() == "ROSPointCloudLoader")
+    {
+      rosInterface.type = ROSInterfaceInfo::ROSPointCloudLoader;
+    }
     else if (child->get_name() == "SimulatedDeviceROS")
     {
       xmlpp::Node::NodeList sublist = child->get_children();

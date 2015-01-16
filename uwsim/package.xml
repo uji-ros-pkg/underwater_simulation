@@ -36,6 +36,7 @@
   <build_depend>uwsim_osgbullet</build_depend>
   <build_depend>uwsim_osgocean</build_depend>
   <build_depend>uwsim_osgworks</build_depend>
+  <build_depend>pcl_ros</build_depend>
 
   <run_depend>boost</run_depend>
   <run_depend>geometry_msgs</run_depend>
@@ -57,6 +58,7 @@
   <run_depend>uwsim_osgbullet</run_depend>
   <run_depend>uwsim_osgocean</run_depend>
   <run_depend>uwsim_osgworks</run_depend>
+  <run_depend>pcl_ros</run_depend>
 
   <export>
     <uwsim plugin="${prefix}/simdev_plugins.xml" />

@@ -47,12 +47,12 @@ template<class T>
       }
     }
 
-    osgPCDLoader(pcl::PointCloud<T> &c)
+    osgPCDLoader(const pcl::PointCloud<T> &c)
     {
       createGeode(c);
     }
 
-    void createGeode(pcl::PointCloud<T> &cloud);
+    void createGeode(const pcl::PointCloud<T> &cloud);
 
     osg::Geode *getGeode()
     {
@@ -66,7 +66,7 @@ template<class T>
   };
 
 template<>
-  void osgPCDLoader<pcl::PointXYZRGB>::createGeode(pcl::PointCloud<pcl::PointXYZRGB> &cloud)
+  void osgPCDLoader<pcl::PointXYZRGB>::createGeode(const pcl::PointCloud<pcl::PointXYZRGB> &cloud)
   {
     geode = osg::ref_ptr < osg::Geode > (new osg::Geode());
     geometry = osg::ref_ptr < osg::Geometry > (new osg::Geometry());
@@ -108,7 +108,7 @@ template<>
   }
 
 template<>
-  void osgPCDLoader<pcl::PointXYZ>::createGeode(pcl::PointCloud<pcl::PointXYZ> &cloud)
+  void osgPCDLoader<pcl::PointXYZ>::createGeode(const pcl::PointCloud<pcl::PointXYZ> &cloud)
   {
     geode = osg::ref_ptr < osg::Geode > (new osg::Geode());
     geometry = osg::ref_ptr < osg::Geometry > (new osg::Geometry());
