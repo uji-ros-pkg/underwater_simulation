@@ -29,6 +29,7 @@ public:
   osg::ref_ptr<osgOceanScene> scene;
   std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile;
   std::vector<osg::ref_ptr<osg::Node> > objects;
+  std::vector<osg::ref_ptr<osg::Node> > trajectories;
 
   osg::ref_ptr<osg::Group> root;
 

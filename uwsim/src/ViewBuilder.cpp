@@ -176,7 +176,7 @@ bool ViewBuilder::init(ConfigFile &config, SceneBuilder *scene_builder)
     }
   }
   viewer->addEventHandler(
-      new SceneEventHandler(camWidgets, hud.get(), scene_builder->getScene(), scene_builder->ROSInterfaces, &config));
+      new SceneEventHandler(camWidgets, hud.get(), scene_builder, &config));
 
   for (unsigned int i = 0; i < scene_builder->realcams.size(); i++)
   {

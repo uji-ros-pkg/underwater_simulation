@@ -267,6 +267,9 @@ void ConfigFile::processShowTrajectory(const xmlpp::Node* node, ShowTrajectory &
       extractPositionOrColor(child, trajectory.color);
     else if (child->get_name() == "lineStyle")
       extractIntChar(child, trajectory.lineStyle);
+    else if (child->get_name() == "timeWindow"){
+      extractFloatChar(child, trajectory.timeWindow);
+    }
   }
 }
 
