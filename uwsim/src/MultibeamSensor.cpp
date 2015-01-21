@@ -13,7 +13,7 @@
 #include <uwsim/MultibeamSensor.h>
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle,
-                                 double finalAngle, double alpha, double range) :
+                                 double finalAngle, double alpha, double range, unsigned int mask) :
     VirtualCamera(uwsim_root, name,parentName, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
                   range)
 {
@@ -24,6 +24,7 @@ MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::
   this->finalAngle = finalAngle;
   this->angleIncr = alpha;
   preCalcTable();
+  textureCamera->setCullMask(mask);
 }
 
 void MultibeamSensor::preCalcTable()

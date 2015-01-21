@@ -1093,6 +1093,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
     {
       XMLMultibeamSensor aux;
       aux.init();
+      xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("underwaterParticles");
+      if(atrib and atrib->get_value()=="true")
+      {
+        aux.underwaterParticles=true;
+      }
       processMultibeamSensor(child, aux);
       vehicle.multibeam_sensors.push_back(aux);
     }

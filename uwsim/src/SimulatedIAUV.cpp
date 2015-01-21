@@ -258,8 +258,13 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
         osg::Quat(MB.orientation[0], osg::Vec3d(1, 0, 0), MB.orientation[1], osg::Vec3d(0, 1, 0), MB.orientation[2],
                   osg::Vec3d(0, 0, 1)));
     urdf->link[MB.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
+    unsigned int mask;
+    if(MB.underwaterParticles)
+      mask=~0x40; //TODO use correct mask
+    else
+      mask=oscene->scene->getOceanScene()->getNormalSceneMask(); //Normal Scene mask should be enough for range sensor
     MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, MB.linkName, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
-                                         MB.range);
+                                         MB.range,mask);
     multibeam_sensors.push_back(mb);
     camview.push_back(mb);
     OSG_INFO << "Done adding a Multibeam Sensor..." << std::endl;
