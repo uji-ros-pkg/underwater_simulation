@@ -60,6 +60,7 @@ struct Vcam
   double position[3], orientation[3];
   double baseLine; ///baseline for stereo cameras
   double fov;
+  double std; //Additive gaussian noise deviation
   boost::shared_ptr<Parameters> parameters;
   void init()
   {
@@ -82,6 +83,7 @@ struct Vcam
     range = 0;
     bw = 0;
     fov=50;
+    std=0.005;
   }
 };
 

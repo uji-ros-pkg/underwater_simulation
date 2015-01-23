@@ -148,6 +148,8 @@ bool SceneBuilder::loadScene(ConfigFile config)
    root->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
    root->getStateSet()->addUniform(new osg::Uniform("SLStex", 3));
    root->getStateSet()->addUniform(new osg::Uniform("SLStex2", 4));
+   root->getStateSet()->addUniform( new osg::Uniform("stddev", 0.0f ) );
+   root->getStateSet()->addUniform( new osg::Uniform("mean", 0.0f ) );
   }
 
   scene->getOceanScene()->setOceanSurfaceHeight(oceanSurfaceHeight);

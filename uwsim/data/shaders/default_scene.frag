@@ -40,6 +40,67 @@ varying vec4 ShadowCoord;
 uniform bool isLaser;
 // -----------------
 
+//Noise variables
+//----------------
+uniform vec4 offsets;
+uniform float mean;
+uniform float stddev;
+//----------------
+
+#define PI 3.14159265358979323846264
+
+//The two following functions were adapted from Gazebo camera_noise_gaussian_fs.glsl shader
+//The main idea is to use 4 CPU random number seeds added to current pixel coordinates in a 
+//pseudo-random number generator so we can generate through Box-Muller transform 4 Gaussian outputs
+//More info on original Gazebo noise shader:
+//https://github.com/thomas-moulard/gazebo-deb/blob/master/media/materials/programs/camera_noise_gaussian_fs.glsl
+
+float rand(vec2 co)
+{
+  // This one-liner can be found in many places, including:
+  // http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+  // I can't find any explanation for it, but experimentally it does seem to
+  // produce approximately uniformly distributed values in the interval [0,1].
+  float r = fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
+
+  // Make sure that we don't return 0.0
+  if(r == 0.0)
+    return 0.000000000001;
+  else
+    return r;
+}
+
+vec4 gaussrand(vec2 co)
+{
+  // Box-Muller method for sampling from the normal distribution
+  // http://en.wikipedia.org/wiki/Normal_distribution#Generating_values_from_normal_distribution
+  // This method requires 2 uniform random inputs and produces 2 
+  // Gaussian random outputs.  We'll take a 3rd random variable and use it to
+  // switch between the two outputs.
+
+  float U, V, W, X;
+  // Add in the CPU-supplied random offsets to generate the 4 random values that
+  // we'll use.
+  U = rand(co + vec2(offsets.x, offsets.x));
+  V = rand(co + vec2(offsets.y, offsets.y));
+  W = rand(co + vec2(offsets.z, offsets.z));
+  X = rand(co + vec2(offsets.w, offsets.w));
+  
+  //generate 3 normal distributed numbers.
+  float r,g,b;
+  r = sqrt(-2.0 * log(U)) * sin(2.0 * PI * V);
+  g = sqrt(-2.0 * log(U)) * cos(2.0 * PI * V);
+  b = sqrt(-2.0 * log(W)) * sin(2.0 * PI * X);
+
+  // Apply the stddev and mean.
+  r = r * stddev + mean;
+  g = g * stddev + mean;
+  b = b * stddev + mean;
+
+  // Return it as a vec4, to be added to the input ("true") color.
+  return vec4(r,g,b, 0.0);
+}
+
 
 float computeDepthBlur(float depth, float focus, float near, float far, float clampval )
 {
@@ -160,7 +221,7 @@ void main(void)
         }
 
         // color buffer
-        gl_FragData[0] = mix( osgOcean_UnderwaterFogColor, final_color, fogFactor );
+        final_color = mix( osgOcean_UnderwaterFogColor, final_color, fogFactor );
     }
     // Above water
     else
@@ -178,8 +239,8 @@ void main(void)
         {
             gl_FragData[1] = vec4(0.0);
         }
-
-        // write to color buffer
-        gl_FragData[0] = final_color;
     }
+
+    // write to color buffer adding noise
+    gl_FragData[0] = final_color+ gaussrand(gl_FragCoord.xy);
 }

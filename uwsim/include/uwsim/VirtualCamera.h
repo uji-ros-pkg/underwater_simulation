@@ -174,6 +174,7 @@ public:
   int paramsOn;
   int bw; //BlackWhite camera
   int widget; //Widget available or not
+  float std;//Camera noise
 
   osg::ref_ptr<osg::Image> renderTexture; //RGB image
   osg::ref_ptr<osg::Image> depthTexture; //Range image
@@ -182,12 +183,12 @@ public:
   VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double fov,
                 double aspectRatio);
   VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double baseline,
-                std::string frameId,double fov,SceneBuilder *oscene, Parameters *params, int range, int bw);
+                std::string frameId,double fov,SceneBuilder *oscene,float std, Parameters *params, int range, int bw);
   VirtualCamera();
 
   void init(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width, int height, double baseline,
             std::string frameId, Parameters *params, int range, double fov, double aspectRatio, double near, double far,
-            int bw, int widget,SceneBuilder *oscene);
+            int bw, int widget,SceneBuilder *oscene, float std);
 
   //Creates the uniforms and loads the shader for the camera.
   void loadShaders(SceneBuilder *oscene);

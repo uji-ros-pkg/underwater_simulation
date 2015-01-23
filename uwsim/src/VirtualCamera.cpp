@@ -33,6 +33,20 @@ protected:
   osg::Camera* mCamera;
 };
 
+class UpdateNoiseSeed : public osg::Uniform::Callback
+{
+public:
+  UpdateNoiseSeed()
+  {
+  }
+  virtual void operator ()(osg::Uniform* u, osg::NodeVisitor*)
+  {
+    u->set(osg::Vec4f(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX));
+  }
+
+protected:
+};
+
 class UpdateEye : public osg::Uniform::Callback
 {
 public:
@@ -73,11 +87,12 @@ VirtualCamera::VirtualCamera()
 
 void VirtualCamera::init(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, int width,
                          int height, double baseline, std::string frameId, Parameters *params, int range, double fov,
-                         double aspectRatio, double near, double far, int bw, int widget, SceneBuilder *oscene)
+                         double aspectRatio, double near, double far, int bw, int widget, SceneBuilder *oscene, float std)
 {
   this->uwsim_root = uwsim_root;
   this->name = name;
   this->parentLinkName=parentName;
+  this->std=std;
 
   this->trackNode = trackNode;
   //Add a switchable frame geometry on the camera frame
@@ -130,20 +145,20 @@ VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::strin
                              double fov, double range)
 { //Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, parentName, trackNode, 1, width, 0.0, "", NULL, 1, fov, 1.0 / width, 0.8, range * 1.2, 0, 0,NULL);
+  init(uwsim_root, name, parentName, trackNode, 1, width, 0.0, "", NULL, 1, fov, 1.0 / width, 0.8, range * 1.2, 0, 0,NULL,0);
 
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
                              int height, double fov, double aspectRatio)
 { //Used in structured light projector as shadow camera
-  init(uwsim_root, name, parentName, trackNode, width, height, 0.0, "", NULL, 1, fov, aspectRatio, 0.1, 20, 0, 0,NULL);
+  init(uwsim_root, name, parentName, trackNode, width, height, 0.0, "", NULL, 1, fov, aspectRatio, 0.1, 20, 0, 0,NULL,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
-                             int height,double baseline, std::string frameId,double fov,SceneBuilder *oscene, Parameters *params=NULL, int range=0, int bw=0)
+                             int height,double baseline, std::string frameId,double fov,SceneBuilder *oscene,float std,  Parameters *params=NULL, int range=0, int bw=0)
 {//Standard camera / depth camera
-  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1,oscene);
+  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1,oscene,std);
 }
 
 void VirtualCamera::createCamera()
@@ -214,7 +229,6 @@ void VirtualCamera::createCamera()
   osg::Uniform* u3 = new osg::Uniform("osg_ViewMatrixInverse", textureCamera->getInverseViewMatrix());
   u3->setUpdateCallback(new UpdateVMI(textureCamera));
   textureCamera->getOrCreateStateSet()->addUniform(u3);
-
 }
 
 void VirtualCamera::loadShaders(SceneBuilder *oscene)
@@ -254,6 +268,14 @@ void VirtualCamera::loadShaders(SceneBuilder *oscene)
     textureCamera->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
     textureCamera->getStateSet()->addUniform(new osg::Uniform("SLStex", 3));
     textureCamera->getStateSet()->addUniform(new osg::Uniform("SLStex2", 4));*/
+
+    osg::Uniform* u = new osg::Uniform("offsets", osg::Vec4f(1,2,3,4));
+    u->setUpdateCallback(new UpdateNoiseSeed());
+    textureCamera->getStateSet()->addUniform(u);
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("stddev", std ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("mean", 0.0f ) );
+
   }
   else
   {

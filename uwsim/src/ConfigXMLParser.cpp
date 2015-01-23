@@ -344,6 +344,8 @@ void ConfigFile::processVcam(const xmlpp::Node* node, Vcam &vcam)
         vcam.bw = 0;
       }
     }
+    else if (child->get_name() == "std")
+      extractFloatChar(child, vcam.std);
   }
 
 }
