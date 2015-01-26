@@ -103,7 +103,7 @@
 <!ELEMENT laser (#PCDATA)>
 
 <!--elementos multibeamSensor -->
-<!ATTLIST multibeamSensor underwaterParticles (true|false) "false">
+<!ATTLIST multibeamSensor underwaterParticles (true|false) #IMPLIED>
 <!ELEMENT initAngle (#PCDATA)>
 <!ELEMENT finalAngle (#PCDATA)>
 <!ELEMENT angleIncr (#PCDATA)>
