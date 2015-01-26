@@ -91,7 +91,7 @@ SimulatedDeviceConfig::Ptr ForceSensor_Factory::processConfig(const xmlpp::Node*
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if(child->get_name() == "target")
       config->extractStringChar(child, cfg->target);
     else if(child->get_name() == "offsetp")

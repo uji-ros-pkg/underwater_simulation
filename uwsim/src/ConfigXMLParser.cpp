@@ -91,7 +91,7 @@ void ConfigFile::extractPositionOrColor(const xmlpp::Node* node, double param[3]
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "x" || child->get_name() == "r")
       extractFloatChar(child, param[0]);
@@ -107,7 +107,7 @@ void ConfigFile::extractOrientation(const xmlpp::Node* node, double param[3])
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "r")
       extractFloatChar(child, param[0]);
@@ -124,7 +124,7 @@ void ConfigFile::processFog(const xmlpp::Node* node)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "density")
       extractFloatChar(child, fogDensity);
     else if (child->get_name() == "color")
@@ -138,8 +138,8 @@ void ConfigFile::processOceanState(const xmlpp::Node* node)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
-    //cout<<child->get_name()<<endl;
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+
     if (child->get_name() == "windx")
       extractFloatChar(child, windx);
     else if (child->get_name() == "windy")
@@ -183,7 +183,7 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "disableShaders")
     {
@@ -260,7 +260,7 @@ void ConfigFile::processShowTrajectory(const xmlpp::Node* node, ShowTrajectory &
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "target")
       extractStringChar(child, trajectory.target);
     else if (child->get_name() == "color")
@@ -278,7 +278,7 @@ void ConfigFile::processParameters(const xmlpp::Node* node, Parameters *params)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "fx")
       extractFloatChar(child, params->fx);
@@ -303,7 +303,7 @@ void ConfigFile::processVcam(const xmlpp::Node* node, Vcam &vcam)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "resw")
       extractIntChar(child, vcam.resw);
@@ -355,7 +355,7 @@ void ConfigFile::processSLProjector(const xmlpp::Node* node, slProjector &slp)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "position")
       extractPositionOrColor(child, slp.position);
     else if (child->get_name() == "relativeTo")
@@ -378,7 +378,7 @@ void ConfigFile::processRangeSensor(const xmlpp::Node* node, rangeSensor &rs)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, rs.position);
@@ -400,7 +400,7 @@ void ConfigFile::processImu(const xmlpp::Node* node, Imu &imu)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, imu.position);
@@ -420,7 +420,7 @@ void ConfigFile::processPressureSensor(const xmlpp::Node* node, XMLPressureSenso
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, ps.position);
@@ -440,7 +440,7 @@ void ConfigFile::processGPSSensor(const xmlpp::Node* node, XMLGPSSensor &s)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, s.position);
@@ -460,7 +460,7 @@ void ConfigFile::processDVLSensor(const xmlpp::Node* node, XMLDVLSensor &s)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, s.position);
@@ -480,7 +480,7 @@ void ConfigFile::processCamera(const xmlpp::Node* node)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "freeMotion")
     {
@@ -514,7 +514,7 @@ void ConfigFile::processMultibeamSensor(const xmlpp::Node* node, XMLMultibeamSen
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "position")
       extractPositionOrColor(child, MB.position);
@@ -721,7 +721,7 @@ void ConfigFile::processJointValues(const xmlpp::Node* node, std::vector<double>
   int pos = 0;
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "joint")
     {
       extractFloatChar(child, jointValues[pos++]);
@@ -1009,7 +1009,7 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "name")
       extractStringChar(child, vehicle.name);
@@ -1095,7 +1095,7 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
     {
       XMLMultibeamSensor aux;
       aux.init();
-      xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("underwaterParticles");
+      const xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("underwaterParticles");
       if(atrib and atrib->get_value()=="true")
       {
         aux.underwaterParticles=true;
@@ -1119,7 +1119,7 @@ void ConfigFile::processPhysicProperties(const xmlpp::Node* node, PhysicProperti
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "mass")
       extractFloatChar(child, pp.mass);
@@ -1168,7 +1168,7 @@ void ConfigFile::processObject(const xmlpp::Node* node, Object &object)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
 
     if (child->get_name() == "name")
       extractStringChar(child, object.name);
@@ -1200,7 +1200,7 @@ void ConfigFile::processROSInterface(const xmlpp::Node* node, ROSInterfaceInfo &
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() != "text")
     { //adding all nodes as text for further processing by a SimulatedDevice
       std::string text;
@@ -1264,8 +1264,8 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
-    xmlpp::Node* subchild = NULL;
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* subchild = NULL;
 
     ROSInterfaceInfo rosInterface;
     rosInterface.rate = 10; //Default rate
@@ -1350,7 +1350,7 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
       xmlpp::Node::NodeList sublist = child->get_children();
       for (xmlpp::Node::NodeList::iterator subiter = sublist.begin(); subiter != sublist.end(); ++subiter)
       {
-        xmlpp::Node* tempchild = dynamic_cast<const xmlpp::Node*>(*subiter);
+        const xmlpp::Node* tempchild = dynamic_cast<const xmlpp::Node*>(*subiter);
         if (tempchild != NULL && tempchild->get_name() != "text")
         {
           std::string subtype = tempchild->get_name();
@@ -1395,7 +1395,7 @@ void ConfigFile::processXML(const xmlpp::Node* node)
     xmlpp::Node::NodeList list = node->get_children();
     for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
     {
-      xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+      const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
       if (child->get_name() == "oceanState")
         processOceanState(child);
       else if (child->get_name() == "simParams")
