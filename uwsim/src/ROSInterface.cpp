@@ -242,6 +242,7 @@ ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Gr
 
 void ROSPointCloudLoader::createSubscriber(ros::NodeHandle &nh)
 {
+  ROS_INFO("ROSPointCloudLoader subscriber on topic %s", topic.c_str());
   sub_ = nh.subscribe<pcl::PointCloud<pcl::PointXYZ> >(topic, 10, &ROSPointCloudLoader::processData, this);
 }
 
