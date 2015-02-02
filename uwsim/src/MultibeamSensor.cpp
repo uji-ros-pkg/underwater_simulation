@@ -13,7 +13,7 @@
 #include <uwsim/MultibeamSensor.h>
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle,
-                                 double finalAngle, double alpha, double range, unsigned int mask) :
+                                 double finalAngle, double alpha, double range, unsigned int mask, int visible) :
     VirtualCamera(uwsim_root, name,parentName, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
                   range)
 {
@@ -25,6 +25,28 @@ MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::
   this->angleIncr = alpha;
   preCalcTable();
   textureCamera->setCullMask(mask);
+
+  if (visible)
+  {
+    osg::ref_ptr<osg::Geometry> beam = osg::ref_ptr<osg::Geometry>(new osg::Geometry);
+    osg::ref_ptr<osg::Vec3Array> points = new osg::Vec3Array;
+    for(double initAux=initAngle;initAux<finalAngle;initAux+=angleIncr)
+    {
+      osg::Vec3d start(0, 0, 0);
+      osg::Vec3d end(0, sin(initAux*3.14/180.0)*range, -cos(initAux*3.14/180.0)*range);
+      points->push_back(start);
+      points->push_back(end);
+    }
+    osg::ref_ptr<osg::Vec4Array> color = new osg::Vec4Array;
+    color->push_back(osg::Vec4(0.0, 1.0, 0.0, 0.6));
+    beam->setVertexArray(points.get());
+    beam->setColorArray(color.get());
+    beam->setColorBinding(osg::Geometry::BIND_OVERALL);
+    beam->addPrimitiveSet(new osg::DrawArrays(GL_LINES, 0, points->size()));
+    geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
+    geode->addDrawable(beam.get());
+  }
+  trackNode->asGroup()->addChild(geode);
 }
 
 void MultibeamSensor::preCalcTable()

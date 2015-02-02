@@ -27,9 +27,10 @@ class MultibeamSensor : public VirtualCamera
 public:
   int numpixels;
   double range, initAngle, finalAngle, angleIncr;
+  osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
   std::vector<Remap> remapVector;
   MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle, double finalAngle,
-                  double alpha, double range, unsigned int mask);
+                  double alpha, double range, unsigned int mask, int visible);
   void preCalcTable();
 };
 

@@ -225,6 +225,7 @@ struct XMLMultibeamSensor
   string linkName;
   double position[3], orientation[3];
   int link;
+  int visible;
   double initAngle, finalAngle, angleIncr, range;
   bool underwaterParticles;
   void init()
@@ -238,6 +239,7 @@ struct XMLMultibeamSensor
     orientation[1] = 0;
     orientation[2] = 0;
     underwaterParticles=false;
+    visible = 0;
   }
 };
 

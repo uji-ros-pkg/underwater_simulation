@@ -532,6 +532,8 @@ void ConfigFile::processMultibeamSensor(const xmlpp::Node* node, XMLMultibeamSen
       extractFloatChar(child, MB.angleIncr);
     else if (child->get_name() == "range")
       extractFloatChar(child, MB.range);
+    else if (child->get_name() == "visible")
+      extractIntChar(child, MB.visible);
   }
 }
 

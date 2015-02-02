@@ -264,7 +264,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     else
       mask=oscene->scene->getOceanScene()->getNormalSceneMask(); //Normal Scene mask should be enough for range sensor
     MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, MB.linkName, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
-                                         MB.range,mask);
+                                         MB.range,mask,MB.visible);
     multibeam_sensors.push_back(mb);
     camview.push_back(mb);
     OSG_INFO << "Done adding a Multibeam Sensor..." << std::endl;
