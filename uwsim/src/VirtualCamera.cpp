@@ -138,6 +138,9 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, std::string p
   }
 
   createCamera();
+  //Add a cull mask to hide Augmented Reality objects from virtual cameras
+  if(oscene)
+    textureCamera->setCullMask(~oscene->scene->getOceanScene()->getARMask());
   loadShaders(oscene);
 }
 

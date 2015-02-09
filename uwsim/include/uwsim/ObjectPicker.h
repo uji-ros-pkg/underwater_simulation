@@ -100,11 +100,11 @@ class ObjectPicker : public VirtualRangeSensor
 {
 public:
   ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,
-               boost::shared_ptr<URDFRobot> urdf);
+               boost::shared_ptr<URDFRobot> urdf,unsigned int mask);
   ObjectPicker();
 
   void init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,
-            boost::shared_ptr<URDFRobot> urdf);
+            boost::shared_ptr<URDFRobot> urdf,unsigned int mask);
 };
 
 #endif

@@ -173,7 +173,8 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
                   osg::Vec3d(0, 0, 1)));
     urdf->link[rs.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMr);
     range_sensors.push_back(
-        VirtualRangeSensor(rs.name, rs.linkName, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible) ? true : false));
+        VirtualRangeSensor(rs.name, rs.linkName, oscene->scene->localizedWorld, vMr, rs.range, (rs.visible) ? true : false,
+        oscene->scene->getOceanScene()->getARMask()));
     OSG_INFO << "Done adding a virtual range sensor..." << std::endl;
   }
 
@@ -260,11 +261,11 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     urdf->link[MB.link]->getParent(0)->getParent(0)->asGroup()->addChild(vMs);
     unsigned int mask;
     if(MB.underwaterParticles)
-      mask=~0x40; //TODO use correct mask
+      mask=oscene->scene->getOceanScene()->getARMask();
     else
       mask=oscene->scene->getOceanScene()->getNormalSceneMask(); //Normal Scene mask should be enough for range sensor
     MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, MB.linkName, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
-                                         MB.range,mask,MB.visible);
+                                         MB.range,mask,MB.visible,oscene->scene->getOceanScene()->getARMask());
     multibeam_sensors.push_back(mb);
     camview.push_back(mb);
     OSG_INFO << "Done adding a Multibeam Sensor..." << std::endl;
@@ -284,7 +285,8 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
                   osg::Vec3d(0, 0, 1)));
     vMr->setName("ObjectPickerNode");
     urdf->link[rs.link]->asGroup()->addChild(vMr);
-    object_pickers.push_back(ObjectPicker(rs.name, oscene->scene->localizedWorld, vMr, rs.range, true, urdf));
+    object_pickers.push_back(ObjectPicker(rs.name, oscene->scene->localizedWorld, vMr, rs.range, true, urdf,
+        oscene->scene->getOceanScene()->getARMask()));
     OSG_INFO << "Done adding an object picker..." << std::endl;
   }
 

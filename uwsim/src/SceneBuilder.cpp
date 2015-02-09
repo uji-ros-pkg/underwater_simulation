@@ -280,7 +280,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
     if (rosInterface.type == ROSInterfaceInfo::ROSPointCloudLoader)
     {
       iface = boost::shared_ptr < ROSPointCloudLoader
-          > (new ROSPointCloudLoader(rosInterface.topic,root));
+          > (new ROSPointCloudLoader(rosInterface.topic,root,scene->getOceanScene()->getARMask()));
 
     }
     if (rosInterface.type == ROSInterfaceInfo::ROSJointStateToArm
@@ -506,8 +506,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
     ShowTrajectory trajectory = config.trajectories.front();
 
     osg::ref_ptr<TrajectoryUpdateCallback> node_tracker = new TrajectoryUpdateCallback(trajectory.color, 0.02,trajectory.lineStyle,
-        trajectory.timeWindow, root, scene->getOceanScene()->getNormalSceneMask() | scene->getOceanScene()->getReflectedSceneMask()
-        | scene->getOceanScene()->getRefractedSceneMask());
+        trajectory.timeWindow, root, scene->getOceanScene()->getARMask());
 
     osg::Node * trackNode=findRN(trajectory.target,root);
     if(trackNode)

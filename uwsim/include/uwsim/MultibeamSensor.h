@@ -30,7 +30,7 @@ public:
   osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
   std::vector<Remap> remapVector;
   MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle, double finalAngle,
-                  double alpha, double range, unsigned int mask, int visible);
+                  double alpha, double range, unsigned int mask, int visible,unsigned int ARMask);
   void preCalcTable();
 };
 

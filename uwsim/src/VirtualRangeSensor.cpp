@@ -20,12 +20,12 @@ VirtualRangeSensor::VirtualRangeSensor()
 }
 
 VirtualRangeSensor::VirtualRangeSensor(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range,
-                                       bool visible)
+                                       bool visible,unsigned int mask)
 {
-  init(name,parentName, root, trackNode, range, visible);
+  init(name,parentName, root, trackNode, range, visible,mask);
 }
 
-void VirtualRangeSensor::init(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible)
+void VirtualRangeSensor::init(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible,unsigned int mask)
 {
   this->name = name;
   this->parentLinkName=parentName;
@@ -45,6 +45,9 @@ void VirtualRangeSensor::init(std::string name, std::string parentName, osg::Nod
   node_tracker = new IntersectorUpdateCallback(range, visible, root);
   trackNode->setUpdateCallback(node_tracker);
   trackNode->asGroup()->addChild(node_tracker->geode);
+
+  if(node_tracker->geode)
+    node_tracker->geode->setNodeMask(mask);
 }
 
 int VirtualRangeSensor::getTFTransform(tf::Pose & pose, std::string & parent){

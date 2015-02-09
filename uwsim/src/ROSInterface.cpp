@@ -235,7 +235,8 @@ ROSPoseToPAT::~ROSPoseToPAT()
 {
 }
 
-ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root): ROSSubscriberInterface(topic), scene_root(root)
+ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root,unsigned int mask)
+: ROSSubscriberInterface(topic), scene_root(root), nodeMask(mask)
 {
   
 }
@@ -264,7 +265,7 @@ void ROSPointCloudLoader::processData(const pcl::PointCloud<pcl::PointXYZ>::Cons
      osg::ref_ptr < osg::MatrixTransform > WorldToBaseTransform= new osg::MatrixTransform(res);
      WorldToBaseTransform->addChild(pcdLoader.getGeode());
 
-     pcdLoader.getGeode()->setNodeMask(0x02 | 0x04 | 0x01); //TODO use correct mask
+     pcdLoader.getGeode()->setNodeMask(nodeMask);
      LWNode->asGroup()->addChild(WorldToBaseTransform);
   }
   else

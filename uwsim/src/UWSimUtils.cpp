@@ -130,12 +130,14 @@ osg::Node * findRN(std::string target, osg::Group * root)
   return findRN.getFirst();
 }
 
-osg::Node* UWSimGeometry::createSwitchableFrame(double radius, double length)
+//Default mask is for AR objects (not shown on Virtual Cameras)
+osg::Node* UWSimGeometry::createSwitchableFrame(double radius, double length, unsigned int mask)
 {
   osg::Switch *axis = new osg::Switch();
   axis->setNewChildDefaultValue(false);
   axis->setName("switch_frames");
   axis->addChild(UWSimGeometry::createFrame());
+  axis->setNodeMask(mask);
   return axis;
 }
 

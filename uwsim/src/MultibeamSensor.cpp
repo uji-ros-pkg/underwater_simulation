@@ -13,7 +13,7 @@
 #include <uwsim/MultibeamSensor.h>
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle,
-                                 double finalAngle, double alpha, double range, unsigned int mask, int visible) :
+                                 double finalAngle, double alpha, double range, unsigned int mask, int visible,unsigned int ARMask) :
     VirtualCamera(uwsim_root, name,parentName, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
                   range)
 {
@@ -45,6 +45,7 @@ MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::
     beam->addPrimitiveSet(new osg::DrawArrays(GL_LINES, 0, points->size()));
     geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
     geode->addDrawable(beam.get());
+    geode->setNodeMask(ARMask);
   }
   trackNode->asGroup()->addChild(geode);
 }
