@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   kdl_parser
   nav_msgs
+  pcl_ros
   pluginlib
   resource_retriever
   robot_state_publisher
@@ -14,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   underwater_sensor_msgs
   urdf
-  pcl_ros
 )
 
 find_package(uwsim_osgocean REQUIRED)
@@ -31,6 +31,7 @@ catkin_package(
     image_transport
     kdl_parser
     nav_msgs
+    pcl_ros
     pluginlib
     resource_retriever
     robot_state_publisher
@@ -39,7 +40,6 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
-    pcl_ros
   DEPENDS
     boost
     libopenscenegraph
@@ -104,8 +104,6 @@ src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 )
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES})
-
-message("OPENSCENEGRAPH_LIBRARIES= ${OPENSCENEGRAPH_LIBRARIES}")
 
 target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
