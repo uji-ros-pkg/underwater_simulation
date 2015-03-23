@@ -1416,9 +1416,15 @@ void ConfigFile::processXML(const xmlpp::Node* node)
       {
         Object object;
 	object.scale[0]=1;object.scale[1]=1;object.scale[2]=1;
+        object.buried=0;
         memset(object.offsetp, 0, 3 * sizeof(double));
         memset(object.offsetr, 0, 3 * sizeof(double));
         object.physicProperties.reset();
+        const xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("buried");
+        if(atrib)
+        {
+          object.buried=boost::lexical_cast<double>(atrib->get_value().c_str());
+        }
         processObject(child, object);
         objects.push_back(object);
       }

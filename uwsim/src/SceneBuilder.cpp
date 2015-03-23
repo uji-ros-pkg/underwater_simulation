@@ -225,6 +225,13 @@ bool SceneBuilder::loadScene(ConfigFile config)
       NodeDataType * data = new NodeDataType(0);
       object->setUserData(data);
     }
+
+    if (auxObject.buried>0) //If object is buried create a reactive heightfield 
+    {
+      osg::Node* mud=createHeightField(object,"mud.png",auxObject.buried,root);
+      object->asGroup()->addChild(mud);
+    }  
+
     objects.push_back(object);
     config.objects.pop_front();
   }

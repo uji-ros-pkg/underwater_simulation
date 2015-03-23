@@ -188,5 +188,23 @@ private:
   nodeListType foundNodeList;
 };
 
+#include <osgParticle/ParticleSystemUpdater>
+#include <osgParticle/ModularEmitter>
+
+class DynamicHF : public osg::Drawable::UpdateCallback
+{
+  public:
+    DynamicHF(osg::HeightField* heightField, osg::Group * root,boost::shared_ptr<osg::Matrix> mat);
+    virtual void update( osg::NodeVisitor*, osg::Drawable*drawable );
+    void addParticleSystem(osgParticle::RandomRateCounter * rrc);
+  private:
+    osg::HeightField* heightField;
+    osg::Group * root;
+    boost::shared_ptr<osg::Matrix> objectMat;
+    osgParticle::RandomRateCounter * emitter;
+    int nparticles;
+};
+
+osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, osg::Group * root );
 #endif
 

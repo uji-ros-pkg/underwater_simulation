@@ -412,3 +412,317 @@ boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
   }
 }
 
+
+//Mudded object functions (maybe a namespace is useful)
+#include <osg/ComputeBoundsVisitor>
+
+#include <osgParticle/ModularEmitter>
+#include <osgParticle/ParticleSystemUpdater>
+#include <osgParticle/SectorPlacer>
+
+#include <osgParticle/FluidFrictionOperator>
+#include <osgParticle/AccelOperator>
+#include <osgParticle/ModularProgram>
+
+class AttractOperator : public osgParticle::Operator
+{
+  public:
+    AttractOperator() : osgParticle::Operator(), _magnitude(1.0f), _ratio(0.5), _killSink(true){}
+    AttractOperator( const AttractOperator& copy, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY )
+      : osgParticle::Operator(copy, copyop), _center(copy._center), _magnitude(copy._magnitude), _ratio(copy._ratio), _killSink(copy._killSink)
+      {}
+    META_Object( spin, AttractOperator );
+    /// Set the center of the attractive force
+    void setCenter( const osg::Vec3& c ) { _center = c; }
+    /// Get the center of the attractive force
+    const osg::Vec3& getCenter() const { return _center; }
+    /// Set the acceleration scale
+    void setMagnitude( float mag ) { _magnitude = mag; }
+    /// Get the acceleration scale
+    float getMagnitude() const { return _magnitude; }
+    /// Set the attraction ratio (CURRENTLY UNUSED)
+    void setRatio( float r ) { _ratio = r; if (_ratio<0.0f) _ratio=0.0f; if (_ratio>1.0f) _ratio=1.0f; }
+    /// Get the attraction ratio
+    float getRatio() const { return _ratio; }
+    /// Set whether the attractor kills the particles once they arrive
+    void setKillSink( bool kill ) { _killSink = kill; }
+    /// Get whether the attractor kills the particles once they arrive
+    bool getKillSink() const { return _killSink; }
+    /// Apply attraction to a particle. Do not call this method manually.
+    inline void operate( osgParticle::Particle* P, double dt );
+    /// Perform some initializations. Do not call this method manually.
+    inline void beginOperate( osgParticle::Program* prg );
+
+    /// Set the center of the attractive force
+    void setNode( osg::Group * root ) { _root = root;}  
+
+    /// Set the rotation of the object
+    void setParent( osg::Node * parent ) { _parent = parent;}  
+
+  protected:
+    virtual ~AttractOperator() {}
+    AttractOperator& operator=( const AttractOperator& ) { return *this; }
+    osg::Vec3 _center;
+    osg::Vec3 _xf_center;
+    osg::Group * _root;
+    osg::Node * _parent;
+    float _magnitude;
+    float _ratio;
+    bool _killSink;
+};
+
+inline void AttractOperator::operate( osgParticle::Particle* P, double dt )
+{
+  osg::Vec3 dir = _xf_center - P->getPosition();
+  if (dir.length()>0.1 )
+  {
+    // similar to orbit (but without epsilon):
+    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
+    // close, but changes absolute position when we move center:
+    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
+    //P->setPosition(P->getPosition() + (dir * _magnitude * dt * _ratio));
+    // make rotation from current direction to target direction:
+    /*osg::Matrix mat;
+    osg::Vec3 current = P->getVelocity();
+    current.normalize();
+    dir.normalize();
+    mat.makeRotate(current, dir);
+    float scalar_factor = 0.01;
+    P->transformPositionVelocity(osg::Matrix::identity(), mat, 1/(1+(_magnitude*_magnitude*0.001)) );*/
+    //P->transformPositionVelocity(osg::Matrix::identity(), mat, _ratio);
+
+    //osg::Vec3 target = osg::Vec3(0,0,100)-P->getPosition();
+    P->setVelocity(dir*(1/dir.length())*_magnitude);
+  }
+  else
+  {
+    if (_killSink)
+    {
+      P->kill();
+    }
+    else
+    {
+      P->setPosition(_xf_center);
+      P->setVelocity(osg::Vec3(0,0,0));
+    }
+  }
+}
+
+inline void AttractOperator::beginOperate( osgParticle::Program* prg )
+{
+  boost::shared_ptr<osg::Matrix> XuponaMat=getWorldCoords(findRN("end_effector",_root));
+  boost::shared_ptr<osg::Matrix> _mat=getWorldCoords(_parent);
+  _mat->invert(*_mat);
+
+  _center=XuponaMat->getTrans();
+
+  if ( prg->getReferenceFrame()==osgParticle::ModularProgram::RELATIVE_RF )
+  {
+    _xf_center = ( *XuponaMat  * *_mat).getTrans();
+  }
+  else
+  {
+    _xf_center = _center;
+  }
+
+  //std::cout<<_rotation.x()<<" "<<_rotation.y()<<" "<<_rotation.z()<<" "<<_rotation.w()<<std::endl;
+  //std::cout<<_xf_center.x()<<" "<<_xf_center.y()<<" "<<_xf_center.z()<<std::endl;
+}
+
+osgParticle::ParticleSystem* createSmokeParticles( osg::Group* parent, osg::Group * root,double x, double y, osgParticle::RandomRateCounter * rrc)
+{
+    osg::ref_ptr<osgParticle::ParticleSystem> ps = new osgParticle::ParticleSystem;
+    ps->getDefaultParticleTemplate().setLifeTime( 15.0f );
+    ps->getDefaultParticleTemplate().setShape( osgParticle::Particle::QUAD );
+    ps->getDefaultParticleTemplate().setSizeRange( osgParticle::rangef(0.05f, 0.1f) );
+    ps->getDefaultParticleTemplate().setAlphaRange( osgParticle::rangef(1.0f, 0.0f) );
+    ps->getDefaultParticleTemplate().setColorRange(
+        osgParticle::rangev4(osg::Vec4(0.3f,0.2f,0.01f,1.0f), osg::Vec4(0.15f,0.1f,0.01f,0.5f)) );
+    ps->setDefaultAttributes( "smoke.rgb", true, false );
+    
+    rrc->setRateRange( 200, 500 );
+    
+    /*osg::ref_ptr<osgParticle::RadialShooter> shooter = new osgParticle::RadialShooter;
+    shooter->setThetaRange( -osg::PI_4*0.5f, osg::PI_4*0.5f );
+    shooter->setPhiRange( -osg::PI_4*0.5f, osg::PI_4*0.5f );
+    shooter->setInitialSpeedRange( 10.0f, 15.0f );*/
+
+    //osg::ref_ptr<CustomShooter> shooter = new CustomShooter;
+
+    osg::ref_ptr<osgParticle::SectorPlacer> placer = new osgParticle::SectorPlacer;
+    placer->setRadiusRange(x/2,y/2);
+    //placer->setPhiRange(0, 2 * osg::PI);
+
+    
+    osg::ref_ptr<osgParticle::ModularEmitter> emitter = new osgParticle::ModularEmitter;
+    emitter->setPlacer(placer);
+    emitter->setParticleSystem( ps.get() );
+    emitter->setCounter( rrc );
+    //emitter->setShooter( shooter.get() );
+    parent->addChild( emitter.get() );
+
+
+    osgParticle::ModularProgram *moveDustInAir = new osgParticle::ModularProgram;
+    moveDustInAir->setParticleSystem(ps);
+
+    /*osgParticle::AccelOperator *accelUp = new osgParticle::AccelOperator;
+    accelUp->setToGravity(-5); // scale factor for normal acceleration due to gravity. 
+    moveDustInAir->addOperator(accelUp);*/
+    
+    AttractOperator * attOp= new AttractOperator;
+    attOp->setCenter(osg::Vec3(0,0,1));
+    attOp->setNode(root);
+    attOp->setParent(parent);
+    attOp->setMagnitude(0.5);
+    attOp->setRatio(50);
+    moveDustInAir->addOperator(attOp);
+
+    osgParticle::FluidFrictionOperator *airFriction = new osgParticle::FluidFrictionOperator;
+    airFriction->setFluidToWater();
+    moveDustInAir->addOperator(airFriction);
+
+    parent->addChild(moveDustInAir);
+
+    return ps.get();
+}
+
+
+DynamicHF::DynamicHF(osg::HeightField* height, osg::Group * root, boost::shared_ptr<osg::Matrix> mat)
+{
+  heightField=height;
+  this->root=root;
+  objectMat=mat;
+  mat->preMultRotate(heightField->getRotation());
+  emitter=NULL;
+  nparticles=0;
+}
+
+void DynamicHF::addParticleSystem(osgParticle::RandomRateCounter * rrc){
+  emitter=rrc;
+}
+
+void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
+{
+  boost::shared_ptr<osg::Matrix> XuponaMat=getWorldCoords(findRN("end_effector",root));
+
+
+  //std::cout<<XuponaMat->getTrans().x()<<" "<<XuponaMat->getTrans().y()<<" "<<XuponaMat->getTrans().z()<<" "<<std::endl;
+  //std::cout<<objectMat->getTrans().x()<<" "<<objectMat->getTrans().y()<<" "<<objectMat->getTrans().z()<<" "<<std::endl;
+  //std::cout<<"Origin: "<<heightField->getOrigin().x()<<" "<<heightField->getOrigin().y()<<" "<<heightField->getOrigin().z()<<std::endl;
+
+  int modified=0;
+
+  for (int r = 0; r < heightField->getNumRows(); r++) {
+    for (int c = 0; c < heightField->getNumColumns(); c++) {
+      if( (  XuponaMat->getTrans() - (objectMat->getTrans() + (heightField->getRotation().inverse() *heightField->getOrigin()) + 
+        osg::Vec3(c*heightField->getXInterval(),r*heightField->getYInterval(),heightField->getHeight(c,r)))
+        ).length2()< 0.01){
+         heightField->setHeight(c, r,heightField->getHeight(c,r)-0.01);
+         modified=1;
+         nparticles++;
+      }
+    }
+  }
+
+  if(modified){
+    drawable->dirtyDisplayList();
+    drawable->dirtyBound();
+  }
+  else
+    nparticles-=max(nparticles*0.1,0.0);
+
+  if(emitter){
+    emitter->setRateRange(nparticles*40,nparticles*80);
+  }
+
+}
+
+osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, osg::Group * root)
+{
+    
+  //osg::Image* heightMap = osgDB::readImageFile(heightFile);
+  osg::ComputeBoundsVisitor cbv;
+  object->accept(cbv);
+  osg::BoundingBox box = cbv.getBoundingBox();
+
+  boost::shared_ptr<osg::Matrix> mat=getWorldCoords( object);
+
+
+  box._min= mat->getRotate() * box._min;
+  box._max= mat->getRotate() * box._max;
+
+  //std::cout<<box.xMin()<<" "<<box.yMin()<<" "<<box.zMin()<<std::endl;
+  //std::cout<<box.xMax()<<" "<<box.yMax()<<" "<<box.zMax()<<std::endl;
+
+
+  //Adjust resolution to closest multiple for each axis
+  float resX=0.01 + fmod((double)abs(box.xMax()-box.xMin()),0.01) / (double)floor(abs(box.xMax()-box.xMin())/0.01);
+  float resY=0.01 + fmod((double)abs(box.yMax()-box.yMin()),0.01) / (double)floor(abs(box.yMax()-box.yMin())/0.01);
+ 
+  //std::cout<<"Resolution: "<<resX<<" "<<resY<<std::endl;
+  //std::cout<<"Nelems: "<<(abs(box.xMax()-box.xMin())/(resX)+1)<<" "<<(abs(box.yMax()-box.yMin())/(resY)+1)<<std::endl;
+
+  int addedElems = abs(box.zMax()-box.zMin())*percent / 0.01*2;
+     
+  osg::HeightField* heightField = new osg::HeightField();
+  heightField->allocate(abs(box.xMax()-box.xMin())/(resX)+1+addedElems,abs(box.yMax()-box.yMin())/(resY)+1+addedElems);
+  heightField->setOrigin(mat->getRotate().inverse() * osg::Vec3(min(box.xMin(),box.xMax())-addedElems*resX/2,min(box.yMin(),box.yMax())-addedElems*resY/2, min(box.zMin(),box.zMax())));
+  heightField->setRotation(mat->getRotate().inverse());  //TODO: does not work with scales!
+  heightField->setXInterval(resX);
+  heightField->setYInterval(resY);
+  heightField->setSkirtHeight(0.01f);
+
+  //std::cout<<"Allocate: "<<(abs(box.xMax()-box.xMin())/(resX)+1)<<" "<<(abs(box.yMax()-box.yMin())/(resY)+1)<<std::endl;        
+  //std::cout<<"Origin: "<<heightField->getOrigin().x()<<" "<<heightField->getOrigin().y()<<" "<<heightField->getOrigin().z()<<std::endl; 
+  //std::cout<<"Height: "<<(box.zMax()-box.zMin())*percent<<std::endl;
+
+  for (int r = 0; r < heightField->getNumRows(); r++) {
+    for (int c = 0; c < heightField->getNumColumns(); c++) {
+      heightField->setHeight(c, r, abs(box.zMax()-box.zMin())*percent );
+      if(r<addedElems/2)
+       heightField->setHeight(c, r,min(heightField->getHeight(c,r), r*resY) );  
+      if(heightField->getNumRows()-r<addedElems/2)
+       heightField->setHeight(c, r,min(heightField->getHeight(c,r), (heightField->getNumRows()-r)*resY) );  
+      if(c<addedElems/2)
+       heightField->setHeight(c, r,min(heightField->getHeight(c,r), c*resX) );  
+      if(heightField->getNumColumns()-c<addedElems/2)
+       heightField->setHeight(c, r,min(heightField->getHeight(c,r), (heightField->getNumColumns()-c)*resX) );  
+
+    }
+  }
+     
+  osg::Geode* geode = new osg::Geode();
+  osg::ShapeDrawable* draw=new osg::ShapeDrawable(heightField);
+  geode->addDrawable(draw);
+  DynamicHF * dynamicHF=new DynamicHF(heightField, root,mat );
+  draw->setUpdateCallback( dynamicHF);
+     
+  osg::Texture2D* tex = new osg::Texture2D(osgDB::readImageFile("mud.jpg"));
+  //tex->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR_MIPMAP_LINEAR);
+  //tex->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+  tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+  tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+  geode->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
+
+  //PARTICLE SYSTEM
+
+  /*osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
+  parent->setMatrix( osg::Matrix::rotate(-osg::PI_2, osg::X_AXIS) * osg::Matrix::translate(0.0f,0.0f,0.0f) );*/
+
+  osgParticle::RandomRateCounter * rrc= new osgParticle::RandomRateCounter;;
+
+  osgParticle::ParticleSystem* smoke = createSmokeParticles(object->asGroup(),root,heightField->getNumColumns()*resX,heightField->getNumRows()*resY,rrc);
+
+  osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater = new osgParticle::ParticleSystemUpdater;
+  updater->addParticleSystem( smoke );
+  dynamicHF->addParticleSystem(rrc);
+  osg::ref_ptr<osg::Geode> smokeGeode = new osg::Geode;
+  smokeGeode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON);
+  smokeGeode->addDrawable( smoke );
+
+  object->asGroup()->addChild( updater.get() );
+  object->asGroup()->addChild( smokeGeode.get() );
+     
+  return geode;
+}
+

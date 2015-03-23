@@ -155,6 +155,7 @@
 <!ELEMENT info (#PCDATA)>
 
 <!-- elementos physics -->
+<!ATTLIST object buried CDATA #IMPLIED>
 <!ELEMENT physics (mass?,inertia?,collisionShapeType?,collisionShape?,linearDamping?,angularDamping?,isKinematic? , minLinearLimit?, maxLinearLimit?,minAngularLimit?,maxAngularLimit?)>
 <!ELEMENT mass (#PCDATA)>
 <!ELEMENT inertia (x,y,z)>

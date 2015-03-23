@@ -361,6 +361,7 @@ struct Object
   double scale[3];
   double offsetp[3];
   double offsetr[3];
+  double buried;// % Object buried in the seafloor
   boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
