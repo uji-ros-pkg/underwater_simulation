@@ -188,6 +188,8 @@ private:
   nodeListType foundNodeList;
 };
 
+//Dredging
+
 #include <osgParticle/ParticleSystemUpdater>
 #include <osgParticle/ModularEmitter>
 

@@ -414,6 +414,8 @@ boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
 
 
 //Mudded object functions (maybe a namespace is useful)
+
+
 #include <osg/ComputeBoundsVisitor>
 
 #include <osgParticle/ModularEmitter>
@@ -551,7 +553,7 @@ osgParticle::ParticleSystem* createSmokeParticles( osg::Group* parent, osg::Grou
 
     osg::ref_ptr<osgParticle::SectorPlacer> placer = new osgParticle::SectorPlacer;
     placer->setRadiusRange(x/2,y/2);
-    //placer->setPhiRange(0, 2 * osg::PI);
+    //placer->setPhiRange(0,  2 * osg::PI);
 
     
     osg::ref_ptr<osgParticle::ModularEmitter> emitter = new osgParticle::ModularEmitter;
@@ -632,7 +634,7 @@ void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
     nparticles-=max(nparticles*0.1,0.0);
 
   if(emitter){
-    emitter->setRateRange(nparticles*40,nparticles*80);
+    emitter->setRateRange(min(nparticles*40,1000),min(nparticles*80,2000));
   }
 
 }
@@ -662,11 +664,11 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   //std::cout<<"Resolution: "<<resX<<" "<<resY<<std::endl;
   //std::cout<<"Nelems: "<<(abs(box.xMax()-box.xMin())/(resX)+1)<<" "<<(abs(box.yMax()-box.yMin())/(resY)+1)<<std::endl;
 
-  int addedElems = abs(box.zMax()-box.zMin())*percent / 0.01*2;
+  int addedElems = abs(box.zMax()-box.zMin())*percent / 0.01*3;
      
   osg::HeightField* heightField = new osg::HeightField();
-  heightField->allocate(abs(box.xMax()-box.xMin())/(resX)+1+addedElems,abs(box.yMax()-box.yMin())/(resY)+1+addedElems);
-  heightField->setOrigin(mat->getRotate().inverse() * osg::Vec3(min(box.xMin(),box.xMax())-addedElems*resX/2,min(box.yMin(),box.yMax())-addedElems*resY/2, min(box.zMin(),box.zMax())));
+  heightField->allocate(abs(box.xMax()-box.xMin())/(resX)+1+addedElems*2,abs(box.yMax()-box.yMin())/(resY)+1+addedElems*2);
+  heightField->setOrigin(mat->getRotate().inverse() * osg::Vec3(min(box.xMin(),box.xMax())-addedElems*resX,min(box.yMin(),box.yMax())-addedElems*resY, min(box.zMin(),box.zMax())));
   heightField->setRotation(mat->getRotate().inverse());  //TODO: does not work with scales!
   heightField->setXInterval(resX);
   heightField->setYInterval(resY);
@@ -679,14 +681,14 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   for (int r = 0; r < heightField->getNumRows(); r++) {
     for (int c = 0; c < heightField->getNumColumns(); c++) {
       heightField->setHeight(c, r, abs(box.zMax()-box.zMin())*percent );
-      if(r<addedElems/2)
-       heightField->setHeight(c, r,min(heightField->getHeight(c,r), r*resY) );  
-      if(heightField->getNumRows()-r<addedElems/2)
-       heightField->setHeight(c, r,min(heightField->getHeight(c,r), (heightField->getNumRows()-r)*resY) );  
-      if(c<addedElems/2)
-       heightField->setHeight(c, r,min(heightField->getHeight(c,r), c*resX) );  
-      if(heightField->getNumColumns()-c<addedElems/2)
-       heightField->setHeight(c, r,min(heightField->getHeight(c,r), (heightField->getNumColumns()-c)*resX) );  
+      if(r<addedElems)
+       heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-r)*(addedElems-r) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); // r*resY) );  
+      if(heightField->getNumRows()-r<addedElems)
+       heightField->setHeight(c, r,min((double)heightField->getHeight(c,r),(1 - ( (addedElems-(heightField->getNumRows()-r))*(addedElems-(heightField->getNumRows()-r)) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) );      //(heightField->getNumRows()-r)*resY) );  
+      if(c<addedElems)
+       heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-c)*(addedElems-c) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); //c*resX) );  
+      if(heightField->getNumColumns()-c<addedElems)
+       heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-(heightField->getNumColumns()-c))*(addedElems-(heightField->getNumColumns()-c)) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); //(heightField->getNumColumns()-c)*resX) );  
 
     }
   }
@@ -697,7 +699,7 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   DynamicHF * dynamicHF=new DynamicHF(heightField, root,mat );
   draw->setUpdateCallback( dynamicHF);
      
-  osg::Texture2D* tex = new osg::Texture2D(osgDB::readImageFile("mud.jpg"));
+  osg::Texture2D* tex = new osg::Texture2D(osgDB::readImageFile(texFile));
   //tex->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR_MIPMAP_LINEAR);
   //tex->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
   tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
@@ -706,12 +708,12 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
 
   //PARTICLE SYSTEM
 
-  /*osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
-  parent->setMatrix( osg::Matrix::rotate(-osg::PI_2, osg::X_AXIS) * osg::Matrix::translate(0.0f,0.0f,0.0f) );*/
+  osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
+  parent->setMatrix( osg::Matrix::rotate(-osg::PI_2, osg::X_AXIS) * osg::Matrix::translate(0.0f,0.0f,0.2f) );
 
   osgParticle::RandomRateCounter * rrc= new osgParticle::RandomRateCounter;;
 
-  osgParticle::ParticleSystem* smoke = createSmokeParticles(object->asGroup(),root,heightField->getNumColumns()*resX,heightField->getNumRows()*resY,rrc);
+  osgParticle::ParticleSystem* smoke = createSmokeParticles(parent,root,heightField->getNumColumns()*resX,heightField->getNumRows()*resY,rrc);
 
   osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater = new osgParticle::ParticleSystemUpdater;
   updater->addParticleSystem( smoke );
@@ -720,8 +722,9 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   smokeGeode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON);
   smokeGeode->addDrawable( smoke );
 
-  object->asGroup()->addChild( updater.get() );
-  object->asGroup()->addChild( smokeGeode.get() );
+  parent->addChild(updater.get() );
+  parent->addChild(smokeGeode.get() );
+  object->asGroup()->addChild( parent.get() );
      
   return geode;
 }
