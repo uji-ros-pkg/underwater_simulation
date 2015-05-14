@@ -3,7 +3,7 @@
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
 <!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsFrequency?,physicsSubSteps?, physicsSolver?,showTrajectory*)>
-<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*)>
+<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*, DredgeTool*)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?,fovy?, parameters?, showpath?,grayscale?,std?)>
 <!ELEMENT virtualRangeImage (name,relativeTo,resw?,resh?,position?,orientation?,frameId?,fovy?,parameters?)>
 <!ELEMENT structuredLightProjector (name,relativeTo,fov,image_name,laser?,position?,orientation?)>
@@ -183,4 +183,6 @@ echoROS?
 
 <!ELEMENT ForceSensor (name, target, offsetp, offsetr)>
 <!ELEMENT ForceSensorROS (name, topic, rate?)>
+
+<!ELEMENT DredgeTool (name, target, offsetp, offsetr)>
 
