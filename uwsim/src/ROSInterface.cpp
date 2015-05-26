@@ -1066,7 +1066,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->imus[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->imus[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->imus[i].name);
           tfpub_->sendTransform(t);
@@ -1078,7 +1078,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->range_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->range_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->range_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1090,7 +1090,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->pressure_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->pressure_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->pressure_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1102,7 +1102,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->gps_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->gps_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->gps_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1114,7 +1114,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->dvl_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->dvl_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->dvl_sensors[i].name);
           tfpub_->sendTransform(t);
