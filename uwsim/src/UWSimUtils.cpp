@@ -418,192 +418,14 @@ boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
 
 #include <osg/ComputeBoundsVisitor>
 
-#include <osgParticle/ModularEmitter>
-#include <osgParticle/ParticleSystemUpdater>
-#include <osgParticle/SectorPlacer>
-
-#include <osgParticle/FluidFrictionOperator>
-#include <osgParticle/AccelOperator>
-#include <osgParticle/ModularProgram>
-
 #include "uwsim/SimulatedIAUV.h"
 
-class AttractOperator : public osgParticle::Operator
-{
-  public:
-    AttractOperator() : osgParticle::Operator(), _magnitude(1.0f), _ratio(0.5), _killSink(true){}
-    AttractOperator( const AttractOperator& copy, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY )
-      : osgParticle::Operator(copy, copyop), _center(copy._center), _magnitude(copy._magnitude), _ratio(copy._ratio), _killSink(copy._killSink)
-      {}
-    META_Object( spin, AttractOperator );
-    /// Set the center of the attractive force
-    void setCenter( const osg::Vec3& c ) { _center = c; }
-    /// Get the center of the attractive force
-    const osg::Vec3& getCenter() const { return _center; }
-    /// Set the acceleration scale
-    void setMagnitude( float mag ) { _magnitude = mag; }
-    /// Get the acceleration scale
-    float getMagnitude() const { return _magnitude; }
-    /// Set the attraction ratio (CURRENTLY UNUSED)
-    void setRatio( float r ) { _ratio = r; if (_ratio<0.0f) _ratio=0.0f; if (_ratio>1.0f) _ratio=1.0f; }
-    /// Get the attraction ratio
-    float getRatio() const { return _ratio; }
-    /// Set whether the attractor kills the particles once they arrive
-    void setKillSink( bool kill ) { _killSink = kill; }
-    /// Get whether the attractor kills the particles once they arrive
-    bool getKillSink() const { return _killSink; }
-    /// Apply attraction to a particle. Do not call this method manually.
-    inline void operate( osgParticle::Particle* P, double dt );
-    /// Perform some initializations. Do not call this method manually.
-    inline void beginOperate( osgParticle::Program* prg );
-
-    /// Set the center of the attractive force
-    void setNode( osg::Group * root ) { _root = root;}  
-
-    /// Set the rotation of the object
-    void setParent( osg::Node * parent ) { _parent = parent;}  
-
-  protected:
-    virtual ~AttractOperator() {}
-    AttractOperator& operator=( const AttractOperator& ) { return *this; }
-    osg::Vec3 _center;
-    osg::Vec3 _xf_center;
-    osg::Group * _root;
-    osg::Node * _parent;
-    float _magnitude;
-    float _ratio;
-    bool _killSink;
-};
-
-inline void AttractOperator::operate( osgParticle::Particle* P, double dt )
-{
-  osg::Vec3 dir = _xf_center - P->getPosition();
-  if (dir.length()>0.1 )
-  {
-    // similar to orbit (but without epsilon):
-    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
-    // close, but changes absolute position when we move center:
-    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
-    //P->setPosition(P->getPosition() + (dir * _magnitude * dt * _ratio));
-    // make rotation from current direction to target direction:
-    /*osg::Matrix mat;
-    osg::Vec3 current = P->getVelocity();
-    current.normalize();
-    dir.normalize();
-    mat.makeRotate(current, dir);
-    float scalar_factor = 0.01;
-    P->transformPositionVelocity(osg::Matrix::identity(), mat, 1/(1+(_magnitude*_magnitude*0.001)) );*/
-    //P->transformPositionVelocity(osg::Matrix::identity(), mat, _ratio);
-
-    //osg::Vec3 target = osg::Vec3(0,0,100)-P->getPosition();
-    P->setVelocity(dir*(1/dir.length())*_magnitude);
-  }
-  else
-  {
-    if (_killSink)
-    {
-      P->kill();
-    }
-    else
-    {
-      P->setPosition(_xf_center);
-      P->setVelocity(osg::Vec3(0,0,0));
-    }
-  }
-}
-
-inline void AttractOperator::beginOperate( osgParticle::Program* prg )
-{
-  boost::shared_ptr<osg::Matrix> XuponaMat=getWorldCoords(findRN("end_effector",_root));
-  boost::shared_ptr<osg::Matrix> _mat=getWorldCoords(_parent);
-  _mat->invert(*_mat);
-
-  _center=XuponaMat->getTrans();
-
-  if ( prg->getReferenceFrame()==osgParticle::ModularProgram::RELATIVE_RF )
-  {
-    _xf_center = ( *XuponaMat  * *_mat).getTrans();
-  }
-  else
-  {
-    _xf_center = _center;
-  }
-
-  //std::cout<<_rotation.x()<<" "<<_rotation.y()<<" "<<_rotation.z()<<" "<<_rotation.w()<<std::endl;
-  //std::cout<<_xf_center.x()<<" "<<_xf_center.y()<<" "<<_xf_center.z()<<std::endl;
-}
-
-osgParticle::ParticleSystem* createSmokeParticles( osg::Group* parent, osg::Group * root,double x, double y, osgParticle::RandomRateCounter * rrc)
-{
-    osg::ref_ptr<osgParticle::ParticleSystem> ps = new osgParticle::ParticleSystem;
-    ps->getDefaultParticleTemplate().setLifeTime( 15.0f );
-    ps->getDefaultParticleTemplate().setShape( osgParticle::Particle::QUAD );
-    ps->getDefaultParticleTemplate().setSizeRange( osgParticle::rangef(0.05f, 0.1f) );
-    ps->getDefaultParticleTemplate().setAlphaRange( osgParticle::rangef(1.0f, 0.0f) );
-    ps->getDefaultParticleTemplate().setColorRange(
-        osgParticle::rangev4(osg::Vec4(0.3f,0.2f,0.01f,1.0f), osg::Vec4(0.15f,0.1f,0.01f,0.5f)) );
-    ps->setDefaultAttributes( "smoke.rgb", true, false );
-    
-    rrc->setRateRange( 200, 500 );
-    
-    /*osg::ref_ptr<osgParticle::RadialShooter> shooter = new osgParticle::RadialShooter;
-    shooter->setThetaRange( -osg::PI_4*0.5f, osg::PI_4*0.5f );
-    shooter->setPhiRange( -osg::PI_4*0.5f, osg::PI_4*0.5f );
-    shooter->setInitialSpeedRange( 10.0f, 15.0f );*/
-
-    //osg::ref_ptr<CustomShooter> shooter = new CustomShooter;
-
-    osg::ref_ptr<osgParticle::SectorPlacer> placer = new osgParticle::SectorPlacer;
-    placer->setRadiusRange(x/2,y/2);
-    //placer->setPhiRange(0,  2 * osg::PI);
-
-    
-    osg::ref_ptr<osgParticle::ModularEmitter> emitter = new osgParticle::ModularEmitter;
-    emitter->setPlacer(placer);
-    emitter->setParticleSystem( ps.get() );
-    emitter->setCounter( rrc );
-    //emitter->setShooter( shooter.get() );
-    parent->addChild( emitter.get() );
-
-
-    osgParticle::ModularProgram *moveDustInAir = new osgParticle::ModularProgram;
-    moveDustInAir->setParticleSystem(ps);
-
-    /*osgParticle::AccelOperator *accelUp = new osgParticle::AccelOperator;
-    accelUp->setToGravity(-5); // scale factor for normal acceleration due to gravity. 
-    moveDustInAir->addOperator(accelUp);*/
-    
-    AttractOperator * attOp= new AttractOperator;
-    attOp->setCenter(osg::Vec3(0,0,1));
-    attOp->setNode(root);
-    attOp->setParent(parent);
-    attOp->setMagnitude(0.5);
-    attOp->setRatio(50);
-    moveDustInAir->addOperator(attOp);
-
-    osgParticle::FluidFrictionOperator *airFriction = new osgParticle::FluidFrictionOperator;
-    airFriction->setFluidToWater();
-    moveDustInAir->addOperator(airFriction);
-
-    parent->addChild(moveDustInAir);
-
-    return ps.get();
-}
-
-
-DynamicHF::DynamicHF(osg::HeightField* height, osg::Group * root, boost::shared_ptr<osg::Matrix> mat, std::vector<boost::shared_ptr<AbstractDredgeTool> > tools)
+DynamicHF::DynamicHF(osg::HeightField* height, boost::shared_ptr<osg::Matrix> mat, std::vector<boost::shared_ptr<AbstractDredgeTool> > tools)
 {
   dredgeTools=tools;
   heightField=height;
-  this->root=root;
   objectMat=mat;
   mat->preMultRotate(heightField->getRotation());
-  emitter=NULL;
-  nparticles=0;
-}
-
-void DynamicHF::addParticleSystem(osgParticle::RandomRateCounter * rrc){
-  emitter=rrc;
 }
 
 void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
@@ -618,6 +440,7 @@ void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
   //std::cout<<"Origin: "<<heightField->getOrigin().x()<<" "<<heightField->getOrigin().y()<<" "<<heightField->getOrigin().z()<<std::endl;
 
     int modified=0;
+    int nparticles=0;
 
     for (int r = 0; r < heightField->getNumRows(); r++) {
       for (int c = 0; c < heightField->getNumColumns(); c++) {
@@ -635,16 +458,13 @@ void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
       drawable->dirtyDisplayList();
       drawable->dirtyBound();
     }
-    else
-      nparticles-=max(nparticles*0.1,0.0);
 
-    if(emitter){
-      emitter->setRateRange(min(nparticles*40,1000),min(nparticles*80,2000));
-    }
+    dredgeTools[i]->dredgedParticles(nparticles);
+    
   }
 }
 
-osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, osg::Group * root, const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles)
+osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles)
 {
     
   //osg::Image* heightMap = osgDB::readImageFile(heightFile);
@@ -715,7 +535,7 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   osg::Geode* geode = new osg::Geode();
   osg::ShapeDrawable* draw=new osg::ShapeDrawable(heightField);
   geode->addDrawable(draw);
-  DynamicHF * dynamicHF=new DynamicHF(heightField, root,mat, dredgeTools );
+  DynamicHF * dynamicHF=new DynamicHF(heightField,mat, dredgeTools );
   draw->setUpdateCallback( dynamicHF);
      
   osg::Texture2D* tex = new osg::Texture2D(osgDB::readImageFile(texFile));
@@ -725,9 +545,9 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
   geode->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 
-  //PARTICLE SYSTEM
+  //PARTICLE SYSTEM  (MOVED TO DREDGE TOOL!)
 
-  osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
+ /* osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
   parent->setMatrix( osg::Matrix::rotate(-osg::PI_2, osg::X_AXIS) * osg::Matrix::translate(0.0f,0.0f,0.2f) );
 
   osgParticle::RandomRateCounter * rrc= new osgParticle::RandomRateCounter;;
@@ -743,7 +563,7 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
 
   parent->addChild(updater.get() );
   parent->addChild(smokeGeode.get() );
-  object->asGroup()->addChild( parent.get() );
+  object->asGroup()->addChild( parent.get() ); */
      
   return geode;
 }

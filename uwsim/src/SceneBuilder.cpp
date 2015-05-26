@@ -228,7 +228,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
 
     if (auxObject.buried>0) //If object is buried create a reactive heightfield 
     {
-      osg::Node* mud=createHeightField(object,"sand2.jpg",auxObject.buried,root, iauvFile);
+      osg::Node* mud=createHeightField(object,"sand2.jpg",auxObject.buried, iauvFile);
       object->asGroup()->addChild(mud);
     }  
 

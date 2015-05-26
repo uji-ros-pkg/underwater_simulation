@@ -190,8 +190,6 @@ private:
 
 //Dredging
 
-#include <osgParticle/ParticleSystemUpdater>
-#include <osgParticle/ModularEmitter>
 
 //This is an abstract Dredge interface that must be implemented by devices to be used with a dynamicHF.
 //By default Dredge Tool will be used.
@@ -206,18 +204,14 @@ public:
 class DynamicHF : public osg::Drawable::UpdateCallback
 {
   public:
-    DynamicHF(osg::HeightField* heightField, osg::Group * root,boost::shared_ptr<osg::Matrix> mat,  std::vector<boost::shared_ptr<AbstractDredgeTool> > tools);
+    DynamicHF(osg::HeightField* heightField, boost::shared_ptr<osg::Matrix> mat,  std::vector<boost::shared_ptr<AbstractDredgeTool> > tools);
     virtual void update( osg::NodeVisitor*, osg::Drawable*drawable );
-    void addParticleSystem(osgParticle::RandomRateCounter * rrc);
   private:
     osg::HeightField* heightField;
-    osg::Group * root;
     boost::shared_ptr<osg::Matrix> objectMat;
-    osgParticle::RandomRateCounter * emitter;
-    int nparticles;
     std::vector<boost::shared_ptr<AbstractDredgeTool> > dredgeTools;
 };
 
-osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, osg::Group * root,  const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles);
+osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent,  const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles);
 #endif
 

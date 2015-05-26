@@ -104,7 +104,7 @@ src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 src/DredgeTool.cpp
 )
-target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES})
+target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 
 target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)

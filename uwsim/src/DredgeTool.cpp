@@ -1,12 +1,132 @@
-//"Echo" example, SimulatedDevice_Echo.cpp
+/* 
+ * Copyright (c) 2013 University of Jaume-I.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Mario Prats
+ *     Javier Perez
+ */
+
 
 #include <pluginlib/class_list_macros.h>
 #include <uwsim/DredgeTool.h>
+
+//PARTICLE SYSTEM FUNCTIONS
+
+inline void AttractOperator::operate( osgParticle::Particle* P, double dt )
+{
+  osg::Vec3 dir = - P->getPosition();
+  if (dir.length()>0.02 )
+  {
+    // similar to orbit (but without epsilon):
+    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
+    // close, but changes absolute position when we move center:
+    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
+    //P->setPosition(P->getPosition() + (dir * _magnitude * dt * _ratio));
+    // make rotation from current direction to target direction:
+    /*osg::Matrix mat;
+    osg::Vec3 current = P->getVelocity();
+    current.normalize();
+    dir.normalize();
+    mat.makeRotate(current, dir);
+    float scalar_factor = 0.01;
+    P->transformPositionVelocity(osg::Matrix::identity(), mat, 1/(1+(_magnitude*_magnitude*0.001)) );*/
+    //P->transformPositionVelocity(osg::Matrix::identity(), mat, _ratio);
+
+    //osg::Vec3 target = osg::Vec3(0,0,100)-P->getPosition();
+    P->setVelocity(dir*(1/dir.length())*_magnitude);
+  }
+  else
+  {
+    if (_killSink)
+    {
+      P->kill();
+    }
+    else
+    {
+      P->setPosition(osg::Vec3(0,0,0));
+      P->setVelocity(osg::Vec3(0,0,0));
+    }
+  }
+}
+
+
+
+osgParticle::ParticleSystem* createSmokeParticles( osg::Group* parent, osgParticle::RandomRateCounter * rrc)
+{
+
+    //Set particle properties (TODO: take them from config file)
+    osg::ref_ptr<osgParticle::ParticleSystem> ps = new osgParticle::ParticleSystem;
+    ps->getDefaultParticleTemplate().setLifeTime( 15.0f );
+    ps->getDefaultParticleTemplate().setShape( osgParticle::Particle::QUAD );
+    ps->getDefaultParticleTemplate().setSizeRange( osgParticle::rangef(0.05f, 0.1f) );
+    ps->getDefaultParticleTemplate().setAlphaRange( osgParticle::rangef(1.0f, 0.0f) );
+    ps->getDefaultParticleTemplate().setColorRange(
+        osgParticle::rangev4(osg::Vec4(0.3f,0.2f,0.01f,1.0f), osg::Vec4(0.15f,0.1f,0.01f,0.5f)) );
+    ps->setDefaultAttributes( "smoke.rgb", true, false );
+    
+    rrc->setRateRange( 0, 0 );
+
+    //Box placer creates particles inside a box
+    //TODO: Box size should depend on dredge tool force
+    osg::ref_ptr<osgParticle::BoxPlacer> placer = new osgParticle::BoxPlacer;
+    placer->setXRange(-0.1,0.1);
+    placer->setYRange(-0.1,0.1);
+    placer->setZRange(0,0.2);
+    
+    //Create emitter
+    osg::ref_ptr<osgParticle::ModularEmitter> emitter = new osgParticle::ModularEmitter;
+    emitter->setPlacer(placer);
+    emitter->setParticleSystem( ps.get() );
+    emitter->setCounter( rrc );
+    parent->addChild( emitter.get() );
+
+
+    //Create AttractOperator program
+    osgParticle::ModularProgram *moveDustInAir = new osgParticle::ModularProgram;
+    moveDustInAir->setParticleSystem(ps);
+    
+    AttractOperator * attOp= new AttractOperator;
+    attOp->setMagnitude(0.2);
+    moveDustInAir->addOperator(attOp);
+
+    //Add FluidFriction (not sure if it does something)
+    osgParticle::FluidFrictionOperator *airFriction = new osgParticle::FluidFrictionOperator;
+    airFriction->setFluidToWater();
+    moveDustInAir->addOperator(airFriction);
+
+    parent->addChild(moveDustInAir);
+
+    return ps.get();
+}
+
+
+
 
 DredgeTool::DredgeTool(DredgeTool_Config * cfg, osg::ref_ptr<osg::Node> target) :
     SimulatedDevice(cfg)
 {
   this->target = target;
+  particles=0;
+
+  //Create particle system:
+  rrc= new osgParticle::RandomRateCounter;
+
+  smoke = createSmokeParticles(target->asGroup(),rrc);
+
+  osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater = new osgParticle::ParticleSystemUpdater;
+  updater->addParticleSystem( smoke );
+  
+  osg::ref_ptr<osg::Geode> smokeGeode = new osg::Geode;
+  smokeGeode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON);
+  smokeGeode->addDrawable( smoke );
+
+  target->asGroup()->addChild( smokeGeode.get() );
+  target->asGroup()->addChild( updater.get() );
+
 }
 
 //To be implemented
@@ -16,11 +136,12 @@ boost::shared_ptr<osg::Matrix> DredgeTool::getDredgePosition(){
 }
 
 void DredgeTool::dredgedParticles(int nparticles){
+  particles*=0.9;
+  particles+=nparticles;
+  std::cout<<"Particles: "<<particles<<" nparticles:" <<nparticles<<std::endl;  
+  rrc->setRateRange( min(particles,50), min(particles*2,100) );
 
 }
-
-
-
 
 SimulatedDeviceConfig::Ptr DredgeTool_Factory::processConfig(const xmlpp::Node* node, ConfigFile * config)
 {
