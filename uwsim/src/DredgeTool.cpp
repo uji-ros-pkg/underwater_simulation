@@ -21,22 +21,7 @@ inline void AttractOperator::operate( osgParticle::Particle* P, double dt )
   osg::Vec3 dir = - P->getPosition();
   if (dir.length()>0.02 )
   {
-    // similar to orbit (but without epsilon):
-    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
-    // close, but changes absolute position when we move center:
-    //P->addVelocity( dir * _magnitude * dt * (1-_ratio) );
-    //P->setPosition(P->getPosition() + (dir * _magnitude * dt * _ratio));
-    // make rotation from current direction to target direction:
-    /*osg::Matrix mat;
-    osg::Vec3 current = P->getVelocity();
-    current.normalize();
-    dir.normalize();
-    mat.makeRotate(current, dir);
-    float scalar_factor = 0.01;
-    P->transformPositionVelocity(osg::Matrix::identity(), mat, 1/(1+(_magnitude*_magnitude*0.001)) );*/
-    //P->transformPositionVelocity(osg::Matrix::identity(), mat, _ratio);
-
-    //osg::Vec3 target = osg::Vec3(0,0,100)-P->getPosition();
+    //Probable something more realistic can be done, but I think it's not worthy
     P->setVelocity(dir*(1/dir.length())*_magnitude);
   }
   else
@@ -129,16 +114,17 @@ DredgeTool::DredgeTool(DredgeTool_Config * cfg, osg::ref_ptr<osg::Node> target) 
 
 }
 
-//To be implemented
-boost::shared_ptr<osg::Matrix> DredgeTool::getDredgePosition(){
-
+boost::shared_ptr<osg::Matrix> DredgeTool::getDredgePosition()
+{
   return getWorldCoords(target);;
 }
 
-void DredgeTool::dredgedParticles(int nparticles){
+void DredgeTool::dredgedParticles(int nparticles)
+{
+  //TODO: use time instead of function calls.
   particles*=0.9;
   particles+=nparticles;
-  std::cout<<"Particles: "<<particles<<" nparticles:" <<nparticles<<std::endl;  
+
   rrc->setRateRange( min(particles,50), min(particles*2,100) );
 
 }

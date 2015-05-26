@@ -413,11 +413,9 @@ boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node)
 }
 
 
-//Mudded object functions (maybe a namespace is useful)
-
+//Dredging functions
 
 #include <osg/ComputeBoundsVisitor>
-
 #include "uwsim/SimulatedIAUV.h"
 
 DynamicHF::DynamicHF(osg::HeightField* height, boost::shared_ptr<osg::Matrix> mat, std::vector<boost::shared_ptr<AbstractDredgeTool> > tools)
@@ -428,25 +426,26 @@ DynamicHF::DynamicHF(osg::HeightField* height, boost::shared_ptr<osg::Matrix> ma
   mat->preMultRotate(heightField->getRotation());
 }
 
+//Checks if any dredge tool is in dredging distance and modifies the dynamicHF
 void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
 {
 
   for(unsigned int i=0;i<dredgeTools.size();i++)
   {
-    boost::shared_ptr<osg::Matrix> XuponaMat=dredgeTools[i]->getDredgePosition();
-
-  //std::cout<<XuponaMat->getTrans().x()<<" "<<XuponaMat->getTrans().y()<<" "<<XuponaMat->getTrans().z()<<" "<<std::endl;
-  //std::cout<<objectMat->getTrans().x()<<" "<<objectMat->getTrans().y()<<" "<<objectMat->getTrans().z()<<" "<<std::endl;
-  //std::cout<<"Origin: "<<heightField->getOrigin().x()<<" "<<heightField->getOrigin().y()<<" "<<heightField->getOrigin().z()<<std::endl;
+    boost::shared_ptr<osg::Matrix> dredgeToolmat=dredgeTools[i]->getDredgePosition();
 
     int modified=0;
     int nparticles=0;
 
-    for (int r = 0; r < heightField->getNumRows(); r++) {
-      for (int c = 0; c < heightField->getNumColumns(); c++) {
-        if( (  XuponaMat->getTrans() - (objectMat->getTrans() + (heightField->getRotation().inverse() *heightField->getOrigin()) + 
+    for (int r = 0; r < heightField->getNumRows(); r++)
+    {
+      for (int c = 0; c < heightField->getNumColumns(); c++)
+      {
+        //TODO: check a cone instead of a sphere, take the distance from dredgeTool
+        if( (  dredgeToolmat->getTrans() - (objectMat->getTrans() + (heightField->getRotation().inverse() *heightField->getOrigin()) + 
           osg::Vec3(c*heightField->getXInterval(),r*heightField->getYInterval(),heightField->getHeight(c,r)))
-          ).length2()< 0.01){
+          ).length2()< 0.01)
+        {
            heightField->setHeight(c, r,heightField->getHeight(c,r)-0.01);
            modified=1;
            nparticles++;
@@ -454,7 +453,8 @@ void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
       }
     }
 
-    if(modified){
+    if(modified)
+    {
       drawable->dirtyDisplayList();
       drawable->dirtyBound();
     }
@@ -464,23 +464,20 @@ void DynamicHF::update( osg::NodeVisitor*,osg::Drawable* drawable )
   }
 }
 
+//Create a dynamic heightfield that can be dredged
 osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent, const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles)
 {
-    
-  //osg::Image* heightMap = osgDB::readImageFile(heightFile);
   osg::ComputeBoundsVisitor cbv;
   object->accept(cbv);
   osg::BoundingBox box = cbv.getBoundingBox();
 
   boost::shared_ptr<osg::Matrix> mat=getWorldCoords( object);
 
-
   box._min= mat->getRotate() * box._min;
   box._max= mat->getRotate() * box._max;
 
   //std::cout<<box.xMin()<<" "<<box.yMin()<<" "<<box.zMin()<<std::endl;
   //std::cout<<box.xMax()<<" "<<box.yMax()<<" "<<box.zMax()<<std::endl;
-
 
   //Adjust resolution to closest multiple for each axis
   float resX=0.01 + fmod((double)abs(box.xMax()-box.xMin()),0.01) / (double)floor(abs(box.xMax()-box.xMin())/0.01);
@@ -491,6 +488,7 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
 
   int addedElems = abs(box.zMax()-box.zMin())*percent / 0.01*3;
      
+  //Create heightfield
   osg::HeightField* heightField = new osg::HeightField();
   heightField->allocate(abs(box.xMax()-box.xMin())/(resX)+1+addedElems*2,abs(box.yMax()-box.yMin())/(resY)+1+addedElems*2);
   heightField->setOrigin(mat->getRotate().inverse() * osg::Vec3(min(box.xMin(),box.xMax())-addedElems*resX,min(box.yMin(),box.yMax())-addedElems*resY, min(box.zMin(),box.zMax())));
@@ -503,15 +501,22 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   //std::cout<<"Origin: "<<heightField->getOrigin().x()<<" "<<heightField->getOrigin().y()<<" "<<heightField->getOrigin().z()<<std::endl; 
   //std::cout<<"Height: "<<(box.zMax()-box.zMin())*percent<<std::endl;
 
-  for (int r = 0; r < heightField->getNumRows(); r++) {
-    for (int c = 0; c < heightField->getNumColumns(); c++) {
+  //set height
+  for (int r = 0; r < heightField->getNumRows(); r++)
+  {
+    for (int c = 0; c < heightField->getNumColumns(); c++)
+    {
       heightField->setHeight(c, r, abs(box.zMax()-box.zMin())*percent );
+
       if(r<addedElems)
        heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-r)*(addedElems-r) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); // r*resY) );  
+
       if(heightField->getNumRows()-r<addedElems)
        heightField->setHeight(c, r,min((double)heightField->getHeight(c,r),(1 - ( (addedElems-(heightField->getNumRows()-r))*(addedElems-(heightField->getNumRows()-r)) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) );      //(heightField->getNumRows()-r)*resY) );  
+
       if(c<addedElems)
        heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-c)*(addedElems-c) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); //c*resX) );  
+
       if(heightField->getNumColumns()-c<addedElems)
        heightField->setHeight(c, r,min((double)heightField->getHeight(c,r), (1 - ( (addedElems-(heightField->getNumColumns()-c))*(addedElems-(heightField->getNumColumns()-c)) / ((double)(addedElems)*(addedElems)))) * abs(box.zMax()-box.zMin())*percent) ); //(heightField->getNumColumns()-c)*resX) );  
 
@@ -532,39 +537,19 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   }
 
 
+  //Create the geode and add the updater
   osg::Geode* geode = new osg::Geode();
   osg::ShapeDrawable* draw=new osg::ShapeDrawable(heightField);
   geode->addDrawable(draw);
   DynamicHF * dynamicHF=new DynamicHF(heightField,mat, dredgeTools );
   draw->setUpdateCallback( dynamicHF);
      
+  //Add the texture
   osg::Texture2D* tex = new osg::Texture2D(osgDB::readImageFile(texFile));
-  //tex->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR_MIPMAP_LINEAR);
-  //tex->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
   tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
   tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
   geode->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 
-  //PARTICLE SYSTEM  (MOVED TO DREDGE TOOL!)
-
- /* osg::ref_ptr<osg::MatrixTransform> parent = new osg::MatrixTransform;
-  parent->setMatrix( osg::Matrix::rotate(-osg::PI_2, osg::X_AXIS) * osg::Matrix::translate(0.0f,0.0f,0.2f) );
-
-  osgParticle::RandomRateCounter * rrc= new osgParticle::RandomRateCounter;;
-
-  osgParticle::ParticleSystem* smoke = createSmokeParticles(parent,root,heightField->getNumColumns()*resX,heightField->getNumRows()*resY,rrc);
-
-  osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater = new osgParticle::ParticleSystemUpdater;
-  updater->addParticleSystem( smoke );
-  dynamicHF->addParticleSystem(rrc);
-  osg::ref_ptr<osg::Geode> smokeGeode = new osg::Geode;
-  smokeGeode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON);
-  smokeGeode->addDrawable( smoke );
-
-  parent->addChild(updater.get() );
-  parent->addChild(smokeGeode.get() );
-  object->asGroup()->addChild( parent.get() ); */
-     
   return geode;
 }
 

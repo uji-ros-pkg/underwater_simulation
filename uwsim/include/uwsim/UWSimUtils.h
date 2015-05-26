@@ -193,12 +193,13 @@ private:
 
 //This is an abstract Dredge interface that must be implemented by devices to be used with a dynamicHF.
 //By default Dredge Tool will be used.
-class AbstractDredgeTool {
-public:
-  // The coordinates must be in world coordinates
-  virtual boost::shared_ptr<osg::Matrix> getDredgePosition() =0;
-  // This function will be called each iteration with an estimation of the number of dredged particles
-  virtual void dredgedParticles(int nparticles) =0;
+class AbstractDredgeTool 
+{
+  public:
+    // The coordinates must be in world coordinates
+    virtual boost::shared_ptr<osg::Matrix> getDredgePosition() =0;
+    // This function will be called each iteration with an estimation of the number of dredged particles
+    virtual void dredgedParticles(int nparticles) =0;
 };
 
 class DynamicHF : public osg::Drawable::UpdateCallback

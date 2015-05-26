@@ -20,11 +20,9 @@ using namespace uwsim;
 
 #include <osgParticle/ModularEmitter>
 #include <osgParticle/ParticleSystemUpdater>
-//#include <osgParticle/SectorPlacer>
 #include <osgParticle/BoxPlacer>
 
 #include <osgParticle/FluidFrictionOperator>
-#include <osgParticle/AccelOperator>
 #include <osgParticle/ModularProgram>
 
 //This operator attracts the particles to a sink (dredge tool).
@@ -38,21 +36,6 @@ class AttractOperator : public osgParticle::Operator
       : osgParticle::Operator(copy, copyop), _magnitude(copy._magnitude), _killSink(copy._killSink)
       {}
     META_Object( spin, AttractOperator );
-   
-//UNUSED FUNCTIONS
-/*
-    /// Set the center of the attractive force 
-    void setCenter( const osg::Vec3& c ) { _center = c; }
-    /// Get the center of the attractive force
-    const osg::Vec3& getCenter() const { return _center; }
-    /// Set the attraction ratio (CURRENTLY UNUSED)
-    void setRatio( float r ) { _ratio = r; if (_ratio<0.0f) _ratio=0.0f; if (_ratio>1.0f) _ratio=1.0f; }
-    /// Get the attraction ratio
-    float getRatio() const { return _ratio; }
-    /// Perform some initializations. Do not call this method manually.
-    inline void beginOperate( osgParticle::Program* prg );
-
-*/
 
     /// Set the acceleration scale
     void setMagnitude( float mag ) { _magnitude = mag; }
@@ -68,10 +51,7 @@ class AttractOperator : public osgParticle::Operator
   protected:
     virtual ~AttractOperator() {}
     AttractOperator& operator=( const AttractOperator& ) { return *this; }
-    //osg::Vec3 _center;
-    //osg::Vec3 _xf_center;
     float _magnitude;
-    //float _ratio;
     bool _killSink;
 };
 
