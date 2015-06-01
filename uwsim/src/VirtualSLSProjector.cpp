@@ -83,7 +83,7 @@ void VirtualSLSProjector::init(std::string name,std::string parentName, osg::Nod
   //Uniform to update texture
   osg::Matrixd lmvpm = camera.textureCamera->getViewMatrix() * camera.textureCamera->getProjectionMatrix()
       * osg::Matrix::translate(1, 1, 1) * osg::Matrix::scale(0.5, 0.5, 0.5);
-  osg::Uniform* u = new osg::Uniform("LightModelViewProjectionMatrix", lmvpm);
+  osg::Uniform* u = new osg::Uniform(osg::Uniform::FLOAT_MAT4,"LightModelViewProjectionMatrix");
   u->setUpdateCallback(new UpdateLMVPM(camera.textureCamera));
   root->getOrCreateStateSet()->addUniform(u);
 

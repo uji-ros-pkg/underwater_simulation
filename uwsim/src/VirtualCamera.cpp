@@ -210,7 +210,7 @@ void VirtualCamera::createCamera()
   u2->setUpdateCallback(new UpdateEye(textureCamera));
   textureCamera->getOrCreateStateSet()->addUniform(u2);
 
-  osg::Uniform* u3 = new osg::Uniform("osg_ViewMatrixInverse", textureCamera->getInverseViewMatrix());
+  osg::Uniform* u3 = new osg::Uniform(osg::Uniform::FLOAT_MAT4,"osg_ViewMatrixInverse");
   u3->setUpdateCallback(new UpdateVMI(textureCamera));
   textureCamera->getOrCreateStateSet()->addUniform(u3);
 
