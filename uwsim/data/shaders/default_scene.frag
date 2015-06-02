@@ -47,6 +47,10 @@ uniform float mean;
 uniform float stddev;
 //----------------
 
+//Light rate
+uniform float light;
+//----------------
+
 #define PI 3.14159265358979323846264
 
 //The two following functions were adapted from Gazebo camera_noise_gaussian_fs.glsl shader
@@ -115,9 +119,9 @@ float computeDepthBlur(float depth, float focus, float near, float far, float cl
    return f * 0.5 + 0.5;
 }
 
-vec4 lighting( vec4 colormap )
+vec4 lighting( vec4 colormap , float lightRate)
 {
-	vec4 final_color = gl_LightSource[osgOcean_LightID].ambient * colormap;
+	vec4 final_color = gl_LightSource[osgOcean_LightID].ambient * colormap * lightRate;
 
 	vec3 N = normalize(vNormal);
 	vec3 L = normalize(vLightDir);
@@ -126,14 +130,14 @@ vec4 lighting( vec4 colormap )
 
 	if(lambertTerm > 0.0)
 	{
-		final_color += gl_LightSource[osgOcean_LightID].diffuse * lambertTerm * colormap;
+		final_color += gl_LightSource[osgOcean_LightID].diffuse * lambertTerm * colormap * lightRate;
 
 		vec3 E = normalize(vEyeVec);
 		vec3 R = reflect(-L, N);
 
 		float specular = pow( max(dot(R, E), 0.0), 2.0 );
 
-		final_color += gl_LightSource[osgOcean_LightID].specular * specular;
+		final_color += gl_LightSource[osgOcean_LightID].specular * specular * lightRate;
 	}
 
 	return final_color;
@@ -183,7 +187,9 @@ void main(void)
 	{ 
 	  if (round(texcolor.x)+round(texcolor.y)+round(texcolor.z)>0.0)
 	  {
-	    textureColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
+            //Set Laser as light color and unset texture color (textureColor will suffer from lighting)
+	    lightColor = vec4(round(texcolor.x),round(texcolor.y),round(texcolor.z),1.0);
+            textureColor = vec4(0,0,0,0);
 	  }
 	}
 	else //treating as light projection (dependent on the distance, added to original color)
@@ -203,7 +209,7 @@ void main(void)
     //JP: this tweak is highly inefficient and has really small benefits -> commented
     if(osgOcean_EyeUnderwater)
     {
-        final_color = lighting( textureColor )+lightColor;
+        final_color = lighting( textureColor , light)+lightColor;
 
         // mix in underwater light
         if(osgOcean_EnableUnderwaterScattering)
@@ -226,7 +232,7 @@ void main(void)
     // Above water
     else
     {
-        final_color = lighting( textureColor )+lightColor;
+        final_color = lighting( textureColor , light)+lightColor;
 
         float fogFactor = computeFogFactor( osgOcean_AboveWaterFogDensity, gl_FogFragCoord );
         final_color = mix( osgOcean_AboveWaterFogColor, final_color, fogFactor );

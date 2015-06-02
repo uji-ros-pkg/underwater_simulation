@@ -450,7 +450,7 @@ public:
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
-         oceanSurfaceHeight, fogDensity;
+         oceanSurfaceHeight, fogDensity, lightRate;
   int isNotChoppy, disableShaders, eye_in_hand, freeMotion, resw, resh, enablePhysics;
   string arm, vehicleToTrack;
   double camPosition[3], camLookAt[3], fogColor[3], color[3], attenuation[3], offsetr[3], offsetp[3];

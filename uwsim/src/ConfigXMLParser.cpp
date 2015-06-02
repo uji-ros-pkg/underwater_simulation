@@ -252,6 +252,8 @@ void ConfigFile::processSimParams(const xmlpp::Node* node)
       processShowTrajectory(child, aux);
       trajectories.push_back(aux);
     }
+    else if (child->get_name() == "lightRate")
+      extractFloatChar(child, lightRate);
   }
 }
 
@@ -1441,6 +1443,7 @@ ConfigFile::ConfigFile(const std::string &fName)
   memset(offsetp, 0, 3 * sizeof(double));
   camNear = camFar = -1;
   enablePhysics = 0;
+  lightRate=1.0;
   physicsConfig.init();
   try
   {
