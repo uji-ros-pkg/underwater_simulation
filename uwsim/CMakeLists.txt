@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   underwater_sensor_msgs
   urdf
+  xacro
 )
 
 find_package(uwsim_osgocean REQUIRED)
@@ -169,8 +170,26 @@ install(
 install(DIRECTORY include/${PROJECT_NAME}
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
+##compìle xacros
+file(GLOB xacro_files data/scenes/*.xml.xacro)
+
+foreach(it ${xacro_files})
+  # remove .xacro extension
+  string(REGEX MATCH "(.*)[.]xacro$" unused ${it})
+  set(output_filename ${CMAKE_MATCH_1})
+
+  # create a rule to generate ${output_filename} from {it}
+  xacro_add_xacro_file(${it} ${output_filename})
+
+  list(APPEND world_files ${output_filename})
+endforeach(it)
+
+# add an abstract target to actually trigger the builds
+add_custom_target(media_files ALL DEPENDS ${world_files})
+
 install(DIRECTORY data/scenes data/shaders
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data
+   PATTERN "*.xacro" EXCLUDE ##Exclude .xacro files
 )
 
 install(DIRECTORY src/

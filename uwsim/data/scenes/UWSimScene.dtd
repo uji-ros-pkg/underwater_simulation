@@ -1,4 +1,5 @@
 <!ELEMENT UWSimScene (oceanState?,simParams?,camera?,vehicle*,object*,rosInterfaces?)>
+<!ATTLIST UWSimScene xmlns:xacro CDATA #IMPLIED>
 
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
