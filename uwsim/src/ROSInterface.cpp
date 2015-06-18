@@ -881,13 +881,13 @@ void MultibeamSensorToROS::publish()
     {
       double Z = (data[i]); ///4294967296.0;
       tmp[i] = b / (Z - a);
-      if (tmp[i] > MB->range)
-        tmp[i] = MB->range;
     }
     for (int i = 0; i < MB->numpixels; i++)
     {
       ls.ranges[i] = (tmp[MB->remapVector[i].pixel1] * MB->remapVector[i].weight1
           + tmp[MB->remapVector[i].pixel2] * MB->remapVector[i].weight2) * MB->remapVector[i].distort;
+      if (ls.ranges[i] > MB->range)
+        ls.ranges[i] = MB->range;
     }
 
     /*r.radiation_type=sensor_msgs::Range::ULTRASOUND;
