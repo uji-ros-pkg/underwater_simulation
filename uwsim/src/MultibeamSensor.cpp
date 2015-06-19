@@ -11,20 +11,29 @@
  */
 
 #include <uwsim/MultibeamSensor.h>
+#include <osg/PositionAttitudeTransform>
 
 MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle,
-                                 double finalAngle, double alpha, double range, unsigned int mask, int visible,unsigned int ARMask) :
-    VirtualCamera(uwsim_root, name,parentName, trackNode, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle),
-                  range)
+                                 double finalAngle, double alpha, double range, unsigned int mask, int visible,unsigned int ARMask)
 {
+
+
+  osg::PositionAttitudeTransform * mTc= new osg::PositionAttitudeTransform;
+  mTc->setPosition(osg::Vec3d(0,0,0));
+  mTc->setAttitude(osg::Quat( (finalAngle + initAngle)/2 * M_PI /180.0, osg::Vec3d(1,0,0)));
+  trackNode->asTransform()->addChild(mTc);
+  vcam = VirtualCamera(uwsim_root, name,parentName, mTc, fabs(finalAngle - initAngle) / alpha + 1, fabs(finalAngle - initAngle), range);
 
   this->numpixels = fabs(finalAngle - initAngle) / alpha + 1;
   this->range = range;
   this->initAngle = initAngle;
   this->finalAngle = finalAngle;
   this->angleIncr = alpha;
+  this->name=name;
+  this->trackNode = trackNode;
+  parentLinkName=parentName;
   preCalcTable();
-  textureCamera->setCullMask(mask);
+  vcam.textureCamera->setCullMask(mask);
 
   if (visible)
   {
@@ -55,8 +64,8 @@ void MultibeamSensor::preCalcTable()
 
   //Create matrix to unproject camera points to real world
   osg::Matrix *MVPW = new osg::Matrix(
-      textureCamera->getViewMatrix() * textureCamera->getProjectionMatrix()
-          * textureCamera->getViewport()->computeWindowMatrix());
+      vcam.textureCamera->getViewMatrix() * vcam.textureCamera->getProjectionMatrix()
+          * vcam.textureCamera->getViewport()->computeWindowMatrix());
   MVPW->invert(*MVPW);
 
   //Get real fov from camera
@@ -103,5 +112,23 @@ void MultibeamSensor::preCalcTable()
     lastTheta = theta;
     //std::cout<<" THETA: "<<theta<<"Current point: "<<current*alpha<<"Error: "<<theta-i*alpha<<"asd: "<<current<<std::endl;
   }
+
+}
+
+int MultibeamSensor::getTFTransform(tf::Pose & pose, std::string & parent){
+  parent=parentLinkName;
+  pose.setOrigin(tf::Vector3(trackNode->asTransform()->asPositionAttitudeTransform()->getPosition().x(),
+                        trackNode->asTransform()->asPositionAttitudeTransform()->getPosition().y(),
+                        trackNode->asTransform()->asPositionAttitudeTransform()->getPosition().z()));
+  pose.setRotation( tf::Quaternion(trackNode->asTransform()->asPositionAttitudeTransform()->getAttitude().x(),
+                        trackNode->asTransform()->asPositionAttitudeTransform()->getAttitude().y(),
+                        trackNode->asTransform()->asPositionAttitudeTransform()->getAttitude().z(),
+                        trackNode->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
+
+  tf::Pose OSGToTFconvention;
+  OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
+  pose=pose*OSGToTFconvention;
+
+  return 1;
 
 }

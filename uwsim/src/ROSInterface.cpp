@@ -863,7 +863,7 @@ void MultibeamSensorToROS::publish()
 
     double fov, aspect, near, far;
 
-    MB->textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+    MB->vcam.textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
     ls.range_min = near;
     ls.range_max = MB->range; //far plane should be higher (z-buffer resolution)
     ls.angle_min = MB->initAngle * M_PI / 180;
@@ -873,7 +873,7 @@ void MultibeamSensorToROS::publish()
     std::vector<double> tmp;
     tmp.resize(MB->numpixels);
 
-    float * data = (float *)MB->depthTexture->data();
+    float * data = (float *)MB->vcam.depthTexture->data();
     double a = far / (far - near);
     double b = (far * near) / (near - far);
 
@@ -1051,15 +1051,32 @@ void WorldToROSTF::publish()
           //Remember that in opengl/osg, the camera frame is a right-handed system with Z going backwards (opposite to the viewing direction) and Y up.
           //While in tf convention, the camera frame is a right-handed system with Z going forward (in the viewing direction) and Y down.
 
+          int multibeam=false;
           for(int k=0;k<iauvFile_[i].get()->multibeam_sensors.size();k++) //check if camera comes from multibeam
 	    if(iauvFile_[i].get()->multibeam_sensors[k].name==iauvFile_[i].get()->camview[j].name)
-              OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
+              multibeam=true;
+              //OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
 
-          pose=pose*OSGToTFconvention;
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
+          if(!multibeam){
+            pose=pose*OSGToTFconvention;
+            tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
+            tfpub_->sendTransform(t);
+          }
+        }  
+      }
+
+      //publish multibeams
+      for(int j=0; j< iauvFile_[i].get()->multibeam_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->multibeam_sensors[j].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->multibeam_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
+
 
       //publish imus
       for(int j=0; j< iauvFile_[i].get()->imus.size();j++)

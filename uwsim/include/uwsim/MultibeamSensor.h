@@ -15,7 +15,7 @@
 
 #include "VirtualCamera.h"
 
-class MultibeamSensor : public VirtualCamera
+class MultibeamSensor
 {
   struct Remap
   {
@@ -25,13 +25,17 @@ class MultibeamSensor : public VirtualCamera
   };
 
 public:
+  VirtualCamera vcam;  //Virtual Camera
+  std::string name, parentLinkName;
   int numpixels;
   double range, initAngle, finalAngle, angleIncr;
   osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
   std::vector<Remap> remapVector;
+  osg::Node *trackNode;
   MultibeamSensor(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, double initAngle, double finalAngle,
                   double alpha, double range, unsigned int mask, int visible,unsigned int ARMask);
   void preCalcTable();
+  int getTFTransform(tf::Pose & pose, std::string & parent);
 };
 
 #endif
