@@ -863,25 +863,30 @@ void MultibeamSensorToROS::publish()
 
     double fov, aspect, near, far;
 
-    MB->vcam.textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
     ls.range_min = near;
     ls.range_max = MB->range; //far plane should be higher (z-buffer resolution)
     ls.angle_min = MB->initAngle * M_PI / 180;
     ls.angle_max = MB->finalAngle * M_PI / 180;
     ls.angle_increment = MB->angleIncr * M_PI / 180;
-    ls.ranges.resize(MB->numpixels);
+
     std::vector<double> tmp;
-    tmp.resize(MB->numpixels);
-
-    float * data = (float *)MB->vcam.depthTexture->data();
-    double a = far / (far - near);
-    double b = (far * near) / (near - far);
-
-    for (int i = 0; i < MB->numpixels; i++)
+    tmp.resize(MB->camPixels*MB->nCams);
+    for(unsigned int j=0; j<MB->nCams ;j++)
     {
-      double Z = (data[i]); ///4294967296.0;
-      tmp[i] = b / (Z - a);
+      MB->vcams[j].textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+
+      float * data = (float *)MB->vcams[j].depthTexture->data();
+      double a = far / (far - near);
+      double b = (far * near) / (near - far);
+
+      for (int i = 0; i < MB->camPixels; i++)
+      {
+        double Z = (data[i]); ///4294967296.0;
+        tmp[i+MB->camPixels*j] = b / (Z - a);
+      }
     }
+
+    ls.ranges.resize(MB->numpixels);
     for (int i = 0; i < MB->numpixels; i++)
     {
       ls.ranges[i] = (tmp[MB->remapVector[i].pixel1] * MB->remapVector[i].weight1
@@ -890,11 +895,6 @@ void MultibeamSensorToROS::publish()
         ls.ranges[i] = MB->range;
     }
 
-    /*r.radiation_type=sensor_msgs::Range::ULTRASOUND;
-     r.field_of_view=0;	//X axis of the sensor
-     r.min_range=0;
-     r.max_range=rs->range;
-     r.range= (rs->node_tracker!=NULL) ? rs->node_tracker->distance_to_obstacle : r.max_range;*/
     pub_.publish(ls);
   }
 }

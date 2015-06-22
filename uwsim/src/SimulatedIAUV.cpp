@@ -267,7 +267,8 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
     MultibeamSensor mb = MultibeamSensor(oscene->root, MB.name, MB.linkName, vMs, MB.initAngle, MB.finalAngle, MB.angleIncr,
                                          MB.range,mask,MB.visible,mask);
     multibeam_sensors.push_back(mb);
-    camview.push_back(mb.vcam);
+    for(unsigned int i=0;i<mb.nCams;i++)
+      camview.push_back(mb.vcams[i]);
     OSG_INFO << "Done adding a Multibeam Sensor..." << std::endl;
   }
 
