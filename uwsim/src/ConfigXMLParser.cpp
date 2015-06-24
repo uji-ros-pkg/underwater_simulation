@@ -1348,6 +1348,13 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
     else if (child->get_name() == "ROSPointCloudLoader")
     {
       rosInterface.type = ROSInterfaceInfo::ROSPointCloudLoader;
+      const xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("delLastPCD");
+      if(atrib and atrib->get_value()=="false")
+      {
+         rosInterface.del=false;
+      }
+      else
+         rosInterface.del=true;
     }
     else if (child->get_name() == "SimulatedDeviceROS")
     {

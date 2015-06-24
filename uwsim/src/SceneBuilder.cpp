@@ -288,7 +288,7 @@ bool SceneBuilder::loadScene(ConfigFile config)
     if (rosInterface.type == ROSInterfaceInfo::ROSPointCloudLoader)
     {
       iface = boost::shared_ptr < ROSPointCloudLoader
-          > (new ROSPointCloudLoader(rosInterface.topic,root,scene->getOceanScene()->getARMask()));
+          > (new ROSPointCloudLoader(rosInterface.topic,root,scene->getOceanScene()->getARMask(),rosInterface.del));
 
     }
     if (rosInterface.type == ROSInterfaceInfo::ROSJointStateToArm

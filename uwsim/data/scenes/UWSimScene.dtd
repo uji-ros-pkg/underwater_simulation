@@ -136,6 +136,7 @@
 <!ELEMENT multibeamSensorToLaserScan (name, topic, rate?)>
 <!ELEMENT contactSensorToROS (name, topic, rate?)>
 <!ELEMENT ROSPointCloudLoader (topic)>
+<!ATTLIST ROSPointCloudLoader delLastPCD (true|false) #IMPLIED>
 
 <!ELEMENT width (#PCDATA)>
 <!ELEMENT height (#PCDATA)>

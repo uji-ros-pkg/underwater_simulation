@@ -159,8 +159,10 @@ class ROSPointCloudLoader : public ROSSubscriberInterface
 {
   osg::ref_ptr<osg::Group> scene_root;
   unsigned int nodeMask;
+  osg::ref_ptr < osg::MatrixTransform > lastPCD;
+  bool deleteLastPCD;
 public:
-  ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root, unsigned int mask);
+  ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root, unsigned int mask,bool del);
   virtual void createSubscriber(ros::NodeHandle &nh);
   virtual void processData(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg);
   ~ROSPointCloudLoader();

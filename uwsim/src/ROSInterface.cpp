@@ -235,8 +235,8 @@ ROSPoseToPAT::~ROSPoseToPAT()
 {
 }
 
-ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root,unsigned int mask)
-: ROSSubscriberInterface(topic), scene_root(root), nodeMask(mask)
+ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root,unsigned int mask,bool del)
+: ROSSubscriberInterface(topic), scene_root(root), nodeMask(mask), deleteLastPCD(del)
 {
   
 }
@@ -267,6 +267,11 @@ void ROSPointCloudLoader::processData(const pcl::PointCloud<pcl::PointXYZ>::Cons
 
      pcdLoader.getGeode()->setNodeMask(nodeMask);
      LWNode->asGroup()->addChild(WorldToBaseTransform);
+     if(deleteLastPCD)
+     {
+       LWNode->asGroup()->removeChild(lastPCD);
+       lastPCD=WorldToBaseTransform;
+     }
   }
   else
   {

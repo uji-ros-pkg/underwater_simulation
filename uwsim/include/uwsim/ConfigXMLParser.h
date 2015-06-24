@@ -43,6 +43,7 @@ struct ROSInterfaceInfo
   unsigned int w, h; //width and height if necessary
   unsigned int posx, posy, depth, blackWhite, enableObjects; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
+  bool del; //Used in ROSPointCloudLoader
 };
 
 struct Parameters
