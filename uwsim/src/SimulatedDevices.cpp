@@ -106,7 +106,7 @@ static void processConfigNode(const xmlpp::Node* node, ConfigFile * config, Simu
   xmlpp::Node::NodeList list = node->get_children();
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
   {
-    xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "name" && cfg->name.length() == 0)
       config->extractStringChar(child, cfg->name);
   }
@@ -138,7 +138,7 @@ std::vector<SimulatedDeviceConfig::Ptr> SimulatedDevices::processConfig(const xm
     xmlpp::Node::NodeList list = node->get_children();
     for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
     {
-      xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+      const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
       std::vector < SimulatedDeviceConfig::Ptr > devs_ = processConfig(child, config, true);
       for (size_t i = 0; i < devs_.size(); ++i)
         devs.push_back(devs_.at(i));

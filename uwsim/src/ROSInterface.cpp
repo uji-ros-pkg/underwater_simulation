@@ -15,6 +15,7 @@
 #include <osg/LineWidth>
 #include <osg/Material>
 #include <osgOcean/ShaderManager>
+#include <uwsim/osgPCDLoader.h>
 
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
@@ -233,6 +234,52 @@ void ROSPoseToPAT::processData(const geometry_msgs::Pose::ConstPtr& pose)
 ROSPoseToPAT::~ROSPoseToPAT()
 {
 }
+
+ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root,unsigned int mask,bool del)
+: ROSSubscriberInterface(topic), scene_root(root), nodeMask(mask), deleteLastPCD(del)
+{
+  
+}
+
+void ROSPointCloudLoader::createSubscriber(ros::NodeHandle &nh)
+{
+  ROS_INFO("ROSPointCloudLoader subscriber on topic %s", topic.c_str());
+  sub_ = nh.subscribe<pcl::PointCloud<pcl::PointXYZ> >(topic, 10, &ROSPointCloudLoader::processData, this);
+}
+
+void ROSPointCloudLoader::processData(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
+{
+   osgPCDLoader<pcl::PointXYZ> pcdLoader(*msg.get());
+
+   osg::ref_ptr < osg::Node > frame_id=findRN(msg->header.frame_id,scene_root);
+
+   if(frame_id)
+   {
+     osg::ref_ptr < osg::Node > LWNode=findRN("localizedWorld",scene_root);
+     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(LWNode);
+     LWMat->invert(*LWMat);
+
+     boost::shared_ptr<osg::Matrix> WorldToBase=getWorldCoords(frame_id);
+
+     osg::Matrixd  res=*WorldToBase * *LWMat;
+     osg::ref_ptr < osg::MatrixTransform > WorldToBaseTransform= new osg::MatrixTransform(res);
+     WorldToBaseTransform->addChild(pcdLoader.getGeode());
+
+     pcdLoader.getGeode()->setNodeMask(nodeMask);
+     LWNode->asGroup()->addChild(WorldToBaseTransform);
+     if(deleteLastPCD)
+     {
+       LWNode->asGroup()->removeChild(lastPCD);
+       lastPCD=WorldToBaseTransform;
+     }
+  }
+  else
+  {
+    ROS_WARN ("%s is not a valid frame id for PointCloudLoader.",msg->header.frame_id.c_str());
+  }
+}
+
+ROSPointCloudLoader::~ROSPointCloudLoader(){}
 
 /*
  class ROSNavigationDataToPAT: public ROSSubscriberInterface {
@@ -821,38 +868,38 @@ void MultibeamSensorToROS::publish()
 
     double fov, aspect, near, far;
 
-    MB->textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
     ls.range_min = near;
     ls.range_max = MB->range; //far plane should be higher (z-buffer resolution)
     ls.angle_min = MB->initAngle * M_PI / 180;
     ls.angle_max = MB->finalAngle * M_PI / 180;
     ls.angle_increment = MB->angleIncr * M_PI / 180;
-    ls.ranges.resize(MB->numpixels);
+
     std::vector<double> tmp;
-    tmp.resize(MB->numpixels);
-
-    float * data = (float *)MB->depthTexture->data();
-    double a = far / (far - near);
-    double b = (far * near) / (near - far);
-
-    for (int i = 0; i < MB->numpixels; i++)
+    tmp.resize(MB->camPixels*MB->nCams);
+    for(unsigned int j=0; j<MB->nCams ;j++)
     {
-      double Z = (data[i]); ///4294967296.0;
-      tmp[i] = b / (Z - a);
-      if (tmp[i] > MB->range)
-        tmp[i] = MB->range;
+      MB->vcams[j].textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+
+      float * data = (float *)MB->vcams[j].depthTexture->data();
+      double a = far / (far - near);
+      double b = (far * near) / (near - far);
+
+      for (int i = 0; i < MB->camPixels; i++)
+      {
+        double Z = (data[i]); ///4294967296.0;
+        tmp[i+MB->camPixels*j] = b / (Z - a);
+      }
     }
+
+    ls.ranges.resize(MB->numpixels);
     for (int i = 0; i < MB->numpixels; i++)
     {
       ls.ranges[i] = (tmp[MB->remapVector[i].pixel1] * MB->remapVector[i].weight1
           + tmp[MB->remapVector[i].pixel2] * MB->remapVector[i].weight2) * MB->remapVector[i].distort;
+      if (ls.ranges[i] > MB->range)
+        ls.ranges[i] = MB->range;
     }
 
-    /*r.radiation_type=sensor_msgs::Range::ULTRASOUND;
-     r.field_of_view=0;	//X axis of the sensor
-     r.min_range=0;
-     r.max_range=rs->range;
-     r.range= (rs->node_tracker!=NULL) ? rs->node_tracker->distance_to_obstacle : r.max_range;*/
     pub_.publish(ls);
   }
 }
@@ -1009,22 +1056,39 @@ void WorldToROSTF::publish()
           //Remember that in opengl/osg, the camera frame is a right-handed system with Z going backwards (opposite to the viewing direction) and Y up.
           //While in tf convention, the camera frame is a right-handed system with Z going forward (in the viewing direction) and Y down.
 
+          int multibeam=false;
           for(int k=0;k<iauvFile_[i].get()->multibeam_sensors.size();k++) //check if camera comes from multibeam
 	    if(iauvFile_[i].get()->multibeam_sensors[k].name==iauvFile_[i].get()->camview[j].name)
-              OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
+              multibeam=true;
+              //OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
 
-          pose=pose*OSGToTFconvention;
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
+          if(!multibeam){
+            pose=pose*OSGToTFconvention;
+            tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
+            tfpub_->sendTransform(t);
+          }
+        }  
+      }
+
+      //publish multibeams
+      for(int j=0; j< iauvFile_[i].get()->multibeam_sensors.size();j++)
+      {
+        tf::Pose pose;
+        std::string parent;
+        if(iauvFile_[i].get()->multibeam_sensors[j].getTFTransform(pose,parent))
+        {
+          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->multibeam_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
+
 
       //publish imus
       for(int j=0; j< iauvFile_[i].get()->imus.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->imus[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->imus[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->imus[i].name);
           tfpub_->sendTransform(t);
@@ -1036,7 +1100,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->range_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->range_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->range_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1048,7 +1112,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->pressure_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->pressure_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->pressure_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1060,7 +1124,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->gps_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->gps_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->gps_sensors[i].name);
           tfpub_->sendTransform(t);
@@ -1072,7 +1136,7 @@ void WorldToROSTF::publish()
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->dvl_sensors[i].getTFTransform(pose,parent))
+        if(iauvFile_[i].get()->dvl_sensors[j].getTFTransform(pose,parent))
         {
           tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->dvl_sensors[i].name);
           tfpub_->sendTransform(t);

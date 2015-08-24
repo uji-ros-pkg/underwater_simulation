@@ -117,11 +117,11 @@ public:
   bool visible; ///< Whether to make the beam visible or not
   osg::ref_ptr<IntersectorUpdateCallback> node_tracker;
 
-  VirtualRangeSensor(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible);
+  VirtualRangeSensor(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible,unsigned int mask);
   VirtualRangeSensor();
   int getTFTransform(tf::Pose & pose, std::string & parent);
 
-  virtual void init(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible);
+  virtual void init(std::string name, std::string parentName, osg::Node *root, osg::Node *trackNode, double range, bool visible, unsigned int mask);
 
 };
 

@@ -57,6 +57,7 @@
 #include <geometry_msgs/Pose.h>
 //#include <cola2_common/NavigationData.h>
 #include <robot_state_publisher/robot_state_publisher.h>
+#include <pcl_ros/point_cloud.h>
 
 //Max time (in seconds) between two consecutive control references
 #define MAX_ELAPSED	1
@@ -152,6 +153,19 @@ public:
 
   virtual void processData(const geometry_msgs::Pose::ConstPtr& odom);
   ~ROSPoseToPAT();
+};
+
+class ROSPointCloudLoader : public ROSSubscriberInterface
+{
+  osg::ref_ptr<osg::Group> scene_root;
+  unsigned int nodeMask;
+  osg::ref_ptr < osg::MatrixTransform > lastPCD;
+  bool deleteLastPCD;
+public:
+  ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root, unsigned int mask,bool del);
+  virtual void createSubscriber(ros::NodeHandle &nh);
+  virtual void processData(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg);
+  ~ROSPointCloudLoader();
 };
 
 /*

@@ -73,7 +73,12 @@ public:
   virtual bool applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *oscene, size_t iteration) = 0;
   //ROSINTERFACE: returns configured ROSInterfaces, executed third
   virtual std::vector<boost::shared_ptr<ROSInterface> > getInterface(
-      ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile) = 0;
+      ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile)
+  {
+    std::vector < boost::shared_ptr<ROSInterface> > ifaces;  
+    return ifaces;
+  }
+  ;
 
   virtual ~SimulatedDeviceFactory()
   {

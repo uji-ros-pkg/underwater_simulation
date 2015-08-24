@@ -32,7 +32,8 @@ struct ROSInterfaceInfo
   {
     Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage,
     RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS,
-    DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS, WorldToROSTF
+    DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS, WorldToROSTF,
+    ROSPointCloudLoader
   } type_t;
   string subtype; //type of a SimulatedDevice
   std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
@@ -42,6 +43,7 @@ struct ROSInterfaceInfo
   unsigned int w, h; //width and height if necessary
   unsigned int posx, posy, depth, blackWhite, enableObjects; ///< default (x,y) position of the widget if necessary, blackWhite camera
   double scale; ///< default scale of the widget if necessary
+  bool del; //Used in ROSPointCloudLoader
 };
 
 struct Parameters
@@ -59,6 +61,7 @@ struct Vcam
   double position[3], orientation[3];
   double baseLine; ///baseline for stereo cameras
   double fov;
+  double std; //Additive gaussian noise deviation
   boost::shared_ptr<Parameters> parameters;
   void init()
   {
@@ -81,6 +84,7 @@ struct Vcam
     range = 0;
     bw = 0;
     fov=50;
+    std=0.005;
   }
 };
 
@@ -222,7 +226,9 @@ struct XMLMultibeamSensor
   string linkName;
   double position[3], orientation[3];
   int link;
+  int visible;
   double initAngle, finalAngle, angleIncr, range;
+  bool underwaterParticles;
   void init()
   {
     name = "";
@@ -233,6 +239,8 @@ struct XMLMultibeamSensor
     orientation[0] = 0;
     orientation[1] = 0;
     orientation[2] = 0;
+    underwaterParticles=false;
+    visible = 0;
   }
 };
 
@@ -354,6 +362,7 @@ struct Object
   double scale[3];
   double offsetp[3];
   double offsetr[3];
+  double buried;// % Object buried in the seafloor
   boost::shared_ptr<PhysicProperties> physicProperties;
 };
 
@@ -442,7 +451,7 @@ public:
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
-         oceanSurfaceHeight, fogDensity;
+         oceanSurfaceHeight, fogDensity, lightRate;
   int isNotChoppy, disableShaders, eye_in_hand, freeMotion, resw, resh, enablePhysics;
   string arm, vehicleToTrack;
   double camPosition[3], camLookAt[3], fogColor[3], color[3], attenuation[3], offsetr[3], offsetp[3];

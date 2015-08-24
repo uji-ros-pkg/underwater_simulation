@@ -33,6 +33,20 @@ protected:
   osg::Camera* mCamera;
 };
 
+class UpdateNoiseSeed : public osg::Uniform::Callback
+{
+public:
+  UpdateNoiseSeed()
+  {
+  }
+  virtual void operator ()(osg::Uniform* u, osg::NodeVisitor*)
+  {
+    u->set(osg::Vec4f(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX));
+  }
+
+protected:
+};
+
 class UpdateEye : public osg::Uniform::Callback
 {
 public:
@@ -73,11 +87,12 @@ VirtualCamera::VirtualCamera()
 
 void VirtualCamera::init(osg::Group *uwsim_root, std::string name, std::string parentName, osg::Node *trackNode, int width,
                          int height, double baseline, std::string frameId, Parameters *params, int range, double fov,
-                         double aspectRatio, double near, double far, int bw, int widget)
+                         double aspectRatio, double near, double far, int bw, int widget, SceneBuilder *oscene, float std)
 {
   this->uwsim_root = uwsim_root;
   this->name = name;
   this->parentLinkName=parentName;
+  this->std=std;
 
   this->trackNode = trackNode;
   //Add a switchable frame geometry on the camera frame
@@ -123,26 +138,30 @@ void VirtualCamera::init(osg::Group *uwsim_root, std::string name, std::string p
   }
 
   createCamera();
+  //Add a cull mask to hide Augmented Reality objects from virtual cameras
+  if(oscene)
+    textureCamera->setCullMask(~oscene->scene->getOceanScene()->getARMask());
+  loadShaders(oscene);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
                              double fov, double range)
 { //Used in multibeam
   //Z-buffer has very low resolution near far plane so we extend it and cut far plane later.
-  init(uwsim_root, name, parentName, trackNode, 1, width, 0.0, "", NULL, 1, fov, 1.0 / width, 0.8, range * 1.2, 0, 0);
+  init(uwsim_root, name, parentName, trackNode, 1, width, 0.0, "", NULL, 1, fov, 1.0 / width, 0.8, range * 1.2, 0, 0,NULL,0);
 
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
                              int height, double fov, double aspectRatio)
 { //Used in structured light projector as shadow camera
-  init(uwsim_root, name, parentName, trackNode, width, height, 0.0, "", NULL, 1, fov, aspectRatio, 0.1, 20, 0, 0);
+  init(uwsim_root, name, parentName, trackNode, width, height, 0.0, "", NULL, 1, fov, aspectRatio, 0.1, 20, 0, 0,NULL,0);
 }
 
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
-                             int height,double baseline, std::string frameId,double fov, Parameters *params=NULL, int range=0, int bw=0)
+                             int height,double baseline, std::string frameId,double fov,SceneBuilder *oscene,float std,  Parameters *params=NULL, int range=0, int bw=0)
 {//Standard camera / depth camera
-  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1);
+  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1,oscene,std);
 }
 
 void VirtualCamera::createCamera()
@@ -213,7 +232,58 @@ void VirtualCamera::createCamera()
   osg::Uniform* u3 = new osg::Uniform(osg::Uniform::FLOAT_MAT4,"osg_ViewMatrixInverse");
   u3->setUpdateCallback(new UpdateVMI(textureCamera));
   textureCamera->getOrCreateStateSet()->addUniform(u3);
+}
 
+void VirtualCamera::loadShaders(SceneBuilder *oscene)
+{
+
+  if(oscene)
+  {
+    static const char model_vertex[] = "default_scene.vert";
+    static const char model_fragment[] = "default_scene.frag";
+    osg::Program* program = osgOcean::ShaderManager::instance().createProgram("object_shader", model_vertex,model_fragment, "", "");
+
+    textureCamera->getOrCreateStateSet()->setAttributeAndModes(program, osg::StateAttribute::ON);
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableGlare", oscene->scene->getOceanScene()->isGlareEnabled()) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableUnderwaterScattering", oscene->scene->getOceanScene()->isUnderwaterScatteringEnabled()) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableDOF", oscene->scene->getOceanScene()->isUnderwaterDOFEnabled()) );
+ 
+    float UWFogDensity= oscene->scene->getOceanScene()->getUnderwaterFogDensity();
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterFogDensity", -UWFogDensity*UWFogDensity*1.442695f) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterFogColor", oscene->scene->getOceanScene()->getUnderwaterFogColor() ) );
+
+    float AWFogDensity= oscene->scene->getOceanScene()->getAboveWaterFogDensity();
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_AboveWaterFogDensity", -AWFogDensity*AWFogDensity*1.442695f ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_AboveWaterFogColor", oscene->scene->getOceanScene()->getAboveWaterFogColor() ) );
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_DOF_Near",  oscene->scene->getOceanScene()->getDOFNear() ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_DOF_Far",  oscene->scene->getOceanScene()->getDOFFar() ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_DOF_Focus",  oscene->scene->getOceanScene()->getDOFFocalDistance() ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_DOF_Clamp",  oscene->scene->getOceanScene()->getDOFFarClamp() ) );
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_WaterHeight", float(oscene->scene->getOceanScene()->getOceanSurfaceHeight()) ) );
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterAttenuation", oscene->scene->getOceanScene()->getUnderwaterAttenuation() ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterDiffuse", oscene->scene->getOceanScene()->getUnderwaterDiffuse() ) );
+
+    /*textureCamera->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
+    textureCamera->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
+    textureCamera->getStateSet()->addUniform(new osg::Uniform("SLStex", 3));
+    textureCamera->getStateSet()->addUniform(new osg::Uniform("SLStex2", 4));*/
+
+    osg::Uniform* u = new osg::Uniform("offsets", osg::Vec4f(1,2,3,4));
+    u->setUpdateCallback(new UpdateNoiseSeed());
+    textureCamera->getStateSet()->addUniform(u);
+
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("stddev", std ) );
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("mean", 0.0f ) );
+
+  }
+  else
+  {
+    textureCamera->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::ON); //Unset shader
+  }
 }
 
 osg::ref_ptr<osgWidget::Window> VirtualCamera::getWidgetWindow()

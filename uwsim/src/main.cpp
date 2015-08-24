@@ -85,7 +85,6 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-    ;
   //Add current folder to path
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string("."));
   //Add UWSim folders to path
@@ -95,6 +94,7 @@ int main(int argc, char *argv[])
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH));
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data");
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data/scenes");
+  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(UWSIM_ROOT_PATH) + "/data/shaders");
 
   //Add dataPath folder to path
   std::string dataPath("");
