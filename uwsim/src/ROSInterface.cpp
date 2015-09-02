@@ -1002,7 +1002,7 @@ WorldToROSTF::WorldToROSTF(  SceneBuilder * scene, std::string worldRootName, un
       transforms_.push_back(transform);
    }
    worldRootName_ = worldRootName;
-   enableObjects_ = enableObjects;//TODO Implement enableObjects feature
+   enableObjects_ = enableObjects;
 }
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
