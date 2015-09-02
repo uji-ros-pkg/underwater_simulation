@@ -161,7 +161,7 @@ VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::strin
 VirtualCamera::VirtualCamera(osg::Group *uwsim_root, std::string name,std::string parentName, osg::Node *trackNode, int width,
                              int height,double baseline, std::string frameId,double fov,SceneBuilder *oscene,float std,  Parameters *params=NULL, int range=0, int bw=0)
 {//Standard camera / depth camera
-  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 20, bw, 1,oscene,std);
+  init(uwsim_root, name, parentName, trackNode, width, height, baseline, frameId, params, range, fov, width/(float)height, 0.18, 2000, bw, 1,oscene,std);
 }
 
 void VirtualCamera::createCamera()
@@ -267,6 +267,10 @@ void VirtualCamera::loadShaders(SceneBuilder *oscene)
     textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterAttenuation", oscene->scene->getOceanScene()->getUnderwaterAttenuation() ) );
     textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_UnderwaterDiffuse", oscene->scene->getOceanScene()->getUnderwaterDiffuse() ) );
 
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableHeightmap", false));
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableReflections", false));
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableRefractions", false));
+    textureCamera->getStateSet()->addUniform( new osg::Uniform("osgOcean_EnableCrestFoam", false));
     /*textureCamera->getStateSet()->addUniform(new osg::Uniform("uOverlayMap", 1));
     textureCamera->getStateSet()->addUniform(new osg::Uniform("uNormalMap", 2));
     textureCamera->getStateSet()->addUniform(new osg::Uniform("SLStex", 3));
