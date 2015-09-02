@@ -968,16 +968,14 @@ contactSensorToROS::~contactSensorToROS()
 }
 
 
-WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile,   std::vector<osg::ref_ptr<osg::Node> > objects, std::string worldRootName, unsigned int enableObjects, int rate ) :
+WorldToROSTF::WorldToROSTF(  SceneBuilder * scene, std::string worldRootName, unsigned int enableObjects, int rate ) :
     ROSPublisherInterface(worldRootName, rate)
 {
-   iauvFile_ = iauvFile;
-   objects_ = objects;
-   rootNode_ = rootNode;
-   for(int i = 0; i < iauvFile_.size(); i++)
+   this->scene=scene;
+   for(int i = 0; i < scene->iauvFile.size(); i++)
    {
       KDL::Tree tree;
-      if (!kdl_parser::treeFromFile(iauvFile[i].get()->urdf->URDFFile, tree))
+      if (!kdl_parser::treeFromFile(scene->iauvFile[i].get()->urdf->URDFFile, tree))
       {
          ROS_ERROR("Failed to construct kdl tree");
       }
@@ -990,8 +988,8 @@ WorldToROSTF::WorldToROSTF(osg::Group *rootNode,  std::vector< boost::shared_ptr
       robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
        new robot_state_publisher::RobotStatePublisher(tree)));
   
-      findNodeVisitor findNode(iauvFile[i].get()->name);
-      rootNode->accept(findNode);
+      findNodeVisitor findNode(scene->iauvFile[i].get()->name);
+      scene->root->accept(findNode);
       osg::Node *first = findNode.getFirst();
       if (first == NULL)
       {
@@ -1016,12 +1014,12 @@ void WorldToROSTF::publish()
 {
 
    //Publish vehicle frames
-   for( int i = 0; i < iauvFile_.size(); i++ )
+   for( int i = 0; i < scene->iauvFile.size(); i++ )
    {
       // Publish moving joints
-      robot_pubs_[i]->RobotStatePublisher::publishTransforms(iauvFile_[i].get()->urdf->getFullJointMap(), getROSTime(), iauvFile_[i].get()->name);
+      robot_pubs_[i]->RobotStatePublisher::publishTransforms(scene->iauvFile[i].get()->urdf->getFullJointMap(), getROSTime(), scene->iauvFile[i].get()->name);
       // Publish fixed joints
-      robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(iauvFile_[i].get()->name);
+      robot_pubs_[i]->RobotStatePublisher::publishFixedTransforms(scene->iauvFile[i].get()->name);
       //Publish odometry
       if (transforms_[i] != NULL)
       {
@@ -1032,24 +1030,24 @@ void WorldToROSTF::publish()
          tf::Vector3 p(pos.x(), pos.y(), pos.z());
          tf::Quaternion q(rot.x(), rot.y(), rot.z(), rot.w());
          tf::Pose pose(q,p);
-         tf::StampedTransform t(pose, getROSTime(), "/" + worldRootName_, "/"+iauvFile_[i].get()->name);
+         tf::StampedTransform t(pose, getROSTime(), "/" + worldRootName_, "/"+scene->iauvFile[i].get()->name);
       
          tf::Vector3 p2(0, 0, 0);
          tf::Quaternion q2(0, 0, 0, 1);
          tf::Pose pose2(q2,p2);
-         tf::StampedTransform t2(pose2, getROSTime(), "/"+iauvFile_[i].get()->name, "/"+iauvFile_[i].get()->name + "/base_link");
+         tf::StampedTransform t2(pose2, getROSTime(), "/"+scene->iauvFile[i].get()->name, "/"+scene->iauvFile[i].get()->name + "/base_link");
 
          tfpub_->sendTransform(t2);
          tfpub_->sendTransform(t);  
       }
 
       //publish Cameras
-      for(int j=0; j< iauvFile_[i].get()->camview.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->camview.size();j++)
       {
         tf::Pose pose;
         std::string parent;
         tf::Pose OSGToTFconvention;
-        if(iauvFile_[i].get()->camview[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->camview[j].getTFTransform(pose,parent))
         {
           OSGToTFconvention.setOrigin(tf::Vector3(0,0,0));
           OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(1,0,0),M_PI));//OSG convention is different to tf:
@@ -1057,88 +1055,88 @@ void WorldToROSTF::publish()
           //While in tf convention, the camera frame is a right-handed system with Z going forward (in the viewing direction) and Y down.
 
           int multibeam=false;
-          for(int k=0;k<iauvFile_[i].get()->multibeam_sensors.size();k++) //check if camera comes from multibeam
-	    if(iauvFile_[i].get()->multibeam_sensors[k].name==iauvFile_[i].get()->camview[j].name)
+          for(int k=0;k<scene->iauvFile[i].get()->multibeam_sensors.size();k++) //check if camera comes from multibeam
+	    if(scene->iauvFile[i].get()->multibeam_sensors[k].name==scene->iauvFile[i].get()->camview[j].name)
               multibeam=true;
               //OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
 
           if(!multibeam){
             pose=pose*OSGToTFconvention;
-            tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->camview[j].name);
+            tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->camview[j].name);
             tfpub_->sendTransform(t);
           }
         }  
       }
 
       //publish multibeams
-      for(int j=0; j< iauvFile_[i].get()->multibeam_sensors.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->multibeam_sensors.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->multibeam_sensors[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->multibeam_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->multibeam_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->multibeam_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
 
 
       //publish imus
-      for(int j=0; j< iauvFile_[i].get()->imus.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->imus.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->imus[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->imus[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->imus[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->imus[i].name);
           tfpub_->sendTransform(t);
         }  
       }
 
       //publish RangeSensor
-      for(int j=0; j< iauvFile_[i].get()->range_sensors.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->range_sensors.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->range_sensors[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->range_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->range_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->range_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
 
       //publish PressureSensor
-      for(int j=0; j< iauvFile_[i].get()->pressure_sensors.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->pressure_sensors.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->pressure_sensors[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->pressure_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->pressure_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->pressure_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
 
       //publish GPSSensor
-      for(int j=0; j< iauvFile_[i].get()->gps_sensors.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->gps_sensors.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->gps_sensors[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->gps_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->gps_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->gps_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
 
       //publish DVLSensor
-      for(int j=0; j< iauvFile_[i].get()->dvl_sensors.size();j++)
+      for(int j=0; j< scene->iauvFile[i].get()->dvl_sensors.size();j++)
       {
         tf::Pose pose;
         std::string parent;
-        if(iauvFile_[i].get()->dvl_sensors[j].getTFTransform(pose,parent))
+        if(scene->iauvFile[i].get()->dvl_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+iauvFile_[i].get()->name + "/" +parent, iauvFile_[i].get()->dvl_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->dvl_sensors[i].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1149,19 +1147,19 @@ void WorldToROSTF::publish()
    if(enableObjects_)
    {
 
-     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(findRN("localizedWorld",rootNode_));
+     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(scene->scene->localizedWorld);
      LWMat->invert(*LWMat);
 
-     for(unsigned int i=0;i<objects_.size();i++)
+     for(unsigned int i=0;i<scene->objects.size();i++)
      {
-       boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(objects_[i]);
+       boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(scene->objects[i]);
 
        osg::Matrixd  res=*objectMat * *LWMat;
 
        tf::Vector3 p2(res.getTrans().x(), res.getTrans().y(), res.getTrans().z());
        tf::Quaternion q2(res.getRotate().x(), res.getRotate().y(), res.getRotate().z(), res.getRotate().w());
        tf::Pose pose2(q2,p2);
-       tf::StampedTransform t(pose2, getROSTime(),  "/" + worldRootName_, objects_[i]->getName());
+       tf::StampedTransform t(pose2, getROSTime(),  "/" + worldRootName_, scene->objects[i]->getName());
 
        tfpub_->sendTransform(t);
      }

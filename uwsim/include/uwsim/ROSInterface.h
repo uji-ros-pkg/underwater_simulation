@@ -27,6 +27,7 @@
 #include "MultibeamSensor.h"
 #include "UWSimUtils.h"
 #include "BulletPhysics.h"
+#include "SceneBuilder.h"
 
 //OSG
 #include <OpenThreads/Thread>
@@ -281,13 +282,11 @@ class WorldToROSTF : public ROSPublisherInterface
   std::vector< osg::ref_ptr<osg::MatrixTransform> > transforms_;
   std::vector< boost::shared_ptr<robot_state_publisher::RobotStatePublisher> > robot_pubs_;
   boost::shared_ptr<tf::TransformBroadcaster> tfpub_;
-  std::vector< boost::shared_ptr<SimulatedIAUV> > iauvFile_;
-  std::vector<osg::ref_ptr<osg::Node> > objects_;
   std::string worldRootName_; 
   unsigned int enableObjects_;
-  osg::Group *rootNode_;
+  SceneBuilder * scene;
 public:
-  WorldToROSTF(osg::Group *rootNode, std::vector<boost::shared_ptr<SimulatedIAUV> > iauvFile,  std::vector<osg::ref_ptr<osg::Node> > objects, std::string worldRootName, unsigned int enableObjects, int rate);
+  WorldToROSTF(SceneBuilder * scene, std::string worldRootName, unsigned int enableObjects, int rate);
 
   void createPublisher(ros::NodeHandle &nh);
 
