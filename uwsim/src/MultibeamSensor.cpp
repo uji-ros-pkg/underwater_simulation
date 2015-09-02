@@ -137,6 +137,7 @@ int MultibeamSensor::getTFTransform(tf::Pose & pose, std::string & parent){
                         trackNode->asTransform()->asPositionAttitudeTransform()->getAttitude().w()));
 
   tf::Pose OSGToTFconvention;
+  OSGToTFconvention.setOrigin(tf::Vector3(0,0,0));
   OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
   pose=pose*OSGToTFconvention;
 
