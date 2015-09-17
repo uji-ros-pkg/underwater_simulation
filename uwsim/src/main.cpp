@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 #include <uwsim/ConfigXMLParser.h>
-#include <uwsim/SceneBuilder.h>
+#include <uwsim/ROSSceneBuilder.h>
 #include <uwsim/ViewBuilder.h>
 #include <uwsim/PhysicsBuilder.h>
 #include "osgbCollision/GLDebugDrawer.h"
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   ros::init(argc, argv, "UWSim");
   ros::start();
 
-  SceneBuilder builder(arguments);
+  ROSSceneBuilder builder(arguments);
   builder.loadScene(config);
 
   PhysicsBuilder physicsBuilder;
@@ -168,6 +168,9 @@ int main(int argc, char *argv[])
     }
 
     view.getViewer()->frame();
+
+    builder.updateIM();
+
   }
   if (ros::ok())
     ros::shutdown();

@@ -4,6 +4,7 @@ project(uwsim)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   image_transport
+  interactive_markers
   kdl_parser
   nav_msgs
   pcl_ros
@@ -22,6 +23,9 @@ find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
+find_package(osg_utils REQUIRED)
+find_package(osg_interactive_markers REQUIRED)
+find_package(osg_markers REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -30,6 +34,7 @@ catkin_package(
   CATKIN_DEPENDS
     geometry_msgs
     image_transport
+    interactive_markers
     kdl_parser
     nav_msgs
     pcl_ros
@@ -46,6 +51,9 @@ catkin_package(
     libopenscenegraph
     libxml++-2.6
     opengl
+    osg_utils
+    osg_markers
+    osg_interactive_markers
     uwsim_bullet
     uwsim_osgocean
     uwsim_osgworks
@@ -55,7 +63,7 @@ find_package(Boost REQUIRED thread program_options system filesystem)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
 
-FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle)
+FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
 
 SET(UWSIM_ROOT_PATH "${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}")
 
@@ -66,7 +74,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h.cmake
 find_package(PkgConfig)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
-INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OSGUTILS_INCLUDE_DIRS} ${OSGMARKERS_INCLUDE_DIRS} ${OSGINTERACTIVEMARKERS_INCLUDE_DIRS})
 
 link_directories(${orocos_kdl_LIBRARY_DIRS})
 
@@ -98,6 +106,7 @@ src/MultibeamSensor.cpp
 src/VirtualSLSProjector.cpp
 src/BulletPhysics.cpp
 src/PhysicsBuilder.cpp
+src/ROSSceneBuilder.cpp
 )
 
 add_library(uwsim_plugins_simdev 
@@ -111,7 +120,7 @@ target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LI
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
 add_executable(uwsim_binary  src/main.cpp)
-target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU )
+target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${OSGUTILS_LIBRARIES} ${OSGINTERACTIVEMARKERS_LIBRARIES} ${OSGMARKERS_LIBRARIES} -lGLU )
 
 add_executable(makeVehicleSurvey interface_examples/makeVehicleSurvey.cpp)
 target_link_libraries(makeVehicleSurvey uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -146,6 +155,12 @@ target_link_libraries(gotoRelativePose uwsim ${catkin_LIBRARIES} ${Boost_LIBRARI
 add_executable(setVehicleActuators interface_examples/setVehicleActuators.cpp)
 target_link_libraries(setVehicleActuators uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_executable(followMarker interface_examples/followMarker.cpp)
+target_link_libraries(followMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+
+add_executable(spawnMarker interface_examples/spawnMarker.cpp)
+target_link_libraries(spawnMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+
 install(
   TARGETS
     uwsim
@@ -162,6 +177,8 @@ install(
     gotoAbsolutePose
     gotoRelativePose
     setVehicleActuators
+    followMarker
+    spawnMarker
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

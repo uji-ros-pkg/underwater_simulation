@@ -19,11 +19,15 @@
   <build_depend>boost</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>image_transport</build_depend>
+  <build_depend>interactive_markers</build_depend>
   <build_depend>kdl_parser</build_depend>
   <build_depend>libopenscenegraph</build_depend>
   <build_depend>libxml++-2.6</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>opengl</build_depend>
+  <build_depend>osg_interactive_markers</build_depend>
+  <build_depend>osg_markers</build_depend>
+  <build_depend>osg_utils</build_depend>
   <build_depend>pcl_ros</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>resource_retriever</build_depend>
@@ -43,11 +47,15 @@
   <run_depend>boost</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>image_transport</run_depend>
+  <run_depend>interactive_markers</run_depend>
   <run_depend>kdl_parser</run_depend>
   <run_depend>libopenscenegraph</run_depend>
   <run_depend>libxml++-2.6</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>opengl</run_depend>
+  <run_depend>osg_interactive_markers</run_depend>
+  <run_depend>osg_markers</run_depend>
+  <run_depend>osg_utils</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>resource_retriever</run_depend>
