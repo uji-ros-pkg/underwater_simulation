@@ -2,5 +2,5 @@
 Changelog for package underwater_vehicle_dynamics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2015-09-23)
+------------------

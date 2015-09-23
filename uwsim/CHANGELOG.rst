@@ -2,8 +2,8 @@
 Changelog for package uwsim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2015-09-23)
+------------------
 * Initial support for markers and interactive markers issue #1
 * MultibeamSensors now use multiple cameras when the FOV is high in order to avoid eyefish distortions and allow FOV >180º.
 * Added xacro support for scene building, some xacro macros created as example
