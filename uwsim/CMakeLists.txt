@@ -160,6 +160,7 @@ target_link_libraries(followMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
 
 add_executable(spawnMarker interface_examples/spawnMarker.cpp)
 target_link_libraries(spawnMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+add_dependencies(spawnMarker underwater_sensor_msgs_gencpp)
 
 install(
   TARGETS

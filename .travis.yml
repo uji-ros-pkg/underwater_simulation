@@ -1,12 +1,12 @@
 # Generic UWSim Travis Continuous Integration Configuration File
+sudo: required
+dist: trusty
 language:
-  - cpp
-compiler:
-  - gcc
+  - generic
 notifications:
   email:
     recipients:
-      - marioprats@gmail.com
+      - perezsolerj@gmail.com
     on_success: change #[always|never|change] # default: change
     on_failure: change #[always|never|change] # default: always
 before_install:
