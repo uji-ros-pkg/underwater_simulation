@@ -11,6 +11,7 @@
  */
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <uwsim/SimulatorConfig.h>
 #include <uwsim/UWSimUtils.h>
 #include <osg/Material>
@@ -331,16 +332,30 @@ osg::Node * UWSimGeometry::loadGeometry(boost::shared_ptr<Geometry> geom)
     osg::Node * node = retrieveResource(geom->file);
     if (node == NULL)
     {
-      //retrieve resource didn't succeed, let's search in the DATA PATH
-      const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+      const std::string file = geom->file;
+      if(file.substr(0,10) == std::string("package://")) // use rospack to find resource
+      {
+        // the package name is between "package://" and the next '/' character, dig it out.
+        // where 10 is the length of "package://"
+        std::string package_path = ros::package::getPath(file.substr(10, file.find('/',10)-10));
+        // take string after package name
+        std::string rest_of_path = file.substr(file.find('/',10));
+        std::string file_fullpath = package_path + rest_of_path;
+        geom->file = file_fullpath;
+      }
+      else
+      {
+        //retrieve resource didn't succeed, let's search in the DATA PATH
+        const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
 
-      osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
-      osgDB::Registry::instance()->getDataFilePathList().push_back(
-          std::string(SIMULATOR_DATA_PATH) + std::string("/objects"));
-      osgDB::Registry::instance()->getDataFilePathList().push_back(
-          std::string(SIMULATOR_DATA_PATH) + std::string("/terrain"));
-      osgDB::Registry::instance()->getDataFilePathList().push_back(
-          std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(
+            std::string(SIMULATOR_DATA_PATH) + std::string("/objects"));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(
+            std::string(SIMULATOR_DATA_PATH) + std::string("/terrain"));
+        osgDB::Registry::instance()->getDataFilePathList().push_back(
+            std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
+      }
       node = osgDB::readNodeFile(geom->file);
 
       if (node == NULL)
