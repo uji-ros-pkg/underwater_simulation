@@ -2,8 +2,8 @@
 Changelog for package uwsim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.1 (2015-12-14)
+------------------
 * Can use package:// to resolve ROS package location for meshes
 * Can use package:// to pull a urdf from a ROS package
 * Fixed transform publishing to fit the new robotpublisher interface

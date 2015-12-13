@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>underwater_vehicle_dynamics</name>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
   <description>An underwater dynamics module</description>
 
   <author>Arnau Carrera</author>
