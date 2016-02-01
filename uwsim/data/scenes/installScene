@@ -3,6 +3,9 @@
 scriptDir=`dirname $0`
 server="http://www.irs.uji.es/uwsim/files"
 force="-k"
+metaScene=false
+clean=false
+
 while [[ $# > 0	 ]]
 do
   key="$1"
@@ -11,6 +14,15 @@ do
     -f|--force)
     force="--overwrite"
     ;;
+
+    -s|--scene)
+    metaScene=true
+    ;;
+
+    -c|--clean)
+    clean=true
+    ;;
+
     *)
     filename=$1        # unknown option
     ;;
@@ -18,10 +30,16 @@ do
 shift # past argument or value
 done
 
-if [ ! -f $filename ]
+if [ "$metaScene" = true ]
 then
-  echo "Can't find $filename file"
-  exit
+  wget $server/scenes/metaScenes/$filename -O ./scene.uws
+  filename="./scene.uws"
+else
+  if [ ! -f $filename ]
+  then
+    echo "Can't find $filename file"
+    exit
+  fi
 fi
 	
 if [ ! -f $scriptDir/UWSimScene.dtd ]
@@ -49,4 +67,9 @@ then
 else
   echo "Data directory doesn't exist. Run UWSim for the first time to download basic scene data."
   exit 
+fi
+
+if [ "$metaScene" = true ] || [ "$clean" = true ]
+then
+  rm "$filename"
 fi
