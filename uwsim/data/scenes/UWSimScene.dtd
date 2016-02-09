@@ -80,6 +80,7 @@
 <!ELEMENT objectToTrack (#PCDATA)>
 
 <!-- elementos virtualCamera -->
+<!ATTLIST virtualRangeImage underwaterParticles (true|false) #IMPLIED>
 <!ELEMENT relativeTo (#PCDATA)>
 <!ELEMENT parameters (fx,fy,x0,y0,f,n,k)>
 <!ELEMENT fovy (#PCDATA)>

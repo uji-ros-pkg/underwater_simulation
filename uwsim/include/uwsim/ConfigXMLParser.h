@@ -63,6 +63,7 @@ struct Vcam
   double fov;
   double std; //Additive gaussian noise deviation
   boost::shared_ptr<Parameters> parameters;
+  bool underwaterParticles;
   void init()
   {
     name = "";
@@ -85,6 +86,7 @@ struct Vcam
     bw = 0;
     fov=50;
     std=0.005;
+    underwaterParticles=false;
   }
 };
 
