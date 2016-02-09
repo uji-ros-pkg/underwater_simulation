@@ -1372,6 +1372,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
       else
          rosInterface.del=true;
     }
+    else if (child->get_name() == "RangeCameraToPCL")
+    {
+      rosInterface.type = ROSInterfaceInfo::RangeCameraToPCL;
+    }
     else if (child->get_name() == "SimulatedDeviceROS")
     {
       xmlpp::Node::NodeList sublist = child->get_children();

@@ -335,6 +335,26 @@ bool SceneBuilder::loadScene(ConfigFile config)
         ROS_WARN ("VirtualCameraToROSInterface more than one %s cameras.",rosInterface.targetName.c_str());
     }
 
+    if (rosInterface.type == ROSInterfaceInfo::RangeCameraToPCL)
+    {
+      int correspondences=0;
+      //Find corresponding VirtualCamera Object on all the vehicles
+      for (int j = 0; j < nvehicle; j++)
+      {
+        for (unsigned int c = 0; c < iauvFile[j]->getNumCams(); c++)
+          if (iauvFile[j]->camview[c].name == rosInterface.targetName)
+	  {
+            iface = boost::shared_ptr < RangeCameraToPCL
+                > (new RangeCameraToPCL(&(iauvFile[j]->camview[c]), rosInterface.topic,rosInterface.rate));
+	    correspondences++;
+	  }
+      }
+      if(correspondences==0)
+        ROS_WARN ("VirtualCameraToROSInterface is not able to find %s camera.",rosInterface.targetName.c_str());
+      else if (correspondences > 1)
+        ROS_WARN ("VirtualCameraToROSInterface more than one %s cameras.",rosInterface.targetName.c_str());
+    }
+
     if (rosInterface.type == ROSInterfaceInfo::RangeImageSensorToROSImage)
     {
       int correspondences=0;
