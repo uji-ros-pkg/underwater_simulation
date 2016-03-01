@@ -411,6 +411,21 @@ public:
 
 };
 
+class RangeCameraToPCL : public ROSPublisherInterface
+{
+  VirtualCamera *cam;
+
+public:
+
+  RangeCameraToPCL(VirtualCamera *camera, std::string topic, int rate);
+
+  void createPublisher(ros::NodeHandle &nh);
+
+  void publish();
+
+  ~RangeCameraToPCL();
+};
+
 class RangeSensorToROSRange : public ROSPublisherInterface
 {
   VirtualRangeSensor *rs;

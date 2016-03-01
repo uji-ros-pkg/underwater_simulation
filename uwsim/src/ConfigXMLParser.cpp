@@ -1059,6 +1059,11 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
       Vcam aux;
       aux.init();
       aux.range = 1;
+      const xmlpp::Attribute * atrib =  dynamic_cast<const xmlpp::Element*>(child)->get_attribute("underwaterParticles");
+      if(atrib and atrib->get_value()=="true")
+      {
+        aux.underwaterParticles=true;
+      }
       processVcam(child, aux);
       vehicle.VRangecams.push_back(aux);
     }
@@ -1371,6 +1376,10 @@ void ConfigFile::processROSInterfaces(const xmlpp::Node* node)
       }
       else
          rosInterface.del=true;
+    }
+    else if (child->get_name() == "RangeCameraToPCL")
+    {
+      rosInterface.type = ROSInterfaceInfo::RangeCameraToPCL;
     }
     else if (child->get_name() == "SimulatedDeviceROS")
     {

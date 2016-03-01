@@ -816,6 +816,56 @@ VirtualCameraToROSImage::~VirtualCameraToROSImage()
 {
 }
 
+RangeCameraToPCL::RangeCameraToPCL(VirtualCamera *camera, std::string topic, int rate) :
+    ROSPublisherInterface(topic, rate), cam(camera)
+{
+}
+
+void RangeCameraToPCL::createPublisher(ros::NodeHandle &nh)
+{
+  ROS_INFO("RangeCameraToPCL publisher on topic %s", topic.c_str());
+  pub_ = nh.advertise < pcl::PointCloud<pcl::PointXYZ> > (topic, 1);
+}
+
+void RangeCameraToPCL::publish()
+{      
+  double fov, aspect, near, far;
+  int w, h, d;
+  float * data = (float *)cam->depthTexture->data();
+
+  if (data != NULL)
+  {
+
+    w = cam->width;
+    h = cam->height;
+
+    cam->textureCamera->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+    double a = far / (far - near);
+    double b = (far * near) / (near - far);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr msg (new pcl::PointCloud<pcl::PointXYZ>);
+    msg->header.frame_id = cam->name;
+
+    //Rotations to transform from OSG to TF conventions are already taken into account
+    for (int i = 0; i < h; i++)
+    {
+      for (int j = 0; j < w; j++)
+      {
+	double depth=  (b / (data[i*w+j] - a)) ;
+	msg->points.push_back (pcl::PointXYZ( (j-cam->cx)/cam->fx * depth , -(i-cam->cy)/cam->fy * depth, depth));
+
+      }
+    }
+
+    //msg->header.stamp = getROSTime();
+    pub_.publish (msg);
+
+  }
+}
+
+RangeCameraToPCL::~RangeCameraToPCL()
+{
+}
+
 RangeSensorToROSRange::RangeSensorToROSRange(VirtualRangeSensor *rangesensor, std::string topic, int rate) :
     ROSPublisherInterface(topic, rate), rs(rangesensor)
 {
@@ -1075,7 +1125,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->multibeam_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->multibeam_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->multibeam_sensors[j].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1088,7 +1138,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->imus[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->imus[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->imus[j].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1100,7 +1150,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->range_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->range_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->range_sensors[j].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1112,7 +1162,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->pressure_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->pressure_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->pressure_sensors[j].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1124,7 +1174,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->gps_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->gps_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->gps_sensors[j].name);
           tfpub_->sendTransform(t);
         }  
       }
@@ -1136,7 +1186,7 @@ void WorldToROSTF::publish()
         std::string parent;
         if(scene->iauvFile[i].get()->dvl_sensors[j].getTFTransform(pose,parent))
         {
-          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->dvl_sensors[i].name);
+          tf::StampedTransform t(pose, getROSTime(),   "/"+scene->iauvFile[i].get()->name + "/" +parent, scene->iauvFile[i].get()->dvl_sensors[j].name);
           tfpub_->sendTransform(t);
         }  
       }
