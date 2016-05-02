@@ -201,7 +201,7 @@
       <orientation>
         <r>0</r>
         <p>0</p>
-        <y>3.9269908169872414</y>
+        <y>M_PI</y>
       </orientation>
       <std>0.0015</std>
     </dvlSensor>
