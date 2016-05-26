@@ -17,18 +17,15 @@ find_package(catkin REQUIRED COMPONENTS
   underwater_sensor_msgs
   urdf
   xacro
-  osg_utils
-  osg_interactive_markers
-  osg_markers
 )
 
 find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
-# find_package(osg_utils REQUIRED)
-# find_package(osg_interactive_markers REQUIRED)
-# find_package(osg_markers REQUIRED)
+find_package(osg_utils REQUIRED)
+find_package(osg_interactive_markers REQUIRED)
+find_package(osg_markers REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -49,14 +46,14 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
-    osg_utils
-    osg_markers
-    osg_interactive_markers
   DEPENDS
     boost
     libopenscenegraph
     libxml++-2.6
     opengl
+    osg_utils
+    osg_markers
+    osg_interactive_markers
     uwsim_bullet
     uwsim_osgocean
     uwsim_osgworks
@@ -84,9 +81,7 @@ link_directories(${orocos_kdl_LIBRARY_DIRS})
 # this disables the warnings that come mostly from osg
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-
-add_library(uwsim
+add_library(uwsim 
 src/osgOceanScene.cpp
 src/SkyDome.cpp
 src/SphereSegment.cpp
@@ -102,7 +97,7 @@ src/ROSInterface.cpp
 src/ObjectPicker.cpp
 src/SceneBuilder.cpp
 src/ViewBuilder.cpp
-src/SimulatedDevices.cpp
+src/SimulatedDevices.cpp 
 src/InertialMeasurementUnit.cpp
 src/PressureSensor.cpp
 src/DVLSensor.cpp
@@ -114,7 +109,7 @@ src/PhysicsBuilder.cpp
 src/ROSSceneBuilder.cpp
 )
 
-add_library(uwsim_plugins_simdev
+add_library(uwsim_plugins_simdev 
 src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 src/DredgeTool.cpp
@@ -217,7 +212,7 @@ install(DIRECTORY data/scenes data/shaders
 
 install(DIRECTORY src/
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-   FILES_MATCHING PATTERN "uwsim"
+   FILES_MATCHING PATTERN "uwsim" 
    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                GROUP_READ GROUP_EXECUTE
                WORLD_READ WORLD_EXECUTE
