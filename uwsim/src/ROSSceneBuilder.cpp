@@ -175,7 +175,5 @@ bool  ROSSceneBuilder::markerSRVCallback(underwater_sensor_msgs::SpawnMarker::Re
   res.success=true;
   res.status_message="object " + boost::lexical_cast<std::string>(req.marker.id) + " " + req.marker.ns + " was successfully ADDED.";
 
-  res.success=false;
-  res.status_message="Feature not ready yet... should be working shortly.";
   return true;
 }

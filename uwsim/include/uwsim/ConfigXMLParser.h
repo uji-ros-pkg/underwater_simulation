@@ -33,7 +33,7 @@ struct ROSInterfaceInfo
     Unknown, ROSOdomToPAT, PATToROSOdom, ROSJointStateToArm, ArmToROSJointState, VirtualCameraToROSImage,
     RangeSensorToROSRange, ROSImageToHUD, ROSTwistToPAT, ROSPoseToPAT, ImuToROSImu, PressureSensorToROS, GPSSensorToROS,
     DVLSensorToROS, RangeImageSensorToROSImage, multibeamSensorToLaserScan, SimulatedDevice, contactSensorToROS, WorldToROSTF,
-    ROSPointCloudLoader
+    ROSPointCloudLoader, RangeCameraToPCL
   } type_t;
   string subtype; //type of a SimulatedDevice
   std::map<std::string, std::string> values; //all configuration values for a SimulatedDevice
@@ -63,6 +63,7 @@ struct Vcam
   double fov;
   double std; //Additive gaussian noise deviation
   boost::shared_ptr<Parameters> parameters;
+  bool underwaterParticles;
   void init()
   {
     name = "";
@@ -85,6 +86,7 @@ struct Vcam
     bw = 0;
     fov=50;
     std=0.005;
+    underwaterParticles=false;
   }
 };
 
