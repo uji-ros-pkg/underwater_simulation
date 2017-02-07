@@ -49,7 +49,7 @@ MultibeamSensor::MultibeamSensor(osg::Group *uwsim_root, std::string name, std::
   {
     osg::ref_ptr<osg::Geometry> beam = osg::ref_ptr<osg::Geometry>(new osg::Geometry);
     osg::ref_ptr<osg::Vec3Array> points = new osg::Vec3Array;
-    for(double initAux=initAngle;initAux<finalAngle;initAux+=angleIncr)
+    for(double initAux=initAngle;initAux<=finalAngle;initAux+=angleIncr)
     {
       osg::Vec3d start(0, 0, 0);
       osg::Vec3d end(0, sin(initAux*3.14/180.0)*range, -cos(initAux*3.14/180.0)*range);
@@ -99,11 +99,10 @@ void MultibeamSensor::preCalcTable()
 
     //Interpolate points
     osg::Vec3d point = osg::Vec3d(0, i%camPixels, 1) * (*MVPW);
-
-    double theta = acos((first * point) / (first.length() * point.length())) + camsFOV*(iCam-1)*M_PI/180;
+    double theta = acos(max(min( (first * point) / (first.length() * point.length()),1.0),-1.0)) + camsFOV*(iCam-1)*M_PI/180;
     while (theta >= angleIncr * current * M_PI/180 && current < numpixels)
     {
-      if (theta == angleIncr * current*M_PI/180 )
+      if (theta == angleIncr * current*M_PI/180 or current==0 )
       { //usually only first iteration as point has to be exactly the same
         remapVector[current].pixel1 = i;
         remapVector[current].weight1 = 0.50;
@@ -123,7 +122,14 @@ void MultibeamSensor::preCalcTable()
     }
     lastTheta = theta;
   }
+  osg::Vec3d point = osg::Vec3d(0, (numpixels-1)%camPixels, 1) * (*MVPW);
+  double theta = acos(max(min( (first * point) / (first.length() * point.length()),1.0),-1.0)) + camsFOV*(iCam-1)*M_PI/180;
 
+  remapVector[numpixels-1].pixel1 = numpixels-1;
+  remapVector[numpixels-1].weight1 = 0.50;
+  remapVector[numpixels-1].pixel2 = numpixels-1;
+  remapVector[numpixels-1].weight2 = 0.50;
+  remapVector[numpixels-1].distort = 1 / cos(fabs(theta - thetacenter));
 }
 
 int MultibeamSensor::getTFTransform(tf::Pose & pose, std::string & parent){
