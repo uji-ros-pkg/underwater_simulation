@@ -244,12 +244,12 @@ ROSPointCloudLoader::ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Gr
 void ROSPointCloudLoader::createSubscriber(ros::NodeHandle &nh)
 {
   ROS_INFO("ROSPointCloudLoader subscriber on topic %s", topic.c_str());
-  sub_ = nh.subscribe<pcl::PointCloud<pcl::PointXYZ> >(topic, 10, &ROSPointCloudLoader::processData, this);
+  sub_ = nh.subscribe<pcl::PointCloud<pcl::PointXYZRGB> >(topic, 10, &ROSPointCloudLoader::processData, this);
 }
 
-void ROSPointCloudLoader::processData(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
+void ROSPointCloudLoader::processData(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg)
 {
-   osgPCDLoader<pcl::PointXYZ> pcdLoader(*msg.get());
+   osgPCDLoader<pcl::PointXYZRGB> pcdLoader(*msg.get());
 
    osg::ref_ptr < osg::Node > frame_id=findRN(msg->header.frame_id,scene_root);
 
