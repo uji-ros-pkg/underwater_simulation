@@ -53,6 +53,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/distortion_models.h>
 #include <sensor_msgs/Range.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <image_transport/image_transport.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Pose.h>
@@ -165,7 +166,10 @@ class ROSPointCloudLoader : public ROSSubscriberInterface
 public:
   ROSPointCloudLoader(std::string topic, osg::ref_ptr<osg::Group> root, unsigned int mask,bool del);
   virtual void createSubscriber(ros::NodeHandle &nh);
-  virtual void processData(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg);
+  virtual void processData(const sensor_msgs::PointCloud2ConstPtr& msg);
+  void colourCloudDepth(pcl::PointCloud<pcl::PointXYZ>::Ptr cloudIn, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud);
+  double interpolate(double val, double y0, double x0, double y1, double x1);
+  double base(double val);
   ~ROSPointCloudLoader();
 };
 
