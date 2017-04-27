@@ -21,4 +21,13 @@
   </description>
   </class>
 
+
+  <class name="CommsDevice_Factory" type="CommsDevice_Factory"
+  base_class_type="uwsim::SimulatedDeviceFactory">
+  <description>
+  Creates a comms device for dccomms_ros simulator
+  </description>
+  </class>
+
+
 </library>

@@ -51,6 +51,7 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
+    dccomms_ros
   DEPENDS
     Boost
     BULLET
@@ -113,6 +114,7 @@ add_library(uwsim_plugins_simdev
 src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 src/DredgeTool.cpp
+src/CommsDevice.cpp
 )
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 
