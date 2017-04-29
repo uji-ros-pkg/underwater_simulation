@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include "ConfigXMLParser.h"
 #include "ROSInterface.h"
-#include <dccomms_ros/AddDevice.h>
+#include <dccomms_ros_msgs/AddDevice.h>
 
 using namespace uwsim;
 
@@ -37,35 +37,7 @@ public:
   CommsDevice_Config * config;
 
   CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv);
-  void Start()
-  {
-    ros::ServiceClient client = node.serviceClient<dccomms_ros::AddDevice>("/dccomms_netsim/add_net_device");
-    dccomms_ros::AddDevice srv;
-
-    srv.request.frameId = this->config->tfId;
-    srv.request.iddev = this->config->name;
-    srv.request.mac = this->config->mac;
-    srv.request.maxBitRate = this->config->maxBitRate;
-    srv.request.maxDistance = this->config->maxDistance;
-    srv.request.minDistance = this->config->minDistance;
-    srv.request.minPktErrorRate = this->config->minPktErrRatio;
-    srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
-    srv.request.prTimeIncPerMeter = this->config->prTimeIncPerMeter;
-    srv.request.trTimeMean = this->config->trTime;
-    srv.request.trTimeSd = this->config->trTimeSd;
-    srv.request.devType = this->config->devClass;
-
-    ROS_INFO("FrameId = %s", srv.request.frameId.c_str());
-    if(client.call(srv))
-    {
-        ROS_INFO("CommsDevice Added");
-    }
-    else
-    {
-        ROS_ERROR("Failed to add CommsDevice");
-    }
-
-  }
+  void Start();
 };
 
 /* You will need to add your code HERE */

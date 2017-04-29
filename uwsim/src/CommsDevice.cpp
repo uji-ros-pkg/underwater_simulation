@@ -131,6 +131,35 @@ std::vector<boost::shared_ptr<ROSInterface> > CommsDevice_Factory::getInterface(
   return ifaces;
 }
 
+void CommsDevice::Start()
+{
+  ros::ServiceClient client = node.serviceClient<dccomms_ros_msgs::AddDevice>("/dccomms_netsim/add_net_device");
+  dccomms_ros_msgs::AddDevice srv;
+
+  srv.request.frameId = this->config->tfId;
+  srv.request.iddev = this->config->name;
+  srv.request.mac = this->config->mac;
+  srv.request.maxBitRate = this->config->maxBitRate;
+  srv.request.maxDistance = this->config->maxDistance;
+  srv.request.minDistance = this->config->minDistance;
+  srv.request.minPktErrorRate = this->config->minPktErrRatio;
+  srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
+  srv.request.prTimeIncPerMeter = this->config->prTimeIncPerMeter;
+  srv.request.trTimeMean = this->config->trTime;
+  srv.request.trTimeSd = this->config->trTimeSd;
+  srv.request.devType = this->config->devClass;
+
+  ROS_INFO("CommsDevice FrameId = %s", srv.request.frameId.c_str());
+  if(client.call(srv))
+  {
+      ROS_INFO("CommsDevice Added");
+  }
+  else
+  {
+      ROS_ERROR("Failed to add CommsDevice");
+  }
+}
+
 CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv) :
     SimulatedDevice(cfg)
 {

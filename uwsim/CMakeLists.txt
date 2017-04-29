@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   underwater_sensor_msgs
   urdf
   xacro
+  dccomms_ros_msgs
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
@@ -51,7 +52,7 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
-    dccomms_ros
+    dccomms_ros_msgs
   DEPENDS
     Boost
     BULLET
