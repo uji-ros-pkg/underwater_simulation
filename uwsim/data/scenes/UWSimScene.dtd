@@ -204,4 +204,4 @@ echoROS?
 <!ELEMENT pktErrRatioIncPerMeter (#PCDATA)>
 <!ELEMENT minPktErrRatio (#PCDATA)>
 
-<!ELEMENT CommsDevice (name,relativeTo, mac, position?,orientation?,class?, tfId?, maxBitRate, intrinsicDelay?, prTimeIncPerMeter?, trTime, trTimeSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
+<!ELEMENT CommsDevice (name,relativeTo, mac, maxBitRate, trTime, class?, tfId?, position?, orientation?, intrinsicDelay?, prTimeIncPerMeter?, trTimeSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
