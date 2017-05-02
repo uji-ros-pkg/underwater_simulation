@@ -3,6 +3,7 @@
 #include <osg/Node>
 #include <uwsim/SimulatedIAUV.h>
 #include <osg/PositionAttitudeTransform>
+#include <thread>
 
 /* You will need to add your code HERE */
 
@@ -150,14 +151,15 @@ void CommsDevice::Start()
   srv.request.devType = this->config->devClass;
 
   ROS_INFO("CommsDevice FrameId = %s", srv.request.frameId.c_str());
-  if(client.call(srv))
+
+  int errorWait = 2000;
+  while(!client.call(srv))
   {
-      ROS_INFO("CommsDevice Added");
+      ROS_ERROR("Failed to add CommsDevice. Trying againg in %d seconds", errorWait / 1000);
+      std::this_thread::sleep_for(std::chrono::milliseconds((int) errorWait));
   }
-  else
-  {
-      ROS_ERROR("Failed to add CommsDevice");
-  }
+
+  ROS_INFO("CommsDevice Added");
 }
 
 CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv) :
