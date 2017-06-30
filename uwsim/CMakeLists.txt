@@ -28,7 +28,7 @@ find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
 find_package(opengl REQUIRED)
-FIND_PACKAGE(libopenScenegraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
+FIND_PACKAGE(openScenegraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
 find_package(PkgConfig)
 
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
