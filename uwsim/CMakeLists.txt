@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   xacro
 )
 
+find_package(Boost REQUIRED thread program_options system filesystem)
 find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
@@ -47,7 +48,7 @@ catkin_package(
     underwater_sensor_msgs
     urdf
   DEPENDS
-    boost
+    Boost
     libopenscenegraph
     libxml++-2.6
     opengl
@@ -58,8 +59,6 @@ catkin_package(
     uwsim_osgocean
     uwsim_osgworks
 )
-
-find_package(Boost REQUIRED thread program_options system filesystem)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
 
