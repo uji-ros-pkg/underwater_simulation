@@ -23,13 +23,12 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
-find_package(libopenscenegraph REQUIRED)
 find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_bullet REQUIRED)
 find_package(opengl REQUIRED)
-FIND_PACKAGE(OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
+FIND_PACKAGE(libopenScenegraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
 find_package(PkgConfig)
 
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
@@ -55,7 +54,7 @@ catkin_package(
     urdf
   DEPENDS
     Boost
-    libopenscenegraph
+    openscenegraph
     libxml++-2.6
     opengl
     osg_utils
