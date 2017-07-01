@@ -42,6 +42,9 @@ catkin_package(
     interactive_markers
     kdl_parser
     nav_msgs
+    osg_utils
+    osg_markers
+    osg_interactive_markers
     pcl_ros
     pluginlib
     resource_retriever
@@ -56,9 +59,6 @@ catkin_package(
     openscenegraph
     libxml++-2.6
     opengl
-    osg_utils
-    osg_markers
-    osg_interactive_markers
     uwsim_bullet
     uwsim_osgocean
     uwsim_osgworks
@@ -97,7 +97,7 @@ src/ROSInterface.cpp
 src/ObjectPicker.cpp
 src/SceneBuilder.cpp
 src/ViewBuilder.cpp
-src/SimulatedDevices.cpp 
+src/SimulatedDevices.cpp
 src/InertialMeasurementUnit.cpp
 src/PressureSensor.cpp
 src/DVLSensor.cpp
