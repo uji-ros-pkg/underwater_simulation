@@ -7,6 +7,11 @@
 
 /* You will need to add your code HERE */
 
+#include <dccomms_ros_msgs/AddDevice.h>
+#include <dccomms_ros_msgs/CheckDevice.h>
+#include <dccomms_ros_msgs/RemoveDevice.h>
+#include <tf/transform_broadcaster.h>
+
 SimulatedDeviceConfig::Ptr CommsDevice_Factory::processConfig(const xmlpp::Node* node, ConfigFile * config)
 {
   CommsDevice_Config * cfg = new CommsDevice_Config(getType());
@@ -150,8 +155,7 @@ void CommsDevice::Start()
   srv.request.trTimeSd = this->config->trTimeSd;
   srv.request.devType = this->config->devClass;
 
-  ROS_INFO("CommsDevice FrameId = %s", srv.request.frameId.c_str());
-
+  ROS_INFO ("CommsDevice  FrameId = %s", srv.request.frameId.c_str());
   int errorWait = 2000;
   while(!client.call(srv))
   {
@@ -166,11 +170,23 @@ CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> targe
     SimulatedDevice(cfg)
 {
   if(cfg->tfId.length() == 0)
-    {
-      std::string tfId = std::string(auv->name) + "_"+cfg->name;
-      cfg->tfId = tfId;
-      ROS_INFO("CommsDevice tfId: '%s'", cfg->tfId.c_str());
-    }
+  {
+    tfId = std::string(auv->name) + "/"+cfg->name;
+  }
+  else
+  {
+    tfId = cfg->tfId;
+  }
+
+  targetTfId = std::string(auv->name);
+  if(cfg->relativeTo.length() != 0)
+  {
+    targetTfId += "/" + cfg->relativeTo;
+  }
+
+  ROS_INFO("CommsDevice targetTfId: '%s' ; tfId: '%s'",
+           targetTfId.c_str (),
+           tfId.c_str());
 
   this->config = cfg;
   this->parent = target;
@@ -187,14 +203,24 @@ void CommsDevice_ROSPublisher::publish()
 {
   geometry_msgs::Pose msg;
   boost::shared_ptr<osg::Matrix> mat = getWorldCoords(dev->parent);
-  msg.position.x= mat->getTrans().x();
-  msg.position.y= mat->getTrans().y();
-  msg.position.z= mat->getTrans().z();
-  msg.orientation.x=mat->getRotate().x();
-  msg.orientation.y=mat->getRotate().y();
-  msg.orientation.z=mat->getRotate().z();
-  msg.orientation.w=mat->getRotate().w();
+  auto trans = mat->getTrans();
+  auto rotate = mat->getRotate();
+  msg.position.x=trans.x();
+  msg.position.y=trans.y();
+  msg.position.z=trans.z();
+  msg.orientation.x=rotate.x();
+  msg.orientation.y=rotate.y();
+  msg.orientation.z=rotate.z();
+  msg.orientation.w=rotate.w();
   pub_.publish(msg);
+
+  tf::Transform transform;
+  transform.setOrigin(tf::Vector3(trans.x(), trans.y(), trans.z()));
+  transform.setRotation(tf::Quaternion(rotate.x(),rotate.y(),rotate.z(), rotate.w()));
+  //ROS_INFO("CommsDevice Publisher tfId: %s ; auv: %s", dev->tfId.c_str (), dev->auv->name.c_str ());
+  _tfBr.sendTransform(tf::StampedTransform(transform, ros::Time::now(), dev->targetTfId, dev->tfId));
+
+
 }
 
 #if ROS_VERSION_MINIMUM(1, 9, 0)

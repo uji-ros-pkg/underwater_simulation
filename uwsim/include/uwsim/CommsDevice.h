@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include "ConfigXMLParser.h"
 #include "ROSInterface.h"
-#include <dccomms_ros_msgs/AddDevice.h>
+#include <tf/transform_broadcaster.h>
 
 using namespace uwsim;
 
@@ -35,6 +35,7 @@ public:
   osg::ref_ptr<osg::Node> target;
   ros::NodeHandle node;
   CommsDevice_Config * config;
+  std::string targetTfId, tfId;
 
   CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv);
   void Start();
@@ -72,6 +73,8 @@ public:
   ~CommsDevice_ROSPublisher()
   {
   }
+private:
+  tf::TransformBroadcaster _tfBr;
 };
 
 #endif

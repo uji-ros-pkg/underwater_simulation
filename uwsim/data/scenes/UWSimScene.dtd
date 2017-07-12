@@ -139,6 +139,7 @@
 <!ELEMENT ROSPointCloudLoader (topic)>
 <!ATTLIST ROSPointCloudLoader delLastPCD (true|false) #IMPLIED>
 <!ELEMENT RangeCameraToPCL (cameraName, topic, rate?)>
+<!ELEMENT CommsDeviceROS (name, topic, rate?)>
 
 <!ELEMENT width (#PCDATA)>
 <!ELEMENT height (#PCDATA)>
