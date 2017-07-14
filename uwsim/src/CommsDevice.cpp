@@ -6,11 +6,8 @@
 #include <thread>
 
 /* You will need to add your code HERE */
-
-#include <dccomms_ros_msgs/AddDevice.h>
-#include <dccomms_ros_msgs/CheckDevice.h>
-#include <dccomms_ros_msgs/RemoveDevice.h>
 #include <tf/transform_broadcaster.h>
+#include <thread>
 
 SimulatedDeviceConfig::Ptr CommsDevice_Factory::processConfig(const xmlpp::Node* node, ConfigFile * config)
 {
@@ -43,6 +40,8 @@ SimulatedDeviceConfig::Ptr CommsDevice_Factory::processConfig(const xmlpp::Node*
       config->extractUIntChar (child, cfg->devClass);
     else if (child->get_name() == "tfId")
       config->extractStringChar (child, cfg->tfId);
+    else if (child->get_name() == "relativeTfId")
+      config->extractStringChar (child, cfg->relativeTfId);
     else if (child->get_name() == "maxBitRate")
       config->extractUIntChar (child, cfg->maxBitRate);
     else if (child->get_name() == "intrinsicDelay")
@@ -137,9 +136,38 @@ std::vector<boost::shared_ptr<ROSInterface> > CommsDevice_Factory::getInterface(
   return ifaces;
 }
 
-void CommsDevice::Start()
+bool CommsDevice::_Check()
 {
-  ros::ServiceClient client = node.serviceClient<dccomms_ros_msgs::AddDevice>("/dccomms_netsim/add_net_device");
+  bool res = true;
+  dccomms_ros_msgs::CheckDevice srv;
+
+  srv.request.iddev = this->config->name;
+
+  if(!_checkService.call(srv))
+  {
+    res = false;
+  }
+
+  return res && srv.response.exists;
+}
+
+bool CommsDevice::_Remove()
+{
+  bool res = true;
+  dccomms_ros_msgs::RemoveDevice srv;
+
+  srv.request.iddev = this->config->name;
+
+  if(!_rmService.call(srv))
+  {
+    res = false;
+  }
+
+  return res && srv.response.removed;
+}
+
+bool CommsDevice::_Add()
+{
   dccomms_ros_msgs::AddDevice srv;
 
   srv.request.frameId = this->config->tfId;
@@ -155,15 +183,36 @@ void CommsDevice::Start()
   srv.request.trTimeSd = this->config->trTimeSd;
   srv.request.devType = this->config->devClass;
 
-  ROS_INFO ("CommsDevice  FrameId = %s", srv.request.frameId.c_str());
-  int errorWait = 2000;
-  while(!client.call(srv))
-  {
-      ROS_ERROR("Failed to add CommsDevice. Trying againg in %d seconds", errorWait / 1000);
-      std::this_thread::sleep_for(std::chrono::milliseconds((int) errorWait));
-  }
 
-  ROS_INFO("CommsDevice Added");
+  ROS_INFO ("CommsDevice  ID = %s ; Frame = %s", srv.request.iddev.c_str (), srv.request.frameId.c_str());
+  if(!_addService.call(srv))
+  {
+    ROS_ERROR("fail adding '%s'", srv.request.iddev.c_str ());
+    return false;
+  }
+  else
+  {
+    ROS_INFO("CommsDevice '%s' added", srv.request.iddev.c_str ());
+    return true;
+  }
+}
+
+void CommsDevice::Start()
+{
+  auto netSimInterfaceWork = [this](void)
+  {
+    while(1)
+    {
+      if(!_Check())
+      {
+        _Remove();
+        _Add();
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds((int) 2000));
+    }
+  };
+  std::thread starter(netSimInterfaceWork);
+  starter.detach();
 }
 
 CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv) :
@@ -178,15 +227,26 @@ CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> targe
     tfId = cfg->tfId;
   }
 
-  targetTfId = std::string(auv->name);
-  if(cfg->relativeTo.length() != 0)
+  if(cfg->relativeTfId.length() != 0)
   {
-    targetTfId += "/" + cfg->relativeTo;
+    targetTfId = cfg->relativeTfId;
+  }
+  else
+  {
+    targetTfId = std::string(auv->name);
+    if(cfg->relativeTo.length() != 0)
+    {
+      targetTfId += "/" + cfg->relativeTo;
+    }
   }
 
   ROS_INFO("CommsDevice targetTfId: '%s' ; tfId: '%s'",
            targetTfId.c_str (),
            tfId.c_str());
+
+  _addService = this->node.serviceClient<dccomms_ros_msgs::AddDevice>("/dccomms_netsim/add_net_device");
+  _rmService = this->node.serviceClient<dccomms_ros_msgs::RemoveDevice>("/dccomms_netsim/remove_net_device");
+  _checkService = this->node.serviceClient<dccomms_ros_msgs::CheckDevice>("/dccomms_netsim/check_net_device");
 
   this->config = cfg;
   this->parent = target;

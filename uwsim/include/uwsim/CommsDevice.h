@@ -5,6 +5,9 @@
 #include "ConfigXMLParser.h"
 #include "ROSInterface.h"
 #include <tf/transform_broadcaster.h>
+#include <dccomms_ros_msgs/AddDevice.h>
+#include <dccomms_ros_msgs/CheckDevice.h>
+#include <dccomms_ros_msgs/RemoveDevice.h>
 
 using namespace uwsim;
 
@@ -12,7 +15,7 @@ class CommsDevice_Config : public SimulatedDeviceConfig
 {
 public:
   //XML members
-    std::string relativeTo, tfId, name;
+    std::string relativeTo, tfId, relativeTfId, name;
     unsigned int devClass, mac;
     unsigned int maxBitRate, intrinsicDelay;
     double prTimeIncPerMeter, trTime, trTimeSd;
@@ -39,6 +42,12 @@ public:
 
   CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv);
   void Start();
+
+private:
+  ros::ServiceClient _addService, _checkService, _rmService;
+  bool _Check();
+  bool _Remove();
+  bool _Add();
 };
 
 /* You will need to add your code HERE */
