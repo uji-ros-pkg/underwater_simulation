@@ -8,6 +8,7 @@
 /* You will need to add your code HERE */
 #include <tf/transform_broadcaster.h>
 #include <thread>
+#include <uwsim/UWSimUtils.h>
 
 SimulatedDeviceConfig::Ptr CommsDevice_Factory::processConfig(const xmlpp::Node* node, ConfigFile * config)
 {
@@ -105,6 +106,9 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars
             auv->urdf->link[target]->getParent(0)->getParent(0)->asGroup()->addChild(vMd);
             auto dev = new CommsDevice(cfg, auv->urdf->link[target], auv);
             auv->devices->all.push_back(CommsDevice::Ptr(dev));
+            
+            osg::ref_ptr<osg::Node> model = UWSimGeometry::createOSGCylinder(0.06,0.3);
+            vMd->addChild(model.get());
             ROS_INFO("CommsDevice: added successfully");
             dev->Start();
           }
@@ -275,8 +279,13 @@ void CommsDevice_ROSPublisher::publish()
   pub_.publish(msg);
 
   tf::Transform transform;
-  transform.setOrigin(tf::Vector3(trans.x(), trans.y(), trans.z()));
-  transform.setRotation(tf::Quaternion(rotate.x(),rotate.y(),rotate.z(), rotate.w()));
+  transform.setOrigin(tf::Vector3(this->dev->config->position[0],
+                                  this->dev->config->position[1],
+                                  this->dev->config->position[2]));
+  transform.setRotation(tf::Quaternion(
+                          this->dev->config->orientation[0],
+                          this->dev->config->orientation[1],
+                          this->dev->config->orientation[2]));
   //ROS_INFO("CommsDevice Publisher tfId: %s ; auv: %s", dev->tfId.c_str (), dev->auv->name.c_str ());
   _tfBr.sendTransform(tf::StampedTransform(transform, ros::Time::now(), dev->targetTfId, dev->tfId));
 
