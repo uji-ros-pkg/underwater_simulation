@@ -19,13 +19,18 @@ find_package(catkin REQUIRED COMPONENTS
   xacro
 )
 
+find_package(Boost REQUIRED thread program_options system filesystem)
+find_package(OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
+find_package(osg_markers REQUIRED)
+find_package(osg_interactive_markers REQUIRED)
+find_package(osg_utils REQUIRED)
+find_package(PkgConfig)
+find_package(uwsim_bullet REQUIRED)
+find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
-find_package(uwsim_osgbullet REQUIRED)
-find_package(uwsim_bullet REQUIRED)
-find_package(osg_utils REQUIRED)
-find_package(osg_interactive_markers REQUIRED)
-find_package(osg_markers REQUIRED)
+
+pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -47,32 +52,25 @@ catkin_package(
     underwater_sensor_msgs
     urdf
   DEPENDS
-    boost
-    libopenscenegraph
-    libxml++-2.6
-    opengl
-    osg_utils
-    osg_markers
-    osg_interactive_markers
-    uwsim_bullet
-    uwsim_osgocean
-    uwsim_osgworks
+    Boost
+    BULLET
+    LIBXML++
+    OPENSCENEGRAPH
+    OSGBULLET
+    OSGINTERACTIVEMARKERS
+    OSGMARKERS
+    OSGOCEAN
+    OSGUTILS
+    OSGWORKS
 )
 
-find_package(Boost REQUIRED thread program_options system filesystem)
-
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
-
-FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
 
 SET(UWSIM_ROOT_PATH "${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}")
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h.cmake
   ${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h
 )
-
-find_package(PkgConfig)
-pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
 INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OSGUTILS_INCLUDE_DIRS} ${OSGMARKERS_INCLUDE_DIRS} ${OSGINTERACTIVEMARKERS_INCLUDE_DIRS})
 
