@@ -205,5 +205,7 @@ echoROS?
 <!ELEMENT minDistance (#PCDATA)>
 <!ELEMENT pktErrRatioIncPerMeter (#PCDATA)>
 <!ELEMENT minPktErrRatio (#PCDATA)>
+<!ELEMENT mesh (path, scaleFactor?)>
+<!ELEMENT path (#PCDATA)>
 
-<!ELEMENT CommsDevice (name,relativeTo, mac, maxBitRate, trTime, class?, tfId?, relativeTfId?, position?, orientation?, intrinsicDelay?, prTimeIncPerMeter?, trTimeSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
+<!ELEMENT CommsDevice (name,relativeTo, mac, maxBitRate, trTime, class?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, trTimeSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>

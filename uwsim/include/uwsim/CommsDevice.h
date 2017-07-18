@@ -13,6 +13,7 @@ using namespace uwsim;
 
 class CommsDevice_Config : public SimulatedDeviceConfig
 {
+
 public:
   //XML members
     std::string relativeTo, tfId, relativeTfId, name;
@@ -22,6 +23,7 @@ public:
     unsigned int maxDistance, minDistance;
     double pktErrRatioIncPerMeter, minPktErrRatio;
     double position[3] {0,0,0}, orientation[3]{0,0,0};
+    Mesh mesh;
 
   //constructor
   CommsDevice_Config(std::string type_) :
@@ -39,6 +41,7 @@ public:
   ros::NodeHandle node;
   CommsDevice_Config * config;
   std::string targetTfId, tfId;
+  bool render;
 
   CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> target, SimulatedIAUV * auv);
   void Start();

@@ -404,6 +404,11 @@ struct PhysicsConfig
  
 };
 
+struct Mesh{
+  std::string path;
+  double scaleFactor[3] {1,1,1};
+};
+
 class ConfigFile
 {
 public:
@@ -417,6 +422,7 @@ public:
   void extractStringChar(const xmlpp::Node* node, string &param);
   void extractPositionOrColor(const xmlpp::Node* node, double param[3]);
   void extractOrientation(const xmlpp::Node* node, double param[3]);
+  void extractMesh(const xmlpp::Node* node, Mesh & mesh);
 
   void processFog(const xmlpp::Node* node);
   void processOceanState(const xmlpp::Node* node);

@@ -119,6 +119,20 @@ void ConfigFile::extractOrientation(const xmlpp::Node* node, double param[3])
   }
 }
 
+void ConfigFile::extractMesh(const xmlpp::Node* node, Mesh & mesh)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+
+    if (child->get_name() == "path")
+      extractStringChar(child, mesh.path);
+    else if (child->get_name() == "scaleFactor")
+      extractPositionOrColor (child, mesh.scaleFactor);
+  }
+}
+
 void ConfigFile::processFog(const xmlpp::Node* node)
 {
 

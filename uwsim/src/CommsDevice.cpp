@@ -37,6 +37,8 @@ SimulatedDeviceConfig::Ptr CommsDevice_Factory::processConfig(const xmlpp::Node*
       config->extractPositionOrColor(child, cfg->position);
     else if (child->get_name() == "orientation")
       config->extractOrientation(child, cfg->orientation);
+    else if (child->get_name() == "mesh")
+      config->extractMesh(child, cfg->mesh);
     else if (child->get_name() == "class")
       config->extractUIntChar (child, cfg->devClass);
     else if (child->get_name() == "tfId")
@@ -107,8 +109,32 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars
             auto dev = new CommsDevice(cfg, auv->urdf->link[target], auv);
             auv->devices->all.push_back(CommsDevice::Ptr(dev));
             
-            osg::ref_ptr<osg::Node> model = UWSimGeometry::createOSGCylinder(0.06,0.3);
-            vMd->addChild(model.get());
+            //osg::ref_ptr<osg::Node> model = UWSimGeometry::createOSGCylinder(0.06,0.3);
+            if(dev->render)
+            {
+              try {
+                osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(dev->config->mesh.path);
+                if(model != NULL)
+                {
+
+                  vMd->asPositionAttitudeTransform()->setScale(
+                        osg::Vec3d(
+                                 dev->config->mesh.scaleFactor[0],
+                                 dev->config->mesh.scaleFactor[1],
+                                 dev->config->mesh.scaleFactor[2]
+                                 ));
+                  model.get()->getOrCreateStateSet ()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
+                  vMd->addChild(model.get());
+                }
+                else{
+                  ROS_ERROR("CommsDevice ('%s'): mesh loading failed", dev->name.c_str ());
+                }
+              } catch (exception e) {
+                ROS_ERROR("CommsDevice ('%s'): mesh loading failed: %s", dev->name.c_str (), e.what ());
+              }
+            }
+
             ROS_INFO("CommsDevice: added successfully");
             dev->Start();
           }
@@ -247,6 +273,8 @@ CommsDevice::CommsDevice(CommsDevice_Config * cfg, osg::ref_ptr<osg::Node> targe
   ROS_INFO("CommsDevice targetTfId: '%s' ; tfId: '%s'",
            targetTfId.c_str (),
            tfId.c_str());
+
+  render = cfg->mesh.path.length() != 0;
 
   _addService = this->node.serviceClient<dccomms_ros_msgs::AddDevice>("/dccomms_netsim/add_net_device");
   _rmService = this->node.serviceClient<dccomms_ros_msgs::RemoveDevice>("/dccomms_netsim/remove_net_device");
