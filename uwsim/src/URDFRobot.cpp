@@ -161,6 +161,7 @@ URDFRobot::URDFRobot(osgOcean::OceanScene *oscene, Vehicle vehicle) :
 
       linkBaseTransforms[i] = new osg::MatrixTransform;
       linkBaseTransforms[i]->setMatrix(linkBase);
+      link[i]->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
       linkBaseTransforms[i]->addChild(link[i]);
 
       //linkBase.invert(linkPost);
