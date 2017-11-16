@@ -1,0 +1,495 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE UWSimScene SYSTEM "UWSimScene.dtd" >
+
+<UWSimScene>
+    <oceanState>
+    <windx> 0.04 </windx>
+    <windy> 0.04 </windy>
+    <windSpeed> 12 </windSpeed>
+    <depth> 1000 </depth>
+    <reflectionDamping> 0.35 </reflectionDamping>
+    <waveScale> 1e-7 </waveScale>
+    <isNotChoppy> 0 </isNotChoppy>
+    <choppyFactor> 2.5 </choppyFactor>
+    <crestFoamHeight> 2.2 </crestFoamHeight>
+    <oceanSurfaceHeight> 0 </oceanSurfaceHeight>
+    <fog>
+      <density> 0.01</density>
+      <color>
+	<r>0</r>
+	<g>0.05</g>
+	<b>0.3</b>
+      </color>
+    </fog>
+    <color>
+      <r>0.0</r>
+      <g>0.05</g>
+      <b>0.3</b>
+    </color>
+    <attenuation>
+      <r>0.015</r>
+      <g>0.0075 </g>
+      <b> 0.005 </b>
+    </attenuation>
+  </oceanState>
+  <simParams>
+    <disableShaders> 0 </disableShaders>
+    <resw> 800 </resw>
+    <resh> 600 </resh>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 3.14</x>
+      <y> 0</y>
+      <z> -1.57 </z>
+    </offsetr>
+    <enablePhysics> 0 </enablePhysics>
+    <showTrajectory>
+      <target>girona500</target>
+    </showTrajectory>
+  </simParams>
+  <camera>
+    <freeMotion> 1 </freeMotion>
+    <objectToTrack>girona500/base_link</objectToTrack>
+    <fov> 60 </fov>
+    <aspectRatio> 1.33 </aspectRatio>
+    <near> 0.1 </near>
+    <far> 10000 </far>
+    <position>
+      <x>-5</x>
+      <y>-5 </y>
+      <z>8 </z>
+    </position> 
+    <lookAt>
+      <x>0</x>
+      <y>0 </y>
+      <z>0 </z>
+    </lookAt>
+  </camera>
+<!--
+  <vehicle>
+    <name>girona500</name>
+    <file>data/scenes/g500ARM5.urdf</file>
+    <jointValues>
+      <joint> 0 </joint>
+      <joint> 0</joint>
+      <joint> 2.2 </joint>
+      <joint> 0 </joint>
+      <joint>0.3 </joint>
+    </jointValues>
+    <position>
+      <x> 1.4</x>
+      <y> 4.5 </y>
+      <z> 7.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0</p>
+      <y>-1.87</y>
+    </orientation>
+
+
+    <virtualCamera>
+      <name>bowtech1</name>
+      <relativeTo>part0</relativeTo>
+      <resw> 320 </resw>
+      <resh> 240 </resh>
+      <position>
+        <x>-0.2</x>
+        <y> 0.0 </y>
+        <z> 0 </z>
+      </position>
+      <orientation>
+        <r>0</r>
+        <p>3.14</p>
+        <y>1.57 </y>
+      </orientation>
+    </virtualCamera>
+
+    <dvlSensor>
+      <name>DVLSensor</name>
+      <relativeTo>base_link</relativeTo>
+      <position>
+        <x>-0.75</x>
+        <y>0</y>
+        <z>0</z>
+      </position>  
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>M_PI</y>
+      </orientation>
+      <std>0.0015</std>
+    </dvlSensor>
+
+    <CommsDevice>
+        <name>g500dev</name>
+        <relativeTo>base_link</relativeTo>
+        <mac>2</mac>
+        <maxBitRate>1200</maxBitRate>
+        <trTime>11</trTime>
+        <tfId>girona500_modem</tfId>
+        <relativeTfId>girona500/base_link</relativeTfId>
+        <position>
+          <x>0</x>
+          <y>0</y>
+          <z>-0.1</z>
+        </position>
+        <orientation>
+          <r>0</r>
+          <p>3.14</p>
+          <y>0</y>
+        </orientation>
+        <mesh>
+           <path>/home/centelld/Models/modem1.3ds</path>
+           <scaleFactor>
+            <x>0.001</x>
+            <y>0.001</y>
+            <z>0.001</z>
+           </scaleFactor>
+        </mesh>
+    </CommsDevice>
+
+  </vehicle>
+-->
+    <vehicle>
+        <name>bluerov</name>
+        <file>/home/centelld/.uwsim/data/robot/BlueROV/bluerov.urdf</file>
+        <position>
+          <x> 5.4</x>
+          <y> 4.5 </y>
+          <z> 4 </z>
+        </position>
+        <orientation>
+          <r>0</r>
+          <p>0</p>
+          <y>3.1416</y>
+        </orientation>
+
+        <CommsDevice>
+            <name>bluerovdev</name>
+            <relativeTo>base_link</relativeTo>
+            <mac>3</mac>
+            <maxBitRate>1200</maxBitRate>
+            <trTime>11</trTime>
+            <tfId>bluerov_modem</tfId>
+            <relativeTfId>bluerov/base_link</relativeTfId>
+            <position>
+              <x>0</x>
+              <y>0</y>
+              <z>0</z>
+            </position>
+            <orientation>
+              <r>0</r>
+              <p>0</p>
+              <y>0</y>
+            </orientation>
+            <mesh>
+               <path>/home/centelld/Models/modem1.3ds</path>
+               <scaleFactor>
+                <x>0.001</x>
+                <y>0.001</y>
+                <z>0.001</z>
+               </scaleFactor>
+            </mesh>
+        </CommsDevice>
+
+    </vehicle>
+
+<!--
+    <vehicle>
+    <name>bluerov2</name>
+    <file>/home/centelld/.uwsim/data/robot/BlueROV/bluerov.urdf</file>
+    <position>
+      <x> 0</x>
+      <y> 0 </y>
+      <z> 5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0</p>
+      <y>1.4</y>
+    </orientation>
+
+    <CommsDevice>
+        <name>bluerov2dev</name>
+        <relativeTo>base_link</relativeTo>
+        <mac>4</mac>
+        <maxBitRate>1200</maxBitRate>
+        <trTime>11</trTime>
+        <tfId>bluerov2_modem</tfId>
+        <relativeTfId>bluerov2/base_link</relativeTfId>
+        <position>
+          <x>0</x>
+          <y>0</y>
+          <z>0</z>
+        </position>
+        <orientation>
+          <r>0</r>
+          <p>0</p>
+          <y>0</y>
+        </orientation>
+        <mesh>
+           <path>/home/centelld/Models/modem1.3ds</path>
+           <scaleFactor>
+            <x>0.001</x>
+            <y>0.001</y>
+            <z>0.001</z>
+           </scaleFactor>
+        </mesh>
+    </CommsDevice>
+  </vehicle>
+-->
+
+<!--
+  <vehicle>
+      <name>sparus</name>
+      <file>/home/centelld/programming/catkin_ws/src/cola2_s2/data/model/sparus2.urdf</file>
+      <position>
+        <x> 1 </x>
+        <y> 4 </y>
+        <z> 0.1 </z>
+      </position>
+      <orientation>
+        <r>0</r>
+        <p>0</p>
+        <y>0</y>
+      </orientation>
+      <CommsDevice>
+          <name>sparusdev</name>
+          <relativeTo>sparus2</relativeTo>
+          <mac>1</mac>
+          <maxBitRate>1200</maxBitRate>
+          <trTime>11</trTime>
+          <tfId>sparus_modem</tfId>
+          <relativeTfId>sparus/base_link</relativeTfId>
+          <position>
+            <x>0</x>
+            <y>0</y>
+            <z>0.2</z>
+          </position>
+          <orientation>
+            <r>0</r>
+            <p>0</p>
+            <y>0</y>
+          </orientation>
+          <mesh>
+             <path>/home/centelld/Models/modem1.3ds</path>
+             <scaleFactor>
+              <x>0.001</x>
+              <y>0.001</y>
+              <z>0.001</z>
+             </scaleFactor>
+          </mesh>
+      </CommsDevice>
+  </vehicle>
+-->
+  <object>
+    <name> terrain </name>
+    <file> terrain/desert/desert2.3ds  </file>
+    <position>
+      <x> 0</x>
+      <y> 0 </y>
+      <z> 10 </z>
+    </position>
+    <orientation>
+      <r>0.0</r>
+      <p>1.57 </p>
+      <y>0 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>pipe</name>
+    <file>objects/pipe_green.3ds</file>
+    <position>
+      <x> 0</x>
+      <y> 0 </y>
+      <z> 9.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>-0.3 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>pipe</name>
+    <file>objects/pipe_green.3ds</file>
+    <position>
+      <x> 0.56</x>
+      <y> 1.8 </y>
+      <z> 9.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>-0.3 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>pipe</name>
+    <file>objects/pipe_green.3ds</file>
+    <position>
+      <x> 1.12</x>
+      <y> 3.6 </y>
+      <z> 9.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>-0.3 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>pipe</name>
+    <file>objects/pipe_green.3ds</file>
+    <position>
+      <x> -0.56</x>
+      <y> -1.8 </y>
+      <z> 9.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>-0.3 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>pipe</name>
+    <file>objects/pipe_green.3ds</file>
+    <position>
+      <x> -1.12</x>
+      <y> -3.6 </y>
+      <z> 9.5 </z>
+    </position>
+    <orientation>
+      <r>0</r>
+      <p>0 </p>
+      <y>-0.3 </y>
+    </orientation>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <rosInterfaces>
+    <ROSOdomToPAT>
+      <topic> /g500/odom </topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSOdomToPAT>
+
+    <ROSOdomToPAT>
+      <topic> /sparus/odom </topic>
+      <vehicleName> sparus </vehicleName>
+    </ROSOdomToPAT>
+
+    <ROSOdomToPAT>
+        <topic> /bluerov/odom </topic>
+        <vehicleName> bluerov </vehicleName>
+    </ROSOdomToPAT>
+<!--
+    <ROSOdomToPAT>
+        <topic> /bluerov2/odom </topic>
+        <vehicleName> bluerov2 </vehicleName>
+    </ROSOdomToPAT>
+-->
+
+    <WorldToROSTF>
+      <rootName> world </rootName>
+      <enableObjects> 1 </enableObjects>
+      <rate>10</rate>
+    </WorldToROSTF>
+
+    <ArmToROSJointState> 
+	<topic>/uwsim/joint_state</topic>
+	<vehicleName> girona500 </vehicleName>
+    </ArmToROSJointState>
+    <ROSJointStateToArm> 
+	<topic>/uwsim/joint_state_command</topic>
+	<vehicleName> girona500 </vehicleName>
+    </ROSJointStateToArm>
+    <VirtualCameraToROSImage> 
+      <cameraName>bowtech1</cameraName>
+      <imageTopic> /g500/camera1 </imageTopic>
+      <infoTopic> /g500/camera1_info </infoTopic>
+    </VirtualCameraToROSImage>
+
+    <ROSTwistToPAT>
+      <topic> /g500/velocityCommand </topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSTwistToPAT>    
+
+    <ROSPoseToPAT>
+      <topic> /g500/pose</topic>
+      <vehicleName> girona500 </vehicleName>
+    </ROSPoseToPAT>
+
+    <DVLSensorToROS>
+      <name>DVLSensor</name>
+      <topic>g500/dvl</topic>
+      <rate>5</rate>
+    </DVLSensorToROS>
+
+
+    <CommsDeviceROS>
+      <name>g500dev</name>
+      <topic>g500/commsdev</topic>
+      <rate>10</rate>
+    </CommsDeviceROS>
+<!--
+    <CommsDeviceROS>
+      <name>sparusdev</name>
+      <topic>sparus/commsdev</topic>
+      <rate>10</rate>
+    </CommsDeviceROS>
+-->
+
+    <CommsDeviceROS>
+      <name>bluerovdev</name>
+      <topic>bluerov/commsdev</topic>
+      <rate>10</rate>
+    </CommsDeviceROS>
+
+<!--
+    <CommsDeviceROS>
+        <name>bluerov2dev</name>
+        <topic>bluerov2/commsdev</topic>
+        <rate>10</rate>
+    </CommsDeviceROS>
+-->
+
+
+  </rosInterfaces>
+
+</UWSimScene>
+

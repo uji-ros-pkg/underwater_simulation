@@ -201,28 +201,28 @@ bool CommsDevice::_Add()
   dccomms_ros_msgs::AddDevice srv;
 
   srv.request.frameId = this->config->tfId;
-  srv.request.iddev = this->config->name;
+  srv.request.dccommsId = this->config->name;
   srv.request.mac = this->config->mac;
   srv.request.maxBitRate = this->config->maxBitRate;
-  srv.request.maxDistance = this->config->maxDistance;
-  srv.request.minDistance = this->config->minDistance;
-  srv.request.minPktErrorRate = this->config->minPktErrRatio;
-  srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
-  srv.request.prTimeIncPerMeter = this->config->prTimeIncPerMeter;
-  srv.request.trTimeMean = this->config->trTime;
-  srv.request.trTimeSd = this->config->trTimeSd;
-  srv.request.devType = this->config->devClass;
+//  srv.request.maxDistance = this->config->maxDistance;
+//  srv.request.minDistance = this->config->minDistance;
+//  srv.request.minPktErrorRate = this->config->minPktErrRatio;
+//  srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
+//  srv.request.prTimeIncPerMeter = this->config->prTimeIncPerMeter;
+//  srv.request.trTimeMean = this->config->trTime;
+//  srv.request.trTimeSd = this->config->trTimeSd;
+//  srv.request.devType = this->config->devClass;
 
 
-  ROS_INFO ("CommsDevice  ID = %s ; Frame = %s", srv.request.iddev.c_str (), srv.request.frameId.c_str());
+  ROS_INFO ("CommsDevice  ID = %s ; Frame = %s", srv.request.dccommsId.c_str (), srv.request.frameId.c_str());
   if(!_addService.call(srv))
   {
-    ROS_ERROR("fail adding '%s'", srv.request.iddev.c_str ());
+    ROS_ERROR("fail adding '%s'", srv.request.dccommsId.c_str ());
     return false;
   }
   else
   {
-    ROS_INFO("CommsDevice '%s' added", srv.request.iddev.c_str ());
+    ROS_INFO("CommsDevice '%s' added", srv.request.dccommsId.c_str ());
     return true;
   }
 }
