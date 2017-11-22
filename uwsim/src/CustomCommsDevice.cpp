@@ -108,6 +108,7 @@ CustomCommsDevice::CustomCommsDevice(CustomCommsDevice_Config *cfg,
                                      osg::ref_ptr<osg::Node> target,
                                      SimulatedIAUV *auv)
     : CommsDevice(cfg, target, auv) {
+  Init(cfg, target, auv);
   _addService = this->node.serviceClient<dccomms_ros_msgs::AddCustomDevice>(
       "/dccomms_netsim/add_custom_net_device");
   _addChannelService =
@@ -128,4 +129,3 @@ CommsDevice *CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
 
 
 PLUGINLIB_EXPORT_CLASS(CustomCommsDevice_Factory, uwsim::SimulatedDeviceFactory)
-PLUGINLIB_EXPORT_CLASS(CustomCommsDevice_Factory, CommsDevice_Factory)

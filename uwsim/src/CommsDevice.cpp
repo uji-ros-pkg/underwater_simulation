@@ -181,7 +181,10 @@ void CommsDevice::Start() {
 
 CommsDevice::CommsDevice(CommsDevice_Config *cfg,
                          osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv)
-    : SimulatedDevice(cfg) {
+    : SimulatedDevice(cfg) {}
+
+void CommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
+                       SimulatedIAUV *auv) {
   if (cfg->tfId.length() == 0) {
     tfId = std::string(auv->name) + "/" + cfg->name;
   } else {
@@ -209,9 +212,8 @@ CommsDevice::CommsDevice(CommsDevice_Config *cfg,
 
   this->parent = target;
   this->auv = auv;
-  this->SetConfig(cfg);
+  SetConfig(cfg);
 }
-
 void CommsDevice_ROSPublisher::createPublisher(ros::NodeHandle &nh) {
   ROS_INFO("CommsDevice ROSPublisher on topic %s", topic.c_str());
   pub_ = nh.advertise<geometry_msgs::Pose>(topic, 1);
@@ -246,8 +248,8 @@ void CommsDevice_ROSPublisher::publish() {
 
 //#if ROS_VERSION_MINIMUM(1, 9, 0)
 //// new pluginlib API in Groovy and Hydro
-//PLUGINLIB_EXPORT_CLASS(CommsDevice_Factory, uwsim::SimulatedDeviceFactory)
+// PLUGINLIB_EXPORT_CLASS(CommsDevice_Factory, uwsim::SimulatedDeviceFactory)
 //#else
-//PLUGINLIB_REGISTER_CLASS(CommsDevice_Factory, CommsDevice_Factory,
+// PLUGINLIB_REGISTER_CLASS(CommsDevice_Factory, CommsDevice_Factory,
 //                         uwsim::SimulatedDeviceFactory)
 //#endif

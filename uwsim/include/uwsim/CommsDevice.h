@@ -32,6 +32,10 @@ public:
 
   CommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
               SimulatedIAUV *auv);
+
+  void Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
+            SimulatedIAUV *auv);
+
   void Start();
   virtual CommsDevice_Config *GetConfig() = 0;
   virtual void SetConfig(CommsDevice_Config *cfg) = 0;
