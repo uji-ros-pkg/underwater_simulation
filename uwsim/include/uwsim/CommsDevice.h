@@ -37,7 +37,6 @@ public:
   virtual void SetConfig(CommsDevice_Config *cfg) = 0;
 
 protected:
-  ros::ServiceClient _addService;
   virtual bool _Add() = 0;
 
 private:

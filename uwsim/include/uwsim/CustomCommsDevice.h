@@ -1,6 +1,5 @@
 #ifndef CustomCommsDevice_ECHO_H_
 #define CustomCommsDevice_ECHO_H_
-#include "CommsDevice.h"
 #include "ConfigXMLParser.h"
 #include "ROSInterface.h"
 #include "SimulatedDevice.h"
@@ -11,6 +10,7 @@
 #include <dccomms_ros_msgs/RemoveDevice.h>
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
+#include <uwsim/CommsDevice.h>
 
 using namespace uwsim;
 
@@ -34,12 +34,14 @@ public:
                     osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
   void Start();
   static bool channelCreated;
+  void SetConfig(CommsDevice_Config *cfg);
+  CommsDevice_Config *GetConfig();
+
+protected:
+  bool _Add();
 
 private:
   ros::ServiceClient _addService, _addChannelService, _linkToChannelService;
-  bool _Add();
-  void SetConfig(CommsDevice_Config *cfg);
-  CommsDevice_Config *GetConfig();
 };
 
 /* You will need to add your code HERE */

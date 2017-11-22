@@ -126,10 +126,6 @@ CommsDevice *CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
   return new CustomCommsDevice(config, target, auv);
 }
 
-#if ROS_VERSION_MINIMUM(1, 9, 0)
-// new pluginlib API in Groovy and Hydro
+
 PLUGINLIB_EXPORT_CLASS(CustomCommsDevice_Factory, uwsim::SimulatedDeviceFactory)
-#else
-PLUGINLIB_REGISTER_CLASS(CustomCommsDevice_Factory, CustomCommsDevice_Factory,
-                         uwsim::SimulatedDeviceFactory)
-#endif
+PLUGINLIB_EXPORT_CLASS(CustomCommsDevice_Factory, CommsDevice_Factory)

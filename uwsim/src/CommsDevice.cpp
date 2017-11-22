@@ -243,3 +243,11 @@ void CommsDevice_ROSPublisher::publish() {
   _tfBr.sendTransform(tf::StampedTransform(transform, ros::Time::now(),
                                            dev->targetTfId, dev->tfId));
 }
+
+//#if ROS_VERSION_MINIMUM(1, 9, 0)
+//// new pluginlib API in Groovy and Hydro
+//PLUGINLIB_EXPORT_CLASS(CommsDevice_Factory, uwsim::SimulatedDeviceFactory)
+//#else
+//PLUGINLIB_REGISTER_CLASS(CommsDevice_Factory, CommsDevice_Factory,
+//                         uwsim::SimulatedDeviceFactory)
+//#endif
