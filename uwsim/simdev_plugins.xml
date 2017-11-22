@@ -22,7 +22,7 @@
   </class>
 
 
-  <class name="CommsDevice_Factory" type="CommsDevice_Factory"
+  <class name="CustomCommsDevice_Factory" type="CustomCommsDevice_Factory"
   base_class_type="uwsim::SimulatedDeviceFactory">
   <description>
   Creates a comms device for dccomms_ros simulator

@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
   osgViewer::Viewer::Windows windows;
   view.getViewer()->getWindows(windows);
   windows[0]->setWindowName("UWSim");
-
+  ros::Rate loop_rate(60);
   double prevSimTime = 0.;
   while (!view.getViewer()->done() && ros::ok())
   {
@@ -170,6 +170,7 @@ int main(int argc, char *argv[])
     view.getViewer()->frame();
 
     builder.updateIM();
+    loop_rate.sleep();
 
   }
   if (ros::ok())
