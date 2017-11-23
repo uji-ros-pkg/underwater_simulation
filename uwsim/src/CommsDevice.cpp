@@ -35,6 +35,8 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->extractStringChar(child, cfg->relativeTfId);
     else if (child->get_name() == "mac")
       config->extractUIntChar(child, cfg->mac);
+    else if (child->get_name() == "channelId")
+      config->extractUIntChar(child, cfg->channelId);
   }
 }
 

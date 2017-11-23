@@ -1,4 +1,4 @@
-<!ELEMENT UWSimScene (oceanState?,simParams?,camera?,vehicle*,object*,rosInterfaces?)>
+<!ELEMENT UWSimScene (oceanState?,simParams?,camera?,(CustomCommsChannel*)?,vehicle*,object*,rosInterfaces?)>
 <!ATTLIST UWSimScene xmlns:xacro CDATA #IMPLIED>
 
 <!-- elementos oceanScene -->
@@ -192,7 +192,11 @@ echoROS?
 
 <!ELEMENT DredgeTool (name, target, offsetp, offsetr)>
 
-<!-- elementos *CommsDevices -->
+<!-- *Comms* items -->
+<!ELEMENT id (#PCDATA)>
+<!ELEMENT channelId (#PCDATA)>
+<!ELEMENT propTimeIncPerMeter (#PCDATA)>
+<!ELEMENT minPropTime (#PCDATA)>
 <!ELEMENT tfId (#PCDATA)>
 <!ELEMENT dccommsId (#PCDATA)>
 <!ELEMENT relativeTfId (#PCDATA)>
@@ -209,4 +213,7 @@ echoROS?
 <!ELEMENT mesh (path, scaleFactor?)>
 <!ELEMENT path (#PCDATA)>
 
-<!ELEMENT CustomCommsDevice (dccommsId,relativeTo, mac, maxBitRate, bitrate, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
+<!ELEMENT CustomCommsChannel (id,propTimeIncPerMeter?,minPropTime?)>
+<!ELEMENT CustomCommsDevice (dccommsId, channelId, relativeTo, mac, maxBitRate, bitrate, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
+
+<!-- *Comms* items end-->

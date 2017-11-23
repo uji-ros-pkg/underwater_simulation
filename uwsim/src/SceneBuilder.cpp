@@ -160,6 +160,13 @@ bool SceneBuilder::loadScene(ConfigFile config)
   scene->getOceanScene()->setUnderwaterAttenuation(
       osg::Vec3f(config.attenuation[0], config.attenuation[1], config.attenuation[2]));
 
+  //Launch *CommsChannel ROS controllers
+  for(CustomCommsChannelConfig channelConfig: config.customCommsChannels)
+  {
+
+  }
+  //End *CommsChannel ROS controllers
+
   //Add config file iauv
   int nvehicle = config.vehicles.size();
   int slsProjectors=0;

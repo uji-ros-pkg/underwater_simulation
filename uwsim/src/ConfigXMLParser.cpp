@@ -1038,6 +1038,21 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
   }
 }
 
+void ConfigFile::processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "id")
+      extractUIntChar(child, channel.id);
+    else if (child->get_name() == "propTimeIncPerMeter")
+      extractFloatChar(child, channel.propTimeIncPerMeter);
+    else if(child->get_name() == "minPropTime")
+      extractFloatChar(child, channel.minPropTime);
+  }
+}
+
 void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1452,6 +1467,12 @@ void ConfigFile::processXML(const xmlpp::Node* node)
         processSimParams(child);
       else if (child->get_name() == "camera")
         processCamera(child);
+      else if (child->get_name() == "CustomCommsChannel")
+      {
+        CustomCommsChannelConfig channel;
+        processCustomCommsChannel(child, channel);
+        customCommsChannels.push_back(channel);
+      }
       else if (child->get_name() == "vehicle")
       {
         Vehicle vehicle;

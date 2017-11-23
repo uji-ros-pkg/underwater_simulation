@@ -10,7 +10,8 @@
 #include <thread>
 #include <uwsim/UWSimUtils.h>
 
-bool CustomCommsDevice::channelCreated = false;
+uint32_t CustomCommsDevice::nDevsReady = 0;
+uint32_t CustomCommsDevice::nDevs = 0;
 
 SimulatedDeviceConfig::Ptr
 CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
@@ -71,7 +72,7 @@ bool CustomCommsDevice::_Add() {
   } else {
     ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
   }
-  if (!channelCreated) {
+  if (true){//(!channelCreated) {
     dccomms_ros_msgs::AddCustomChannel acchSrv;
     acchSrv.request.id = 0;
     acchSrv.request.minPrTime = 0;
@@ -81,13 +82,12 @@ bool CustomCommsDevice::_Add() {
       return false;
     } else {
       ROS_INFO("comms channel added");
-      channelCreated = true;
     }
   }
   // link dev to channel
   dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
   ldchSrv.request.dccommsId = this->config->dccommsId;
-  ldchSrv.request.channelId = 0;
+  ldchSrv.request.channelId = this->config->channelId;
   if (!_linkToChannelService.call(ldchSrv)) {
     ROS_ERROR("fail linking dev to channel");
     return false;

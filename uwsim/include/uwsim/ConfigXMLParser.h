@@ -409,6 +409,16 @@ struct Mesh{
   double scaleFactor[3] {1,1,1};
 };
 
+struct CustomCommsChannelConfig
+{
+  uint32_t id;
+  double propTimeIncPerMeter, minPropTime;
+  CustomCommsChannelConfig(){
+      propTimeIncPerMeter = 0.66667;
+      minPropTime = 0;
+  }
+};
+
 class ConfigFile
 {
 public:
@@ -457,6 +467,9 @@ public:
 
   void postprocessVehicle(Vehicle &vehicle);
 
+  //Comms related methods
+  void processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel);
+
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
          oceanSurfaceHeight, fogDensity, lightRate;
@@ -470,6 +483,7 @@ public:
   list<ROSInterfaceInfo> ROSPhysInterfaces; //Physics interfaces are loaded after physics
   list<ShowTrajectory> trajectories;
   PhysicsConfig physicsConfig;
+  list<CustomCommsChannelConfig> customCommsChannels;
 
 
   ConfigFile(const std::string &fName);

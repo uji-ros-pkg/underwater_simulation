@@ -33,7 +33,8 @@ public:
   CustomCommsDevice(CustomCommsDevice_Config *cfg,
                     osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
   void Start();
-  static bool channelCreated;
+  static uint32_t nDevsReady;
+  static uint32_t nDevs;
   void SetConfig(CommsDevice_Config *cfg);
   CommsDevice_Config *GetConfig();
 

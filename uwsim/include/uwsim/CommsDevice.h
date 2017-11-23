@@ -15,7 +15,7 @@ class CommsDevice_Config : public SimulatedDeviceConfig {
 public:
   // XML members
   std::string relativeTo, tfId, relativeTfId, dccommsId;
-  unsigned int mac;
+  unsigned int mac, channelId;
   double position[3]{0, 0, 0}, orientation[3]{0, 0, 0};
   Mesh mesh;
   CommsDevice_Config(std::string type_) : SimulatedDeviceConfig(type_) {}
