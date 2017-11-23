@@ -143,7 +143,7 @@ bool CommsDevice::_Check() {
   bool res = true;
   dccomms_ros_msgs::CheckDevice srv;
 
-  srv.request.iddev = this->GetConfig()->name;
+  srv.request.iddev = this->GetConfig()->dccommsId;
 
   if (!_checkService.call(srv)) {
     res = false;
@@ -156,7 +156,7 @@ bool CommsDevice::_Remove() {
   bool res = true;
   dccomms_ros_msgs::RemoveDevice srv;
 
-  srv.request.iddev = this->GetConfig()->name;
+  srv.request.iddev = this->GetConfig()->dccommsId;
 
   if (!_rmService.call(srv)) {
     res = false;
@@ -212,6 +212,7 @@ void CommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
 
   this->parent = target;
   this->auv = auv;
+  this->name = cfg->dccommsId;
   SetConfig(cfg);
 }
 void CommsDevice_ROSPublisher::createPublisher(ros::NodeHandle &nh) {

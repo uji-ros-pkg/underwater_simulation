@@ -31,7 +31,6 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
        ++iter) {
 
     const xmlpp::Node *child = dynamic_cast<const xmlpp::Node *>(*iter);
-    config->extractStringChar(child, cfg->relativeTfId);
     if (child->get_name() == "maxBitRate")
       config->extractUIntChar(child, cfg->maxBitRate);
     else if (child->get_name() == "intrinsicDelay")
@@ -71,7 +70,6 @@ bool CustomCommsDevice::_Add() {
     return false;
   } else {
     ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
-    return true;
   }
   if (!channelCreated) {
     dccomms_ros_msgs::AddCustomChannel acchSrv;
@@ -83,7 +81,7 @@ bool CustomCommsDevice::_Add() {
       return false;
     } else {
       ROS_INFO("comms channel added");
-      return true;
+      channelCreated = true;
     }
   }
   // link dev to channel
