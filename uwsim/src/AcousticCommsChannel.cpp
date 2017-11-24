@@ -1,21 +1,21 @@
-#include <dccomms_ros_msgs/AddCustomChannel.h>
+#include <dccomms_ros_msgs/AddAcousticChannel.h>
 #include <dccomms_ros_msgs/CheckChannel.h>
 #include <thread>
-#include <uwsim/CustomCommsChannel.h>
+#include <uwsim/AcousticCommsChannel.h>
 
 namespace uwsim {
 
-CustomCommsChannel::CustomCommsChannel(CustomCommsChannelConfig cfg) {
+AcousticCommsChannel::AcousticCommsChannel(AcousticCommsChannelConfig cfg) {
   config = cfg;
-  _addChannelService = _nh.serviceClient<dccomms_ros_msgs::AddCustomChannel>(
-      "/dccomms_netsim/add_custom_channel");
+  _addChannelService = _nh.serviceClient<dccomms_ros_msgs::AddAcousticChannel>(
+      "/dccomms_netsim/add_acoustic_channel");
   _checkChannelService = _nh.serviceClient<dccomms_ros_msgs::CheckChannel>(
       "/dccomms_netsim/check_channel");
-  std::thread worker(&CustomCommsChannel::_Work, this);
+  std::thread worker(&AcousticCommsChannel::_Work, this);
   worker.detach();
 }
 
-bool CustomCommsChannel::_Check() {
+bool AcousticCommsChannel::_Check() {
   bool res = true;
   dccomms_ros_msgs::CheckChannel srv;
 
@@ -28,24 +28,22 @@ bool CustomCommsChannel::_Check() {
   return res && srv.response.exists;
 }
 
-void CustomCommsChannel::_Work() {
+void AcousticCommsChannel::_Work() {
   while (!_Check()) {
     _Add();
     std::this_thread::sleep_for(std::chrono::seconds(4));
   }
 }
 
-bool CustomCommsChannel::_Add() {
-  dccomms_ros_msgs::AddCustomChannel srv;
+bool AcousticCommsChannel::_Add() {
+  dccomms_ros_msgs::AddAcousticChannel srv;
   srv.request.id = config.id;
-  srv.request.minPrTime = config.minPropTime;
-  srv.request.prTimeIncPerMeter = config.propTimeIncPerMeter;
 
   if (!_addChannelService.call(srv)) {
     ROS_ERROR("fail adding channel '%d'", srv.request.id);
     return false;
   } else {
-    ROS_INFO("CustomCommsChannel: '%d' added", srv.request.id);
+    ROS_INFO("AcousticCommsChannel: '%d' added", srv.request.id);
     return true;
   }
 }

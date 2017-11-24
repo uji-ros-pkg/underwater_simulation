@@ -28,4 +28,11 @@
   </description>
   </class>
 
+    <class name="AcousticCommsDevice_Factory" type="AcousticCommsDevice_Factory"
+    base_class_type="uwsim::SimulatedDeviceFactory">
+    <description>
+    Creates a comms device for dccomms_ros simulator
+    </description>
+    </class>
+
 </library>

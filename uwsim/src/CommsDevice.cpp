@@ -169,11 +169,8 @@ bool CommsDevice::_Remove() {
 
 void CommsDevice::Start() {
   auto netSimInterfaceWork = [this](void) {
-    while (1) {
-      if (!_Check()) {
-        //_Remove();
-        _Add();
-      }
+    while (!_Check()) {
+      _Add();
       std::this_thread::sleep_for(std::chrono::seconds(4));
     }
   };

@@ -1038,6 +1038,17 @@ void ConfigFile::postprocessVehicle(Vehicle &vehicle)
   }
 }
 
+void ConfigFile::processAcousticCommsChannel(const xmlpp::Node* node, AcousticCommsChannelConfig &channel)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "id")
+      extractUIntChar(child, channel.id);
+  }
+}
+
 void ConfigFile::processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1472,6 +1483,12 @@ void ConfigFile::processXML(const xmlpp::Node* node)
         CustomCommsChannelConfig channel;
         processCustomCommsChannel(child, channel);
         customCommsChannels.push_back(channel);
+      }
+      else if (child->get_name() == "AcousticCommsChannel")
+      {
+        AcousticCommsChannelConfig channel;
+        processAcousticCommsChannel(child, channel);
+        acousticCommsChannels.push_back(channel);
       }
       else if (child->get_name() == "vehicle")
       {

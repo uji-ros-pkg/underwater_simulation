@@ -419,6 +419,13 @@ struct CustomCommsChannelConfig
   }
 };
 
+struct AcousticCommsChannelConfig
+{
+  uint32_t id;
+  AcousticCommsChannelConfig(){
+  }
+};
+
 class ConfigFile
 {
 public:
@@ -469,6 +476,7 @@ public:
 
   //Comms related methods
   void processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel);
+  void processAcousticCommsChannel(const xmlpp::Node* node, AcousticCommsChannelConfig &channel);
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
@@ -484,6 +492,7 @@ public:
   list<ShowTrajectory> trajectories;
   PhysicsConfig physicsConfig;
   list<CustomCommsChannelConfig> customCommsChannels;
+  list<AcousticCommsChannelConfig> acousticCommsChannels;
 
 
   ConfigFile(const std::string &fName);

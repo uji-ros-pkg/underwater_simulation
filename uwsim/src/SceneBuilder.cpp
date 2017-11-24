@@ -166,6 +166,11 @@ bool SceneBuilder::loadScene(ConfigFile config)
       auto channel = boost::shared_ptr<uwsim::CustomCommsChannel>(new uwsim::CustomCommsChannel(channelConfig));
       customCommsChannels.push_back(channel);
   }
+  for(AcousticCommsChannelConfig channelConfig: config.acousticCommsChannels)
+  {
+      auto channel = boost::shared_ptr<uwsim::AcousticCommsChannel>(new uwsim::AcousticCommsChannel(channelConfig));
+      acousticCommsChannels.push_back(channel);
+  }
   //End *CommsChannel ROS controllers
 
   //Add config file iauv

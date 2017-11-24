@@ -110,6 +110,7 @@ src/BulletPhysics.cpp
 src/PhysicsBuilder.cpp
 src/ROSSceneBuilder.cpp
 src/CustomCommsChannel.cpp
+src/AcousticCommsChannel.cpp
 )
 
 add_library(uwsim_plugins_simdev 
@@ -117,6 +118,7 @@ src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 src/DredgeTool.cpp
 src/CustomCommsDevice.cpp
+src/AcousticCommsDevice.cpp
 src/CommsDevice.cpp
 )
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
