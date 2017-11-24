@@ -72,18 +72,7 @@ bool CustomCommsDevice::_Add() {
   } else {
     ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
   }
-  if (true){//(!channelCreated) {
-    dccomms_ros_msgs::AddCustomChannel acchSrv;
-    acchSrv.request.id = 0;
-    acchSrv.request.minPrTime = 0;
-    acchSrv.request.prTimeIncPerMeter = 0.666667;
-    if (!_addChannelService.call(acchSrv)) {
-      ROS_ERROR("fail adding comms channel");
-      return false;
-    } else {
-      ROS_INFO("comms channel added");
-    }
-  }
+
   // link dev to channel
   dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
   ldchSrv.request.dccommsId = this->config->dccommsId;
@@ -109,9 +98,6 @@ CustomCommsDevice::CustomCommsDevice(CustomCommsDevice_Config *cfg,
   Init(cfg, target, auv);
   _addService = this->node.serviceClient<dccomms_ros_msgs::AddCustomDevice>(
       "/dccomms_netsim/add_custom_net_device");
-  _addChannelService =
-      this->node.serviceClient<dccomms_ros_msgs::AddCustomChannel>(
-          "/dccomms_netsim/add_custom_channel");
   _linkToChannelService =
       this->node.serviceClient<dccomms_ros_msgs::LinkDeviceToChannel>(
           "/dccomms_netsim/link_dev_to_channel");

@@ -109,6 +109,7 @@ src/VirtualSLSProjector.cpp
 src/BulletPhysics.cpp
 src/PhysicsBuilder.cpp
 src/ROSSceneBuilder.cpp
+src/CustomCommsChannel.cpp
 )
 
 add_library(uwsim_plugins_simdev 

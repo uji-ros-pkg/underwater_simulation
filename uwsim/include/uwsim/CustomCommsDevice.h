@@ -42,7 +42,7 @@ protected:
   bool _Add();
 
 private:
-  ros::ServiceClient _addService, _addChannelService, _linkToChannelService;
+  ros::ServiceClient _addService, _linkToChannelService;
 };
 
 /* You will need to add your code HERE */

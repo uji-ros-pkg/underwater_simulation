@@ -12,8 +12,10 @@ public:
   CustomCommsChannel(CustomCommsChannelConfig cfg);
 private:
   ros::NodeHandle _nh;
-  ros::ServiceClient _checkChannel, _addChannel;
+  ros::ServiceClient _checkChannelService, _addChannelService;
   void _Work();
+  bool _Check();
+  bool _Add();
 
 };
 }

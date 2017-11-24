@@ -174,7 +174,7 @@ void CommsDevice::Start() {
         _Remove();
         _Add();
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds((int)2000));
+      std::this_thread::sleep_for(std::chrono::seconds(4));
     }
   };
   std::thread starter(netSimInterfaceWork);

@@ -21,6 +21,7 @@
 #include "ROSInterface.h"
 #include "SimulatedIAUV.h"
 #include "ConfigXMLParser.h"
+#include <uwsim/CustomCommsChannel.h>
 
 class SceneBuilder
 {
@@ -36,6 +37,7 @@ public:
   std::vector<boost::shared_ptr<HUDCamera> > realcams;
   std::vector<boost::shared_ptr<ROSInterface> > ROSInterfaces;
   std::vector<osg::ref_ptr<osgWidget::Window> > camWidgets;
+  std::vector<boost::shared_ptr<uwsim::CustomCommsChannel>> customCommsChannels;
 
 public:
   SceneBuilder();

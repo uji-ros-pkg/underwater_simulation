@@ -163,7 +163,8 @@ bool SceneBuilder::loadScene(ConfigFile config)
   //Launch *CommsChannel ROS controllers
   for(CustomCommsChannelConfig channelConfig: config.customCommsChannels)
   {
-
+      auto channel = boost::shared_ptr<uwsim::CustomCommsChannel>(new uwsim::CustomCommsChannel(channelConfig));
+      customCommsChannels.push_back(channel);
   }
   //End *CommsChannel ROS controllers
 
