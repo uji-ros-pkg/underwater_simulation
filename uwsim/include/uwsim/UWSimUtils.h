@@ -214,5 +214,13 @@ class DynamicHF : public osg::Drawable::UpdateCallback
 };
 
 osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent,  const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles);
+
+
+class LightBuilder
+{
+public:
+  static osg::Node* createLightSource(unsigned int num, const osg::Vec3& trans, const osg::Vec4& color, float att);
+  static osg::LightSource* createLightSource(unsigned int num, const osg::Vec4& color, float att);
+};
 #endif
 

@@ -568,3 +568,33 @@ osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile
   return geode;
 }
 
+osg::Node* LightBuilder::createLightSource(unsigned int num, const osg::Vec3 &trans, const osg::Vec4 &color, float att)
+{
+  osg::ref_ptr<osg::Light> light = new osg::Light;
+  light->setLightNum(num);
+  light->setDiffuse(color);
+  light->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+  light->setConstantAttenuation(att);
+  osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
+  lightSource->setLight(light);
+
+  osg::ref_ptr<osg::MatrixTransform> sourceTrans =
+      new osg::MatrixTransform;
+  sourceTrans->setMatrix(osg::Matrix::translate(trans));
+  sourceTrans->addChild (lightSource.get());
+  return sourceTrans.release();
+}
+
+osg::LightSource* LightBuilder::createLightSource(unsigned int num, const osg::Vec4 &color, float att)
+{
+  osg::ref_ptr<osg::Light> light = new osg::Light;
+  light->setLightNum(num);
+  light->setDiffuse(color);
+  light->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+  light->setConstantAttenuation(att);
+  osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
+  lightSource->setLight(light);
+
+  return lightSource.release();
+}
+
