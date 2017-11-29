@@ -3,12 +3,35 @@
 #include "ConfigXMLParser.h"
 #include "ROSInterface.h"
 #include "SimulatedDevice.h"
+#include <chrono>
 #include <dccomms_ros_msgs/CheckDevice.h>
 #include <dccomms_ros_msgs/RemoveDevice.h>
+#include <osg/Geometry>
+#include <osg/Material>
+#include <osg/ShapeDrawable>
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 
 using namespace uwsim;
+
+class CommsLights {
+public:
+  enum ledType { RED_LED, GREEN_LED };
+  CommsLights(osg::ref_ptr<osg::Group> sceneRoot);
+  osg::ref_ptr<osg::Node> GetOSGNode();
+  void StartAnimationTest();
+  void UpdateLetState(ledType, bool);
+
+private:
+  osg::ref_ptr<osg::Group> sceneRoot;
+  osg::ref_ptr<osg::Transform> vMRedLight;
+  osg::ref_ptr<osg::Transform> vMGreenLight;
+  osg::ref_ptr<osg::Node> node;
+  static uint32_t numCommsLights;
+  osg::ref_ptr<osg::LightSource> greenLightSource, redLightSource;
+  osg::ref_ptr<osg::Material> greenLightMaterial, redLightMaterial;
+  uint32_t redLightNum, greenLightNum;
+};
 
 class CommsDevice_Config : public SimulatedDeviceConfig {
 
@@ -29,6 +52,7 @@ public:
   ros::NodeHandle node;
   std::string targetTfId, tfId;
   bool render;
+  std::shared_ptr<CommsLights> commsLeds;
 
   CommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
               SimulatedIAUV *auv);

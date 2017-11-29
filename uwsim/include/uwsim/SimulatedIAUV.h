@@ -42,6 +42,7 @@ public:
   std::vector<DVLSensor> dvl_sensors;
   std::vector<MultibeamSensor> multibeam_sensors;
   boost::shared_ptr<SimulatedDevices> devices;
+  osg::ref_ptr<osg::Group> root;
 
   typedef enum
   {
