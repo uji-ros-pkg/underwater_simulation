@@ -14,6 +14,7 @@
 #include <uwsim/SimulatorConfig.h>
 #include <osgDB/FileUtils>
 #include <ros/package.h>
+#include <uwsim/LedArray.h>
 
 void ConfigFile::esPi(string in, double &param)
 {
@@ -1064,6 +1065,23 @@ void ConfigFile::processCustomCommsChannel(const xmlpp::Node* node, CustomCommsC
   }
 }
 
+void ConfigFile::processLedArray(const xmlpp::Node* node, LedArrayConfig & ledArrayConfig)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "name")
+      extractStringChar(child, ledArrayConfig.name);
+    else if (child->get_name() == "relativeTo")
+      extractStringChar(child, ledArrayConfig.relativeTo);
+    else if (child->get_name() == "position")
+      extractPositionOrColor(child, ledArrayConfig.position);
+    else if (child->get_name() == "orientation")
+      extractOrientation(child, ledArrayConfig.orientation);
+  }
+}
+
 void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1167,6 +1185,13 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
       }
       processMultibeamSensor(child, aux);
       vehicle.multibeam_sensors.push_back(aux);
+    }
+    else if (child->get_name() == "LedArray")
+    {
+        LedArrayConfig ledArrayConfig;
+        processLedArray(child, ledArrayConfig);
+        ledArrayConfig.enabled = true;
+        vehicle.ledArrayConfig = ledArrayConfig;
     }
     else
     {

@@ -291,6 +291,25 @@ struct Material
   double r, g, b, a;
 };
 
+struct LedArrayConfig
+{
+  string name, relativeTo;
+  double position[3];
+  double orientation[3];
+  bool enabled;
+
+  LedArrayConfig()
+  {
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+    enabled = false;
+  }
+};
+
 struct Vehicle
 {
   string name;
@@ -315,6 +334,7 @@ struct Vehicle
   std::list<XMLMultibeamSensor> multibeam_sensors;
   std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
   std::string URDFFile;
+  LedArrayConfig ledArrayConfig;
 };
 
 struct PhysicProperties
@@ -426,6 +446,7 @@ struct AcousticCommsChannelConfig
   }
 };
 
+
 class ConfigFile
 {
 public:
@@ -477,6 +498,7 @@ public:
   //Comms related methods
   void processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel);
   void processAcousticCommsChannel(const xmlpp::Node* node, AcousticCommsChannelConfig &channel);
+  void processLedArray(const xmlpp::Node* node, LedArrayConfig & ledArrayConfig);
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,

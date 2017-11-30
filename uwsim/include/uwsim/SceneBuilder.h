@@ -23,6 +23,7 @@
 #include "ConfigXMLParser.h"
 #include <uwsim/CustomCommsChannel.h>
 #include <uwsim/AcousticCommsChannel.h>
+#include <uwsim/LedArray.h>
 
 class SceneBuilder
 {
@@ -40,6 +41,7 @@ public:
   std::vector<osg::ref_ptr<osgWidget::Window> > camWidgets;
   std::vector<boost::shared_ptr<uwsim::CustomCommsChannel>> customCommsChannels;
   std::vector<boost::shared_ptr<uwsim::AcousticCommsChannel>> acousticCommsChannels;
+  std::vector<std::shared_ptr<uwsim::LedArray>> ledArrays;
 
 public:
   SceneBuilder();

@@ -111,6 +111,7 @@ src/PhysicsBuilder.cpp
 src/ROSSceneBuilder.cpp
 src/CustomCommsChannel.cpp
 src/AcousticCommsChannel.cpp
+src/LedArray.cpp
 )
 
 add_library(uwsim_plugins_simdev 

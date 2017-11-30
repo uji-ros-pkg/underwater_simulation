@@ -24,12 +24,12 @@
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/VirtualRangeSensor.h>
 #include <uwsim/osgOceanScene.h>
-
 #include <osg/Geometry>
 #include <osg/Material>
 #include <osg/ShapeDrawable>
 #include <thread>
 #include <chrono>
+
 using namespace std;
 
 SceneBuilder::SceneBuilder() {
@@ -206,6 +206,37 @@ bool SceneBuilder::loadScene(ConfigFile config) {
     }
 
     slsProjectors += vehicle.sls_projectors.size();
+
+    //Add other complements to the vehicle (LedArray, etc.)
+    if(vehicle.ledArrayConfig.enabled)
+    {
+      osg::ref_ptr<osg::Transform> vMl =
+          (osg::Transform *)new osg::PositionAttitudeTransform;
+      vMl->asPositionAttitudeTransform()->setPosition(osg::Vec3d(
+          vehicle.ledArrayConfig.position[0], vehicle.ledArrayConfig.position[1], vehicle.ledArrayConfig.position[2]));
+
+      int target = -1;
+      for (int j = 0; j < siauv->urdf->link.size(); j++) {
+        if (siauv->urdf->link[j]->getName() == vehicle.ledArrayConfig.relativeTo) {
+          target = j;
+          ROS_INFO("LedArray: found target on vehicle");
+        }
+      }
+      if(target != -1)
+      {
+        siauv->urdf->link[target]
+            ->getParent(0)
+            ->getParent(0)
+            ->asGroup()
+            ->addChild(vMl);
+        std::shared_ptr<uwsim::LedArray> ledArray = std::shared_ptr<uwsim::LedArray>(new uwsim::LedArray(root));
+        ledArrays.push_back(ledArray);
+        vMl->addChild(ledArray->GetOSGNode().get());
+        ledArray->StartAnimationTest();
+        ROS_INFO("LedArray: attached to vehicle");
+      }
+    }
+
   }
 
   // Enable or disable sls shader computation

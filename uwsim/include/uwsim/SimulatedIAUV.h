@@ -25,6 +25,7 @@
 #include "GPSSensor.h"
 #include "DVLSensor.h"
 #include "MultibeamSensor.h"
+#include <uwsim/LedArray.h>
 
 class SceneBuilder;
 
@@ -43,6 +44,7 @@ public:
   std::vector<MultibeamSensor> multibeam_sensors;
   boost::shared_ptr<SimulatedDevices> devices;
   osg::ref_ptr<osg::Group> root;
+  std::shared_ptr<uwsim::LedArray> ledArray;
 
   typedef enum
   {

@@ -4,7 +4,7 @@
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
 <!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsFrequency?,physicsSubSteps?, physicsSolver?,showTrajectory*,lightRate?)>
-<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*, DredgeTool*, CustomCommsDevice*, AcousticCommsDevice*)>
+<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*, DredgeTool*, CustomCommsDevice*, AcousticCommsDevice*, LedArray?)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?,fovy?, parameters?, showpath?,grayscale?,std?)>
 <!ELEMENT virtualRangeImage (name,relativeTo,resw?,resh?,position?,orientation?,frameId?,fovy?,parameters?)>
 <!ELEMENT structuredLightProjector (name,relativeTo,fov,image_name,laser?,position?,orientation?)>
@@ -218,6 +218,8 @@ echoROS?
 <!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, maxBitRate, bitrate, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
 <!ELEMENT CustomCommsChannel (id,propTimeIncPerMeter?,minPropTime?)>
 <!ELEMENT CustomCommsDevice (dccommsId, channelId, relativeTo, mac, maxBitRate, bitrate, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
-
-
 <!-- *Comms* items end-->
+
+<!-- Utils -->
+<!ELEMENT LedArray (name, relativeTo, position, orientation)>
+<!-- Utils end -->
