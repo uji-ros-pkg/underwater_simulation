@@ -7,6 +7,7 @@ add_message_files(
   FILES
   DVL.msg
   Pressure.msg
+  LedLight.msg
 )
 
 add_service_files(

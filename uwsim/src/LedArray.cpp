@@ -12,7 +12,7 @@ using namespace osg;
 namespace uwsim {
 uint32_t LedArray::numLedLights = 0;
 
-LedArray::LedArray(osg::ref_ptr<osg::Group> root) {
+LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config) {
   sceneRoot = root;
   float ledRadio = 0.02;
   osg::Geode *redLightGeode = new osg::Geode();
@@ -50,7 +50,7 @@ LedArray::LedArray(osg::ref_ptr<osg::Group> root) {
   redLightSource->getLight()->setQuadraticAttenuation(0.1);
   uint32_t numLight = GL_LIGHT0 + numLedLights % 8; // maximum: 8 lights!
   redLightNum = numLight;
-  sceneRoot->getOrCreateStateSet()->setMode(numLight, osg::StateAttribute::ON);
+  sceneRoot->getOrCreateStateSet()->setMode(numLight, osg::StateAttribute::OFF);
 
   numLedLights++;
 
@@ -62,7 +62,7 @@ LedArray::LedArray(osg::ref_ptr<osg::Group> root) {
   greenLightSource->getLight()->setQuadraticAttenuation(0.1);
   numLight = GL_LIGHT0 + numLedLights % 8; // maximum: 8 lights!
   greenLightNum = numLight;
-  sceneRoot->getOrCreateStateSet()->setMode(numLight, osg::StateAttribute::ON);
+  sceneRoot->getOrCreateStateSet()->setMode(numLight, osg::StateAttribute::OFF);
 
   // Add to scene graph
   vMRedLight = (osg::Transform *)new osg::PositionAttitudeTransform();
@@ -81,6 +81,12 @@ LedArray::LedArray(osg::ref_ptr<osg::Group> root) {
   node = new osg::Group();
   node->asGroup()->addChild(vMRedLight.get());
   node->asGroup()->addChild(vMGreenLight.get());
+
+  redStateOn = false;
+  greenStateOn = false;
+
+  this->config = config;
+  InitROSInterface();
 }
 
 void LedArray::UpdateLetState(ledType type, bool on) {
@@ -92,11 +98,13 @@ void LedArray::UpdateLetState(ledType type, bool on) {
     num = redLightNum;
     material = redLightMaterial;
     color = osg::Vec4(1.0, 0.0, 0.0, 1.0);
+    redStateOn = on;
     break;
   case GREEN_LED:
     num = greenLightNum;
     material = greenLightMaterial;
     color = osg::Vec4(0.0, 1.0, 0.0, 1.0);
+    greenStateOn = on;
     break;
   }
   if (on) {
@@ -108,8 +116,56 @@ void LedArray::UpdateLetState(ledType type, bool on) {
   }
 }
 
+void LedArray::HandleNewLedState(underwater_sensor_msgs::LedLightConstPtr msg,
+                                 ledType type) {
+  ros::Time offTime = ros::Time::now() + msg->duration;
+  //actionsMutex.lock();
+  switch (type) {
+  case RED_LED:
+    redAction.offTime = offTime;
+    break;
+  case GREEN_LED:
+    greenAction.offTime = offTime;
+    break;
+  }
+  // actionsCond.notify_one();
+  //actionsMutex.unlock();
+}
+
+void LedArray::CheckAndUpdateLed(const ros::Time & now, ledType type, bool on,
+                                 const Action &action) {
+  if (on) {
+    if (action.offTime <= now) {
+      UpdateLetState(type, false);
+    }
+  } else if (action.offTime > now) {
+    UpdateLetState(type, true);
+  }
+}
+void LedArray::InitROSInterface() {
+  ros::NodeHandle nh(config.name);
+  redLedSubscriber = nh.subscribe<underwater_sensor_msgs::LedLight>(
+      "red", 1,
+      boost::bind(&LedArray::HandleNewLedState, this, _1, ledType::RED_LED));
+  greenLedSubscriber = nh.subscribe<underwater_sensor_msgs::LedLight>(
+      "green", 1,
+      boost::bind(&LedArray::HandleNewLedState, this, _1, ledType::GREEN_LED));
+
+  std::thread rosWorker([this]() {
+    ros::Rate rate(20);
+    while (1) {
+      ros::Time now = ros::Time::now();
+      CheckAndUpdateLed(now, RED_LED, redStateOn, redAction);
+      CheckAndUpdateLed(now, GREEN_LED, greenStateOn, greenAction);
+      ros::spinOnce();
+      rate.sleep();
+    }
+  });
+  rosWorker.detach();
+}
+
 void LedArray::StartAnimationTest() {
-  std::thread redLightWorker([this]() {
+  testWorker = std::thread([this]() {
     while (1) {
       std::this_thread::sleep_for(chrono::milliseconds(700));
       UpdateLetState(RED_LED, true);
@@ -119,21 +175,8 @@ void LedArray::StartAnimationTest() {
       UpdateLetState(GREEN_LED, true);
     }
   });
-  redLightWorker.detach();
+  testWorker.detach();
 }
 
 osg::ref_ptr<osg::Node> LedArray::GetOSGNode() { return node.get(); }
 }
-// osg::ref_ptr<osg::Transform> vMl =
-//    (osg::Transform *)new osg::PositionAttitudeTransform;
-// vMl->asPositionAttitudeTransform()->setPosition(osg::Vec3d(
-//    cfg->position[0], cfg->position[1], cfg->position[2]));
-// auv->urdf->link[target]
-//    ->getParent(0)
-//    ->getParent(0)
-//    ->asGroup()
-//    ->addChild(vMl);
-// dev->commsLeds =
-//    std::shared_ptr<CommsLights>(new CommsLights(auv->root));
-// vMl->addChild(dev->commsLeds->GetOSGNode().get());
-// dev->commsLeds->StartAnimationTest();

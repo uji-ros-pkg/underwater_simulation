@@ -229,10 +229,10 @@ bool SceneBuilder::loadScene(ConfigFile config) {
             ->getParent(0)
             ->asGroup()
             ->addChild(vMl);
-        std::shared_ptr<uwsim::LedArray> ledArray = std::shared_ptr<uwsim::LedArray>(new uwsim::LedArray(root));
+        std::shared_ptr<uwsim::LedArray> ledArray = std::shared_ptr<uwsim::LedArray>(new uwsim::LedArray(root, vehicle.ledArrayConfig));
         ledArrays.push_back(ledArray);
         vMl->addChild(ledArray->GetOSGNode().get());
-        ledArray->StartAnimationTest();
+        //ledArray->StartAnimationTest();
         ROS_INFO("LedArray: attached to vehicle");
       }
     }
