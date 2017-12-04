@@ -297,6 +297,7 @@ struct LedArrayConfig
   double position[3];
   double orientation[3];
   bool enabled;
+  double radio, space;
 
   LedArrayConfig()
   {
@@ -307,6 +308,8 @@ struct LedArrayConfig
     orientation[1] = 0;
     orientation[2] = 0;
     enabled = false;
+    radio = 0.02;
+    space = 0.2;
   }
 };
 

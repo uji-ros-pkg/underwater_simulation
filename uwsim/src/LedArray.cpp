@@ -14,7 +14,8 @@ uint32_t LedArray::numLedLights = 0;
 
 LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config) {
   sceneRoot = root;
-  float ledRadio = 0.02;
+  double ledRadio = config.radio;
+  double offset = config.space / 2;
   osg::Geode *redLightGeode = new osg::Geode();
   redLightGeode->addDrawable(
       new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(), ledRadio)));
@@ -68,9 +69,9 @@ LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config) {
   vMRedLight = (osg::Transform *)new osg::PositionAttitudeTransform();
   vMGreenLight = (osg::Transform *)new osg::PositionAttitudeTransform();
 
-  vMRedLight->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0, 0.1, 0));
+  vMRedLight->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0, offset, 0));
   vMGreenLight->asPositionAttitudeTransform()->setPosition(
-      osg::Vec3d(0, -0.1, 0));
+      osg::Vec3d(0, -offset, 0));
 
   vMRedLight->addChild(redLightGeode);
   vMRedLight->addChild(redLightSource.get());

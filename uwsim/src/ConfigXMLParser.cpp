@@ -1079,6 +1079,10 @@ void ConfigFile::processLedArray(const xmlpp::Node* node, LedArrayConfig & ledAr
       extractPositionOrColor(child, ledArrayConfig.position);
     else if (child->get_name() == "orientation")
       extractOrientation(child, ledArrayConfig.orientation);
+    else if (child->get_name() == "radio")
+      extractFloatChar(child, ledArrayConfig.radio);
+    else if (child->get_name() == "space")
+      extractFloatChar(child, ledArrayConfig.space);
   }
 }
 

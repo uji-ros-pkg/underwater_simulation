@@ -212,8 +212,14 @@ bool SceneBuilder::loadScene(ConfigFile config) {
     {
       osg::ref_ptr<osg::Transform> vMl =
           (osg::Transform *)new osg::PositionAttitudeTransform;
+      auto scale = siauv->scale;
       vMl->asPositionAttitudeTransform()->setPosition(osg::Vec3d(
-          vehicle.ledArrayConfig.position[0], vehicle.ledArrayConfig.position[1], vehicle.ledArrayConfig.position[2]));
+          vehicle.ledArrayConfig.position[0]/scale[0], vehicle.ledArrayConfig.position[1]/scale[1], vehicle.ledArrayConfig.position[2]/scale[2]));
+      vMl->asPositionAttitudeTransform()->setScale (osg::Vec3d(
+           1/scale[0], 1/scale[1], 1/scale[2]));
+      vMl->asPositionAttitudeTransform()->setAttitude(osg::Quat(
+          vehicle.ledArrayConfig.orientation[0], osg::Vec3d(1, 0, 0), vehicle.ledArrayConfig.orientation[1],
+          osg::Vec3d(0, 1, 0), vehicle.ledArrayConfig.orientation[2], osg::Vec3d(0, 0, 1)));
 
       int target = -1;
       for (int j = 0; j < siauv->urdf->link.size(); j++) {

@@ -221,5 +221,7 @@ echoROS?
 <!-- *Comms* items end-->
 
 <!-- Utils -->
-<!ELEMENT LedArray (name, relativeTo, position, orientation)>
+<!ELEMENT radio (#PCDATA)>
+<!ELEMENT space (#PCDATA)>
+<!ELEMENT LedArray (name, relativeTo, position, orientation, radio?, space?)>
 <!-- Utils end -->
