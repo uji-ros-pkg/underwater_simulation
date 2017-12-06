@@ -32,9 +32,7 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
        ++iter) {
 
     const xmlpp::Node *child = dynamic_cast<const xmlpp::Node *>(*iter);
-    if (child->get_name() == "maxBitRate")
-      config->extractUIntChar(child, cfg->maxBitRate);
-    else if (child->get_name() == "intrinsicDelay")
+    if (child->get_name() == "intrinsicDelay")
       config->extractUIntChar(child, cfg->intrinsicDelay);
     else if (child->get_name() == "bitrate")
       config->extractFloatChar(child, cfg->bitrate);
@@ -56,7 +54,6 @@ bool CustomCommsDevice::_Add() {
   srv.request.frameId = this->config->tfId;
   srv.request.dccommsId = this->config->dccommsId;
   srv.request.mac = this->config->mac;
-  srv.request.maxBitRate = this->config->maxBitRate;
   srv.request.maxDistance = this->config->maxDistance;
   srv.request.minDistance = this->config->minDistance;
   srv.request.minPktErrorRate = this->config->minPktErrRatio;
