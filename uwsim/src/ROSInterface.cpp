@@ -1173,7 +1173,8 @@ void WorldToROSTF::publish()
 
           int multibeam=false;
           for(int k=0;k<scene->iauvFile[i].get()->multibeam_sensors.size();k++) //check if camera comes from multibeam
-	    if(scene->iauvFile[i].get()->multibeam_sensors[k].name==scene->iauvFile[i].get()->camview[j].name)
+	    if(scene->iauvFile[i].get()->multibeam_sensors[k].name==scene->iauvFile[i].get()->camview[j].name  ||
+                "ProfilingSonar" == scene->iauvFile[i]->devices->all[k].get()->name )
               multibeam=true;
               //OSGToTFconvention.setRotation(tf::Quaternion(tf::Vector3(0,1,0),M_PI/2));  //As we are using camera to simulate it, we need to rotate it
 

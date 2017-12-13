@@ -113,6 +113,7 @@ add_library(uwsim_plugins_simdev
 src/SimDev_Echo.cpp
 src/ForceSensor.cpp
 src/DredgeTool.cpp
+src/ProfilingSonar.cpp
 )
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 

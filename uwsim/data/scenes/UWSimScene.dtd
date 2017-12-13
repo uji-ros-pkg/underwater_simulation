@@ -15,9 +15,10 @@
 <!ELEMENT gpsSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT dvlSensor (name,relativeTo,position?,orientation?, std?)>
 <!ELEMENT multibeamSensor (name,relativeTo,visible?,position?,orientation?, initAngle,finalAngle, angleIncr,range)>
+
 <!ELEMENT camera (freeMotion?,objectToTrack?,fov?,aspectRatio?,near?,far?,position?,lookAt?) >
 <!ELEMENT object (name,file,position,orientation,scaleFactor?,offsetp?,offsetr?,physics?)>
-<!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (WorldToROSTF*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?, (RangeImageSensorToROSImage*)?,(multibeamSensorToLaserScan*)?, (SimulatedDeviceROS*)?,(contactSensorToROS*)?,(echoROS*)?,(ForceSensorROS*)?,(ROSPointCloudLoader*)?,(RangeCameraToPCL*)?) >
+<!ELEMENT rosInterfaces ((ROSOdomToPAT*)?, (PATToROSOdom*)?, (WorldToROSTF*)?, (ArmToROSJointState*)?, (ROSJointStateToArm*)?, (VirtualCameraToROSImage*)?, (ROSImageToHUD*)?,(ROSTwistToPAT*)?, (RangeSensorToROSRange*)?, (ROSPoseToPAT*)?, (ImuToROSImu*)?, (PressureSensorToROS*)?, (GPSSensorToROS*)?, (DVLSensorToROS*)?, (RangeImageSensorToROSImage*)?,(multibeamSensorToLaserScan*)?,(ProfilingSonarToLaserScan*)?, (SimulatedDeviceROS*)?,(contactSensorToROS*)?,(echoROS*)?,(ForceSensorROS*)?,(ROSPointCloudLoader*)?,(RangeCameraToPCL*)?,(ProfilingSonarROS*)?) >
 
 <!-- elementos comunes -->
 <!ELEMENT position (x,y,z)>
@@ -135,6 +136,7 @@
 <!ELEMENT GPSSensorToROS (name, topic, rate?)>
 <!ELEMENT DVLSensorToROS (name, topic, rate?)>
 <!ELEMENT multibeamSensorToLaserScan (name, topic, rate?)>
+<!ELEMENT ProfilingSonarToLaserScan (name, topic, rate?)>
 <!ELEMENT contactSensorToROS (name, topic, rate?)>
 <!ELEMENT ROSPointCloudLoader (topic)>
 <!ATTLIST ROSPointCloudLoader delLastPCD (true|false) #IMPLIED>
@@ -176,12 +178,14 @@
 
 
 <!-- simulatedDevices -->
-<!ELEMENT simulatedDevices (
-echo*
-)>
-<!ELEMENT SimulatedDeviceROS (
-echoROS?
-)>
+<!ELEMENT simulatedDevices ( echo*,
+			     ForceSensor*,
+			     DredgeTool*,
+			     ProfilingSonar*)>
+
+<!ELEMENT SimulatedDeviceROS ( echoROS?,
+			      ForceSensorROS?,
+			      ProfilingSonarROS?)>
 
 <!ELEMENT echo (name, info )>
 <!ELEMENT echoROS (name, topic, rate?)>
@@ -190,4 +194,7 @@ echoROS?
 <!ELEMENT ForceSensorROS (name, topic, rate?)>
 
 <!ELEMENT DredgeTool (name, target, offsetp, offsetr)>
+
+<!ELEMENT ProfilingSonar (name,relativeTo,visible?,position?,orientation?, initAngle,finalAngle, angleIncr,range,fov)>
+<!ELEMENT ProfilingSonarROS (name, topic, rate?)>
 

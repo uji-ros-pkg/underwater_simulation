@@ -21,4 +21,11 @@
   </description>
   </class>
 
+  <class name="ProfilingSonar_Factory" type="ProfilingSonar_Factory" 
+    base_class_type="uwsim::SimulatedDeviceFactory">
+  <description>
+  Profiling Sonar
+  </description>
+</class>
+
 </library>
