@@ -48,6 +48,7 @@ bool AcousticCommsDevice::_Add() {
   srv.request.frameId = this->config->tfId;
   srv.request.dccommsId = this->config->dccommsId;
   srv.request.mac = this->config->mac;
+  srv.request.maxTxFifoSize = this->config->txFifoSize;
 
   ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s",
            srv.request.dccommsId.c_str(), srv.request.frameId.c_str());

@@ -60,6 +60,7 @@ bool CustomCommsDevice::_Add() {
   srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
   srv.request.bitrate = this->config->bitrate;
   srv.request.bitrateSd = this->config->bitrateSd;
+  srv.request.maxTxFifoSize = this->config->txFifoSize;
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s",
            srv.request.dccommsId.c_str(), srv.request.frameId.c_str());

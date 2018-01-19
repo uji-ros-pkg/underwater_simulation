@@ -15,6 +15,7 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
                                               CommsDevice_Config *cfg) {
   xmlpp::Node::NodeList list = node->get_children();
 
+  cfg->txFifoSize = 500000;
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end();
        ++iter) {
 
@@ -37,6 +38,8 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->extractUIntChar(child, cfg->mac);
     else if (child->get_name() == "channelId")
       config->extractUIntChar(child, cfg->channelId);
+    else if (child->get_name() == "txFifoSize")
+      config->extractUIntChar(child, cfg->txFifoSize);
   }
 }
 
