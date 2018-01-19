@@ -44,6 +44,10 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractUIntChar(child, cfg->minDistance);
     else if (child->get_name() == "minPktErrRatio")
       config->extractFloatChar(child, cfg->minPktErrRatio);
+    else if (child->get_name() == "pktErrRatioIncPerMeter")
+      config->extractFloatChar(child, cfg->pktErrRatioIncPerMeter);
+
+
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
