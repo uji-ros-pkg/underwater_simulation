@@ -399,6 +399,8 @@ osg::Node* osgOceanScene::addObject(osg::Transform *transform, std::string filen
       std::string(UWSIM_ROOT_PATH) + std::string("/data/shaders"));
   osg::ref_ptr < osg::Node > object = osgDB::readNodeFile(filename);
 
+  object->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
   if (!object.valid())
   {
     OSG_FATAL << "Error: could not find: " << filename << std::endl;
