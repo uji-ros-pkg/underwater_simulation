@@ -196,6 +196,8 @@ echoROS?
 <!-- *Comms* items -->
 <!ELEMENT id (#PCDATA)>
 <!ELEMENT channelId (#PCDATA)>
+<!ELEMENT txChannelId (#PCDATA)>
+<!ELEMENT rxChannelId (#PCDATA)>
 <!ELEMENT propTimeIncPerMeter (#PCDATA)>
 <!ELEMENT minPropTime (#PCDATA)>
 <!ELEMENT tfId (#PCDATA)>
@@ -218,7 +220,7 @@ echoROS?
 <!ELEMENT AcousticCommsChannel (id)>
 <!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
 <!ELEMENT CustomCommsChannel (id,propTimeIncPerMeter?,minPropTime?)>
-<!ELEMENT CustomCommsDevice (dccommsId, channelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
+<!ELEMENT CustomCommsDevice (dccommsId, txChannelId, rxChannelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?)>
 <!-- *Comms* items end-->
 
 <!-- Utils -->

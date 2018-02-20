@@ -4,7 +4,7 @@
 #include <thread>
 #include <uwsim/CustomCommsDevice.h>
 #include <uwsim/SimulatedIAUV.h>
-
+#include <dccomms_ros_msgs/types.h>
 /* You will need to add your code HERE */
 #include <tf/transform_broadcaster.h>
 #include <thread>
@@ -46,6 +46,10 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractFloatChar(child, cfg->minPktErrRatio);
     else if (child->get_name() == "pktErrRatioIncPerMeter")
       config->extractFloatChar(child, cfg->pktErrRatioIncPerMeter);
+    else if (child->get_name() == "txChannelId")
+      config->extractUIntChar(child, cfg->txChannelId);
+    else if (child->get_name() == "rxChannelId")
+      config->extractUIntChar(child, cfg->rxChannelId);
 
 
   }
@@ -75,15 +79,28 @@ bool CustomCommsDevice::_Add() {
     ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
   }
 
-  // link dev to channel
+  // link dev to tx channel
   dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
   ldchSrv.request.dccommsId = this->config->dccommsId;
-  ldchSrv.request.channelId = this->config->channelId;
+  ldchSrv.request.channelId = this->config->txChannelId;
+  ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_TX;
   if (!_linkToChannelService.call(ldchSrv)) {
-    ROS_ERROR("fail linking dev to channel");
+    ROS_ERROR("fail linking dev to tx channel");
     return false;
   } else {
-    ROS_INFO("comms dev linked to channel");
+    ROS_INFO("comms dev linked to tx channel");
+    return true;
+  }
+
+  // link dev to rx channel
+  ldchSrv.request.dccommsId = this->config->dccommsId;
+  ldchSrv.request.channelId = this->config->rxChannelId;
+  ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_RX;
+  if (!_linkToChannelService.call(ldchSrv)) {
+    ROS_ERROR("fail linking dev to rx channel");
+    return false;
+  } else {
+    ROS_INFO("comms dev linked to rx channel");
     return true;
   }
 }
