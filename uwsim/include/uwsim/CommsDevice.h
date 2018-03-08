@@ -23,7 +23,7 @@ public:
   CommsDevice_Config(std::string type_) : SimulatedDeviceConfig(type_) {}
 };
 
-class CommsDevice : public SimulatedDevice {
+class UWSimCommsDevice : public SimulatedDevice {
 public:
   osg::Node *parent;
   SimulatedIAUV *auv;
@@ -32,18 +32,18 @@ public:
   std::string targetTfId, tfId;
   bool render;
 
-  CommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
+  UWSimCommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
               SimulatedIAUV *auv);
 
   void Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
             SimulatedIAUV *auv);
 
-  void Start();
+  void AddToNetSim();
   virtual CommsDevice_Config *GetConfig() = 0;
   virtual void SetConfig(CommsDevice_Config *cfg) = 0;
 
 protected:
-  virtual bool _Add() = 0;
+  virtual bool _AddToNetSim() = 0;
 
 private:
   ros::ServiceClient _checkService, _rmService;
@@ -57,7 +57,7 @@ public:
   // this is the only place the device/interface type is set
   CommsDevice_Factory(std::string type_ = "CommsDevice")
       : SimulatedDeviceFactory(type_){};
-  virtual CommsDevice *Create(CommsDevice_Config *cfg,
+  virtual UWSimCommsDevice *Create(CommsDevice_Config *cfg,
                               osg::ref_ptr<osg::Node> target,
                               SimulatedIAUV *auv) = 0;
 
@@ -76,10 +76,10 @@ public:
 
 class CommsDevice_ROSPublisher : public ROSPublisherInterface {
 public:
-  CommsDevice_ROSPublisher(CommsDevice *dev, std::string topic, int rate)
+  CommsDevice_ROSPublisher(UWSimCommsDevice *dev, std::string topic, int rate)
       : ROSPublisherInterface(topic, rate), dev(dev) {}
 
-  CommsDevice *dev;
+  UWSimCommsDevice *dev;
   virtual void createPublisher(ros::NodeHandle &nh);
   virtual void publish();
 

@@ -7,46 +7,16 @@ namespace uwsim {
 
 CustomCommsChannel::CustomCommsChannel(CustomCommsChannelConfig cfg) {
   config = cfg;
-  _addChannelService = _nh.serviceClient<dccomms_ros_msgs::AddCustomChannel>(
-      "/dccomms_netsim/add_custom_channel");
-  _checkChannelService = _nh.serviceClient<dccomms_ros_msgs::CheckChannel>(
-      "/dccomms_netsim/check_channel");
-  std::thread worker(&CustomCommsChannel::_Work, this);
-  worker.detach();
+  _AddToNetSim();
 }
 
-bool CustomCommsChannel::_Check() {
-  bool res = true;
-  dccomms_ros_msgs::CheckChannel srv;
+bool CustomCommsChannel::_AddToNetSim() {
+  dccomms_ros_msgs::AddCustomChannelRequest srv;
+  srv.id = config.id;
+  srv.minPrTime = config.minPropTime;
+  srv.prTimeIncPerMeter = config.propTimeIncPerMeter;
 
-  srv.request.id = config.id;
-
-  if (!_checkChannelService.call(srv)) {
-    res = false;
-  }
-
-  return res && srv.response.exists;
-}
-
-void CustomCommsChannel::_Work() {
-  while (!_Check()) {
-    _Add();
-    std::this_thread::sleep_for(std::chrono::seconds(4));
-  }
-}
-
-bool CustomCommsChannel::_Add() {
-  dccomms_ros_msgs::AddCustomChannel srv;
-  srv.request.id = config.id;
-  srv.request.minPrTime = config.minPropTime;
-  srv.request.prTimeIncPerMeter = config.propTimeIncPerMeter;
-
-  if (!_addChannelService.call(srv)) {
-    ROS_ERROR("fail adding channel '%d'", srv.request.id);
-    return false;
-  } else {
-    ROS_INFO("CustomCommsChannel: '%d' added", srv.request.id);
-    return true;
-  }
+  auto netsim = NetSim::GetSim();
+  netsim->AddCustomChannel(srv);
 }
 }

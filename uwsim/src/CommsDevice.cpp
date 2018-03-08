@@ -87,7 +87,7 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
               ->addChild(vMd);
 
           auto dev = Create(cfg, auv->urdf->link[target], auv);
-          auv->devices->all.push_back(CommsDevice::Ptr(dev));
+          auv->devices->all.push_back(UWSimCommsDevice::Ptr(dev));
 
           if (dev->render) {
             try {
@@ -113,7 +113,7 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
           }
 
           ROS_INFO("CommsDevice: added successfully");
-          dev->Start();
+          dev->AddToNetSim();
         }
       } else
         OSG_FATAL << "CommsDevice device '"
@@ -135,7 +135,7 @@ std::vector<boost::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
           iauvFile[i]->devices->all[d]->name == rosInterface.targetName) {
         ifaces.push_back(
             boost::shared_ptr<ROSInterface>(new CommsDevice_ROSPublisher(
-                dynamic_cast<CommsDevice *>(iauvFile[i]->devices->all[d].get()),
+                dynamic_cast<UWSimCommsDevice *>(iauvFile[i]->devices->all[d].get()),
                 rosInterface.topic, rosInterface.rate)));
       }
   if (ifaces.size() == 0)
@@ -144,48 +144,14 @@ std::vector<boost::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
   return ifaces;
 }
 
-bool CommsDevice::_Check() {
-  bool res = true;
-  dccomms_ros_msgs::CheckDevice srv;
 
-  srv.request.iddev = this->GetConfig()->dccommsId;
+void UWSimCommsDevice::AddToNetSim() { _AddToNetSim(); }
 
-  if (!_checkService.call(srv)) {
-    res = false;
-  }
-
-  return res && srv.response.exists;
-}
-
-bool CommsDevice::_Remove() {
-  bool res = true;
-  dccomms_ros_msgs::RemoveDevice srv;
-
-  srv.request.iddev = this->GetConfig()->dccommsId;
-
-  if (!_rmService.call(srv)) {
-    res = false;
-  }
-
-  return res && srv.response.removed;
-}
-
-void CommsDevice::Start() {
-  auto netSimInterfaceWork = [this](void) {
-    while (!_Check()) {
-      _Add();
-      std::this_thread::sleep_for(std::chrono::seconds(4));
-    }
-  };
-  std::thread starter(netSimInterfaceWork);
-  starter.detach();
-}
-
-CommsDevice::CommsDevice(CommsDevice_Config *cfg,
+UWSimCommsDevice::UWSimCommsDevice(CommsDevice_Config *cfg,
                          osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv)
     : SimulatedDevice(cfg) {}
 
-void CommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
+void UWSimCommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
                        SimulatedIAUV *auv) {
   if (cfg->tfId.length() == 0) {
     tfId = std::string(auv->name) + "/" + cfg->name;
@@ -206,11 +172,6 @@ void CommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
            tfId.c_str());
 
   render = cfg->mesh.path.length() != 0;
-
-  _rmService = this->node.serviceClient<dccomms_ros_msgs::RemoveDevice>(
-      "/dccomms_netsim/remove_net_device");
-  _checkService = this->node.serviceClient<dccomms_ros_msgs::CheckDevice>(
-      "/dccomms_netsim/check_net_device");
 
   this->parent = target;
   this->auv = auv;

@@ -27,19 +27,19 @@ public:
   CustomCommsDevice_Config(std::string type_) : CommsDevice_Config(type_) {}
 };
 
-class CustomCommsDevice : public CommsDevice {
+class CustomCommsDevice : public UWSimCommsDevice {
 public:
   CustomCommsDevice_Config *config;
   CustomCommsDevice(CustomCommsDevice_Config *cfg,
                     osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
-  void Start();
+  void AddToNetSim();
   static uint32_t nDevsReady;
   static uint32_t nDevs;
   void SetConfig(CommsDevice_Config *cfg);
   CommsDevice_Config *GetConfig();
 
 protected:
-  bool _Add();
+  bool _AddToNetSim();
 
 private:
   ros::ServiceClient _addService, _linkToChannelService;
@@ -51,7 +51,7 @@ public:
   // this is the only place the device/interface type is set
   CustomCommsDevice_Factory(std::string type_ = "CustomCommsDevice")
       : CommsDevice_Factory(type_){};
-  CommsDevice *Create(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
+  UWSimCommsDevice *Create(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
                       SimulatedIAUV *auv);
   SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node *node,
                                            ConfigFile *config);

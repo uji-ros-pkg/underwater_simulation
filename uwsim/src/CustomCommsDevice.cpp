@@ -1,10 +1,10 @@
+#include <dccomms_ros_msgs/types.h>
 #include <osg/Node>
 #include <osg/PositionAttitudeTransform>
 #include <pluginlib/class_list_macros.h>
 #include <thread>
 #include <uwsim/CustomCommsDevice.h>
 #include <uwsim/SimulatedIAUV.h>
-#include <dccomms_ros_msgs/types.h>
 /* You will need to add your code HERE */
 #include <tf/transform_broadcaster.h>
 #include <thread>
@@ -50,56 +50,50 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractUIntChar(child, cfg->txChannelId);
     else if (child->get_name() == "rxChannelId")
       config->extractUIntChar(child, cfg->rxChannelId);
-
-
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
 
-bool CustomCommsDevice::_Add() {
-  dccomms_ros_msgs::AddCustomDevice srv;
+bool CustomCommsDevice::_AddToNetSim() {
+  auto netsim = NetSim::GetSim();
 
-  srv.request.frameId = this->config->tfId;
-  srv.request.dccommsId = this->config->dccommsId;
-  srv.request.mac = this->config->mac;
-  srv.request.maxDistance = this->config->maxDistance;
-  srv.request.minDistance = this->config->minDistance;
-  srv.request.minPktErrorRate = this->config->minPktErrRatio;
-  srv.request.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
-  srv.request.bitrate = this->config->bitrate;
-  srv.request.bitrateSd = this->config->bitrateSd;
-  srv.request.maxTxFifoSize = this->config->txFifoSize;
+  dccomms_ros_msgs::AddCustomDeviceRequest srv;
+
+  srv.frameId = this->config->tfId;
+  srv.dccommsId = this->config->dccommsId;
+  srv.mac = this->config->mac;
+  srv.maxDistance = this->config->maxDistance;
+  srv.minDistance = this->config->minDistance;
+  srv.minPktErrorRate = this->config->minPktErrRatio;
+  srv.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
+  srv.bitrate = this->config->bitrate;
+  srv.bitrateSd = this->config->bitrateSd;
+  srv.maxTxFifoSize = this->config->txFifoSize;
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s",
-           srv.request.dccommsId.c_str(), srv.request.frameId.c_str());
-  while (!_addService.call(srv)) {
-    ROS_ERROR("fail adding '%s'", srv.request.dccommsId.c_str());
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  }
-  ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
+           srv.dccommsId.c_str(), srv.frameId.c_str());
 
+  netsim->AddCustomDevice(srv);
+
+  ROS_INFO("CustomCommsDevice '%s' added", srv.dccommsId.c_str());
 
   // link dev to tx channel
-  dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
-  ldchSrv.request.dccommsId = this->config->dccommsId;
-  ldchSrv.request.channelId = this->config->txChannelId;
-  ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_TX;
-  while (!_linkToChannelService.call(ldchSrv)) {
-    ROS_ERROR("fail linking dev to tx channel");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  }
+  dccomms_ros_msgs::LinkDeviceToChannelRequest ldchSrv;
+  ldchSrv.dccommsId = this->config->dccommsId;
+  ldchSrv.channelId = this->config->txChannelId;
+  ldchSrv.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_TX;
+
+  netsim->LinkDevToChannel(ldchSrv);
+
   ROS_INFO("comms dev linked to tx channel");
 
-
   // link dev to rx channel
-  ldchSrv.request.dccommsId = this->config->dccommsId;
-  ldchSrv.request.channelId = this->config->rxChannelId;
-  ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_RX;
-  while (!_linkToChannelService.call(ldchSrv)) {
-    ROS_ERROR("fail linking dev to rx channel");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  }
-  ROS_INFO("comms dev linked to rx channel");
+  ldchSrv.dccommsId = this->config->dccommsId;
+  ldchSrv.channelId = this->config->rxChannelId;
+  ldchSrv.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_RX;
+
+  netsim->LinkDevToChannel(ldchSrv);
+
   return true;
 }
 void CustomCommsDevice::SetConfig(CommsDevice_Config *cfg) {
@@ -111,22 +105,16 @@ CommsDevice_Config *CustomCommsDevice::GetConfig() { return config; }
 CustomCommsDevice::CustomCommsDevice(CustomCommsDevice_Config *cfg,
                                      osg::ref_ptr<osg::Node> target,
                                      SimulatedIAUV *auv)
-    : CommsDevice(cfg, target, auv) {
+    : UWSimCommsDevice(cfg, target, auv) {
   Init(cfg, target, auv);
-  _addService = this->node.serviceClient<dccomms_ros_msgs::AddCustomDevice>(
-      "/dccomms_netsim/add_custom_net_device");
-  _linkToChannelService =
-      this->node.serviceClient<dccomms_ros_msgs::LinkDeviceToChannel>(
-          "/dccomms_netsim/link_dev_to_channel");
 }
 
-CommsDevice *CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
+UWSimCommsDevice *CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
                                                osg::ref_ptr<osg::Node> target,
                                                SimulatedIAUV *auv) {
   CustomCommsDevice_Config *config =
       dynamic_cast<CustomCommsDevice_Config *>(cfg);
   return new CustomCommsDevice(config, target, auv);
 }
-
 
 PLUGINLIB_EXPORT_CLASS(CustomCommsDevice_Factory, uwsim::SimulatedDeviceFactory)
