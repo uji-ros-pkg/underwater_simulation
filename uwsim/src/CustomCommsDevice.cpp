@@ -72,37 +72,35 @@ bool CustomCommsDevice::_Add() {
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s",
            srv.request.dccommsId.c_str(), srv.request.frameId.c_str());
-  if (!_addService.call(srv)) {
+  while (!_addService.call(srv)) {
     ROS_ERROR("fail adding '%s'", srv.request.dccommsId.c_str());
-    return false;
-  } else {
-    ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+  ROS_INFO("CustomCommsDevice '%s' added", srv.request.dccommsId.c_str());
+
 
   // link dev to tx channel
   dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
   ldchSrv.request.dccommsId = this->config->dccommsId;
   ldchSrv.request.channelId = this->config->txChannelId;
   ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_TX;
-  if (!_linkToChannelService.call(ldchSrv)) {
+  while (!_linkToChannelService.call(ldchSrv)) {
     ROS_ERROR("fail linking dev to tx channel");
-    return false;
-  } else {
-    ROS_INFO("comms dev linked to tx channel");
-    return true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+  ROS_INFO("comms dev linked to tx channel");
+
 
   // link dev to rx channel
   ldchSrv.request.dccommsId = this->config->dccommsId;
   ldchSrv.request.channelId = this->config->rxChannelId;
   ldchSrv.request.linkType = dccomms_ros::CHANNEL_LINK_TYPE::CHANNEL_RX;
-  if (!_linkToChannelService.call(ldchSrv)) {
+  while (!_linkToChannelService.call(ldchSrv)) {
     ROS_ERROR("fail linking dev to rx channel");
-    return false;
-  } else {
-    ROS_INFO("comms dev linked to rx channel");
-    return true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+  ROS_INFO("comms dev linked to rx channel");
+  return true;
 }
 void CustomCommsDevice::SetConfig(CommsDevice_Config *cfg) {
   config = dynamic_cast<CustomCommsDevice_Config *>(cfg);

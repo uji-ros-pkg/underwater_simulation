@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   xacro
   dccomms_ros_msgs
+  dccomms_ros
 )
 
 find_package(Boost REQUIRED thread program_options system filesystem)
@@ -53,6 +54,7 @@ catkin_package(
     underwater_sensor_msgs
     urdf
     dccomms_ros_msgs
+    dccomms_ros
   DEPENDS
     Boost
     BULLET
@@ -112,6 +114,7 @@ src/ROSSceneBuilder.cpp
 src/CustomCommsChannel.cpp
 src/AcousticCommsChannel.cpp
 src/LedArray.cpp
+src/NetSim.cpp
 )
 
 add_library(uwsim_plugins_simdev 

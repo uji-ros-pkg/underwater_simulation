@@ -52,24 +52,21 @@ bool AcousticCommsDevice::_Add() {
 
   ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s",
            srv.request.dccommsId.c_str(), srv.request.frameId.c_str());
-  if (!_addService.call(srv)) {
+  while (!_addService.call(srv)) {
     ROS_ERROR("fail adding '%s'", srv.request.dccommsId.c_str());
-    return false;
-  } else {
-    ROS_INFO("AcousticCommsDevice '%s' added", srv.request.dccommsId.c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+  ROS_INFO("AcousticCommsDevice '%s' added", srv.request.dccommsId.c_str());
 
   // link dev to channel
   dccomms_ros_msgs::LinkDeviceToChannel ldchSrv;
   ldchSrv.request.dccommsId = this->config->dccommsId;
   ldchSrv.request.channelId = this->config->channelId;
-  if (!_linkToChannelService.call(ldchSrv)) {
+  while (!_linkToChannelService.call(ldchSrv)) {
     ROS_ERROR("fail linking dev to channel");
-    return false;
-  } else {
-    ROS_INFO("comms dev linked to channel");
-    return true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+  ROS_INFO("comms dev linked to channel");
 }
 void AcousticCommsDevice::SetConfig(CommsDevice_Config *cfg) {
   config = dynamic_cast<AcousticCommsDevice_Config *>(cfg);
