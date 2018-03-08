@@ -40,6 +40,10 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->extractUIntChar(child, cfg->channelId);
     else if (child->get_name() == "txFifoSize")
       config->extractUIntChar(child, cfg->txFifoSize);
+    else if (child->get_name() == "txPacketBuilder")
+      config->processPacketBuilderConfig(child, cfg->txPacketBuilderConfig);
+    else if (child->get_name() == "rxPacketBuilder")
+      config->processPacketBuilderConfig(child, cfg->rxPacketBuilderConfig);
   }
 }
 

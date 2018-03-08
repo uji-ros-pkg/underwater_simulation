@@ -615,6 +615,14 @@ bool SceneBuilder::loadScene(ConfigFile config) {
     config.trajectories.pop_front();
   }
 
+  // NetSim Tracing
+  if(config.netTracingScriptConfig.className == "")
+    uwsim::NetSim::LoadDefaultTracingScript();
+  else
+  {
+      uwsim::NetSim::LoadTracingScript(config.netTracingScriptConfig.className,
+                                       config.netTracingScriptConfig.libPath);
+  }
   auto netsim = uwsim::NetSim::GetSim();
   if (netsim) {
     netsim->StartROSInterface();

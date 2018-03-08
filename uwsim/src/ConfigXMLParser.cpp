@@ -1086,6 +1086,32 @@ void ConfigFile::processLedArray(const xmlpp::Node* node, LedArrayConfig & ledAr
   }
 }
 
+void ConfigFile::processPacketBuilderConfig(const xmlpp::Node* node, PacketBuilderConfig & config)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "className")
+      extractStringChar(child, config.className);
+    else if (child->get_name() == "libPath")
+      extractStringChar(child, config.libPath);
+  }
+}
+
+void ConfigFile::processNetTracingScript(const xmlpp::Node* node, NetTracingScriptConfig & config)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "className")
+      extractStringChar(child, config.className);
+    else if (child->get_name() == "libPath")
+      extractStringChar(child, config.libPath);
+  }
+}
+
 void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1507,6 +1533,10 @@ void ConfigFile::processXML(const xmlpp::Node* node)
         processSimParams(child);
       else if (child->get_name() == "camera")
         processCamera(child);
+      else if (child->get_name() == "netTracingScript")
+      {
+        processNetTracingScript (child, netTracingScriptConfig);
+      }
       else if (child->get_name() == "CustomCommsChannel")
       {
         CustomCommsChannelConfig channel;

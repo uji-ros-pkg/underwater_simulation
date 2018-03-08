@@ -449,6 +449,20 @@ struct AcousticCommsChannelConfig
   }
 };
 
+struct NetTracingScriptConfig
+{
+  std::string className,
+  libPath;
+  NetTracingScriptConfig(): className(""), libPath(""){}
+};
+
+struct PacketBuilderConfig
+{
+  std::string className,
+  libPath;
+  PacketBuilderConfig(): className(""), libPath(""){}
+};
+
 
 class ConfigFile
 {
@@ -502,6 +516,8 @@ public:
   void processCustomCommsChannel(const xmlpp::Node* node, CustomCommsChannelConfig &channel);
   void processAcousticCommsChannel(const xmlpp::Node* node, AcousticCommsChannelConfig &channel);
   void processLedArray(const xmlpp::Node* node, LedArrayConfig & ledArrayConfig);
+  void processPacketBuilderConfig(const xmlpp::Node* node, PacketBuilderConfig & config);
+  void processNetTracingScript(const xmlpp::Node* node, NetTracingScriptConfig & config);
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
@@ -518,7 +534,7 @@ public:
   PhysicsConfig physicsConfig;
   list<CustomCommsChannelConfig> customCommsChannels;
   list<AcousticCommsChannelConfig> acousticCommsChannels;
-
+  NetTracingScriptConfig netTracingScriptConfig;
 
   ConfigFile(const std::string &fName);
 };

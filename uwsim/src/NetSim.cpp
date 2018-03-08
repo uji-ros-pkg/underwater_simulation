@@ -1,6 +1,3 @@
-#ifndef UWSIM_NETSIM_H
-#define UWSIM_NETSIM_H
-
 #include <class_loader/multi_library_class_loader.h>
 #include <uwsim/NetSim.h>
 namespace uwsim {
@@ -14,6 +11,30 @@ ns3::Ptr<ROSCommsSimulator> NetSim::GetSim() {
     ptr->SetDefaultPacketBuilder(pb);
   }
   return ptr;
+}
+
+void NetSim::LoadTracingScript(const std::string &className,
+                               const std::string &libPath) {
+  class_loader::ClassLoader loader(libPath);
+  //_loader.loadLibrary(libName);
+  std::vector<std::string> classes =
+      loader.getAvailableClasses<NetSimTracing>();
+  static std::shared_ptr<NetSimTracing> tracing;
+  for (unsigned int c = 0; c < classes.size(); ++c) {
+    if (classes[c] == className) {
+      NetSimTracing *tr =
+          loader.createUnmanagedInstance<NetSimTracing>(classes[c]);
+      tracing = std::shared_ptr<NetSimTracing>(tr);
+      tracing->Configure();
+      break;
+    }
+  }
+}
+
+void NetSim::LoadDefaultTracingScript() {
+
+  static std::shared_ptr<NetSimTracing> tracing(new NetSimTracing());
+  tracing->Configure();
 }
 
 NetSimTracing::NetSimTracing() {}
@@ -40,7 +61,7 @@ void NetSimTracing::Configure() {
   ROSCommsDevice::PacketTransmittingCallback txcb =
       [](std::string path, ROSCommsDevicePtr dev, PacketPtr pkt) {
         tracing->Info("{}: (ID: {} ; MAC: {}) Transmitting packet", path,
-                      dev->GetDccommsId());
+                      dev->GetDccommsId(), dev->GetMac());
       };
 
   ROSCommsDevice::PacketReceivedCallback rxcb = [](
@@ -57,4 +78,3 @@ void NetSimTracing::Configure() {
                        ns3::MakeCallback(rxcb));
 }
 }
-#endif

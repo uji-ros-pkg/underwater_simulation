@@ -17,6 +17,7 @@ class CommsDevice_Config : public SimulatedDeviceConfig {
 public:
   // XML members
   std::string relativeTo, tfId, relativeTfId, dccommsId;
+  PacketBuilderConfig txPacketBuilderConfig, rxPacketBuilderConfig;
   unsigned int mac, channelId, txFifoSize;
   double position[3]{0, 0, 0}, orientation[3]{0, 0, 0};
   Mesh mesh;
