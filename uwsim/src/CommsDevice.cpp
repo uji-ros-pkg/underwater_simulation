@@ -139,7 +139,8 @@ std::vector<boost::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
           iauvFile[i]->devices->all[d]->name == rosInterface.targetName) {
         ifaces.push_back(
             boost::shared_ptr<ROSInterface>(new CommsDevice_ROSPublisher(
-                dynamic_cast<UWSimCommsDevice *>(iauvFile[i]->devices->all[d].get()),
+                dynamic_cast<UWSimCommsDevice *>(
+                    iauvFile[i]->devices->all[d].get()),
                 rosInterface.topic, rosInterface.rate)));
       }
   if (ifaces.size() == 0)
@@ -148,15 +149,53 @@ std::vector<boost::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
   return ifaces;
 }
 
-
 void UWSimCommsDevice::AddToNetSim() { _AddToNetSim(); }
 
-UWSimCommsDevice::UWSimCommsDevice(CommsDevice_Config *cfg,
-                         osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv)
-    : SimulatedDevice(cfg) {}
+void UWSimCommsDevice::SetPacketBuilder(PACKET_TYPE pType,
+                                        CommsDevice_Config *cfg,
+                                        PacketBuilderConfig *pbcfg) {
+  auto netsim = uwsim::NetSim::GetSim();
+  dccomms::PacketBuilderPtr pb;
+  if (pbcfg->libPath == "") { // Default lib
+    if (pbcfg->className == "DataLinkFrameBuilderCRC16")
+      pb = std::shared_ptr<dccomms::DataLinkFrameBuilderCRC16>(
+          new dccomms::DataLinkFrameBuilderCRC16());
+    if (pb) {
+      netsim->SetPacketBuilder(cfg->dccommsId, pType, pb);
+    }
+  } else {
+    std::string path = pbcfg->libPath;
+    if (path[0] != '/') {
+      path = std::string(getenv("HOME")) + "/.uwsim/data/netsim/" + path;
+    }
+    if (access(path.c_str(), F_OK) != -1) {
+      // file exists
+      try {
+        netsim->SetPacketBuilder(cfg->dccommsId, pType, path, pbcfg->className);
+      } catch (std::exception e) {
+        ROS_ERROR("CommsDevice ('%s'): '%s' class implementation not loaded "
+                  "(inner exception: '%s')",
+                  cfg->dccommsId.c_str(), pbcfg->className.c_str(), e.what());
+      }
+    } else {
+      // file doesn't exist
+      ROS_ERROR("CommsDevice ('%s'): '%s' library does not exist",
+                cfg->dccommsId.c_str(), path.c_str());
+    }
+  }
+}
 
-void UWSimCommsDevice::Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
-                       SimulatedIAUV *auv) {
+UWSimCommsDevice::UWSimCommsDevice(CommsDevice_Config *cfg,
+                                   osg::ref_ptr<osg::Node> target,
+                                   SimulatedIAUV *auv)
+    : SimulatedDevice(cfg) {
+  SetPacketBuilder(PACKET_TYPE::TX_PACKET, cfg, &cfg->txPacketBuilderConfig);
+  SetPacketBuilder(PACKET_TYPE::RX_PACKET, cfg, &cfg->rxPacketBuilderConfig);
+}
+
+void UWSimCommsDevice::Init(CommsDevice_Config *cfg,
+                            osg::ref_ptr<osg::Node> target,
+                            SimulatedIAUV *auv) {
   if (cfg->tfId.length() == 0) {
     tfId = std::string(auv->name) + "/" + cfg->name;
   } else {

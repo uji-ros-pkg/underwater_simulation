@@ -32,6 +32,7 @@ public:
   ros::NodeHandle node;
   std::string targetTfId, tfId;
   bool render;
+  dccomms::PacketBuilderPtr txPacketBuilder, rxPacketBuilder;
 
   UWSimCommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
               SimulatedIAUV *auv);
@@ -42,6 +43,7 @@ public:
   void AddToNetSim();
   virtual CommsDevice_Config *GetConfig() = 0;
   virtual void SetConfig(CommsDevice_Config *cfg) = 0;
+  void SetPacketBuilder(PACKET_TYPE pType, CommsDevice_Config * cfg, PacketBuilderConfig * pbcfg);
 
 protected:
   virtual bool _AddToNetSim() = 0;

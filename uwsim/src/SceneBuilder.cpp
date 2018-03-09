@@ -616,11 +616,12 @@ bool SceneBuilder::loadScene(ConfigFile config) {
   }
 
   // NetSim Tracing
-  if(config.netTracingScriptConfig.className == "")
+  if(config.netTracingScriptConfig.className == "default" && config.netTracingScriptConfig.libPath == "" )
     uwsim::NetSim::LoadDefaultTracingScript();
   else
   {
-      uwsim::NetSim::LoadTracingScript(config.netTracingScriptConfig.className,
+      if(config.netTracingScriptConfig.className != "")
+        uwsim::NetSim::LoadTracingScript(config.netTracingScriptConfig.className,
                                        config.netTracingScriptConfig.libPath);
   }
   auto netsim = uwsim::NetSim::GetSim();
