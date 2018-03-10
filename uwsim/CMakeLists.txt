@@ -17,7 +17,6 @@ find_package(catkin REQUIRED COMPONENTS
   underwater_sensor_msgs
   urdf
   xacro
-  dccomms_ros_msgs
   dccomms_ros
 )
 
@@ -53,7 +52,6 @@ catkin_package(
     tf
     underwater_sensor_msgs
     urdf
-    dccomms_ros_msgs
     dccomms_ros
   DEPENDS
     Boost
