@@ -616,7 +616,7 @@ bool SceneBuilder::loadScene(ConfigFile config) {
   }
 
   // NetSim Tracing
-  if(config.netTracingScriptConfig.className == "default" && config.netTracingScriptConfig.libPath == "" )
+  if(config.netTracingScriptConfig.className == "" || config.netTracingScriptConfig.className == "default" && config.netTracingScriptConfig.libPath == "" )
     uwsim::NetSim::LoadDefaultTracingScript();
   else
   {
