@@ -445,8 +445,9 @@ struct CustomCommsChannelConfig
 struct AcousticCommsChannelConfig
 {
   uint32_t id;
-  AcousticCommsChannelConfig(){
-  }
+  double bandwidth, temperature, salinity, noise;
+  AcousticCommsChannelConfig():
+    bandwidth(4096), temperature(25), salinity(35),  noise(0){}
 };
 
 struct NetTracingScriptConfig

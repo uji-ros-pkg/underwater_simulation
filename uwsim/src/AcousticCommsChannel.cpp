@@ -13,6 +13,10 @@ AcousticCommsChannel::AcousticCommsChannel(AcousticCommsChannelConfig cfg) {
 bool AcousticCommsChannel::_AddToNetSim() {
   dccomms_ros_msgs::AddAcousticChannelRequest srv;
   srv.id = config.id;
+  srv.noiseLvl = config.noise;
+  srv.salinity = config.salinity;
+  srv.temperature = config.temperature;
+  srv.bandwidth = config.bandwidth;
 
   auto netsim = NetSim::GetSim();
   netsim->AddAcousticChannel(srv);

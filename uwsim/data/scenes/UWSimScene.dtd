@@ -216,6 +216,22 @@ echoROS?
 <!ELEMENT mesh (path, scaleFactor?)>
 <!ELEMENT path (#PCDATA)>
 <!ELEMENT txFifoSize (#PCDATA)>
+<!ELEMENT bandwidth (#PCDATA)>
+<!ELEMENT temperature (#PCDATA)>
+<!ELEMENT salinity (#PCDATA)>
+<!ELEMENT noiseLvl (#PCDATA)>
+<!ELEMENT pT (#PCDATA)>
+<!ELEMENT frequency (#PCDATA)>
+<!ELEMENT L (#PCDATA)>
+<!ELEMENT K (#PCDATA)>
+<!ELEMENT turnOnEnergy (#PCDATA)>
+<!ELEMENT turnOffEnergy (#PCDATA)>
+<!ELEMENT preamble (#PCDATA)>
+<!ELEMENT pTConsume (#PCDATA)>
+<!ELEMENT pRConsume (#PCDATA)>
+<!ELEMENT pIdle (#PCDATA)>
+<!ELEMENT macProtocol (#PCDATA)>
+
 
 <!ELEMENT className (#PCDATA)>
 <!ELEMENT libPath (#PCDATA)>
@@ -223,8 +239,8 @@ echoROS?
 <!ELEMENT rxPacketBuilder (className, libPath?)>
 <!ELEMENT netTracingScript (className, libPath?)>
 
-<!ELEMENT AcousticCommsChannel (id)>
-<!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?, txPacketBuilder, rxPacketBuilder)>
+<!ELEMENT AcousticCommsChannel (id, bandwidth?, temperature?, salinity?, noiseLvl?)>
+<!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, range?, pT?, frequency?, L?, K?, turnOnEnergy?, turnOffEnergy?, preamble?, pTConsume?, pRConsume?, pIdle?, macProtocol?, txPacketBuilder, rxPacketBuilder)>
 <!ELEMENT CustomCommsChannel (id,propTimeIncPerMeter?,minPropTime?)>
 <!ELEMENT CustomCommsDevice (dccommsId, txChannelId, rxChannelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, pktErrRatioIncPerMeter?, minPktErrRatio?, txPacketBuilder, rxPacketBuilder)>
 <!-- *Comms* items end-->

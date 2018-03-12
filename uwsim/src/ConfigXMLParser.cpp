@@ -1047,6 +1047,14 @@ void ConfigFile::processAcousticCommsChannel(const xmlpp::Node* node, AcousticCo
     const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
     if (child->get_name() == "id")
       extractUIntChar(child, channel.id);
+    else if (child->get_name() == "bandwidth")
+      extractFloatChar(child, channel.bandwidth);
+    else if(child->get_name() == "temperature")
+      extractFloatChar(child, channel.temperature);
+    else if (child->get_name() == "salinity")
+      extractFloatChar(child, channel.salinity);
+    else if(child->get_name() == "noiseLvl")
+      extractFloatChar(child, channel.noise);
   }
 }
 

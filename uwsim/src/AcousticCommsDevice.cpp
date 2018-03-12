@@ -24,20 +24,28 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
        ++iter) {
 
     const xmlpp::Node *child = dynamic_cast<const xmlpp::Node *>(*iter);
-    //    if (child->get_name() == "maxBitRate")
-    //      config->extractUIntChar(child, cfg->maxBitRate);
-    //    else if (child->get_name() == "intrinsicDelay")
-    //      config->extractUIntChar(child, cfg->intrinsicDelay);
-    //    else if (child->get_name() == "bitrate")
-    //      config->extractFloatChar(child, cfg->bitrate);
-    //    else if (child->get_name() == "bitrateSd")
-    //      config->extractFloatChar(child, cfg->bitrateSd);
-    //    else if (child->get_name() == "maxDistance")
-    //      config->extractUIntChar(child, cfg->maxDistance);
-    //    else if (child->get_name() == "minDistance")
-    //      config->extractUIntChar(child, cfg->minDistance);
-    //    else if (child->get_name() == "minPktErrRatio")
-    //      config->extractFloatChar(child, cfg->minPktErrRatio);
+    if (child->get_name() == "range")
+      config->extractFloatChar(child, cfg->range);
+    else if (child->get_name() == "frequency")
+      config->extractFloatChar(child, cfg->frequency);
+    else if (child->get_name() == "L")
+      config->extractFloatChar(child, cfg->L);
+    else if (child->get_name() == "K")
+      config->extractFloatChar(child, cfg->K);
+    else if (child->get_name() == "turnOnEnergy")
+      config->extractFloatChar(child, cfg->turnOnEnergy);
+    else if (child->get_name() == "turnOffEnergy")
+      config->extractFloatChar(child, cfg->turnOffEnergy);
+    else if (child->get_name() == "preamble")
+      config->extractFloatChar(child, cfg->pTConsume);
+    else if (child->get_name() == "pTConsume")
+      config->extractFloatChar(child, cfg->pTConsume);
+    else if (child->get_name() == "pRConsume")
+      config->extractFloatChar(child, cfg->pIdle);
+    else if (child->get_name() == "pIdle")
+      config->extractFloatChar(child, cfg->pIdle);
+    else if (child->get_name() == "macProtocol")
+      config->extractStringChar(child, cfg->relativeTfId);
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
@@ -51,9 +59,21 @@ bool AcousticCommsDevice::_AddToNetSim() {
   srv.dccommsId = this->config->dccommsId;
   srv.mac = this->config->mac;
   srv.maxTxFifoSize = this->config->txFifoSize;
+  srv.frequency = this->config->frequency;
+  srv.K = this->config->K;
+  srv.L = this->config->L;
+  srv.range = this->config->range;
+  srv.PT = this->config->pT;
+  srv.turnOnEnergy = this->config->turnOnEnergy;
+  srv.turnOffEnergy = this->config->turnOffEnergy;
+  srv.preamble = this->config->preamble;
+  srv.PTConsume = this->config->pTConsume;
+  srv.PRConsume = this->config->pRConsume;
+  srv.PIdle = this->config->pIdle;
+  srv.macProtocol = this->config->macProtocol;
 
-  ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s",
-           srv.dccommsId.c_str(), srv.frameId.c_str());
+  ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
+           srv.frameId.c_str());
 
   netsim->AddAcousticDevice(srv);
 
@@ -81,9 +101,10 @@ AcousticCommsDevice::AcousticCommsDevice(AcousticCommsDevice_Config *cfg,
   Init(cfg, target, auv);
 }
 
-UWSimCommsDevice *AcousticCommsDevice_Factory::Create(CommsDevice_Config *cfg,
-                                                 osg::ref_ptr<osg::Node> target,
-                                                 SimulatedIAUV *auv) {
+UWSimCommsDevice *
+AcousticCommsDevice_Factory::Create(CommsDevice_Config *cfg,
+                                    osg::ref_ptr<osg::Node> target,
+                                    SimulatedIAUV *auv) {
   AcousticCommsDevice_Config *config =
       dynamic_cast<AcousticCommsDevice_Config *>(cfg);
   return new AcousticCommsDevice(config, target, auv);

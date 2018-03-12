@@ -17,16 +17,21 @@ class AcousticCommsDevice_Config : public CommsDevice_Config {
 
 public:
   // XML members
-
+  double range, pT, frequency, L, K, turnOnEnergy, turnOffEnergy, preamble,
+      pTConsume, pRConsume, pIdle;
+  std::string macProtocol;
   // constructor
-  AcousticCommsDevice_Config(std::string type_) : CommsDevice_Config(type_) {}
+  AcousticCommsDevice_Config(std::string type_)
+      : CommsDevice_Config(type_), range(100), pT(0.2818), frequency(25),
+        L(0.0), K(2.0), turnOnEnergy(0.0), turnOffEnergy(0.0), preamble(0.0),
+        pTConsume(0.660), pRConsume(0.395), pIdle(0.0), macProtocol("ALOHA") {}
 };
 
 class AcousticCommsDevice : public UWSimCommsDevice {
 public:
   AcousticCommsDevice_Config *config;
   AcousticCommsDevice(AcousticCommsDevice_Config *cfg,
-                    osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
+                      osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
   void AddToNetSim();
   static uint32_t nDevsReady;
   static uint32_t nDevs;
@@ -46,8 +51,8 @@ public:
   // this is the only place the device/interface type is set
   AcousticCommsDevice_Factory(std::string type_ = "AcousticCommsDevice")
       : CommsDevice_Factory(type_){};
-  UWSimCommsDevice *Create(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
-                      SimulatedIAUV *auv);
+  UWSimCommsDevice *Create(CommsDevice_Config *cfg,
+                           osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
   SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node *node,
                                            ConfigFile *config);
 };
@@ -55,7 +60,7 @@ public:
 class AcousticCommsDevice_ROSPublisher : public CommsDevice_ROSPublisher {
 public:
   AcousticCommsDevice_ROSPublisher(AcousticCommsDevice *dev, std::string topic,
-                                 int rate)
+                                   int rate)
       : CommsDevice_ROSPublisher(dev, topic, rate) {}
 
   ~AcousticCommsDevice_ROSPublisher() {}
