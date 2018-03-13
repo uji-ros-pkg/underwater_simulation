@@ -45,7 +45,7 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
     else if (child->get_name() == "pIdle")
       config->extractFloatChar(child, cfg->pIdle);
     else if (child->get_name() == "macProtocol")
-      config->extractStringChar(child, cfg->relativeTfId);
+      config->extractStringChar(child, cfg->macProtocol);
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
