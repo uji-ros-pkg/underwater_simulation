@@ -18,7 +18,8 @@ class AcousticCommsDevice_Config : public CommsDevice_Config {
 public:
   // XML members
   double range, pT, frequency, L, K, turnOnEnergy, turnOffEnergy, preamble,
-      pTConsume, pRConsume, pIdle;
+      pTConsume, pRConsume, pIdle, codingEff, bitErrorRate;
+  uint32_t symbolsPerSecond;
   std::string macProtocol;
   // constructor
   AcousticCommsDevice_Config(std::string type_)

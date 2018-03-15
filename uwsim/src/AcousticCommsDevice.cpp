@@ -46,6 +46,12 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractFloatChar(child, cfg->pIdle);
     else if (child->get_name() == "macProtocol")
       config->extractStringChar(child, cfg->macProtocol);
+    else if (child->get_name() == "symbolsPerSecond")
+      config->extractUIntChar(child, cfg->symbolsPerSecond);
+    else if (child->get_name() == "codingEff")
+      config->extractFloatChar(child, cfg->codingEff);
+    else if (child->get_name() == "bitErrorRate")
+      config->extractFloatChar(child, cfg->bitErrorRate);
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
@@ -71,6 +77,9 @@ bool AcousticCommsDevice::_AddToNetSim() {
   srv.PRConsume = this->config->pRConsume;
   srv.PIdle = this->config->pIdle;
   srv.macProtocol = this->config->macProtocol;
+  srv.bitErrorRate = this->config->bitErrorRate;
+  srv.symbolsPerSecond = this->config->symbolsPerSecond;
+  srv.codingEff = this->config->codingEff;
 
   ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());
