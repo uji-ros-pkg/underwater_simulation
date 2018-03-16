@@ -32,18 +32,8 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractFloatChar(child, cfg->L);
     else if (child->get_name() == "K")
       config->extractFloatChar(child, cfg->K);
-    else if (child->get_name() == "turnOnEnergy")
-      config->extractFloatChar(child, cfg->turnOnEnergy);
-    else if (child->get_name() == "turnOffEnergy")
-      config->extractFloatChar(child, cfg->turnOffEnergy);
     else if (child->get_name() == "preamble")
-      config->extractFloatChar(child, cfg->pTConsume);
-    else if (child->get_name() == "pTConsume")
-      config->extractFloatChar(child, cfg->pTConsume);
-    else if (child->get_name() == "pRConsume")
-      config->extractFloatChar(child, cfg->pIdle);
-    else if (child->get_name() == "pIdle")
-      config->extractFloatChar(child, cfg->pIdle);
+      config->extractFloatChar(child, cfg->preamble);
     else if (child->get_name() == "macProtocol")
       config->extractStringChar(child, cfg->macProtocol);
     else if (child->get_name() == "symbolsPerSecond")
@@ -52,6 +42,27 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractFloatChar(child, cfg->codingEff);
     else if (child->get_name() == "bitErrorRate")
       config->extractFloatChar(child, cfg->bitErrorRate);
+    else if (child->get_name() == "energyModel") {
+      xmlpp::Node::NodeList emAttributes = child->get_children();
+      for (xmlpp::Node::NodeList::iterator subiter = emAttributes.begin();
+           subiter != emAttributes.end(); ++subiter) {
+        const xmlpp::Node *ema = dynamic_cast<const xmlpp::Node *>(*subiter);
+        if (ema->get_name() == "turnOnEnergy")
+          config->extractFloatChar(ema, cfg->turnOnEnergy);
+        else if (child->get_name() == "turnOffEnergy")
+          config->extractFloatChar(ema, cfg->turnOffEnergy);
+        else if (ema->get_name() == "pTConsume")
+          config->extractFloatChar(ema, cfg->pTConsume);
+        else if (ema->get_name() == "pRConsume")
+          config->extractFloatChar(ema, cfg->pRConsume);
+        else if (ema->get_name() == "pIdle")
+          config->extractFloatChar(ema, cfg->pIdle);
+        else if (ema->get_name() == "energyLevel")
+          config->extractFloatChar(ema, cfg->energyLevel);
+        else if (ema->get_name() == "pT")
+          config->extractFloatChar(ema, cfg->pT);
+      }
+    }
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
@@ -75,6 +86,7 @@ bool AcousticCommsDevice::_AddToNetSim() {
   srv.preamble = this->config->preamble;
   srv.PTConsume = this->config->pTConsume;
   srv.PRConsume = this->config->pRConsume;
+  srv.batteryEnergy = this->config->energyLevel;
   srv.PIdle = this->config->pIdle;
   srv.macProtocol = this->config->macProtocol;
   srv.bitErrorRate = this->config->bitErrorRate;
