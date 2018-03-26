@@ -22,6 +22,7 @@ public:
   double bitrate, bitrateSd;
   unsigned int maxDistance, minDistance;
   double pktErrRatioIncPerMeter, minPktErrRatio;
+  std::string errorRateExpr, errorUnit;
 
   // constructor
   CustomCommsDevice_Config(std::string type_) : CommsDevice_Config(type_) {}

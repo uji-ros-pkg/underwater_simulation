@@ -27,6 +27,8 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
   cfg->minDistance = 0;
   cfg->pktErrRatioIncPerMeter = 0;
   cfg->minPktErrRatio = 0;
+  cfg->errorUnit = "bit";
+  cfg->errorRateExpr = "0.01*m";
 
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end();
        ++iter) {
@@ -50,6 +52,17 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractUIntChar(child, cfg->txChannelId);
     else if (child->get_name() == "rxChannelId")
       config->extractUIntChar(child, cfg->rxChannelId);
+    else if (child->get_name() == "rateErrorModel") {
+      xmlpp::Node::NodeList emAttributes = child->get_children();
+      for (xmlpp::Node::NodeList::iterator subiter = emAttributes.begin();
+           subiter != emAttributes.end(); ++subiter) {
+        const xmlpp::Node *ema = dynamic_cast<const xmlpp::Node *>(*subiter);
+        if (ema->get_name() == "errorUnit")
+          config->extractStringChar(ema, cfg->errorUnit);
+        else if (ema->get_name() == "errorRateExpr")
+          config->extractStringChar(ema, cfg->errorRateExpr);
+      }
+    }
   }
   return SimulatedDeviceConfig::Ptr(cfg);
 }
@@ -69,9 +82,11 @@ bool CustomCommsDevice::_AddToNetSim() {
   srv.bitrate = this->config->bitrate;
   srv.bitrateSd = this->config->bitrateSd;
   srv.maxTxFifoSize = this->config->txFifoSize;
+  srv.errorRateExpr = this->config->errorRateExpr;
+  srv.errorUnit = this->config->errorUnit;
 
-  ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s",
-           srv.dccommsId.c_str(), srv.frameId.c_str());
+  ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
+           srv.frameId.c_str());
 
   netsim->AddCustomDevice(srv);
 
@@ -109,9 +124,10 @@ CustomCommsDevice::CustomCommsDevice(CustomCommsDevice_Config *cfg,
   Init(cfg, target, auv);
 }
 
-UWSimCommsDevice *CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
-                                               osg::ref_ptr<osg::Node> target,
-                                               SimulatedIAUV *auv) {
+UWSimCommsDevice *
+CustomCommsDevice_Factory::Create(CommsDevice_Config *cfg,
+                                  osg::ref_ptr<osg::Node> target,
+                                  SimulatedIAUV *auv) {
   CustomCommsDevice_Config *config =
       dynamic_cast<CustomCommsDevice_Config *>(cfg);
   return new CustomCommsDevice(config, target, auv);

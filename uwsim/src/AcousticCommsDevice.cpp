@@ -49,7 +49,7 @@ AcousticCommsDevice_Factory::processConfig(const xmlpp::Node *node,
         const xmlpp::Node *ema = dynamic_cast<const xmlpp::Node *>(*subiter);
         if (ema->get_name() == "turnOnEnergy")
           config->extractFloatChar(ema, cfg->turnOnEnergy);
-        else if (child->get_name() == "turnOffEnergy")
+        else if (ema->get_name() == "turnOffEnergy")
           config->extractFloatChar(ema, cfg->turnOffEnergy);
         else if (ema->get_name() == "pTConsume")
           config->extractFloatChar(ema, cfg->pTConsume);
