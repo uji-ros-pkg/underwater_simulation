@@ -436,9 +436,11 @@ struct CustomCommsChannelConfig
 {
   uint32_t id;
   double propTimeIncPerMeter, minPropTime;
+  std::string logLevel;
   CustomCommsChannelConfig(){
       propTimeIncPerMeter = 0.66667;
       minPropTime = 0;
+      logLevel = "off";
   }
 };
 
@@ -446,8 +448,10 @@ struct AcousticCommsChannelConfig
 {
   uint32_t id;
   double bandwidth, temperature, salinity, noise;
+  std::string logLevel;
   AcousticCommsChannelConfig():
-    bandwidth(4096), temperature(25), salinity(35),  noise(0){}
+    bandwidth(4096), temperature(25), salinity(35),  noise(0),
+    logLevel("off"){}
 };
 
 struct NetTracingScriptConfig

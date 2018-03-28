@@ -92,6 +92,7 @@ bool AcousticCommsDevice::_AddToNetSim() {
   srv.bitErrorRate = this->config->bitErrorRate;
   srv.symbolsPerSecond = this->config->symbolsPerSecond;
   srv.codingEff = this->config->codingEff;
+  srv.logLevel = this->config->logLevel;
 
   ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());

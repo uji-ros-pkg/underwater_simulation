@@ -84,6 +84,7 @@ bool CustomCommsDevice::_AddToNetSim() {
   srv.maxTxFifoSize = this->config->txFifoSize;
   srv.errorRateExpr = this->config->errorRateExpr;
   srv.errorUnit = this->config->errorUnit;
+  srv.logLevel = this->config->logLevel;
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());

@@ -15,6 +15,7 @@ bool CustomCommsChannel::_AddToNetSim() {
   srv.id = config.id;
   srv.minPrTime = config.minPropTime;
   srv.prTimeIncPerMeter = config.propTimeIncPerMeter;
+  srv.logLevel = config.logLevel;
 
   auto netsim = NetSim::GetSim();
   netsim->AddCustomChannel(srv);

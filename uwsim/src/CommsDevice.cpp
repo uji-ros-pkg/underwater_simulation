@@ -44,6 +44,8 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->processPacketBuilderConfig(child, cfg->txPacketBuilderConfig);
     else if (child->get_name() == "rxPacketBuilder")
       config->processPacketBuilderConfig(child, cfg->rxPacketBuilderConfig);
+    else if (child->get_name() == "logLevel")
+      config->extractStringChar(child, cfg->logLevel);
   }
 }
 

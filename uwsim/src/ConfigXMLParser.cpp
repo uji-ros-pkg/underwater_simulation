@@ -1055,6 +1055,8 @@ void ConfigFile::processAcousticCommsChannel(const xmlpp::Node* node, AcousticCo
       extractFloatChar(child, channel.salinity);
     else if(child->get_name() == "noiseLvl")
       extractFloatChar(child, channel.noise);
+    else if(child->get_name() == "logLevel")
+      extractStringChar(child, channel.logLevel);
   }
 }
 
@@ -1070,6 +1072,8 @@ void ConfigFile::processCustomCommsChannel(const xmlpp::Node* node, CustomCommsC
       extractFloatChar(child, channel.propTimeIncPerMeter);
     else if(child->get_name() == "minPropTime")
       extractFloatChar(child, channel.minPropTime);
+    else if(child->get_name() == "logLevel")
+      extractStringChar(child, channel.logLevel);
   }
 }
 

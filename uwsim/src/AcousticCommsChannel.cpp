@@ -17,6 +17,7 @@ bool AcousticCommsChannel::_AddToNetSim() {
   srv.salinity = config.salinity;
   srv.temperature = config.temperature;
   srv.bandwidth = config.bandwidth;
+  srv.logLevel = config.logLevel;
 
   auto netsim = NetSim::GetSim();
   netsim->AddAcousticChannel(srv);
