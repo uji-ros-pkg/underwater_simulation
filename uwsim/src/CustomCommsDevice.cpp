@@ -35,15 +35,15 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
 
     const xmlpp::Node *child = dynamic_cast<const xmlpp::Node *>(*iter);
     if (child->get_name() == "intrinsicDelay")
-      config->extractUIntChar(child, cfg->intrinsicDelay);
+      config->extractFloatChar(child, cfg->intrinsicDelay);
     else if (child->get_name() == "bitrate")
       config->extractFloatChar(child, cfg->bitrate);
     else if (child->get_name() == "bitrateSd")
       config->extractFloatChar(child, cfg->bitrateSd);
     else if (child->get_name() == "maxDistance")
-      config->extractUIntChar(child, cfg->maxDistance);
+      config->extractFloatChar(child, cfg->maxDistance);
     else if (child->get_name() == "minDistance")
-      config->extractUIntChar(child, cfg->minDistance);
+      config->extractFloatChar(child, cfg->minDistance);
     else if (child->get_name() == "minPktErrRatio")
       config->extractFloatChar(child, cfg->minPktErrRatio);
     else if (child->get_name() == "pktErrRatioIncPerMeter")
@@ -85,6 +85,7 @@ bool CustomCommsDevice::_AddToNetSim() {
   srv.errorRateExpr = this->config->errorRateExpr;
   srv.errorUnit = this->config->errorUnit;
   srv.logLevel = this->config->logLevel;
+  srv.intrinsicDelay = this->config->intrinsicDelay;
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());

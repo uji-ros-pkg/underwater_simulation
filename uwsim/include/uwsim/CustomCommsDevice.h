@@ -18,9 +18,10 @@ class CustomCommsDevice_Config : public CommsDevice_Config {
 
 public:
   // XML members
-  unsigned int intrinsicDelay, txChannelId, rxChannelId;
+  unsigned int  txChannelId, rxChannelId;
   double bitrate, bitrateSd;
-  unsigned int maxDistance, minDistance;
+  double intrinsicDelay;
+  double maxDistance, minDistance;
   double pktErrRatioIncPerMeter, minPktErrRatio;
   std::string errorRateExpr, errorUnit;
 
