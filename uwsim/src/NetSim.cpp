@@ -2,6 +2,8 @@
 #include <uwsim/NetSim.h>
 namespace uwsim {
 
+NetSimTracingPtr NetSim::_script;
+
 ns3::Ptr<ROSCommsSimulator> NetSim::GetSim() {
   static ns3::Ptr<ROSCommsSimulator> ptr = 0;
   if (ptr == 0) {
@@ -19,23 +21,23 @@ void NetSim::LoadTracingScript(const std::string &className,
   //_loader.loadLibrary(libName);
   std::vector<std::string> classes =
       loader.getAvailableClasses<NetSimTracing>();
-  static std::shared_ptr<NetSimTracing> tracing;
   for (unsigned int c = 0; c < classes.size(); ++c) {
     if (classes[c] == className) {
       NetSimTracing *tr =
           loader.createUnmanagedInstance<NetSimTracing>(classes[c]);
-      tracing = std::shared_ptr<NetSimTracing>(tr);
-      tracing->Configure();
+      _script = std::shared_ptr<NetSimTracing>(tr);
+      _script->Configure();
       break;
     }
   }
 }
 
 void NetSim::LoadDefaultTracingScript() {
-
-  static std::shared_ptr<NetSimTracing> tracing(new NetSimTracing());
-  tracing->Configure();
+  _script = NetSimTracingPtr(new NetSimTracing());
+  _script->Configure();
 }
+
+NetSimTracingPtr NetSim::GetScript() { return _script; }
 
 NetSimTracing::NetSimTracing() {}
 
@@ -79,4 +81,7 @@ void NetSimTracing::Configure() {
   ns3::Config::Connect("/ROSDeviceList/*/PacketReceived",
                        ns3::MakeCallback(rxcb));
 }
+
+void NetSimTracing::Run() { DoRun(); }
+void NetSimTracing::DoRun() {}
 }
