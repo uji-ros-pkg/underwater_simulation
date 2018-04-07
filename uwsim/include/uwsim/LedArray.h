@@ -25,6 +25,7 @@ public:
   void UpdateLetState(ledType, bool);
 
 private:
+  ros::NodeHandle nh;
   osg::ref_ptr<osg::Group> sceneRoot;
   osg::ref_ptr<osg::Transform> vMRedLight;
   osg::ref_ptr<osg::Transform> vMGreenLight;

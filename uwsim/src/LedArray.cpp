@@ -12,7 +12,8 @@ using namespace osg;
 namespace uwsim {
 uint32_t LedArray::numLedLights = 0;
 
-LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config) {
+LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config)
+    : nh(config.name) {
   sceneRoot = root;
   double ledRadio = config.radio;
   double offset = config.space / 2;
@@ -69,7 +70,8 @@ LedArray::LedArray(osg::ref_ptr<osg::Group> root, LedArrayConfig config) {
   vMRedLight = (osg::Transform *)new osg::PositionAttitudeTransform();
   vMGreenLight = (osg::Transform *)new osg::PositionAttitudeTransform();
 
-  vMRedLight->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0, offset, 0));
+  vMRedLight->asPositionAttitudeTransform()->setPosition(
+      osg::Vec3d(0, offset, 0));
   vMGreenLight->asPositionAttitudeTransform()->setPosition(
       osg::Vec3d(0, -offset, 0));
 
@@ -120,7 +122,7 @@ void LedArray::UpdateLetState(ledType type, bool on) {
 void LedArray::HandleNewLedState(underwater_sensor_msgs::LedLightConstPtr msg,
                                  ledType type) {
   ros::Time offTime = ros::Time::now() + msg->duration;
-  //actionsMutex.lock();
+  // actionsMutex.lock();
   switch (type) {
   case RED_LED:
     redAction.offTime = offTime;
@@ -130,10 +132,10 @@ void LedArray::HandleNewLedState(underwater_sensor_msgs::LedLightConstPtr msg,
     break;
   }
   // actionsCond.notify_one();
-  //actionsMutex.unlock();
+  // actionsMutex.unlock();
 }
 
-void LedArray::CheckAndUpdateLed(const ros::Time & now, ledType type, bool on,
+void LedArray::CheckAndUpdateLed(const ros::Time &now, ledType type, bool on,
                                  const Action &action) {
   if (on) {
     if (action.offTime <= now) {
@@ -144,7 +146,6 @@ void LedArray::CheckAndUpdateLed(const ros::Time & now, ledType type, bool on,
   }
 }
 void LedArray::InitROSInterface() {
-  ros::NodeHandle nh(config.name);
   redLedSubscriber = nh.subscribe<underwater_sensor_msgs::LedLight>(
       "red", 1,
       boost::bind(&LedArray::HandleNewLedState, this, _1, ledType::RED_LED));
@@ -158,7 +159,6 @@ void LedArray::InitROSInterface() {
       ros::Time now = ros::Time::now();
       CheckAndUpdateLed(now, RED_LED, redStateOn, redAction);
       CheckAndUpdateLed(now, GREEN_LED, greenStateOn, greenAction);
-      ros::spinOnce();
       rate.sleep();
     }
   });

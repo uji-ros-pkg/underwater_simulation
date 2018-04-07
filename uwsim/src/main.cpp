@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
+#include <ostream>
 
 #include <uwsim/ConfigXMLParser.h>
 #include <uwsim/ROSSceneBuilder.h>
@@ -25,10 +26,49 @@
 
 using namespace std;
 
-//#include "BulletPhysics.h"
+void stopROS()
+{
+  ROS_INFO("Finished");
+  if (ros::ok())
+    ros::shutdown();
+}
+
+void stopNetworkSimulator()
+{
+  auto netsim = uwsim::NetSim::GetSim();
+  if (netsim) {
+    auto script = uwsim::NetSim::GetScript();
+    script->FlushLog();
+    ROS_INFO("Network simulator log messages flushed");
+    netsim->Stop();
+  }
+}
+
+void stopAll()
+{
+  stopNetworkSimulator();
+  stopROS();
+  std::cout << "All stopped" << std::endl; //ROS_INFO does not work after ros::shutdown()
+}
+
+void SIGINT_handler(int sig)
+{
+  ROS_INFO("Received %d signal.", sig);
+  stopAll();
+  exit(0);
+}
+
+void setSignals()
+{
+  if (signal(SIGINT, SIGINT_handler) == SIG_ERR) {
+    ROS_ERROR("Error installing SIGINT handler");
+    exit(1);
+  }
+}
 
 int main(int argc, char *argv[])
 {
+  setSignals();
   //osg::notify(osg::ALWAYS) << "UWSim; using osgOcean " << osgOceanGetVersion() << std::endl;
 
   boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc, argv));
@@ -109,7 +149,8 @@ int main(int argc, char *argv[])
     ;
   ConfigFile config(configfile);
 
-  ros::init(argc, argv, "UWSim");
+  //https://answers.ros.org/question/191787/sigint-handler-not-working/
+  ros::init(argc, argv, "UWSim", ros::init_options::NoSigintHandler);
   ros::start();
 
   ROSSceneBuilder builder(arguments);
@@ -179,10 +220,9 @@ int main(int argc, char *argv[])
     loop_rate.sleep();
 
   }
-  if (ros::ok())
-    ros::shutdown();
 
-  ROS_INFO("Finished");
+  ROS_INFO("UWSim closed");
+  stopAll();
 
   return 0;
 }
