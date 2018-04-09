@@ -1,5 +1,7 @@
 #include <class_loader/multi_library_class_loader.h>
 #include <uwsim/NetSim.h>
+#include <dccomms_ros/simulator/NetsimLogFormatter.h>
+
 namespace uwsim {
 
 NetSimTracingPtr NetSim::_script;
@@ -39,7 +41,9 @@ void NetSim::LoadDefaultTracingScript() {
 
 NetSimTracingPtr NetSim::GetScript() { return _script; }
 
-NetSimTracing::NetSimTracing() {}
+NetSimTracing::NetSimTracing() {
+  SetLogFormatter(std::make_shared<NetsimLogFormatter>("%v"));
+}
 
 void NetSimTracing::Configure() {
   SetLogName("uwsim_netsim");
