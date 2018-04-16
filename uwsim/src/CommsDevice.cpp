@@ -162,6 +162,13 @@ void UWSimCommsDevice::SetPacketBuilder(PACKET_TYPE pType,
     if (pbcfg->className == "DataLinkFrameBuilderCRC16")
       pb = std::shared_ptr<dccomms::DataLinkFrameBuilderCRC16>(
           new dccomms::DataLinkFrameBuilderCRC16());
+    else {
+      ROS_ERROR("CommsDevice ('%s'): '%s' packet builder not found in "
+                "default library ",
+                cfg->dccommsId.c_str(), pbcfg->className.c_str());
+      throw dccomms::CommsException(pbcfg->className,
+                                    COMMS_EXCEPTION_CONFIG_ERROR);
+    }
     if (pb) {
       netsim->SetPacketBuilder(cfg->dccommsId, pType, pb);
     }
