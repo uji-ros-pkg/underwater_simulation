@@ -43,6 +43,7 @@ NetSimTracingPtr NetSim::GetScript() { return _script; }
 
 NetSimTracing::NetSimTracing() {
   SetLogFormatter(std::make_shared<NetsimLogFormatter>("%v"));
+  LogToConsole(false);
 }
 
 void NetSimTracing::Configure() {
