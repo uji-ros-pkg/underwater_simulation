@@ -185,11 +185,14 @@ void UWSimCommsDevice::SetPacketBuilder(PACKET_TYPE pType,
         ROS_ERROR("CommsDevice ('%s'): '%s' class implementation not loaded "
                   "(inner exception: '%s')",
                   cfg->dccommsId.c_str(), pbcfg->className.c_str(), e.what());
+        throw dccomms::CommsException(pbcfg->className,
+                                      COMMS_EXCEPTION_CONFIG_ERROR);
       }
     } else {
       // file doesn't exist
       ROS_ERROR("CommsDevice ('%s'): '%s' library does not exist",
                 cfg->dccommsId.c_str(), path.c_str());
+      throw dccomms::CommsException(path, COMMS_EXCEPTION_CONFIG_ERROR);
     }
   }
 }
