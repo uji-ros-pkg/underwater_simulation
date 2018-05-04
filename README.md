@@ -62,8 +62,16 @@ $ ./installScene -s netsim_scenes.uws
 ```
 This will install the following scenes:
 + **netsim_custom_halfd.xml**: a simple scene with 2 BlueROVs. A custom communication device is attached to each BlueROV. In order to simulate a Half-Duplex link these modems are attached to the same communication channel for sending and receiving.
+
+<p align="center"><img src="https://drive.google.com/uc?id=1x9h9tOj-i3hRySSriu30Cbj8lx5CYCYE" width="50%" /></p>
+
 + **netsim_twinbot.xml**: scene representing the scenario of the TWINBOT project. In this project, two AUV will launch a cooperative manipulation of an underwater pipe. The communication between them will be through a half-duplex wireless link based on the S100 RF modems of the WFS company. One of the UV communicates with a buoy by using the Evologics S2CR modems. The supervisor/operator is connected to the buoy through a Wi-Fi link (which is not modeled yet)
+
+<p align="center"><img src="https://drive.google.com/uc?id=1JEbBEzJ7iytCHK_BLFmRyzvOikcwLq-Z" width="50%" /></p>
+
 +  **netsim_shipwreck_bluerov_seabotix**: A shipwreck scenario with a surface boat and two ROVs (Seabotix and BlueROV2) using the S100 RF modems. The communication between the ROVs is stablished through a half-duplex wireless link.
+
+<p align="center"><img src="https://drive.google.com/uc?id=1sQDEY5-3MGbCf0ysCtwnLT5rCcKGFQh7" width="50%" /></p>
 
 In the same directory, run any network scene:
 ```bash
