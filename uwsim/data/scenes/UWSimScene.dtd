@@ -236,6 +236,7 @@ echoROS?
 <!ELEMENT errorUnit (#PCDATA)>
 <!ELEMENT errorRateExpr (#PCDATA)>
 <!ELEMENT logLevel (#PCDATA)>
+<!ELEMENT disable (#PCDATA)>
 
 <!ELEMENT rateErrorModel (errorUnit, errorRateExpr)>
 <!ELEMENT className (#PCDATA)>
@@ -246,9 +247,9 @@ echoROS?
 <!ELEMENT energyModel (energyLevel, turnOnEnergy, turnOffEnergy, pTConsume, pRConsume, pIdle, pT)>
 
 <!ELEMENT AcousticCommsChannel (id, bandwidth?, temperature?, salinity?, noiseLvl?, logLevel?)>
-<!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, symbolsPerSecond, codingEff?, bitErrorRate?, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, range?, frequency?, L?, K?, energyModel?, preamble?, macProtocol?, txPacketBuilder, rxPacketBuilder, logLevel?)>
+<!ELEMENT AcousticCommsDevice (dccommsId, channelId, relativeTo, mac, symbolsPerSecond, codingEff?, bitErrorRate?, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, range?, frequency?, L?, K?, energyModel?, preamble?, macProtocol?, txPacketBuilder, rxPacketBuilder, logLevel?, disable?)>
 <!ELEMENT CustomCommsChannel (id,propTimeIncPerMeter?,minPropTime?, logLevel?)>
-<!ELEMENT CustomCommsDevice (dccommsId, txChannelId, rxChannelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, rateErrorModel?, txPacketBuilder, rxPacketBuilder, logLevel?)>
+<!ELEMENT CustomCommsDevice (dccommsId, txChannelId, rxChannelId, relativeTo, mac, bitrate, txFifoSize?, tfId?, relativeTfId?, position?, orientation?, mesh?, intrinsicDelay?, prTimeIncPerMeter?, bitrateSd?, maxDistance?, minDistance?, rateErrorModel?, txPacketBuilder, rxPacketBuilder, logLevel?, disable?)>
 <!-- *Comms* items end-->
 
 <!-- Utils -->

@@ -46,6 +46,8 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->processPacketBuilderConfig(child, cfg->rxPacketBuilderConfig);
     else if (child->get_name() == "logLevel")
       config->extractStringChar(child, cfg->logLevel);
+    else if (child->get_name() == "disable")
+      config->extractIntChar(child, cfg->disable);
   }
 }
 
@@ -117,7 +119,10 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
                         dev->name.c_str(), e.what());
             }
           }
-
+          if (cfg->disable) {
+            ROS_WARN("CommsDevice: disabled by user");
+            return true;
+          }
           ROS_INFO("CommsDevice: added successfully");
           dev->AddToNetSim();
         }

@@ -21,6 +21,7 @@ public:
   unsigned int mac, channelId, txFifoSize;
   double position[3]{0, 0, 0}, orientation[3]{0, 0, 0};
   Mesh mesh;
+  int disable = 0;
   CommsDevice_Config(std::string type_) : SimulatedDeviceConfig(type_) {}
 };
 
