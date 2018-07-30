@@ -338,6 +338,7 @@ struct Vehicle
   std::vector<uwsim::SimulatedDeviceConfig::Ptr> simulated_devices;
   std::string URDFFile;
   LedArrayConfig ledArrayConfig;
+  int fdmPort = -1;
 };
 
 struct PhysicProperties
@@ -461,6 +462,18 @@ struct NetTracingScriptConfig
   NetTracingScriptConfig(): className(""), libPath(""){}
 };
 
+struct NedOriginConfig
+{
+  double lat, lon;
+  bool enabled;
+  NedOriginConfig()
+  {
+    lat = 0;
+    lon = 0;
+    enabled = false;
+  }
+};
+
 struct PacketBuilderConfig
 {
   std::string className,
@@ -477,6 +490,7 @@ public:
   void esPi(string in, double &param);
 
   void extractFloatChar(const xmlpp::Node* node, double &param);
+  void extractDecimalChar(const xmlpp::Node* node, double &param);
   void extractIntChar(const xmlpp::Node* node, int &param);
   void extractUIntChar(const xmlpp::Node* node, unsigned int &param);
   void extractStringChar(const xmlpp::Node* node, string &param);
@@ -523,6 +537,7 @@ public:
   void processLedArray(const xmlpp::Node* node, LedArrayConfig & ledArrayConfig);
   void processPacketBuilderConfig(const xmlpp::Node* node, PacketBuilderConfig & config);
   void processNetTracingScript(const xmlpp::Node* node, NetTracingScriptConfig & config);
+  void processNedOriginConfig(const xmlpp::Node* node, NedOriginConfig & config);
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
@@ -540,6 +555,7 @@ public:
   list<CustomCommsChannelConfig> customCommsChannels;
   list<AcousticCommsChannelConfig> acousticCommsChannels;
   NetTracingScriptConfig netTracingScriptConfig;
+  NedOriginConfig nedOriginConfig;
 
   ConfigFile(const std::string &fName);
 };

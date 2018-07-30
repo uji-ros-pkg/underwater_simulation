@@ -30,6 +30,7 @@
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/VirtualRangeSensor.h>
 #include <uwsim/osgOceanScene.h>
+#include <uwsim/NED.h>
 
 using namespace std;
 
@@ -181,6 +182,8 @@ bool SceneBuilder::loadScene(ConfigFile config) {
         new uwsim::AcousticCommsChannel(channelConfig));
     acousticCommsChannels.push_back(channel);
   }
+  //set NED
+  uwsim::NED::SetOrigin(config.nedOriginConfig.lat, config.nedOriginConfig.lon, 0);
 
   // Add config file iauv
   int nvehicle = config.vehicles.size();

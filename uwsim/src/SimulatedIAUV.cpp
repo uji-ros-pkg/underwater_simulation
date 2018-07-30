@@ -17,6 +17,8 @@
 #include <uwsim/URDFRobot.h>
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>
+#include <uwsim/NED.h>
+#include <uwsim/UWSimUtils.h>
 
 /** Callback for updating the vehicle lamp according to the vehicle position */
 /*
@@ -314,6 +316,137 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
    lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
    lightSource->setUpdateCallback(new LightUpdateCallback(baseTransform));
    */
+
+  //Check and launch FDM
+
+  if(vehicleChars.fdmPort != -1)
+    {
+      //launch FDM worker
+      std::thread worker([vehicleChars, this](){
+          double degRad = 180 / M_PI;
+          FDMData fdmData;
+          int GCS_BUFFER_LENGTH = 4096;
+          uint16_t localPort = vehicleChars.fdmPort;
+          bool worldMned_set = false;
+          tf::StampedTransform worldMned, nedMv;
+          tf::Transform  wMv;
+          tf::Vector3 nedTv, vehicle_pos;
+          tf::Quaternion nedRv, enuRv, vehicle_rot;
+          tf::Matrix3x3 tmpMat;
+          int sockfd;
+          struct sockaddr_in simAddr;
+          struct sockaddr_in locAddr;
+          sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+          memset(&locAddr, 0, sizeof(locAddr));
+          locAddr.sin_family = AF_INET;
+          locAddr.sin_addr.s_addr = INADDR_ANY;
+          locAddr.sin_port = htons(localPort);
+          tf::TransformListener wMnListener;
+          if (fcntl(sockfd, F_SETFL, O_NONBLOCK) < 0) {
+            close(sockfd);
+            exit(EXIT_FAILURE);
+          }
+          if (-1 ==
+              bind(sockfd, (struct sockaddr *)&locAddr, sizeof(struct sockaddr))) {
+            perror("error bind failed");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+          }
+
+          // ros::Rate rate(30);
+          uint8_t rxbuff[GCS_BUFFER_LENGTH];
+
+          uint32_t *version = (uint32_t *)rxbuff;
+          uint32_t *padding = version + 1;
+          double *longitude = (double *)(padding + 1);
+          double *latitude = longitude + 1;
+          double *altitude = latitude + 1;
+          float *agl = (float *)(altitude + 1);
+          float *phi = agl + 1;
+          float *theta = phi + 1;
+          float *psi = theta + 1;
+          while (1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            memset(rxbuff, 0, GCS_BUFFER_LENGTH);
+            socklen_t fromlen = sizeof(sockaddr);
+
+            ssize_t recsize;
+            do {
+              recsize = recvfrom(sockfd, (void *)rxbuff, GCS_BUFFER_LENGTH, 0,
+                                 (struct sockaddr *)&simAddr, &fromlen);
+            } while (recsize > 0);
+
+            do {
+              recsize = recvfrom(sockfd, (void *)rxbuff, GCS_BUFFER_LENGTH, 0,
+                                 (struct sockaddr *)&simAddr, &fromlen);
+            } while (recsize <= 0);
+
+            if (recsize > 0) {
+              switch4Bytes(&fdmData.version, version);
+              switch4Bytes(&fdmData.padding, padding);
+              switch8Bytes(&fdmData.longitude, longitude);
+              switch8Bytes(&fdmData.latitude, latitude);
+              switch8Bytes(&fdmData.altitude, altitude);
+              switch4Bytes(&fdmData.agl, agl);
+              switch4Bytes(&fdmData.phi, phi);
+              switch4Bytes(&fdmData.theta, theta);
+              switch4Bytes(&fdmData.psi, psi);
+
+              double ned_x, ned_y, ned_z;
+              double lat, lon, alt;
+              float roll, pitch, yaw;
+              double yawDeg;
+
+              lat = degRad * fdmData.latitude;
+              lon = degRad * fdmData.longitude;
+              alt = fdmData.altitude;
+              roll = fdmData.phi;
+              pitch = fdmData.theta;
+              yaw = fdmData.psi;
+
+              yawDeg = degRad * yaw;
+              uwsim::NED::GetNED(lat, lon, alt,
+                               ned_x, ned_y, ned_z);
+              //ROS_INFO("LL: %.9f, %.9f, %.9f ; NED: %f, %f, %f (Yaw: %f)", lat, lon, alt, ned_x, ned_y, ned_z, yawDeg);
+              //std::cout << std::flush;
+
+              //Wait for transform
+              if (worldMned_set) {
+                  nedTv.setX (ned_x);
+                  nedTv.setY (ned_y);
+                  nedTv.setZ (ned_z);
+                  //https://github.com/mavlink/mavros/issues/216
+                  nedRv.setRPY (roll, -pitch, -yaw);
+
+                  nedMv.setOrigin (nedTv);
+                  nedMv.setRotation (nedRv);
+
+                  wMv = worldMned * nedMv;
+                  vehicle_pos = wMv.getOrigin();
+                  vehicle_rot = wMv.getRotation();
+                  double roll, pitch, yaw;
+                  tmpMat.setRotation(vehicle_rot);
+                  tmpMat.getRPY(roll, pitch, yaw);
+                  setVehiclePosition(vehicle_pos.x(), vehicle_pos.y(), vehicle_pos.z (), roll, pitch, yaw);
+
+              } else {
+                try {
+                  wMnListener.waitForTransform("world", "local_origin_ned",
+                                                  ros::Time(0), ros::Duration(1));
+                  wMnListener.lookupTransform("world", "local_origin_ned",
+                                                 ros::Time(0), worldMned);
+                  worldMned_set = true;
+                } catch (tf::TransformException &e) {
+                  ROS_ERROR("Not able to lookup transform: %s", e.what());
+                  worldMned_set = false;
+                };
+
+              }
+            }
+          }
+        });
+      worker.detach();
+    }
 }
 
 /*
@@ -342,6 +475,8 @@ void SimulatedIAUV::setVehiclePosition(double x, double y, double z, double roll
 
 void SimulatedIAUV::setVehiclePosition(osg::Matrixd m)
 {
+  baseTransform_mutex.lock();
   baseTransform->setMatrix(m);
+  baseTransform_mutex.unlock();
 }
 

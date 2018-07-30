@@ -222,5 +222,41 @@ public:
   static osg::Node* createLightSource(unsigned int num, const osg::Vec3& trans, const osg::Vec4& color, float att);
   static osg::LightSource* createLightSource(unsigned int num, const osg::Vec4& color, float att);
 };
+
+void switch4Bytes(void *dst, void *src);
+void switch8Bytes(void *dst, void *src);
+
+struct FDMData {
+  uint32_t version;
+  uint32_t padding;
+  double longitude;
+  double latitude;
+  double altitude;
+  float agl;
+  float phi;
+  float theta;
+  float psi;
+
+  float phidot;            // roll rate (radians/sec)
+  float thetadot;          // pitch rate (radians/sec)
+  float psidot;            // yaw rate (radians/sec)
+  float vcas;              // calibrated airspeed
+  float climb_rate;        // feet per second
+  float v_north;           // north velocity in local/body frame, fps
+  float v_east;            // east velocity in local/body frame, fps
+  float v_down;            // down/vertical velocity in local/body frame, fps
+  float v_wind_body_north; // north velocity in local/body frame
+                           // relative to local airmass, fps
+  float v_wind_body_east;  // east velocity in local/body frame
+                           // relative to local airmass, fps
+  float v_wind_body_down;  // down/vertical velocity in local/body
+                           // frame relative to local airmass, fps
+
+  // Accelerations
+  float A_X_pilot; // X accel in body frame ft/sec^2
+  float A_Y_pilot; // Y accel in body frame ft/sec^2
+  float A_Z_pilot; // Z accel in body frame ft/sec^2
+};
+
 #endif
 

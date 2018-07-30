@@ -20,6 +20,9 @@ find_package(catkin REQUIRED COMPONENTS
   dccomms_ros
 )
 
+# add package modules path, not needed in dependend packages
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
 find_package(Boost REQUIRED thread program_options system filesystem)
 find_package(OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTerrain osgViewer osgText osgWidget osg osgParticle osgManipulator)
 find_package(osg_markers REQUIRED)
@@ -30,6 +33,12 @@ find_package(uwsim_bullet REQUIRED)
 find_package(uwsim_osgbullet REQUIRED)
 find_package(uwsim_osgocean REQUIRED)
 find_package(uwsim_osgworks REQUIRED)
+
+## Find GeographicLib
+find_package(GeographicLib REQUIRED)
+
+## Check if the datasets are installed
+include(CheckGeographicLibDatasets)
 
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 
@@ -64,6 +73,7 @@ catkin_package(
     OSGOCEAN
     OSGUTILS
     OSGWORKS
+    GeographicLib
 )
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;{CMAKE_MODULE_PATH}")
@@ -74,7 +84,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h.cmake
   ${PROJECT_SOURCE_DIR}/include/uwsim/SimulatorConfig.h
 )
 
-INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OSGUTILS_INCLUDE_DIRS} ${OSGMARKERS_INCLUDE_DIRS} ${OSGINTERACTIVEMARKERS_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OSGUTILS_INCLUDE_DIRS} ${OSGMARKERS_INCLUDE_DIRS} ${OSGINTERACTIVEMARKERS_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS})
 
 link_directories(${orocos_kdl_LIBRARY_DIRS})
 
@@ -113,6 +123,7 @@ src/CustomCommsChannel.cpp
 src/AcousticCommsChannel.cpp
 src/LedArray.cpp
 src/NetSim.cpp
+src/NED.cpp
 )
 
 add_library(uwsim_plugins_simdev 
@@ -125,7 +136,7 @@ src/CommsDevice.cpp
 )
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 
-target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU)
+target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU ${GeographicLib_LIBRARIES})
 add_dependencies(uwsim underwater_sensor_msgs_gencpp)
 
 add_executable(uwsim_binary  src/main.cpp)

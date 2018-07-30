@@ -50,6 +50,18 @@ void ConfigFile::extractFloatChar(const xmlpp::Node* node, double &param)
   }
 }
 
+void ConfigFile::extractDecimalChar(const xmlpp::Node* node, double &param)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::TextNode* nodeText = dynamic_cast<const xmlpp::TextNode*>(*iter);
+    if (nodeText)
+        param=atof(nodeText->get_content().c_str());
+  }
+}
+
 void ConfigFile::extractIntChar(const xmlpp::Node* node, int &param)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1124,6 +1136,20 @@ void ConfigFile::processNetTracingScript(const xmlpp::Node* node, NetTracingScri
   }
 }
 
+void ConfigFile::processNedOriginConfig(const xmlpp::Node* node, NedOriginConfig & config)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  config.enabled = true;
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "lat")
+      extractDecimalChar(child, config.lat);
+    else if (child->get_name() == "lon")
+      extractDecimalChar(child, config.lon);
+  }
+}
+
 void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1139,6 +1165,8 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
       extractStringChar(child, aux);
       processURDFFile(aux, vehicle);
     }
+    else if (child->get_name() == "fdm")
+      extractIntChar(child, vehicle.fdmPort);
     else if (child->get_name() == "position")
       extractPositionOrColor(child, vehicle.position);
     else if (child->get_name() == "orientation")
@@ -1545,6 +1573,10 @@ void ConfigFile::processXML(const xmlpp::Node* node)
         processSimParams(child);
       else if (child->get_name() == "camera")
         processCamera(child);
+      else if (child->get_name() == "nedOrigin")
+      {
+        processNedOriginConfig(child, nedOriginConfig);
+      }
       else if (child->get_name() == "netTracingScript")
       {
         processNetTracingScript (child, netTracingScriptConfig);

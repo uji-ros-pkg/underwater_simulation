@@ -598,3 +598,22 @@ osg::LightSource* LightBuilder::createLightSource(unsigned int num, const osg::V
   return lightSource.release();
 }
 
+void switch4Bytes(void *dst, void *src) {
+  uint8_t *buf = (uint8_t *)dst;
+  *buf = *((uint8_t *)src + 3);
+  *(buf + 1) = *((uint8_t *)src + 2);
+  *(buf + 2) = *((uint8_t *)src + 1);
+  *(buf + 3) = *((uint8_t *)src);
+}
+
+void switch8Bytes(void *dst, void *src) {
+  uint8_t *buf = (uint8_t *)dst;
+  *buf = *((uint8_t *)src + 7);
+  *(buf + 1) = *((uint8_t *)src + 6);
+  *(buf + 2) = *((uint8_t *)src + 5);
+  *(buf + 3) = *((uint8_t *)src + 4);
+  *(buf + 4) = *((uint8_t *)src + 3);
+  *(buf + 5) = *((uint8_t *)src + 2);
+  *(buf + 6) = *((uint8_t *)src + 1);
+  *(buf + 7) = *((uint8_t *)src);
+}

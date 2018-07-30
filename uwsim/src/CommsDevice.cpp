@@ -121,7 +121,7 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
           }
           if (cfg->disable) {
             ROS_WARN("CommsDevice: disabled by user");
-            return true;
+            continue;
           }
           ROS_INFO("CommsDevice: added successfully");
           dev->AddToNetSim();

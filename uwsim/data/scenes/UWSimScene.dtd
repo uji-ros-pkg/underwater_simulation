@@ -1,10 +1,10 @@
-<!ELEMENT UWSimScene (oceanState?,simParams?,camera?, netTracingScript?, (CustomCommsChannel*)?,(AcousticCommsChannel*)?,vehicle*,object*,rosInterfaces?)>
+<!ELEMENT UWSimScene (oceanState?,simParams?,camera?, nedOrigin?, netTracingScript?, (CustomCommsChannel*)?,(AcousticCommsChannel*)?,vehicle*,object*,rosInterfaces?)>
 <!ATTLIST UWSimScene xmlns:xacro CDATA #IMPLIED>
 
 <!-- elementos oceanScene -->
 <!ELEMENT oceanState (windx?,windy?,windSpeed?,depth?,reflectionDamping?,waveScale?,isNotChoppy?,choppyFactor?,crestFoamHeight?,oceanSurfaceHeight?,fog?,color?,attenuation?)>
 <!ELEMENT simParams (disableShaders?,resw?,resh?,offsetp?,offsetr?,enablePhysics?,gravity?,physicsFrequency?,physicsSubSteps?, physicsSolver?,showTrajectory*,lightRate?)>
-<!ELEMENT vehicle (name,file,jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*, DredgeTool*, CustomCommsDevice*, AcousticCommsDevice*, LedArray?)>
+<!ELEMENT vehicle (name,file, fdm?, jointValues?,position?,orientation?,scaleFactor?,virtualCamera*, structuredLightProjector*, rangeSensor*, objectPicker*, imu*, pressureSensor*, gpsSensor*, dvlSensor*, virtualRangeImage*,multibeamSensor*, simulatedDevices?, echo*, ForceSensor*, DredgeTool*, CustomCommsDevice*, AcousticCommsDevice*, LedArray?)>
 <!ELEMENT virtualCamera (name,relativeTo,resw?,resh?,position?,orientation?,baseline?,frameId?,fovy?, parameters?, showpath?,grayscale?,std?)>
 <!ELEMENT virtualRangeImage (name,relativeTo,resw?,resh?,position?,orientation?,frameId?,fovy?,parameters?)>
 <!ELEMENT structuredLightProjector (name,relativeTo,fov,image_name,laser?,position?,orientation?)>
@@ -237,7 +237,11 @@ echoROS?
 <!ELEMENT errorRateExpr (#PCDATA)>
 <!ELEMENT logLevel (#PCDATA)>
 <!ELEMENT disable (#PCDATA)>
+<!ELEMENT fdm (#PCDATA)>
+<!ELEMENT lat (#PCDATA)>
+<!ELEMENT lon (#PCDATA)>
 
+<!ELEMENT nedOrigin (lat, lon)>
 <!ELEMENT rateErrorModel (errorUnit, errorRateExpr)>
 <!ELEMENT className (#PCDATA)>
 <!ELEMENT libPath (#PCDATA)>
