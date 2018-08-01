@@ -366,7 +366,7 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
           float *theta = phi + 1;
           float *psi = theta + 1;
           while (1) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
             memset(rxbuff, 0, GCS_BUFFER_LENGTH);
             socklen_t fromlen = sizeof(sockaddr);
 
