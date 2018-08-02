@@ -18,7 +18,10 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   xacro
   dccomms_ros
+  roslaunch
 )
+
+roslaunch_add_file_check(data/scenes/launch)
 
 # add package modules path, not needed in dependend packages
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
