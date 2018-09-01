@@ -22,7 +22,8 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
 
   cfg->intrinsicDelay = 0;
   cfg->bitrate = 1000;
-  cfg->bitrateSd = 0;
+  cfg->txJitter = 0;
+  cfg->rxJitter = 0;
   cfg->maxDistance = 99999999;
   cfg->minDistance = 0;
   cfg->pktErrRatioIncPerMeter = 0;
@@ -38,8 +39,6 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
       config->extractFloatChar(child, cfg->intrinsicDelay);
     else if (child->get_name() == "bitrate")
       config->extractFloatChar(child, cfg->bitrate);
-    else if (child->get_name() == "bitrateSd")
-      config->extractFloatChar(child, cfg->bitrateSd);
     else if (child->get_name() == "maxDistance")
       config->extractFloatChar(child, cfg->maxDistance);
     else if (child->get_name() == "minDistance")
@@ -62,6 +61,16 @@ CustomCommsDevice_Factory::processConfig(const xmlpp::Node *node,
         else if (ema->get_name() == "errorRateExpr")
           config->extractStringChar(ema, cfg->errorRateExpr);
       }
+    } else if (child->get_name() == "jitter") {
+      xmlpp::Node::NodeList emAttributes = child->get_children();
+      for (xmlpp::Node::NodeList::iterator subiter = emAttributes.begin();
+           subiter != emAttributes.end(); ++subiter) {
+        const xmlpp::Node *ema = dynamic_cast<const xmlpp::Node *>(*subiter);
+        if (ema->get_name() == "tx")
+          config->extractFloatChar(ema, cfg->txJitter);
+        else if (ema->get_name() == "rx")
+          config->extractFloatChar(ema, cfg->rxJitter);
+      }
     }
   }
   return SimulatedDeviceConfig::Ptr(cfg);
@@ -80,7 +89,8 @@ bool CustomCommsDevice::_AddToNetSim() {
   srv.minPktErrorRate = this->config->minPktErrRatio;
   srv.pktErrorRateIncPerMeter = this->config->pktErrRatioIncPerMeter;
   srv.bitrate = this->config->bitrate;
-  srv.bitrateSd = this->config->bitrateSd;
+  srv.txJitter = this->config->txJitter;
+  srv.rxJitter = this->config->rxJitter;
   srv.maxTxFifoSize = this->config->txFifoSize;
   srv.errorRateExpr = this->config->errorRateExpr;
   srv.errorUnit = this->config->errorUnit;
