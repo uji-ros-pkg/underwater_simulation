@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="rviz" default="true"/>
+  <arg name="base_marker" default="aruco_marker_8"/>
+  <arg name="mavros_running" default="false"/>
+  <arg name="scene" default="cuba_aruco.xml"/>
+
+  <!-- local_origin tf is the ENU origin. Mavros will public the NED frame named local_origin_ned --> 
+
+  <!-- see https://github.com/mavlink/mavros/blob/de9f39a719b091b8448214a17d27b3b1c415d0dc/mavros/src/lib/uas_data.cpp#L55 
+   	publish_static_transform("local_origin", "local_origin_ned", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, M_PI_2)));
+	publish_static_transform("fcu", "fcu_frd", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, 0)));
+  -->
+  <node unless="$(arg mavros_running)" pkg="tf2_ros" type="static_transform_publisher" name="enu_to_ned" required="true" output="screen" args="0 0 0 1.5707963267948966 0 3.141592653589793 local_origin local_origin_ned"/> 
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="cuba2_world_local_origin_broadcaster" required="true" output="screen" args="0 0 -4.25 -1.578 0 0 world local_origin"/> 
+
+  <node pkg="uwsim" type="uwsim" name="uwsim_cuba" output="screen" required="true" args="--configfile $(arg scene) --dataPath $(find uwsim)/data/scenes/"/>
+
+  <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" required="true" args="-d $(find uwsim)/data/scenes/launch/cuba_aruco.rviz" />
+
+  <node pkg="uwsim" type="followMarker" name="bluerov2_follow_marker" required="true" output="screen" args="/bluerov2_ghost/odom 0 1.5 -5 3.1416 0 0 0.01 0.7 0 0 1" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="bluerov2_enu_broadcaster" required="true" output="screen" args="0 0 0 0 0 3.141592653589793 bluerov2 bluerov2_enu"/> 
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="bluerov2_ghost_enu_broadcaster" required="true" output="screen" args="0 0 0 0 0 3.141592653589793 bluerov2_ghost bluerov2_ghost_enu"/> 
+
+</launch>

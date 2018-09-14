@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="scene" default="netsim_cirs.xml"/>
+
+  <node pkg="uwsim" type="uwsim" name="uwsim_cuba" output="screen" required="true" args="--configfile $(arg scene) --dataPath $(find uwsim)/data/scenes/"/>
+
+  <node pkg="uwsim" type="followMarker" name="g500_follow_marker" required="true" output="screen" args="/g500_ghost/odom 2.88776 0.868419 3.02345 0 0 -1.72872 0.01 1.5 0 0 1" />
+</launch>
