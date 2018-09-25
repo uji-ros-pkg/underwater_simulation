@@ -339,6 +339,7 @@ struct Vehicle
   std::string URDFFile;
   LedArrayConfig ledArrayConfig;
   int fdmPort = -1;
+  int vr = 0;
 };
 
 struct PhysicProperties

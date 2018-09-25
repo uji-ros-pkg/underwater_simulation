@@ -1167,6 +1167,8 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
     }
     else if (child->get_name() == "fdm")
       extractIntChar(child, vehicle.fdmPort);
+    else if (child->get_name() == "vr")
+      extractIntChar(child, vehicle.vr);
     else if (child->get_name() == "position")
       extractPositionOrColor(child, vehicle.position);
     else if (child->get_name() == "orientation")
