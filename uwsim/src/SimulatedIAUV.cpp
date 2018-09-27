@@ -90,6 +90,8 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars) :
   name = vehicleChars.name;
   baseTransform = new osg::MatrixTransform;
   root = oscene->root;
+  if(vehicleChars.vr)
+    baseTransform->setNodeMask(oscene->scene->getOceanScene()->getARMask());
 
   if (urdf->baseTransform != NULL /* && arm->baseTransform!=NULL*/)
   {

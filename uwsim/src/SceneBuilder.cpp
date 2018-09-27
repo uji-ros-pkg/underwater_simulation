@@ -627,6 +627,14 @@ bool SceneBuilder::loadScene(ConfigFile config) {
         uwsim::NetSim::LoadTracingScript(config.netTracingScriptConfig.className,
                                        config.netTracingScriptConfig.libPath);
   }
+  auto tracingScript = uwsim::NetSim::GetScript();
+  if(config.netTracingScriptConfig.asyncLog)
+    tracingScript->SetAsyncMode();
+  else
+    tracingScript->SetSyncMode();
+  tracingScript->LogToConsole (config.netTracingScriptConfig.logToConsole);
+  if(config.netTracingScriptConfig.logToFile != "")
+    tracingScript->LogToFile(config.netTracingScriptConfig.logToFile);
 
   return true;
 }

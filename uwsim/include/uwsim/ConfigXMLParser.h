@@ -459,8 +459,9 @@ struct AcousticCommsChannelConfig
 struct NetTracingScriptConfig
 {
   std::string className,
-  libPath;
-  NetTracingScriptConfig(): className(""), libPath(""){}
+  libPath, logToFile;
+  int logToConsole, asyncLog;
+  NetTracingScriptConfig(): className(""), libPath(""), logToFile(""), logToConsole(1), asyncLog(1){}
 };
 
 struct NedOriginConfig

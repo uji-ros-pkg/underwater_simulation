@@ -1133,6 +1133,12 @@ void ConfigFile::processNetTracingScript(const xmlpp::Node* node, NetTracingScri
       extractStringChar(child, config.className);
     else if (child->get_name() == "libPath")
       extractStringChar(child, config.libPath);
+    else if (child->get_name() == "logToFile")
+      extractStringChar(child, config.logToFile);
+    else if (child->get_name() == "logToConsole")
+      extractIntChar(child, config.logToConsole);
+    else if (child->get_name() == "asyncLog")
+      extractIntChar(child, config.asyncLog);
   }
 }
 

@@ -242,6 +242,9 @@ echoROS?
 <!ELEMENT tx (#PCDATA)>
 <!ELEMENT rx (#PCDATA)>
 <!ELEMENT vr (#PCDATA)>
+<!ELEMENT logToFile (#PCDATA)>
+<!ELEMENT logToConsole (#PCDATA)>
+<!ELEMENT asyncLog (#PCDATA)>
 
 <!ELEMENT nedOrigin (lat, lon)>
 <!ELEMENT rateErrorModel (errorUnit, errorRateExpr)>
@@ -250,7 +253,7 @@ echoROS?
 <!ELEMENT libPath (#PCDATA)>
 <!ELEMENT txPacketBuilder (className, libPath?)>
 <!ELEMENT rxPacketBuilder (className, libPath?)>
-<!ELEMENT netTracingScript (className, libPath?)>
+<!ELEMENT netTracingScript (className, libPath?, logToFile?, logToConsole?, asyncLog?)>
 <!ELEMENT energyModel (energyLevel, turnOnEnergy, turnOffEnergy, pTConsume, pRConsume, pIdle, pT)>
 
 <!ELEMENT AcousticCommsChannel (id, bandwidth?, temperature?, salinity?, noiseLvl?, logLevel?)>
