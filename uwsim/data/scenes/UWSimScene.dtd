@@ -248,7 +248,7 @@ echoROS?
 
 <!ELEMENT nedOrigin (lat, lon)>
 <!ELEMENT rateErrorModel (errorUnit, errorRateExpr)>
-<!ELEMENT jitter (tx, rx)>
+<!ELEMENT jitter (tx?, rx)>
 <!ELEMENT className (#PCDATA)>
 <!ELEMENT libPath (#PCDATA)>
 <!ELEMENT txPacketBuilder (className, libPath?)>
