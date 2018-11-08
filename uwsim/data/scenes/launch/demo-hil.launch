@@ -4,7 +4,7 @@
   <arg name="rviz" default="true"/>
   <arg name="base_marker" default="aruco_marker_8"/>
   <arg name="mavros_running" default="false"/>
-  <arg name="scene" default="cuba_aruco.xml"/>
+  <arg name="scene" default="demo-hil.xml"/>
   <arg name="publish_base_marker" default="true" />
 
   <node if="$(arg publish_base_marker)" pkg="tf2_ros" type="static_transform_publisher" name="base_marker_broadcaster" required="true" output="screen" args="0 0 0 0 0.0 0 $(arg base_marker) base_marker"/>
@@ -23,7 +23,9 @@
 
   <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" required="true" args="-d $(find uwsim)/data/scenes/launch/cuba_aruco.rviz" />
 
+<!--
   <node pkg="uwsim" type="followMarker" name="bluerov2_follow_marker" required="true" output="screen" args="/bluerov2_ghost/odom 0 1.5 -5 3.1416 0 0 0.01 0.7 0 0 1" />
+-->
 
   <node pkg="tf2_ros" type="static_transform_publisher" name="bluerov2_enu_broadcaster" required="true" output="screen" args="0 0 0 0 0 3.141592653589793 bluerov2 bluerov2_enu"/> 
 

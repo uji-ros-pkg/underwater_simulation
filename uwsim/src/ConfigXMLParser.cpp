@@ -1110,6 +1110,21 @@ void ConfigFile::processLedArray(const xmlpp::Node* node, LedArrayConfig & ledAr
   }
 }
 
+void ConfigFile::processTfRelativeConfig(const xmlpp::Node* node, TfRelativeConfig & config)
+{
+  xmlpp::Node::NodeList list = node->get_children();
+  for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    const xmlpp::Node* child = dynamic_cast<const xmlpp::Node*>(*iter);
+    if (child->get_name() == "tfId")
+      extractStringChar(child, config.tfId);
+    else if (child->get_name() == "position")
+      extractPositionOrColor(child, config.position);
+    else if (child->get_name() == "orientation")
+      extractOrientation(child, config.orientation);
+  }
+}
+
 void ConfigFile::processPacketBuilderConfig(const xmlpp::Node* node, PacketBuilderConfig & config)
 {
   xmlpp::Node::NodeList list = node->get_children();
@@ -1173,6 +1188,8 @@ void ConfigFile::processVehicle(const xmlpp::Node* node, Vehicle &vehicle)
     }
     else if (child->get_name() == "fdm")
       extractIntChar(child, vehicle.fdmPort);
+    else if (child->get_name() == "tf")
+      processTfRelativeConfig(child, vehicle.tfRelativeConfig);
     else if (child->get_name() == "vr")
       extractIntChar(child, vehicle.vr);
     else if (child->get_name() == "position")

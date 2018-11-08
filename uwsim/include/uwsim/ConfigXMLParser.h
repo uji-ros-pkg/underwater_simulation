@@ -1,10 +1,10 @@
-/* 
+/*
  * Copyright (c) 2013 University of Jaume-I.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/gpl.html
- * 
+ *
  * Contributors:
  *     Mario Prats
  *     Javier Perez
@@ -313,6 +313,22 @@ struct LedArrayConfig
   }
 };
 
+struct TfRelativeConfig
+{
+  std::string tfId;
+  double position[3];
+  double orientation[3];
+  TfRelativeConfig(): tfId("")
+  {
+    position[0] = 0;
+    position[1] = 0;
+    position[2] = 0;
+    orientation[0] = 0;
+    orientation[1] = 0;
+    orientation[2] = 0;
+  }
+};
+
 struct Vehicle
 {
   string name;
@@ -340,6 +356,7 @@ struct Vehicle
   LedArrayConfig ledArrayConfig;
   int fdmPort = -1;
   int vr = 0;
+  TfRelativeConfig tfRelativeConfig;
 };
 
 struct PhysicProperties
@@ -426,7 +443,7 @@ struct PhysicsConfig
    subSteps = 0;
    solver=Dantzig;
  }
- 
+
 };
 
 struct Mesh{
@@ -540,6 +557,8 @@ public:
   void processPacketBuilderConfig(const xmlpp::Node* node, PacketBuilderConfig & config);
   void processNetTracingScript(const xmlpp::Node* node, NetTracingScriptConfig & config);
   void processNedOriginConfig(const xmlpp::Node* node, NedOriginConfig & config);
+
+  void processTfRelativeConfig(const xmlpp::Node* node, TfRelativeConfig & config);
 
 public:
   double windx, windy, windSpeed, depth, reflectionDamping, waveScale, choppyFactor, crestFoamHeight,
