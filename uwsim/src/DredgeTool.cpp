@@ -114,7 +114,7 @@ DredgeTool::DredgeTool(DredgeTool_Config * cfg, osg::ref_ptr<osg::Node> target) 
 
 }
 
-boost::shared_ptr<osg::Matrix> DredgeTool::getDredgePosition()
+std::shared_ptr<osg::Matrix> DredgeTool::getDredgePosition()
 {
   return getWorldCoords(target);;
 }

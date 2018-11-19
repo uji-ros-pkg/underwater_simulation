@@ -34,7 +34,7 @@ ViewBuilder::ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *a
   init(config, scene_builder);
 }
 
-ViewBuilder::ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, boost::shared_ptr<osg::ArgumentParser> args)
+ViewBuilder::ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, std::shared_ptr<osg::ArgumentParser> args)
 {
   arguments = args;
   init(config, scene_builder);

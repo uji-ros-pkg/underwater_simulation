@@ -42,8 +42,8 @@ public:
 
   SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node* node, ConfigFile * config);
   bool applyConfig(SimulatedIAUV * auv, Vehicle &vehicleChars, SceneBuilder *sceneBuilder, size_t iteration);
-  std::vector<boost::shared_ptr<ROSInterface> > getInterface(ROSInterfaceInfo & rosInterface,
-                                                             std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile);
+  std::vector<std::shared_ptr<ROSInterface> > getInterface(ROSInterfaceInfo & rosInterface,
+                                                             std::vector<std::shared_ptr<SimulatedIAUV> > & iauvFile);
 };
 
 //can be a sparate header file for actual implementation classes...

@@ -145,7 +145,7 @@ public:
                 _sceneBuilder->objects[i]->getParent(0)->getParent(0)->getParent(0)->removeChild(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
 
                 //Get object position in OSG world to move it to Bullet
-                boost::shared_ptr<osg::Matrix> mat = getWorldCoords(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
+                std::shared_ptr<osg::Matrix> mat = getWorldCoords(_sceneBuilder->objects[i]->getParent(0)->getParent(0));
 
                 //Unset STATIC flag (catched objects)
                 data->rigidBody->setCollisionFlags(

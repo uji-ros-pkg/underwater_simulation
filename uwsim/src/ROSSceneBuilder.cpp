@@ -21,7 +21,7 @@
 #include <osg_markers/triangle_list_marker.h>
 #include <osg_markers/mesh_resource_marker.h>
 
-ROSSceneBuilder::ROSSceneBuilder(boost::shared_ptr<osg::ArgumentParser> args)
+ROSSceneBuilder::ROSSceneBuilder(std::shared_ptr<osg::ArgumentParser> args)
 :SceneBuilder(args)
 {
 
@@ -40,9 +40,9 @@ bool ROSSceneBuilder::loadScene(ConfigFile config)
   markers->setNodeMask(scene->getOceanScene()->getNormalSceneMask() | scene->getOceanScene()->getReflectedSceneMask() | scene->getOceanScene()->getRefractedSceneMask());
 
   //Create a marker frame manager, and interactive marker client
-  frame_manager = osg_utils::FrameManager::instance();
+  frame_manager = to_std_ptr(osg_utils::FrameManager::instance());
   frame_manager->setFixedFrame("/world");
-  marker_cli= (boost::shared_ptr<osg_interactive_markers::InteractiveMarkerDisplay>)
+  marker_cli= (std::shared_ptr<osg_interactive_markers::InteractiveMarkerDisplay>)
 	 new osg_interactive_markers::InteractiveMarkerDisplay("osg_im","/uwsim_marker/update", markers, *(frame_manager->getTFClient()));
 
   //Start time elapsed vars for interactive marker client
@@ -63,7 +63,7 @@ void ROSSceneBuilder::updateIM()
 
 bool  ROSSceneBuilder::markerSRVCallback(underwater_sensor_msgs::SpawnMarker::Request  &req, underwater_sensor_msgs::SpawnMarker::Response &res)
 {
-  boost::shared_ptr<osg_markers::MarkerBase> markerSearch;
+  std::shared_ptr<osg_markers::MarkerBase> markerSearch;
   //Search for marker in markerList
   for (MarkerList::iterator iter = markerList.begin(); iter != markerList.end(); ++iter)
   {
@@ -101,7 +101,7 @@ bool  ROSSceneBuilder::markerSRVCallback(underwater_sensor_msgs::SpawnMarker::Re
     return true; 
   }
 
-  boost::shared_ptr<osg_markers::MarkerBase> marker;
+  std::shared_ptr<osg_markers::MarkerBase> marker;
   osg::MatrixTransform * parent = new osg::MatrixTransform();
 
   switch (req.marker.type)

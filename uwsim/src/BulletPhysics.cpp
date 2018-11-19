@@ -95,7 +95,7 @@ public:
 
   virtual void getWorldTransform(btTransform &worldTrans) const
   {
-    boost::shared_ptr<osg::Matrix> mat = getWorldCoords(object);
+    std::shared_ptr<osg::Matrix> mat = getWorldCoords(object);
     //BTTransforms do not use scale, so we turn it back to 1.
     mat->preMultScale(osg::Vec3d(1.0/mat->getScale().x(),1.0/mat->getScale().y(),1.0/mat->getScale().z())); 
     worldTrans = osgbCollision::asBtTransform(*mat);
@@ -104,7 +104,7 @@ public:
   virtual void setWorldTransform(const btTransform &worldTrans)
   {
     //Object initial position
-    boost::shared_ptr<osg::Matrix> mat = getWorldCoords(transf->getParent(0));
+    std::shared_ptr<osg::Matrix> mat = getWorldCoords(transf->getParent(0));
 
     //Get object position in matrixd
     osg::Matrixd worldMatrix;
@@ -315,7 +315,7 @@ btCollisionShape* BulletPhysics::GetCSFromOSG(osg::Node * node, collisionShapeTy
 }
 
 btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *node, CollisionDataType * data,
-                                      boost::shared_ptr<PhysicProperties> pp, osg::Node * colShape)
+                                      std::shared_ptr<PhysicProperties> pp, osg::Node * colShape)
 {
   //if not physic properties set default.
   if (!pp)
@@ -356,7 +356,7 @@ btRigidBody* BulletPhysics::addObject(osg::MatrixTransform *root, osg::Node *nod
     cs = GetCSFromOSG(colShape, ctype);
 
   //As btTransforms do not work with scale, we scale the collision shape
-  boost::shared_ptr<osg::Matrix> mat = getWorldCoords(node);
+  std::shared_ptr<osg::Matrix> mat = getWorldCoords(node);
   cs->setLocalScaling(btVector3(mat->getScale().x(),mat->getScale().y(),mat->getScale().z()));
 
   btVector3 inertia = btVector3(pp->inertia[0], pp->inertia[1], pp->inertia[2]);

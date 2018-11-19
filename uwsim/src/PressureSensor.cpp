@@ -18,7 +18,7 @@
 double PressureSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
-  boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
+  std::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   osg::Matrixd lMs = *rMs * osg::Matrixd::inverse(rMl_);
 
   //Now add some gaussian noise

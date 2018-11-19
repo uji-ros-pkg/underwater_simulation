@@ -13,13 +13,14 @@
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/DVLSensor.h>
 #include <osg/io_utils>
+#include <memory>
 
 #include <osg/PositionAttitudeTransform>
 
 osg::Vec3d DVLSensor::getMeasurement()
 {
   //Should get world coords and then transform to the localizedWorld
-  boost::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
+  std::shared_ptr<osg::Matrix> rMs = getWorldCoords(node_);
   osg::Matrixd lMs = *rMs * osg::Matrixd::inverse(rMl_);
   osg::Vec3d x = lMs.getTrans();
 

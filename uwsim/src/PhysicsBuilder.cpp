@@ -11,6 +11,7 @@
  */
 
 #include <uwsim/PhysicsBuilder.h>
+#include <memory>
 
 PhysicsBuilder::PhysicsBuilder(SceneBuilder * scene_builder, ConfigFile config)
 {
@@ -31,7 +32,7 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
       osg::Node * link = scene_builder->iauvFile[i]->urdf->link[j];
       osg::Node * cs = NULL;
       btRigidBody* rigidBody;
-      boost::shared_ptr<PhysicProperties> pp;
+      std::shared_ptr<PhysicProperties> pp;
       pp.reset(new PhysicProperties);
       pp->init();
       pp->isKinematic = 1;
@@ -92,7 +93,7 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
     CollisionDataType * colData = new CollisionDataType(scene_builder->objects[i]->getName(), " ", 0);
 
     //Search for object in config, and look for physic properties
-    boost::shared_ptr < PhysicProperties > pp;
+    std::shared_ptr < PhysicProperties > pp;
     for (std::list<Object>::iterator j = config.objects.begin(); j != config.objects.end(); j++)
     {
       if (j->name == scene_builder->objects[i]->getName())
@@ -105,7 +106,7 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
     //Check if object has a collisionShape defined
     osg::Node * cs = NULL;
     if (pp && pp->cs != ""){
-      boost::shared_ptr<Geometry> geom =(boost::shared_ptr<Geometry>) new Geometry;
+      std::shared_ptr<Geometry> geom =(std::shared_ptr<Geometry>) new Geometry;
       geom->file=pp->cs;
       geom->type=0;
       cs = UWSimGeometry::loadGeometry(geom);
@@ -128,10 +129,10 @@ void PhysicsBuilder::loadPhysics(SceneBuilder * scene_builder, ConfigFile config
   {
     ROSInterfaceInfo rosInterface = config.ROSPhysInterfaces.front();
 
-    boost::shared_ptr < ROSInterface > iface;
+    std::shared_ptr < ROSInterface > iface;
 
     if (rosInterface.type == ROSInterfaceInfo::contactSensorToROS)
-      iface = boost::shared_ptr < contactSensorToROS
+      iface = std::shared_ptr < contactSensorToROS
           > (new contactSensorToROS(scene_builder->root, physics, rosInterface.targetName, rosInterface.topic,
                                     rosInterface.rate));
 

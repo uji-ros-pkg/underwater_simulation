@@ -29,8 +29,8 @@ public:
   //Factory methods
 
   //returns configured ROSInterface based on given XML configuration
-  static std::vector<boost::shared_ptr<ROSInterface> > getInterfaces(
-      ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile);
+  static std::vector<std::shared_ptr<ROSInterface> > getInterfaces(
+      ROSInterfaceInfo & rosInterface, std::vector<std::shared_ptr<SimulatedIAUV> > & iauvFile);
 
   //Parses driver's XML configuration
   static std::vector<uwsim::SimulatedDeviceConfig::Ptr> processConfig(const xmlpp::Node* node, ConfigFile * config,

@@ -43,7 +43,7 @@ public:
   std::vector<GPSSensor> gps_sensors;
   std::vector<DVLSensor> dvl_sensors;
   std::vector<MultibeamSensor> multibeam_sensors;
-  boost::shared_ptr<SimulatedDevices> devices;
+  std::shared_ptr<SimulatedDevices> devices;
   osg::ref_ptr<osg::Group> root;
   std::shared_ptr<uwsim::LedArray> ledArray;
 
@@ -53,7 +53,7 @@ public:
   } arm_t;
 
   std::string name; ///< Vehicle name
-  boost::shared_ptr<URDFRobot> urdf; ///< URDF I-AUV
+  std::shared_ptr<URDFRobot> urdf; ///< URDF I-AUV
   //osg::LightSource* lightSource;	///< vehicle lamp
   osg::ref_ptr<osg::MatrixTransform> baseTransform;
   std::mutex baseTransform_mutex;

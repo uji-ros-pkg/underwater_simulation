@@ -114,7 +114,7 @@ public:
 
   DredgeTool(DredgeTool_Config * cfg, osg::ref_ptr<osg::Node> target);
 
-  virtual boost::shared_ptr<osg::Matrix> getDredgePosition();
+  virtual std::shared_ptr<osg::Matrix> getDredgePosition();
 
   void dredgedParticles(int nparticles);
 

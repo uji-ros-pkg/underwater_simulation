@@ -614,7 +614,7 @@ void ConfigFile::processGeometry(urdf::Geometry * geometry, Geometry * geom)
   }
 }
 
-void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link,
+void ConfigFile::processVisual(std::shared_ptr<const urdf::Visual> visual, Link &link,
                                std::map<std::string, Material> &materials)
 {
   processGeometry(visual->geometry.get(), link.geom.get());
@@ -634,7 +634,7 @@ void ConfigFile::processVisual(boost::shared_ptr<const urdf::Visual> visual, Lin
   }
 }
 
-void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle, int parentLink,
+void ConfigFile::processJoint(std::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle, int parentLink,
                               int childLink)
 {
   jointVehicle.name = joint->name;
@@ -681,7 +681,7 @@ void ConfigFile::processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint 
   }
 }
 
-int ConfigFile::processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint,
+int ConfigFile::processLink(std::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint,
                             std::map<std::string, Material> &materials)
 {
   vehicle.links[nlink].name = link->name;
@@ -755,7 +755,7 @@ int ConfigFile::processURDFFile(string file, Vehicle &vehicle)
   vehicle.links.resize(vehicle.nlinks);
   vehicle.njoints = model.joints_.size();
   vehicle.joints.resize(vehicle.njoints);
-  boost::shared_ptr<const urdf::Link> root = model.getRoot();
+  std::shared_ptr<const urdf::Link> root = model.getRoot();
   processLink(root, vehicle, 0, 0, vehicle.materials);
   return 0;
 }

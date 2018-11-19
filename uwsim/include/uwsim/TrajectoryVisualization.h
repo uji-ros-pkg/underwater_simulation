@@ -24,7 +24,7 @@ class TrajectoryUpdateCallback : public osg::NodeTrackerCallback
 {
   virtual void operator()(osg::Node *node, osg::NodeVisitor *nv)
   {
-    boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(node);
+    std::shared_ptr<osg::Matrix> objectMat= getWorldCoords(node);
     osg::Matrixd  res=*objectMat * *LWMat;
     if (trajectory_initialized)
     {
@@ -79,7 +79,7 @@ public:
   double timeWindow;
 
   osg::ref_ptr<osg::Geode> geode; //Geometry node that draws the beam
-  boost::shared_ptr<osg::Matrix> LWMat; //LocalizedWorld Inverted Matrix ( to know distnace from it)
+  std::shared_ptr<osg::Matrix> LWMat; //LocalizedWorld Inverted Matrix ( to know distnace from it)
 
   void reset()
   {

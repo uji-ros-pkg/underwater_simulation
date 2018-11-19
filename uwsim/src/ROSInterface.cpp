@@ -270,10 +270,10 @@ void ROSPointCloudLoader::processData(const sensor_msgs::PointCloud2ConstPtr& ms
    if(frame_id)
    {
      osg::ref_ptr < osg::Node > LWNode=findRN("localizedWorld",scene_root);
-     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(LWNode);
+     std::shared_ptr<osg::Matrix> LWMat=getWorldCoords(LWNode);
      LWMat->invert(*LWMat);
 
-     boost::shared_ptr<osg::Matrix> WorldToBase=getWorldCoords(frame_id);
+     std::shared_ptr<osg::Matrix> WorldToBase=getWorldCoords(frame_id);
 
      osg::Matrixd  res=*WorldToBase * *LWMat;
      osg::ref_ptr < osg::MatrixTransform > WorldToBaseTransform= new osg::MatrixTransform(res);
@@ -400,7 +400,7 @@ ROSPointCloudLoader::~ROSPointCloudLoader(){}
  };
  */
 
-ROSJointStateToArm::ROSJointStateToArm(std::string topic, boost::shared_ptr<SimulatedIAUV> arm) :
+ROSJointStateToArm::ROSJointStateToArm(std::string topic, std::shared_ptr<SimulatedIAUV> arm) :
     ROSSubscriberInterface(topic)
 {
   this->arm = arm;
@@ -435,7 +435,7 @@ ROSJointStateToArm::~ROSJointStateToArm()
 {
 }
 
-ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_topic, boost::shared_ptr<HUDCamera> camera) :
+ROSImageToHUDCamera::ROSImageToHUDCamera(std::string topic, std::string info_topic, std::shared_ptr<HUDCamera> camera) :
     ROSSubscriberInterface(info_topic), cam(camera), image_topic(topic)
 {
 }
@@ -1102,7 +1102,7 @@ WorldToROSTF::WorldToROSTF(  SceneBuilder * scene, std::string worldRootName, un
       }
       
       osg::ref_ptr<osg::MatrixTransform> transform;
-      robot_pubs_.push_back(boost::shared_ptr<robot_state_publisher::RobotStatePublisher>(
+      robot_pubs_.push_back(std::shared_ptr<robot_state_publisher::RobotStatePublisher>(
        new robot_state_publisher::RobotStatePublisher(tree)));
   
       findNodeVisitor findNode(scene->iauvFile[i].get()->name);
@@ -1124,7 +1124,7 @@ WorldToROSTF::WorldToROSTF(  SceneBuilder * scene, std::string worldRootName, un
 
 void WorldToROSTF::createPublisher(ros::NodeHandle &nh)
 {   
-   tfpub_ = boost::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
+   tfpub_ = std::shared_ptr<tf::TransformBroadcaster>(new tf::TransformBroadcaster());
 }
 
 void WorldToROSTF::publish()
@@ -1264,12 +1264,12 @@ void WorldToROSTF::publish()
    if(enableObjects_)
    {
 
-     boost::shared_ptr<osg::Matrix> LWMat=getWorldCoords(scene->scene->localizedWorld);
+     std::shared_ptr<osg::Matrix> LWMat=getWorldCoords(scene->scene->localizedWorld);
      LWMat->invert(*LWMat);
 
      for(unsigned int i=0;i<scene->objects.size();i++)
      {
-       boost::shared_ptr<osg::Matrix> objectMat= getWorldCoords(scene->objects[i]);
+       std::shared_ptr<osg::Matrix> objectMat= getWorldCoords(scene->objects[i]);
 
        osg::Matrixd  res=*objectMat * *LWMat;
 

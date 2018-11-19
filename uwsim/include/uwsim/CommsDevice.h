@@ -71,9 +71,9 @@ public:
   // Methods from SimulatedDevice
   virtual bool applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
                            SceneBuilder *sceneBuilder, size_t iteration);
-  virtual std::vector<boost::shared_ptr<ROSInterface>>
+  virtual std::vector<std::shared_ptr<ROSInterface>>
   getInterface(ROSInterfaceInfo &rosInterface,
-               std::vector<boost::shared_ptr<SimulatedIAUV>> &iauvFile);
+               std::vector<std::shared_ptr<SimulatedIAUV>> &iauvFile);
   virtual SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node *node,
                                                    ConfigFile *config) = 0;
 };

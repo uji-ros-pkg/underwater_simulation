@@ -22,19 +22,20 @@
 #include "SimulatedIAUV.h"
 #include "ConfigXMLParser.h"
 #include "SceneBuilder.h"
+#include <memory>
 
 class ViewBuilder
 {
 public:
   osg::ref_ptr<osgViewer::Viewer> viewer;
-  boost::shared_ptr<osg::ArgumentParser> arguments;
+  std::shared_ptr<osg::ArgumentParser> arguments;
   int fullScreenNum;
 
 public:
   osg::ref_ptr<osgWidget::WindowManager> wm;
   ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder);
   ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, int *argc, char **argv);
-  ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, boost::shared_ptr<osg::ArgumentParser> args);
+  ViewBuilder(ConfigFile &config, SceneBuilder *scene_builder, std::shared_ptr<osg::ArgumentParser> args);
 
   osgViewer::View* getView()
   {

@@ -91,7 +91,7 @@ public:
     dynamicsWorld->setGravity(g);
   }
   btRigidBody* addObject(osg::MatrixTransform *root, osg::Node *node, CollisionDataType * data,
-                         boost::shared_ptr<PhysicProperties> pp, osg::Node * colShape = NULL);
+                         std::shared_ptr<PhysicProperties> pp, osg::Node * colShape = NULL);
 
   void stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep);
   void printManifolds();

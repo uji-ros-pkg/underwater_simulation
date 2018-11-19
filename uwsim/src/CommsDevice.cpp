@@ -136,16 +136,16 @@ bool CommsDevice_Factory::applyConfig(SimulatedIAUV *auv, Vehicle &vehicleChars,
   return true;
 }
 
-std::vector<boost::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
+std::vector<std::shared_ptr<ROSInterface>> CommsDevice_Factory::getInterface(
     ROSInterfaceInfo &rosInterface,
-    std::vector<boost::shared_ptr<SimulatedIAUV>> &iauvFile) {
-  std::vector<boost::shared_ptr<ROSInterface>> ifaces;
+    std::vector<std::shared_ptr<SimulatedIAUV>> &iauvFile) {
+  std::vector<std::shared_ptr<ROSInterface>> ifaces;
   for (size_t i = 0; i < iauvFile.size(); ++i)
     for (size_t d = 0; d < iauvFile[i]->devices->all.size(); ++d)
       if (iauvFile[i]->devices->all[d]->getType() == this->getType() &&
           iauvFile[i]->devices->all[d]->name == rosInterface.targetName) {
         ifaces.push_back(
-            boost::shared_ptr<ROSInterface>(new CommsDevice_ROSPublisher(
+            std::shared_ptr<ROSInterface>(new CommsDevice_ROSPublisher(
                 dynamic_cast<UWSimCommsDevice *>(
                     iauvFile[i]->devices->all[d].get()),
                 rosInterface.topic, rosInterface.rate)));
@@ -245,7 +245,7 @@ void CommsDevice_ROSPublisher::createPublisher(ros::NodeHandle &nh) {
 
 void CommsDevice_ROSPublisher::publish() {
   geometry_msgs::Pose msg;
-  boost::shared_ptr<osg::Matrix> mat = getWorldCoords(dev->parent);
+  std::shared_ptr<osg::Matrix> mat = getWorldCoords(dev->parent);
   auto trans = mat->getTrans();
   auto rotate = mat->getRotate();
   msg.position.x = trans.x();

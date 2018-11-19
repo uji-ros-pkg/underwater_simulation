@@ -15,11 +15,13 @@
 #include <osg/Notify>
 
 #include <pluginlib/class_loader.h>
+#include <uwsim/UWSimUtils.h>
+
 using namespace uwsim;
 
 class SimulatedDevicesLoader
 {
-  boost::shared_ptr<pluginlib::ClassLoader<SimulatedDeviceFactory> > simdev_loader;
+  std::shared_ptr<pluginlib::ClassLoader<SimulatedDeviceFactory> > simdev_loader;
   vector<string> available_plugins;
 public:
   //a list of "factories" to initialize and apply a device and/or rosinterface
@@ -33,7 +35,7 @@ public:
     for (size_t i = 0; i < available_plugins.size(); ++i)
     {
       OSG_ALWAYS << "Loading SimulatedDevices plugin: '" << available_plugins.at(i) << "'" << std::endl;
-      factories.push_back(simdev_loader->createInstance(available_plugins.at(i)));
+      factories.push_back(to_std_ptr(simdev_loader->createInstance(available_plugins.at(i))));
     }
 
     for (size_t i = 0; i < factories.size(); ++i)
@@ -54,16 +56,16 @@ public:
   }
 };
 
-boost::shared_ptr<SimulatedDevicesLoader> loader(new SimulatedDevicesLoader());
+std::shared_ptr<SimulatedDevicesLoader> loader(new SimulatedDevicesLoader());
 
 SimulatedDevices::SimulatedDevices()
 {
 }
 
-std::vector<boost::shared_ptr<ROSInterface> > SimulatedDevices::getInterfaces(
-    ROSInterfaceInfo & rosInterface, std::vector<boost::shared_ptr<SimulatedIAUV> > & iauvFile)
+std::vector<std::shared_ptr<ROSInterface> > SimulatedDevices::getInterfaces(
+    ROSInterfaceInfo & rosInterface, std::vector<std::shared_ptr<SimulatedIAUV> > & iauvFile)
 {
-  std::vector < boost::shared_ptr<ROSInterface> > ifaces;
+  std::vector < std::shared_ptr<ROSInterface> > ifaces;
   bool isFactoryFound = false;
   if (rosInterface.type == ROSInterfaceInfo::SimulatedDevice)
   {
@@ -71,7 +73,7 @@ std::vector<boost::shared_ptr<ROSInterface> > SimulatedDevices::getInterfaces(
       if (loader->factories[i]->getType() == rosInterface.subtype)
       {
         isFactoryFound = true;
-        std::vector < boost::shared_ptr<ROSInterface> > ifaces_ = loader->factories[i]->getInterface(rosInterface,
+        std::vector < std::shared_ptr<ROSInterface> > ifaces_ = loader->factories[i]->getInterface(rosInterface,
                                                                                                      iauvFile);
         for (size_t j = 0; j < ifaces_.size(); ++j)
           ifaces.push_back(ifaces_[j]);

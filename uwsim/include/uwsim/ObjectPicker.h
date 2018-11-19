@@ -16,6 +16,7 @@
 #include "VirtualRangeSensor.h"
 #include "UWSimUtils.h"
 #include "URDFRobot.h"
+#include <memory>
 
 //Node tracker that updates the ray coordinates from the tracked node position, computes intersections and 'picks' nodes
 class ObjectPickerUpdateCallback : public IntersectorUpdateCallback
@@ -62,8 +63,8 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback
           osg::Node * objectTransf = i[0]->getParent(0)->getParent(0); //Object->linkBaseTransform->transform
 
           //Get coordinates to change them when changing position in graph
-          boost::shared_ptr<osg::Matrix> originalpos = getWorldCoords(objectTransf);
-          boost::shared_ptr<osg::Matrix> hand = getWorldCoords(trackNode);
+          std::shared_ptr<osg::Matrix> originalpos = getWorldCoords(objectTransf);
+          std::shared_ptr<osg::Matrix> hand = getWorldCoords(trackNode);
           hand->invert(*hand);
 
           //ADD node in hand, remove object from original position.
@@ -83,11 +84,11 @@ class ObjectPickerUpdateCallback : public IntersectorUpdateCallback
 public:
   osg::NodePath impact;
   osg::Node *trackNode;
-  boost::shared_ptr<URDFRobot> urdf;
+  std::shared_ptr<URDFRobot> urdf;
   bool picked;
 
   ObjectPickerUpdateCallback(osg::Node *trackNode, double range, bool visible, osg::Node *root,
-                             boost::shared_ptr<URDFRobot> urdf) :
+                             std::shared_ptr<URDFRobot> urdf) :
       IntersectorUpdateCallback(range, visible, root)
   {
     this->trackNode = trackNode;
@@ -100,11 +101,11 @@ class ObjectPicker : public VirtualRangeSensor
 {
 public:
   ObjectPicker(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,
-               boost::shared_ptr<URDFRobot> urdf,unsigned int mask);
+               std::shared_ptr<URDFRobot> urdf,unsigned int mask);
   ObjectPicker();
 
   void init(std::string name, osg::Node *root, osg::Node *trackNode, double range, bool visible,
-            boost::shared_ptr<URDFRobot> urdf,unsigned int mask);
+            std::shared_ptr<URDFRobot> urdf,unsigned int mask);
 };
 
 #endif

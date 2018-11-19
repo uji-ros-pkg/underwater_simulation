@@ -20,7 +20,7 @@
 #include "SimulatedDevices.h"
 #include <libxml++/libxml++.h>
 #include <urdf/model.h>
-
+#include <memory>
 #include <iostream>
 using namespace std;
 #include <cstdlib>
@@ -62,7 +62,7 @@ struct Vcam
   double baseLine; ///baseline for stereo cameras
   double fov;
   double std; //Additive gaussian noise deviation
-  boost::shared_ptr<Parameters> parameters;
+  std::shared_ptr<Parameters> parameters;
   bool underwaterParticles;
   void init()
   {
@@ -268,7 +268,7 @@ struct Link
   double rpy[3];
   double quat[4];
   std::string material;
-  boost::shared_ptr<Geometry> cs, geom;
+  std::shared_ptr<Geometry> cs, geom;
   double mass;
 };
 
@@ -278,7 +278,7 @@ struct Joint
   int parent, child; //references to Link
   int mimicp, type; //0 fixed, 1 rotation, 2 prismatic.
   float lowLimit, upLimit;
-  boost::shared_ptr<Mimic> mimic;
+  std::shared_ptr<Mimic> mimic;
   double position[3];
   double rpy[3];
   double axis[3];
@@ -407,7 +407,7 @@ struct Object
   double offsetp[3];
   double offsetr[3];
   double buried;// % Object buried in the seafloor
-  boost::shared_ptr<PhysicProperties> physicProperties;
+  std::shared_ptr<PhysicProperties> physicProperties;
 };
 
 struct ShowTrajectory
@@ -541,10 +541,10 @@ public:
 
   void processGeometry(urdf::Geometry * geometry, Geometry * geom);
   void processPose(urdf::Pose pose, double position[3], double rpy[3], double quat[4]);
-  void processVisual(boost::shared_ptr<const urdf::Visual> visual, Link &link,
+  void processVisual(std::shared_ptr<const urdf::Visual> visual, Link &link,
                      std::map<std::string, Material> &materials);
-  void processJoint(boost::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle, int parentLink, int childLink);
-  int processLink(boost::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint,
+  void processJoint(std::shared_ptr<const urdf::Joint> joint, Joint &jointVehicle, int parentLink, int childLink);
+  int processLink(std::shared_ptr<const urdf::Link> link, Vehicle &vehicle, int nlink, int njoint,
                   std::map<std::string, Material> &materials); //returns current link number
   int processURDFFile(string file, Vehicle &vehicle);
 

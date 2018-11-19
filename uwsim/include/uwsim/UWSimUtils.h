@@ -143,7 +143,7 @@ public:
   static osg::Node* createLabel(std::string text,double charSize=0.02, int bb=1, osg::Vec4 color=osg::Vec4(1,1,1,1) );
 
   static osg::Node * retrieveResource(std::string name);
-  static osg::Node * loadGeometry(boost::shared_ptr<Geometry> geom);
+  static osg::Node * loadGeometry(std::shared_ptr<Geometry> geom);
 private:
 
 };
@@ -160,10 +160,10 @@ class getWorldCoordOfNodeVisitor : public osg::NodeVisitor
 public:
   getWorldCoordOfNodeVisitor();
   virtual void apply(osg::Node &node);
-  boost::shared_ptr<osg::Matrix> giveUpDaMat();
+  std::shared_ptr<osg::Matrix> giveUpDaMat();
 private:
   bool done;
-  boost::shared_ptr<osg::Matrix> wcMatrix;
+  std::shared_ptr<osg::Matrix> wcMatrix;
 };
 
 // Given a valid node placed in a scene under a transform, return the
@@ -171,7 +171,7 @@ private:
 // Creates a visitor that will update a matrix representing world coordinates
 // of the node, return this matrix.
 // (This could be a class member for something derived from node also.
-boost::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node);
+std::shared_ptr<osg::Matrix> getWorldCoords(osg::Node* node);
 
 //Class to get all the catchable objects
 
@@ -197,7 +197,7 @@ class AbstractDredgeTool
 {
   public:
     // The coordinates must be in world coordinates
-    virtual boost::shared_ptr<osg::Matrix> getDredgePosition() =0;
+    virtual std::shared_ptr<osg::Matrix> getDredgePosition() =0;
     // This function will be called each iteration with an estimation of the number of dredged particles
     virtual void dredgedParticles(int nparticles) =0;
 };
@@ -205,15 +205,15 @@ class AbstractDredgeTool
 class DynamicHF : public osg::Drawable::UpdateCallback
 {
   public:
-    DynamicHF(osg::HeightField* heightField, boost::shared_ptr<osg::Matrix> mat,  std::vector<boost::shared_ptr<AbstractDredgeTool> > tools);
+    DynamicHF(osg::HeightField* heightField, std::shared_ptr<osg::Matrix> mat,  std::vector<std::shared_ptr<AbstractDredgeTool> > tools);
     virtual void update( osg::NodeVisitor*, osg::Drawable*drawable );
   private:
     osg::HeightField* heightField;
-    boost::shared_ptr<osg::Matrix> objectMat;
-    std::vector<boost::shared_ptr<AbstractDredgeTool> > dredgeTools;
+    std::shared_ptr<osg::Matrix> objectMat;
+    std::vector<std::shared_ptr<AbstractDredgeTool> > dredgeTools;
 };
 
-osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent,  const std::vector<boost::shared_ptr<SimulatedIAUV> >  vehicles);
+osg::Node* createHeightField(osg::ref_ptr<osg::Node> object, std::string texFile, double percent,  const std::vector<std::shared_ptr<SimulatedIAUV> >  vehicles);
 
 
 class LightBuilder
@@ -257,6 +257,21 @@ struct FDMData {
   float A_Y_pilot; // Y accel in body frame ft/sec^2
   float A_Z_pilot; // Z accel in body frame ft/sec^2
 };
+
+template<typename T>
+void release_boost_ptr(typename boost::shared_ptr<T> const&, T*)
+{
+}
+
+template<typename T>
+typename std::shared_ptr<T> to_std_ptr(typename boost::shared_ptr<T> const& p)
+{
+    return
+        std::shared_ptr<T>(
+                p.get(),
+                boost::bind(&release_boost_ptr<T>, p, _1));
+
+}
 
 #endif
 
