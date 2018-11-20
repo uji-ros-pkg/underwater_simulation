@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
-cmake_policy(VERSION 3.5.1)
+cmake_minimum_required(VERSION 2.8.3)
 project(uwsim)
 
 #It seams that from Ubuntu 17.10 the linker flag --disable-new-dtags is needed
