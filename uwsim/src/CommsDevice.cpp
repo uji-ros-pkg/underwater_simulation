@@ -7,6 +7,8 @@
 
 /* You will need to add your code HERE */
 
+#include <dccomms_packets/VariableLength2BPacket.h>
+#include <dccomms_packets/VariableLengthPacket.h>
 #include <thread>
 #include <uwsim/UWSimUtils.h>
 
@@ -167,6 +169,12 @@ void UWSimCommsDevice::SetPacketBuilder(PACKET_TYPE pType,
     if (pbcfg->className == "DataLinkFrameBuilderCRC16")
       pb = std::shared_ptr<dccomms::DataLinkFrameBuilderCRC16>(
           new dccomms::DataLinkFrameBuilderCRC16());
+    else if (pbcfg->className == "VariableLengthPacketBuilder")
+      pb = std::shared_ptr<dccomms_packets::VariableLengthPacketBuilder>(
+          new dccomms_packets::VariableLengthPacketBuilder());
+    else if (pbcfg->className == "VariableLength2BPacketBuilder")
+      pb = std::shared_ptr<dccomms_packets::VariableLength2BPacketBuilder>(
+          new dccomms_packets::VariableLength2BPacketBuilder());
     else {
       ROS_ERROR("CommsDevice ('%s'): '%s' packet builder not found in "
                 "default library ",
