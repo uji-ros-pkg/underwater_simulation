@@ -3,6 +3,7 @@
 
 #include <dccomms/DataLinkFrame.h>
 #include <dccomms_ros/simulator/ROSCommsSimulator.h>
+#include <class_loader/multi_library_class_loader.hpp>
 
 namespace uwsim {
 using namespace dccomms_ros;
@@ -25,6 +26,7 @@ public:
   static NetSimTracingPtr GetScript();
 private:
   static NetSimTracingPtr _script;
+  static std::shared_ptr<class_loader::ClassLoader> _loader;
 
 };
 

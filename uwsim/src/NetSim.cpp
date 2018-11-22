@@ -1,10 +1,10 @@
-#include <class_loader/multi_library_class_loader.h>
 #include <uwsim/NetSim.h>
 #include <dccomms_ros/simulator/NetsimLogFormatter.h>
 
 namespace uwsim {
 
 NetSimTracingPtr NetSim::_script;
+std::shared_ptr<class_loader::ClassLoader> NetSim::_loader;
 
 ns3::Ptr<ROSCommsSimulator> NetSim::GetSim() {
   static ns3::Ptr<ROSCommsSimulator> ptr = 0;
@@ -19,14 +19,13 @@ ns3::Ptr<ROSCommsSimulator> NetSim::GetSim() {
 
 void NetSim::LoadTracingScript(const std::string &className,
                                const std::string &libPath) {
-  class_loader::ClassLoader loader(libPath);
-  //_loader.loadLibrary(libName);
+  _loader = std::shared_ptr<class_loader::ClassLoader>(new class_loader::ClassLoader(libPath));
   std::vector<std::string> classes =
-      loader.getAvailableClasses<NetSimTracing>();
+      _loader->getAvailableClasses<NetSimTracing>();
   for (unsigned int c = 0; c < classes.size(); ++c) {
     if (classes[c] == className) {
       NetSimTracing *tr =
-          loader.createUnmanagedInstance<NetSimTracing>(classes[c]);
+          _loader->createUnmanagedInstance<NetSimTracing>(classes[c]);
       _script = std::shared_ptr<NetSimTracing>(tr);
       _script->Configure();
       break;
