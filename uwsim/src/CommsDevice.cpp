@@ -17,6 +17,10 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
                                               CommsDevice_Config *cfg) {
   xmlpp::Node::NodeList list = node->get_children();
 
+
+  cfg->macProtocol = "";
+  cfg->macDistance = 0;
+
   cfg->txFifoSize = 500000;
   for (xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end();
        ++iter) {
@@ -50,6 +54,17 @@ void CommsDevice_Factory::processCommonConfig(const xmlpp::Node *node,
       config->extractStringChar(child, cfg->logLevel);
     else if (child->get_name() == "disable")
       config->extractIntChar(child, cfg->disable);
+    else if (child->get_name() == "macProtocol") {
+      xmlpp::Node::NodeList emAttributes = child->get_children();
+      for (xmlpp::Node::NodeList::iterator subiter = emAttributes.begin();
+           subiter != emAttributes.end(); ++subiter) {
+        const xmlpp::Node *ema = dynamic_cast<const xmlpp::Node *>(*subiter);
+        if (ema->get_name() == "name")
+          config->extractStringChar(ema, cfg->macProtocol);
+        else if (ema->get_name() == "maxDistance")
+          config->extractDecimalChar(ema, cfg->macDistance);
+      }
+    }
   }
 }
 

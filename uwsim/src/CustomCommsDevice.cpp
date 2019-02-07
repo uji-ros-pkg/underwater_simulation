@@ -97,6 +97,9 @@ bool CustomCommsDevice::_AddToNetSim() {
   srv.logLevel = this->config->logLevel;
   srv.intrinsicDelay = this->config->intrinsicDelay;
 
+  srv.macProtocol = this->config->macProtocol;
+  srv.macDistance = this->config->macDistance;
+
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());
 

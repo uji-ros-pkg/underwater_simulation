@@ -20,12 +20,11 @@ public:
   double range, pT, frequency, L, K, turnOnEnergy, turnOffEnergy, preamble,
       pTConsume, pRConsume, pIdle, codingEff, bitErrorRate, energyLevel;
   uint32_t symbolsPerSecond;
-  std::string macProtocol;
   // constructor
   AcousticCommsDevice_Config(std::string type_)
       : CommsDevice_Config(type_), range(100), pT(0.2818), frequency(25),
         L(0.0), K(2.0), turnOnEnergy(0.0), turnOffEnergy(0.0), preamble(0.0),
-        pTConsume(0.660), pRConsume(0.395), pIdle(0.0), macProtocol("") {}
+        pTConsume(0.660), pRConsume(0.395), pIdle(0.0) {}
 };
 
 class AcousticCommsDevice : public UWSimCommsDevice {

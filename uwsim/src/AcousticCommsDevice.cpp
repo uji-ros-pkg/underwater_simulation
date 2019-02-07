@@ -88,11 +88,13 @@ bool AcousticCommsDevice::_AddToNetSim() {
   srv.PRConsume = this->config->pRConsume;
   srv.batteryEnergy = this->config->energyLevel;
   srv.PIdle = this->config->pIdle;
-  srv.macProtocol = this->config->macProtocol;
   srv.bitErrorRate = this->config->bitErrorRate;
   srv.symbolsPerSecond = this->config->symbolsPerSecond;
   srv.codingEff = this->config->codingEff;
   srv.logLevel = this->config->logLevel;
+
+  srv.macProtocol = this->config->macProtocol;
+  srv.macDistance = this->config->macDistance;
 
   ROS_INFO("AcousticCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());

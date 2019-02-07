@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/irs/programming/uwsim_ws/devel/include",
+                "/home/irs/programming/uwsim_deps_ws/install_isolated/include",
+                "/opt/ros/melodic/include",
+                "/home/irs/programming/uwsim_ws/src/dccomms_ros_pkgs/dccomms_ros_msgs/include",
+                "/home/irs/programming/uwsim_ws/src/underwater_simulation/uwsim/include",
+                "/usr/include"
+            ],
+            "name": "Linux",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

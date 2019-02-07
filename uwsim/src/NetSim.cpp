@@ -65,13 +65,13 @@ void NetSimTracing::Configure() {
 
   static NetSimTracing *tracing = this;
   ROSCommsDevice::PacketTransmittingCallback txcb =
-      [](std::string path, ROSCommsDevicePtr dev, ns3PacketPtr pkt) {
+      [](std::string path, ROSCommsDevicePtr dev, ns3ConstPacketPtr pkt) {
 //        tracing->Info("{}: (ID: {} ; MAC: {}) Transmitting packet", path,
 //                      dev->GetDccommsId(), dev->GetMac());
       };
 
   ROSCommsDevice::PacketReceivedCallback rxcb = [](
-      std::string path, ROSCommsDevicePtr dev, ns3PacketPtr pkt) {
+      std::string path, ROSCommsDevicePtr dev, ns3ConstPacketPtr pkt) {
 //    NetsimHeader header;
 //    pkt->PeekHeader(header);
 //    tracing->Info("{}: (ID: {} ; MAC: {}) Packet received from {} ({} bytes)",
