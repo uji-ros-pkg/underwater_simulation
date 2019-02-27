@@ -23,7 +23,9 @@
 #include <uwsim/ROSSceneBuilder.h>
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/ViewBuilder.h>
+#include <cpputils/SignalManager.h>
 
+#include <chrono>
 using namespace std;
 
 void stopROS() {
@@ -49,21 +51,7 @@ void stopAll() {
             << std::endl; // ROS_INFO does not work after ros::shutdown()
 }
 
-void SIGINT_handler(int sig) {
-  ROS_INFO("Received %d signal.", sig);
-  stopAll();
-  exit(0);
-}
-
-void setSignals() {
-  if (signal(SIGINT, SIGINT_handler) == SIG_ERR) {
-    ROS_ERROR("Error installing SIGINT handler");
-    exit(1);
-  }
-}
-
 int main(int argc, char *argv[]) {
-  setSignals();
   // osg::notify(osg::ALWAYS) << "UWSim; using osgOcean " <<
   // osgOceanGetVersion() << std::endl;
 
@@ -214,6 +202,11 @@ int main(int argc, char *argv[]) {
   }
   auto camera = view.getViewer()->getCamera();
   osg::Vec3f cameraEye, cameraCenter, cameraUp;
+
+  cpputils::SignalManager::SetLastCallback(SIGTERM, [&](int sig)
+  {
+      stopAll();
+  });
   while (!view.getViewer()->done() && ros::ok()) {
     ROSInterface::setROSTime(ros::Time::now());
     ros::spinOnce();
