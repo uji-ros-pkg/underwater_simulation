@@ -26,7 +26,7 @@ $ sudo ./install_geographiclib_datasets.sh
 - git: {local-name: src/visualization_osg, uri: 'https://github.com/uji-ros-pkg/visualization_osg.git', version: kinetic-devel}
 - git: {local-name: src/underwater_simulation, uri: 'https://github.com/dcentelles/underwater_simulation.git', version: melodic-devel}
 - git: {local-name: src/uwsimbenchmarks, uri: 'https://github.com/dcentelles/uwsimbenchmarks.git', version: melodic-devel}
-        
+- git: {local-name: src/uwsim_netsim_scripts, uri: 'https://github.com/dcentelles/uwsim_netsim_scripts.git', version: master}
 ```    
 4. Then, run the following commands to download the sources:
 ```bash
