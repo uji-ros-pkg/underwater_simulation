@@ -214,7 +214,7 @@ install(
 )
 
 install(DIRECTORY include/${PROJECT_NAME}
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+	DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION})
 
 ##compìle xacros
 file(GLOB xacro_files data/scenes/*.xml.xacro)
