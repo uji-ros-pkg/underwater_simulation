@@ -1,4 +1,4 @@
-# UWSim with Network Simulator
+# UWSim-NET: UWSim with Network Simulator
 This is a fork of https://github.com/uji-ros-pkg/underwater_simulation.
 This new version of UWSim intregates a Network Simulator to be used along with the dccomms API. This simulator uses the NS3 libraries and the AquaSim NG as a NS3 module. The documentation is a work-in-progress.
 
@@ -11,7 +11,7 @@ $ sudo apt-get install libxml++2.6-dev libmuparser-dev libopenscenegraph-dev lib
 ```bash
 $ wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
 $ chmod u+x install_geographiclib_datasets.sh
-$ ./install_geographiclib_datasets.sh
+$ sudo ./install_geographiclib_datasets.sh
 ```
 3. Create a catkin workspace to build uwsim and place a .rosinstall file inside with the following contents:
 ```
@@ -30,6 +30,7 @@ $ ./install_geographiclib_datasets.sh
 ```    
 4. Then, run the following commands to download the sources:
 ```bash
+$ sudo apt-get install python-rosinstall
 $ cd <UWSimWorkspace>
 $ rosws update
 ```
@@ -42,11 +43,13 @@ $ git clone --recursive https://github.com/dcentelles/dccomms_ros_pkgs.git
 4. Then go to the root of your catkin workspace and install the remaining ROS dependencies:
 ```bash
 $ cd <UWSimWorkspace>
+$ sudo rosdep init
+$ rosdep update
 $ rosdep install --from-paths src --ignore-src --rosdistro melodic -y -r
 ```
 5. Build and install the entire workspace with catkin_make_isolated:
 ```bash
-$ catkin_make_isolated --install
+$ catkin_make_isolated --install -j2
 ```
 6. Source the catkin_workspace:
 ```bash
