@@ -415,7 +415,8 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars)
       tf::Transform wMv;
       tf::Vector3 nedTv, vehicle_pos;
       tf::Quaternion nedRv, enuRv, vehicle_rot;
-      tf::Matrix3x3 tmpMat;
+      tfScalar tmpMatVec[9];
+      osg::Matrixd S, transform;
       int sockfd;
       struct sockaddr_in simAddr;
       struct sockaddr_in locAddr;
@@ -499,20 +500,16 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars)
             nedTv.setY(ned_y);
             nedTv.setZ(ned_z);
             // https://github.com/mavlink/mavros/issues/216
-            nedRv.setRPY(roll, -pitch, -yaw);
-
+            nedRv.setRPY(roll, pitch, yaw);
             nedMv.setOrigin(nedTv);
             nedMv.setRotation(nedRv);
-
             wMv = worldMned * nedMv;
-            vehicle_pos = wMv.getOrigin();
-            vehicle_rot = wMv.getRotation();
-            double roll, pitch, yaw;
-            tmpMat.setRotation(vehicle_rot);
-            tmpMat.getRPY(roll, pitch, yaw);
-            setVehiclePosition(vehicle_pos.x(), vehicle_pos.y(),
-                               vehicle_pos.z(), roll, pitch, yaw);
 
+            S.makeScale(scale);
+            wMv.getOpenGLMatrix(tmpMatVec);
+            transform.set(tmpMatVec);
+            transform = S * transform;
+            setVehiclePosition(transform);
           } else {
             try {
               wMnListener.waitForTransform("world", "local_origin_ned",
