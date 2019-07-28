@@ -449,8 +449,12 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars)
       float *phi = agl + 1;
       float *theta = phi + 1;
       float *psi = theta + 1;
+
+      uint64_t baseReceptionPeriodMillis = 25;
+      uint64_t maxReceptionPeriodMillis = baseReceptionPeriodMillis;
+      auto maxReceptionPeriod = std::chrono::milliseconds(maxReceptionPeriodMillis);
+      dccomms::Timer itTimer;
       while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
         memset(rxbuff, 0, GCS_BUFFER_LENGTH);
         socklen_t fromlen = sizeof(sockaddr);
 
@@ -459,11 +463,17 @@ SimulatedIAUV::SimulatedIAUV(SceneBuilder *oscene, Vehicle vehicleChars)
           recsize = recvfrom(sockfd, (void *)rxbuff, GCS_BUFFER_LENGTH, 0,
                              (struct sockaddr *)&simAddr, &fromlen);
         } while (recsize > 0);
-
+        itTimer.Reset();
         do {
+          std::this_thread::sleep_for(maxReceptionPeriod);
           recsize = recvfrom(sockfd, (void *)rxbuff, GCS_BUFFER_LENGTH, 0,
                              (struct sockaddr *)&simAddr, &fromlen);
         } while (recsize <= 0);
+
+        maxReceptionPeriodMillis = static_cast<uint64_t>(itTimer.Elapsed() >> 2);
+        if(maxReceptionPeriodMillis > 1000)
+            maxReceptionPeriodMillis = baseReceptionPeriodMillis;
+        maxReceptionPeriod = std::chrono::milliseconds(maxReceptionPeriodMillis);
 
         if (recsize > 0) {
           switch4Bytes(&fdmData.version, version);
