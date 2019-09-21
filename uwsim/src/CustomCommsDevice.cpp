@@ -99,6 +99,7 @@ bool CustomCommsDevice::_AddToNetSim() {
 
   srv.macProtocol = this->config->macProtocol;
   srv.macDistance = this->config->macDistance;
+  srv.maxBackoffSlots = this->config->maxBackoffSlots;
 
   ROS_INFO("CustomCommsDevice  ID = %s ; Frame = %s", srv.dccommsId.c_str(),
            srv.frameId.c_str());

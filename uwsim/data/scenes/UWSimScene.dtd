@@ -244,8 +244,9 @@ echoROS?
 <!ELEMENT logToFile (#PCDATA)>
 <!ELEMENT logToConsole (#PCDATA)>
 <!ELEMENT asyncLog (#PCDATA)>
+<!ELEMENT maxBackoffSlots (#PCDATA)>
 
-<!ELEMENT macProtocol (name, maxDistance?)>
+<!ELEMENT macProtocol (name, maxDistance?, maxBackoffSlots?)>
 <!ELEMENT nedOrigin (lat, lon)>
 <!ELEMENT rateErrorModel (errorUnit, errorRateExpr)>
 <!ELEMENT tf (tfId, position?, orientation?)>

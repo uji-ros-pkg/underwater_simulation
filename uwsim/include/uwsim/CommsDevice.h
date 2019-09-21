@@ -11,14 +11,13 @@
 
 using namespace uwsim;
 
-
 class CommsDevice_Config : public SimulatedDeviceConfig {
 
 public:
   // XML members
   std::string relativeTo, tfId, relativeTfId, dccommsId, logLevel;
   PacketBuilderConfig txPacketBuilderConfig, rxPacketBuilderConfig;
-  unsigned int mac, channelId, txFifoSize;
+  unsigned int mac, channelId, txFifoSize, maxBackoffSlots;
   double position[3]{0, 0, 0}, orientation[3]{0, 0, 0};
   Mesh mesh;
   int disable = 0;
@@ -39,7 +38,7 @@ public:
   dccomms::PacketBuilderPtr txPacketBuilder, rxPacketBuilder;
 
   UWSimCommsDevice(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
-              SimulatedIAUV *auv);
+                   SimulatedIAUV *auv);
 
   void Init(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
             SimulatedIAUV *auv);
@@ -47,7 +46,8 @@ public:
   void AddToNetSim();
   virtual CommsDevice_Config *GetConfig() = 0;
   virtual void SetConfig(CommsDevice_Config *cfg) = 0;
-  void SetPacketBuilder(PACKET_TYPE pType, CommsDevice_Config * cfg, PacketBuilderConfig * pbcfg);
+  void SetPacketBuilder(PACKET_TYPE pType, CommsDevice_Config *cfg,
+                        PacketBuilderConfig *pbcfg);
 
 protected:
   virtual bool _AddToNetSim() = 0;
@@ -65,8 +65,8 @@ public:
   CommsDevice_Factory(std::string type_ = "CommsDevice")
       : SimulatedDeviceFactory(type_){};
   virtual UWSimCommsDevice *Create(CommsDevice_Config *cfg,
-                              osg::ref_ptr<osg::Node> target,
-                              SimulatedIAUV *auv) = 0;
+                                   osg::ref_ptr<osg::Node> target,
+                                   SimulatedIAUV *auv) = 0;
 
   virtual void processCommonConfig(const xmlpp::Node *node, ConfigFile *config,
                                    CommsDevice_Config *commonConfig);

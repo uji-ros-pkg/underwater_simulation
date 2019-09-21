@@ -18,7 +18,7 @@ class CustomCommsDevice_Config : public CommsDevice_Config {
 
 public:
   // XML members
-  unsigned int  txChannelId, rxChannelId;
+  unsigned int txChannelId, rxChannelId;
   double bitrate;
   double txJitter, rxJitter;
   double intrinsicDelay;
@@ -54,8 +54,8 @@ public:
   // this is the only place the device/interface type is set
   CustomCommsDevice_Factory(std::string type_ = "CustomCommsDevice")
       : CommsDevice_Factory(type_){};
-  UWSimCommsDevice *Create(CommsDevice_Config *cfg, osg::ref_ptr<osg::Node> target,
-                      SimulatedIAUV *auv);
+  UWSimCommsDevice *Create(CommsDevice_Config *cfg,
+                           osg::ref_ptr<osg::Node> target, SimulatedIAUV *auv);
   SimulatedDeviceConfig::Ptr processConfig(const xmlpp::Node *node,
                                            ConfigFile *config);
 };
