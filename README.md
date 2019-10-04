@@ -5,13 +5,13 @@ This new version of UWSim intregates a Network Simulator to be used along with t
 ### Installation
 1. Install system dependencies:
 ```bash
-$ sudo apt-get install libxml++2.6-dev libmuparser-dev libopenscenegraph-dev libfftw3-dev geographiclib-tools libgeographic-dev geographiclib-doc -y
+sudo apt-get install libxml++2.6-dev libmuparser-dev libopenscenegraph-dev libfftw3-dev geographiclib-tools libgeographic-dev geographiclib-doc -y
 ```
 2. Install geographiclib datasets:
 ```bash
-$ wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
-$ chmod u+x install_geographiclib_datasets.sh
-$ sudo ./install_geographiclib_datasets.sh
+wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+chmod u+x install_geographiclib_datasets.sh
+sudo ./install_geographiclib_datasets.sh
 ```
 3. Create a catkin workspace to build uwsim and place a .rosinstall file inside with the following contents:
 ```
@@ -30,34 +30,34 @@ $ sudo ./install_geographiclib_datasets.sh
 ```    
 4. Then, run the following commands to download the sources:
 ```bash
-$ sudo apt-get install python-rosinstall
-$ cd <UWSimWorkspace>
-$ rosws update
+sudo apt-get install python-rosinstall
+cd <UWSimWorkspace>
+rosws update
 ```
 
 5. Go again to src directory and clone the *dccomms_ros_pkgs* with the --recursive option (we recommand to first cache the github credentials):
 ```bash
-$ cd <UWSimWorkspace>/src
-$ git clone --recursive https://github.com/dcentelles/dccomms_ros_pkgs.git
+cd <UWSimWorkspace>/src
+git clone --recursive https://github.com/dcentelles/dccomms_ros_pkgs.git
 ```
 4. Then go to the root of your catkin workspace and install the remaining ROS dependencies:
 ```bash
-$ cd <UWSimWorkspace>
-$ sudo rosdep init
-$ rosdep update
-$ rosdep install --from-paths src --ignore-src --rosdistro melodic -y -r
+cd <UWSimWorkspace>
+sudo rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src --rosdistro melodic -y -r
 ```
 5. Build and install the entire workspace with catkin_make_isolated:
 ```bash
-$ catkin_make_isolated --install -j2
+catkin_make_isolated --install -j2
 ```
 6. Source the catkin_workspace:
 ```bash
-$ source install_isolated/setup.bash
+source install_isolated/setup.bash
 ```
 9. Run the UWSim for the first time (if you have not already done so) and type Y to create the simulator directories:
 ```
-$ rosrun uwsim uwsim
+rosrun uwsim uwsim
 The UWSim data directory (~/.uwsim/data) does not exist. We need to download ~300Mb of data and place it under ~/.uwsim/data. Note this is required to run UWSim.
 Continue (Y/n) ?
 ```
