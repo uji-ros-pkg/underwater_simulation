@@ -29,6 +29,7 @@ env:
     - VERBOSE_OUTPUT=false
     - CATKIN_CONFIG='--isolate-install'
     - UPSTREAM_WORKSPACE=file
+    - BEFORE_SCRIPT='./setup.bash'
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
   matrix: # each line is a job
     - ROS_DISTRO="melodic"
