@@ -6,7 +6,7 @@ language: generic # optional, just removes the language badge
 notifications:
   email:
     recipients:
-      - centelld@gmail.com
+      - centelld@uji.es
 
 services:
   - docker
