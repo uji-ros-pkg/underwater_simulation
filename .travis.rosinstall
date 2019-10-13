@@ -1,7 +1,3 @@
-- other: {local-name: /opt/ros/melodic/share/ros}
-- other: {local-name: /opt/ros/melodic/share}
-- other: {local-name: /opt/ros/melodic/stacks}
-- setup-file: {local-name: /opt/ros/melodic/setup.sh}
 - git: {local-name: src/uwsim_osgocean, uri: 'https://github.com/uji-ros-pkg/uwsim_osgocean.git', version: kinetic-devel}
 - git: {local-name: src/uwsim_osgworks, uri: 'https://github.com/uji-ros-pkg/uwsim_osgworks.git', version: kinetic-devel}
 - git: {local-name: src/uwsim_bullet, uri: 'https://github.com/uji-ros-pkg/uwsim_bullet.git', version: kinetic-devel}
