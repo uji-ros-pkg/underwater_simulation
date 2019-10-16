@@ -1,3 +1,4 @@
+
 # UWSim-NET: UWSim with Network Simulator
 This is a fork of https://github.com/uji-ros-pkg/underwater_simulation.
 This new version of UWSim intregates a Network Simulator to be used along with the dccomms API. This simulator uses the NS3 libraries and the AquaSim NG as a NS3 module. The documentation is a work-in-progress.
@@ -24,9 +25,7 @@ sudo ./install_geographiclib_datasets.sh
 - git: {local-name: src/uwsim_bullet, uri: 'https://github.com/uji-ros-pkg/uwsim_bullet.git', version: kinetic-devel}
 - git: {local-name: src/uwsim_osgbullet, uri: 'https://github.com/uji-ros-pkg/uwsim_osgbullet.git', version: kinetic-devel}
 - git: {local-name: src/visualization_osg, uri: 'https://github.com/uji-ros-pkg/visualization_osg.git', version: kinetic-devel}
-- git: {local-name: src/underwater_simulation, uri: 'https://github.com/dcentelles/underwater_simulation.git', version: melodic-devel}
-- git: {local-name: src/uwsimbenchmarks, uri: 'https://github.com/dcentelles/uwsimbenchmarks.git', version: melodic-devel}
-- git: {local-name: src/uwsim_netsim_scripts, uri: 'https://github.com/dcentelles/uwsim_netsim_scripts.git', version: master}
+- git: {local-name: src/underwater_simulation, uri: 'https://github.com/uji-ros-pkg/underwater_simulation.git', version: melodic-devel}
 ```    
 4. Then, run the following commands to download the sources:
 ```bash
