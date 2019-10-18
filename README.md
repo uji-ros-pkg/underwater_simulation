@@ -16,15 +16,12 @@ sudo ./install_geographiclib_datasets.sh
 ```
 3. Create a catkin workspace to build uwsim and place a .rosinstall file inside with the following contents:
 ```
-- other: {local-name: /opt/ros/melodic/share/ros}
-- other: {local-name: /opt/ros/melodic/share}
-- other: {local-name: /opt/ros/melodic/stacks}
-- setup-file: {local-name: /opt/ros/melodic/setup.sh}
-- git: {local-name: src/uwsim_osgocean, uri: 'https://github.com/uji-ros-pkg/uwsim_osgocean.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_osgworks, uri: 'https://github.com/uji-ros-pkg/uwsim_osgworks.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_bullet, uri: 'https://github.com/uji-ros-pkg/uwsim_bullet.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_osgbullet, uri: 'https://github.com/uji-ros-pkg/uwsim_osgbullet.git', version: kinetic-devel}
-- git: {local-name: src/visualization_osg, uri: 'https://github.com/uji-ros-pkg/visualization_osg.git', version: kinetic-devel}
+- git: {local-name: src/uwsim_osgocean, uri: 'https://github.com/uji-ros-pkg/uwsim_osgocean.git', version: melodic-devel}
+- git: {local-name: src/uwsim_osgworks, uri: 'https://github.com/uji-ros-pkg/uwsim_osgworks.git', version: melodic-devel}
+- git: {local-name: src/uwsim_bullet, uri: 'https://github.com/uji-ros-pkg/uwsim_bullet.git', version: melodic-devel}
+- git: {local-name: src/uwsim_osgbullet, uri: 'https://github.com/uji-ros-pkg/uwsim_osgbullet.git', version: melodic-devel}
+- git: {local-name: src/visualization_osg, uri: 'https://github.com/uji-ros-pkg/visualization_osg.git', version: melodic-devel}
+- git: {local-name: src/dccomms_ros_pkgs, uri: 'https://github.com/dcentelles/dccomms_ros_pkgs.git', version: master}
 - git: {local-name: src/underwater_simulation, uri: 'https://github.com/uji-ros-pkg/underwater_simulation.git', version: uwsimnet-devel}
 ```    
 4. Then, run the following commands to download the sources:
@@ -33,26 +30,26 @@ sudo apt-get install python-rosinstall
 cd <UWSimWorkspace>
 rosws update
 ```
-
-5. Go again to src directory and clone the *dccomms_ros_pkgs* with the --recursive option (we recommand to first cache the github credentials):
-```bash
-cd <UWSimWorkspace>/src
-git clone --recursive https://github.com/dcentelles/dccomms_ros_pkgs.git
-```
-4. Then go to the root of your catkin workspace and install the remaining ROS dependencies:
+5. Then go to the root of your catkin workspace and install the remaining ROS dependencies:
 ```bash
 cd <UWSimWorkspace>
 sudo rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src --rosdistro melodic -y -r
 ```
-5. Build and install the entire workspace with catkin_make_isolated:
+6. Build and install the entire workspace with catkin_make_isolated:
 ```bash
 catkin_make_isolated --install -j2
 ```
-6. Source the catkin_workspace:
+7. Source the catkin_workspace:
 ```bash
 source install_isolated/setup.bash
+```
+8. Install default UWSim-NET scene files and last object models.
+
+```bash
+roscd uwsim/data/scenes
+./installScene -s netsim_scenes.uws -f
 ```
 9. Run the UWSim for the first time (if you have not already done so) and type Y to create the simulator directories:
 ```
