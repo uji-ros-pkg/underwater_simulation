@@ -204,25 +204,14 @@ void UWSimCommsDevice::SetPacketBuilder(PACKET_TYPE pType,
     }
   } else {
     std::string path = pbcfg->libPath;
-    if (path[0] != '/') {
-      path = std::string(getenv("HOME")) + "/.uwsim/data/netsim/" + path;
-    }
-    if (access(path.c_str(), F_OK) != -1) {
-      // file exists
-      try {
-        netsim->SetPacketBuilder(cfg->dccommsId, pType, path, pbcfg->className);
-      } catch (std::exception e) {
-        ROS_ERROR("CommsDevice ('%s'): '%s' class implementation not loaded "
-                  "(inner exception: '%s')",
-                  cfg->dccommsId.c_str(), pbcfg->className.c_str(), e.what());
-        throw dccomms::CommsException(pbcfg->className,
-                                      COMMS_EXCEPTION_CONFIG_ERROR);
-      }
-    } else {
-      // file doesn't exist
-      ROS_ERROR("CommsDevice ('%s'): '%s' library does not exist",
-                cfg->dccommsId.c_str(), path.c_str());
-      throw dccomms::CommsException(path, COMMS_EXCEPTION_CONFIG_ERROR);
+    try {
+      netsim->SetPacketBuilder(cfg->dccommsId, pType, path, pbcfg->className);
+    } catch (std::exception e) {
+      ROS_ERROR("CommsDevice ('%s'): '%s' class implementation not loaded "
+                "(inner exception: '%s')",
+                cfg->dccommsId.c_str(), pbcfg->className.c_str(), e.what());
+      throw dccomms::CommsException(pbcfg->className,
+                                    COMMS_EXCEPTION_CONFIG_ERROR);
     }
   }
 }
