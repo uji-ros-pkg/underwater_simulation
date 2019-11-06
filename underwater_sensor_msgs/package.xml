@@ -7,7 +7,8 @@
   <author email="marioprats@gmail.com">Mario Prats</author>
   <maintainer email="marioprats@gmail.com">Mario Prats</maintainer>
   <maintainer email="perezsolerj@gmail.com">Javier Perez</maintainer>
-
+  <maintainer email="centelld@uji.es">Diego Centelles</maintainer>
+  
   <license>BSD</license>
 
   <build_depend>roscpp</build_depend>
