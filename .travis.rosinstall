@@ -1,6 +1,1 @@
-- git: {local-name: src/uwsim_osgocean, uri: 'https://github.com/uji-ros-pkg/uwsim_osgocean.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_osgworks, uri: 'https://github.com/uji-ros-pkg/uwsim_osgworks.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_bullet, uri: 'https://github.com/uji-ros-pkg/uwsim_bullet.git', version: kinetic-devel}
-- git: {local-name: src/uwsim_osgbullet, uri: 'https://github.com/uji-ros-pkg/uwsim_osgbullet.git', version: kinetic-devel}
-- git: {local-name: src/visualization_osg, uri: 'https://github.com/uji-ros-pkg/visualization_osg.git', version: kinetic-devel}
 - git: {local-name: src/dccomms_ros_pkgs, uri: 'https://github.com/dcentelles/dccomms_ros_pkgs.git', version: master}
