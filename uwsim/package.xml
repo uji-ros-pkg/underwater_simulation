@@ -45,6 +45,13 @@
   <build_depend>xacro</build_depend>
   <build_depend>dccomms_ros</build_depend>
 
+  <build_depend>libxml++-2.6</build_depend>
+  <build_depend>muparser</build_depend>
+  <build_depend>libopenscenegraph</build_depend>
+  <build_depend>libfftw3</build_depend>
+  <build_depend>geographiclib-tools</build_depend>
+  <build_depend>geographiclib</build_depend>
+
   <run_depend>boost</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>image_transport</run_depend>
@@ -72,6 +79,13 @@
   <run_depend>uwsim_osgworks</run_depend>
   <run_depend>xacro</run_depend>
   <run_depend>dccomms_ros</run_depend>
+
+  <run_depend>libxml++-2.6</run_depend>
+  <run_depend>muparser</run_depend>
+  <run_depend>libopenscenegraph</run_depend>
+  <run_depend>libfftw3</run_depend>
+  <run_depend>geographiclib-tools</run_depend>
+  <run_depend>geographiclib</run_depend>
 
 
   <export>
