@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5.1)
 project(uwsim)
 
 #It seams that from Ubuntu 17.10 the linker flag --disable-new-dtags is needed
@@ -145,7 +145,7 @@ src/CommsDevice.cpp
 target_link_libraries(uwsim_plugins_simdev ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 
 target_link_libraries(uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} -lGLU ${GeographicLib_LIBRARIES})
-add_dependencies(uwsim underwater_sensor_msgs_gencpp)
+add_dependencies(uwsim underwater_sensor_msgs_generate_messages_cpp)
 
 add_executable(uwsim_binary  src/main.cpp)
 target_link_libraries(uwsim_binary uwsim ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OSGOCEAN_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${OSGUTILS_LIBRARIES} ${OSGINTERACTIVEMARKERS_LIBRARIES} ${OSGMARKERS_LIBRARIES} -lGLU )
@@ -188,7 +188,7 @@ target_link_libraries(followMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
 
 add_executable(spawnMarker interface_examples/spawnMarker.cpp)
 target_link_libraries(spawnMarker ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
-add_dependencies(spawnMarker underwater_sensor_msgs_gencpp)
+add_dependencies(spawnMarker underwater_sensor_msgs_generate_messages_cpp)
 
 install(
   TARGETS
