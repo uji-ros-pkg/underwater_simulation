@@ -2,7 +2,7 @@
 # UWSim-NET: UWSim with Network Simulator
 [![Build Status](http://build.ros.org/job/Mbin_uB64__uwsim__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__uwsim__ubuntu_bionic_amd64__binary/)
 
-The new version of UWSim intregates a Network Simulator to be used along with the dccomms API. This simulator uses the NS3 libraries and the AquaSimNG as a NS3 module. The documentation to simulate communications is a work in progress and will be included in the Wiki as soon as we can.
+The new version of UWSim intregates a Network Simulator to be used along with the dccomms API. This simulator uses the NS3 libraries and the AquaSimNG as a NS3 module. The documentation related to simulate communications is a work in progress and will be included in the Wiki as soon as we can (please, be patience).
 
 ### Wiki
 http://www.irs.uji.es/uwsim/wiki/index.php?title=Main_Page
