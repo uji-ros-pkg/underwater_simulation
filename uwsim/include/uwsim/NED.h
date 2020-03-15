@@ -16,7 +16,6 @@ public:
 private:
   static GeographicLib::LocalCartesian localCartesian;
   static GeographicLib::Geocentric earth;
-  static std::shared_ptr<GeographicLib::Geoid> egm96_5;
   static std::mutex localCartesian_mutex;
 
 };

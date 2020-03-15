@@ -4,7 +4,6 @@ namespace uwsim {
 
 GeographicLib::LocalCartesian NED::localCartesian;
 GeographicLib::Geocentric NED::earth;
-std::shared_ptr<GeographicLib::Geoid> NED::egm96_5;
 std::mutex NED::localCartesian_mutex;
 
 void NED::SetOrigin(double lat, double lon, double alt) {
@@ -12,7 +11,6 @@ void NED::SetOrigin(double lat, double lon, double alt) {
   earth = GeographicLib::Geocentric(GeographicLib::Constants::WGS84_a(),
                                     GeographicLib::Constants::WGS84_f());
   localCartesian = GeographicLib::LocalCartesian(lat, lon, alt, earth);
-  egm96_5 = std::make_shared<GeographicLib::Geoid>("egm96-5", "", true, true);
   localCartesian_mutex.unlock();
 }
 
