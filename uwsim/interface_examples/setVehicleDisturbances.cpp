@@ -38,7 +38,7 @@ void vehiclePoseCallback(const nav_msgs::Odometry& odom) {
 
 int main(int argc, char **argv) {
 
-	if (argc!=9) {
+	if (argc < 9) {
 		std::cerr << "USAGE: " << argv[0] << " <vehiclePoseTopic> <controlTopic> <ax> <ay> <az> <aroll> <apitch> <ayaw>" << std::endl;
 		std::cerr << "<ax> <ay> <az> <ayaw> is the maximum desired variation on the vehicle pose" << std::endl;
  		std::cerr << "units in meters and radians" << std::endl;

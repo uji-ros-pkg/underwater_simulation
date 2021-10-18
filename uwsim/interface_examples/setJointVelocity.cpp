@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-	if (argc != 7) {
+	if (argc < 7) {
                 std::cerr << "Usage: " << argv[0] << "<topic> <qdot1> <qdot2> <qdot3> <qdot4> <qdot5>" << std::endl;
 		std::cerr << "Units are radians/simulated_time. Time scale to be implemented." << std::endl;
                 exit(0);

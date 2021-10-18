@@ -21,7 +21,7 @@
 int main(int argc, char **argv) {
 
 
-	if (argc!=8) {
+	if (argc < 8) {
 		std::cerr << "USAGE: " << argv[0] << " <topic> <vx> <vy> <vz> <vroll> <vpitch> <vyaw>" << std::endl;
 		std::cerr << "units are displacement/simulated_time. Time scale to be implemented." << std::endl;
 		return 0;

@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "gotoRelativePose");
 	ros::NodeHandle nh;
 
-	if (argc!=9) {
+	if (argc < 9) {
 		std::cerr << "USAGE: " << argv[0] << " <vehiclePoseTopic> <vehicleControlTopic> <rx> <ry> <rz> <rroll> <rpitch> <ryaw>" << std::endl;
 		std::cerr << "units are meters and radians." << std::endl;
 		return 0;

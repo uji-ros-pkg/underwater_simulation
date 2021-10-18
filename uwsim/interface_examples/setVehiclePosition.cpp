@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "setVehiclePosition");
 	ros::NodeHandle nh;
 
-	if (argc!=8) {
+	if (argc < 8) {
 		std::cerr << "USAGE: " << argv[0] << " <topic> <x> <y> <z> <roll> <pitch> <yaw>" << std::endl;
 		std::cerr << "units in meters and radians" << std::endl;
 		return 0;
