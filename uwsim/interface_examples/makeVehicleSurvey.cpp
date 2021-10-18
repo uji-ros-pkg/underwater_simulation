@@ -23,7 +23,7 @@
 int main(int argc, char **argv) {
 
 
-	if (argc!=8) {
+	if (argc < 8) {
 		std::cerr << "USAGE: " << argv[0] << " <topic> <x> <y> <z> <yaw> <long> <step>" << std::endl;
 		std::cerr << "units in meters and radians" << std::endl;
 		return 0;

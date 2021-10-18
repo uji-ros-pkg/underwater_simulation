@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-	if (argc != 7) {
+	if (argc < 7) {
                 std::cerr << "Usage: " << argv[0] << "<topic> <q1> <q2> <q3> <q4> <q5>" << std::endl;
 		std::cerr << "Units are radians" << std::endl;
                 exit(0);
