@@ -1,14 +1,14 @@
 
-# UWSim-NET   [![Badge Build]][Status]
+# UWSim - NET   [![Badge Build]][Status]
 
-*UWSim + Network Simulator*
+*UWSim + Network Simulator*
 
 <div align = center>
 
 <br>
 
-The new version of **UWSim** integrates a <br>
-**Network Simulator** to be used <br>
+The new version of **UWSim** integrates <br>
+a **Network Simulator** to be used <br>
 along with the **dccomms** API.
 
 <br>
@@ -26,21 +26,17 @@ along with the **dccomms** API.
 
 ## Libraries
 
-*This simulator uses:*
-
 - **NS3 Libraries**
 
 - **[AquaSimNG]** 
     
-    *as a NS3 module*
-
 <br>
 
 ## Documentation
 
 *The documentation related to simulating communication is* <br> 
-*work in progress and will be included in the **[Wiki]** as soon as* <br>
-*we can, please be patience.*
+*work in progress and will be included in the **[Wiki]** as soon* <br>
+*as we can, please be patience.*
 
 <br>
 
@@ -73,7 +69,7 @@ along with the **dccomms** API.
   
   <kbd> Applied Sciences 2019, 9, 3526 </kbd>
 
-
+<br>
 
 
 <!----------------------------------------------------------------------------->
