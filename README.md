@@ -9,7 +9,7 @@
 
 ---
 
-[<kbd> <br> Wiki <br> </kbd>][Wiki]
+[<kbd> <br> Wiki <br> </kbd>][Wiki]   
 [<kbd> <br> Issues <br> </kbd>][Issues]
 
 ---
@@ -21,10 +21,34 @@
 
 The new version of UWSim intregates a Network Simulator to be used along with the dccomms API. This simulator uses the NS3 libraries and the AquaSimNG as a NS3 module. The documentation related to simulate communications is a work in progress and will be included in the Wiki as soon as we can (please, be patience).
 
+<br>
 
-### Citations
-- Prats, M.; Perez, J.; Fernandez, J.J.; Sanz, P.J., "An open source tool for simulation and supervision of underwater intervention missions", 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), pp. 2577-2582, 7-12 Oct. 2012
-- Centelles, D.; Soriano-Asensi, A.; Martí, J.V.; Marín, R.; Sanz, P.J. Underwater Wireless Communications for Cooperative Robotics with UWSim-NET. Appl. Sci. 2019, 9, 3526.
+## Citations
+
+- <kbd> Prats, M. </kbd> 
+  <kbd> Perez, J. </kbd> 
+  <kbd> Fernandez, J.J. </kbd> 
+  <kbd> Sanz, P.J. </kbd>
+  
+  `'An open source tool for simulation and supervision of underwater intervention missions'`
+  
+  <kbd> 2012 IEEE / RSJ </kbd> 
+  <kbd> International Conference on Intelligent Robots and Systems (IROS) </kbd>
+  
+  <kbd> pp. 2577-2582 </kbd> 
+  <kbd> 7-12 Oct. 2012 </kbd>
+  
+  <br>
+
+- <kbd> Centelles, D. </kbd> 
+  <kbd> Soriano-Asensi, A. </kbd> 
+  <kbd> Martí, J.V. </kbd> 
+  <kbd> Marín, R. </kbd> 
+  <kbd> Sanz, P.J. </kbd>
+  
+  `'Underwater Wireless Communications for Cooperative Robotics with UWSim-NET.'`
+  
+  <kbd> Appl. Sci. 2019, 9, 3526 </kbd>
 
 
 

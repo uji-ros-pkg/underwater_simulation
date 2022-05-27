@@ -1,9 +1,14 @@
 
 # Issues
 
+<br>
+<br>
+
 ## Exception `GeographicLib::GeographicErr`
 
 *when starting `uwsim`.*
+
+<br>
 
 ### Showcase
 
@@ -26,6 +31,8 @@ what():  File not readable /usr/share/GeographicLib/geoids/egm96-5.pgm
 (core dumped) rosrun uwsim uwsim_binary --dataPath ~/.uwsim/data $@
 ```
 
+<br>
+
 ### Fix
 
 *Run the following command:*
@@ -35,3 +42,5 @@ wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/inst
 chmod u+x install_geographiclib_datasets.sh
 sudo ./install_geographiclib_datasets.sh
 ```
+
+<br>
