@@ -49,12 +49,12 @@ along with the **dccomms** API.
   <kbd> [Fernandez, J.J.] </kbd> 
   <kbd> [Sanz, P.J.] </kbd>
   
-  [`'An open source tool for simulation and supervision of underwater intervention missions'`][Article Tool]
+  [' An open source tool for simulation and supervision of underwater intervention missions '][Article Tool]
   
   <kbd> 2012 IEEE / RSJ  International Conference on Intelligent Robots and Systems (IROS) </kbd>
   
-  <kbd> Pages: 2577 - 2582 </kbd> 
-  <kbd> Conference: 7 - 12 Oct. 2012 </kbd>
+  <kbd> Pages 2577 - 2582 </kbd> 
+  <kbd> Conference 7 - 12 Oct. 2012 </kbd>
   
   <br>
 
@@ -64,11 +64,11 @@ along with the **dccomms** API.
   <kbd> [Marín, R.] </kbd> 
   <kbd> [Sanz, P.J.] </kbd>
   
-  [`'Underwater Wireless Communications for Cooperative Robotics with UWSim-NET'`][Article Communication]
+  [' Underwater Wireless Communications for Cooperative Robotics with UWSim-NET '][Article Communication]
   
   <kbd> Applied Sciences 2019 </kbd> 
   <kbd> Volume 9 </kbd> 
-  <kbd> Article: 3526 </kbd>
+  <kbd> Article 3526 </kbd>
 
 <br>
 
